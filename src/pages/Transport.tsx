@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import PageHeader from '../components/layout/PageHeader';
+import { Sailboat, Starfish } from '../components/ui/Illustrations';
 import { getTransferConfig } from '../services/transferConfigService';
 import { calculateDistancePrice } from '../services/transferPricingEngine';
 import { getRouteBetweenPoints } from '../services/routingService';
@@ -247,44 +249,51 @@ const Transport: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <div className="grid min-h-screen place-items-center">Loading...</div>;
+    return (
+      <div className="grid min-h-screen place-items-center font-display text-xl font-extrabold text-ink">
+        Loading…
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-50 via-white to-amber-50 pb-16 pt-6 md:py-16">
+    <div className="min-h-screen bg-paper pb-16">
+      <PageHeader
+        tone="lagoon"
+        kicker="Door to door"
+        title={<FormattedMessage id="transport.title" defaultMessage="Airport Transfers" />}
+        subtitle={
+          <FormattedMessage
+            id="transport.subtitle"
+            defaultMessage="Private transfers from Punta Cana Airport (PUJ) to any destination. Reliable, comfortable, and affordable."
+          />
+        }
+        artLeft={<Sailboat className="h-28 w-28 animate-bob" />}
+        artRight={<Starfish className="h-20 w-20 animate-sway" />}
+      />
+
       <div className="section-shell max-w-5xl px-3 md:px-4">
-        <div className="mb-6 text-center md:mb-10">
-          <h1 className="mb-3 text-3xl font-bold text-slate-900 md:text-5xl">
-            <FormattedMessage id="transport.title" defaultMessage="Airport Transfers" />
-          </h1>
-          <p className="mx-auto max-w-2xl text-base text-slate-600 md:text-lg">
-            <FormattedMessage
-              id="transport.subtitle"
-              defaultMessage="Private transfers from Punta Cana Airport (PUJ) to any destination. Reliable, comfortable, and affordable."
-            />
-          </p>
-        </div>
 
         {!mapsAvailable && (
-          <div className="mb-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          <div className="mb-4 rounded-2xl bg-mango-light px-4 py-3 text-sm text-mango-dark">
             ⚠️ Map services unavailable. Enter your pickup/drop-off manually below.
           </div>
         )}
 
         {!config ? (
-          <div className="rounded-3xl bg-red-50 p-8 text-center text-red-700">
+          <div className="rounded-3xl bg-red-50 p-8 text-center text-hibiscus-dark">
             <FormattedMessage id="transport.configError" defaultMessage="Unable to load transfer configuration. Please try again later." />
           </div>
         ) : (
           <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
             <div className="flex-1 space-y-5 md:space-y-6">
-              <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
-                <h2 className="mb-4 text-lg font-semibold text-slate-800">
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h2 className="mb-4 text-lg font-semibold text-ink-soft">
                   📍 <FormattedMessage id="transport.pickupDropoff" defaultMessage="Pickup & Drop-off" />
                 </h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-slate-500">
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
                       <FormattedMessage id="transport.origin" defaultMessage="Pickup location" />
                     </label>
                     <PlaceAutocomplete
@@ -298,7 +307,7 @@ const Transport: React.FC = () => {
                       }}
                     />
                     {form.originMunicipio && (
-                      <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
+                      <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-lagoon-light px-3 py-1 text-xs font-semibold text-lagoon-dark">
                         <span>📍</span>
                         <span>{locale === 'es' ? 'Municipio origen' : 'Origin municipio'}: {form.originMunicipio}</span>
                       </div>
@@ -306,7 +315,7 @@ const Transport: React.FC = () => {
                   </div>
 
                   {priceResult && (
-                    <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 flex items-center justify-between">
+                    <div className="mt-3 rounded-lg bg-paper-warm px-3 py-2 text-sm text-ink-soft flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span>📏</span>
                         <span className="font-medium">{priceResult.distanceKm.toFixed(1)} km • {(priceResult.distanceKm * 0.621371).toFixed(1)} mi</span>
@@ -334,7 +343,7 @@ const Transport: React.FC = () => {
                         setDestLatLng(tmpLatLng);
                         setForm((prev) => ({ ...prev, destinationMunicipio: tmpMunicipio }));
                       }}
-                      className="grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-teal-100 hover:text-teal-600 active:scale-90"
+                      className="grid h-9 w-9 place-items-center rounded-full bg-paper-warm text-ink-light transition hover:bg-lagoon-light hover:text-lagoon-dark active:scale-90"
                       aria-label="Swap origin and destination"
                     >
                       ⇅
@@ -342,7 +351,7 @@ const Transport: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-slate-500">
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
                       <FormattedMessage id="transport.destination" defaultMessage="Drop-off location" />
                     </label>
                     <PlaceAutocomplete
@@ -356,7 +365,7 @@ const Transport: React.FC = () => {
                       }}
                     />
                     {form.destinationMunicipio && (
-                      <div className="mt-2 inline-block rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                      <div className="mt-2 inline-block rounded-full bg-mango-light px-3 py-1 text-xs font-semibold text-mango-dark">
                         📍 {form.destinationMunicipio}
                       </div>
                     )}
@@ -364,27 +373,27 @@ const Transport: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
-                <label className="mb-3 block text-sm font-semibold text-slate-700">
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <label className="mb-3 block text-sm font-semibold text-ink-soft">
                   <FormattedMessage id="transport.tripType" defaultMessage="Trip Type" />
                 </label>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setTripType('round-trip')}
-                    className={`flex-1 rounded-xl px-4 py-4 text-center font-semibold text-base transition ${
+                    className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
                       tripType === 'round-trip'
-                        ? 'bg-teal-600 text-white shadow-md'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-lagoon text-white'
+                        : 'bg-paper text-ink hover:bg-mango-light'
                     }`}
                   >
                     🔄 <FormattedMessage id="transport.roundTrip" defaultMessage="Round Trip" />
                   </button>
                   <button
                     onClick={() => setTripType('one-way')}
-                    className={`flex-1 rounded-xl px-4 py-4 text-center font-semibold text-base transition ${
+                    className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
                       tripType === 'one-way'
-                        ? 'bg-teal-600 text-white shadow-md'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-lagoon text-white'
+                        : 'bg-paper text-ink hover:bg-mango-light'
                     }`}
                   >
                     ➡️ <FormattedMessage id="transport.oneWay" defaultMessage="One Way" />
@@ -392,8 +401,8 @@ const Transport: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
-                <h3 className="mb-4 text-lg font-semibold text-slate-800">
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
                   📅 <FormattedMessage id="transport.dateTime" defaultMessage="Date & Time" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -428,19 +437,19 @@ const Transport: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
-                <h3 className="mb-4 text-lg font-semibold text-slate-800">
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
                   🚗 <FormattedMessage id="transport.vehicleAndPassengers" defaultMessage="Vehicle & Passengers" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-slate-500">
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
                       <FormattedMessage id="transport.vehicleType" defaultMessage="Vehicle Type" />
                     </label>
                     <select
                       value={form.vehicleKey}
                       onChange={(e) => setForm((prev) => ({ ...prev, vehicleKey: e.target.value }))}
-                      className="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 py-4 text-base focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+                      className="w-full appearance-none rounded-2xl border-2 border-ink bg-white px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     >
                       {config.vehicleTypes.map((vt) => (
                         <option key={vt.key} value={vt.key}>
@@ -460,7 +469,7 @@ const Transport: React.FC = () => {
                   />
                 </div>
                 {selectedVehicle && (
-                  <div className="mt-3 space-y-2 text-sm text-slate-600">
+                  <div className="mt-3 space-y-2 text-sm text-ink-soft">
                     <p>
                       <FormattedMessage
                         id="transport.vehicleCapacity"
@@ -468,14 +477,14 @@ const Transport: React.FC = () => {
                         values={{ min: selectedVehicle.typicalPassengers[0], max: selectedVehicle.typicalPassengers[1] }}
                       />
                     </p>
-                    <p className="text-xs text-slate-400">{selectedVehicle.description}</p>
+                    <p className="text-xs text-ink-light">{selectedVehicle.description}</p>
                     {selectedVehicle.image && (
-                      <div className="mt-2 h-28 w-full overflow-hidden rounded-xl bg-slate-100 md:h-36">
+                      <div className="mt-2 h-28 w-full overflow-hidden rounded-xl bg-paper-warm md:h-36">
                         <img src={selectedVehicle.image} alt={selectedVehicle.label} className="h-full w-full object-cover" />
                       </div>
                     )}
                     {needsTwoVehicles && (
-                      <p className="flex items-center gap-1 rounded-lg bg-amber-50 px-3 py-2 text-amber-700">
+                      <p className="flex items-center gap-1 rounded-lg bg-mango-light px-3 py-2 text-mango-dark">
                         <span>⚠️</span>
                         <FormattedMessage
                           id="transport.twoVehiclesNeeded"
@@ -487,19 +496,19 @@ const Transport: React.FC = () => {
                 )}
               </div>
 
-              <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
-                <h3 className="mb-4 text-lg font-semibold text-slate-800">
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
                   ⚙️ <FormattedMessage id="transport.extras" defaultMessage="Extras" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition has-[:checked]:border-teal-300 has-[:checked]:bg-teal-50 active:scale-[0.98]">
+                  <label className="flex items-center gap-3 rounded-xl border border-ink/20 p-4 transition has-[:checked]:border-ink has-[:checked]:bg-lagoon-light active:scale-[0.98]">
                     <input
                       type="checkbox"
                       checked={form.nightTransfer}
                       onChange={(e) => setForm((prev) => ({ ...prev, nightTransfer: e.target.checked }))}
-                      className="h-5 w-5 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                      className="h-5 w-5 rounded border-2 border-ink text-lagoon-dark"
                     />
-                    <span className="text-sm text-slate-700">
+                    <span className="text-sm text-ink-soft">
                       🌙 <FormattedMessage id="transport.nightTransfer" defaultMessage="Night Transfer" />
                     </span>
                   </label>
@@ -523,17 +532,17 @@ const Transport: React.FC = () => {
                   />
                 </div>
                 {form.nightTransfer && (
-                  <p className="mt-2 text-xs text-amber-600">🌙 +15% night surcharge after 10 PM</p>
+                  <p className="mt-2 text-xs text-mango-dark">🌙 +15% night surcharge after 10 PM</p>
                 )}
               </div>
 
-              <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
-                <h3 className="mb-4 text-lg font-semibold text-slate-800">
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
                   📋 <FormattedMessage id="transport.locationInfo" defaultMessage="Location Details" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-slate-500">
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
                       <FormattedMessage id="transport.flightNumber" defaultMessage="Flight Number" />
                     </label>
                     <input
@@ -542,11 +551,11 @@ const Transport: React.FC = () => {
                       value={flightNumber}
                       onChange={(e) => setFlightNumber(e.target.value)}
                       placeholder={locale === 'es' ? 'Ej: AA 1234' : 'e.g. AA 1234'}
-                      className="w-full rounded-2xl border border-slate-200 px-4 py-4 text-base focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+                      className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-slate-500">
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
                       <FormattedMessage id="transport.hotelName" defaultMessage="Hotel / Resort" />
                     </label>
                     <input
@@ -555,11 +564,11 @@ const Transport: React.FC = () => {
                       value={hotelName}
                       onChange={(e) => setHotelName(e.target.value)}
                       placeholder={locale === 'es' ? 'Ej: Iberostar' : 'e.g. Iberostar'}
-                      className="w-full rounded-2xl border border-slate-200 px-4 py-4 text-base focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+                      className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="mb-1.5 block text-xs font-medium text-slate-500">
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
                       <FormattedMessage id="transport.notes" defaultMessage="Notes" />
                     </label>
                     <textarea
@@ -567,7 +576,7 @@ const Transport: React.FC = () => {
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder={locale === 'es' ? 'Requisitos especiales...' : 'Special requirements...'}
                       rows={3}
-                      className="w-full rounded-2xl border border-slate-200 px-4 py-4 text-base focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+                      className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     />
                   </div>
                 </div>
@@ -576,23 +585,23 @@ const Transport: React.FC = () => {
 
             <div className="w-full lg:w-80 xl:w-96">
               <div className="sticky top-24 space-y-5 md:space-y-6">
-                <div className="rounded-2xl bg-white p-5 shadow-lg md:p-6">
-                  <h2 className="mb-4 text-lg font-semibold text-slate-800">
+                <div className="rounded-2xl border-[2.5px] border-ink bg-white p-5 shadow-ink-sm md:p-6">
+                  <h2 className="mb-4 text-lg font-semibold text-ink-soft">
                     💰 <FormattedMessage id="transport.priceSummary" defaultMessage="Price Summary" />
                   </h2>
 
                   {priceError && (
-                    <div className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">{priceError}</div>
+                    <div className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-hibiscus-dark">{priceError}</div>
                   )}
 
                   {priceResult && !priceError && (
                     <div className="space-y-4">
                       <div className="text-center">
-                        <p className="text-3xl font-bold text-teal-700">{formatPrice(priceResult.estimatedPrice)}</p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-3xl font-bold text-lagoon-dark">{formatPrice(priceResult.estimatedPrice)}</p>
+                        <p className="text-xs text-ink-light">
                           <FormattedMessage id="transport.estimatedPrice" defaultMessage="Estimated total price" />
                         </p>
-                        <p className="mt-1 text-sm text-slate-600">
+                        <p className="mt-1 text-sm text-ink-soft">
                           {tripType === 'round-trip' ? (
                             <FormattedMessage id="transport.roundTripIncluded" defaultMessage="Round trip (both ways)" />
                           ) : (
@@ -601,13 +610,13 @@ const Transport: React.FC = () => {
                         </p>
                       </div>
 
-                      <div className="space-y-2 border-t border-slate-100 pt-4 text-sm text-slate-600">
+                      <div className="space-y-2 border-t-2 border-ink/15 pt-4 text-sm text-ink-soft">
                         <div className="flex justify-between">
                           <span><FormattedMessage id="transport.origin" defaultMessage="From" /></span>
                           <span className="font-medium">{priceResult.originLabel}</span>
                         </div>
                         {priceResult.originMunicipio && (
-                          <div className="flex justify-between items-center text-teal-700">
+                          <div className="flex justify-between items-center text-lagoon-dark">
                             <span>📍 <FormattedMessage id="transport.originMunicipio" defaultMessage="Origin municipio" /></span>
                             <span className="font-semibold">{priceResult.originMunicipio}</span>
                           </div>
@@ -617,13 +626,13 @@ const Transport: React.FC = () => {
                           <span className="font-medium">{priceResult.destinationLabel}</span>
                         </div>
                         {priceResult.destinationMunicipio && (
-                          <div className="flex justify-between items-center text-amber-700">
+                          <div className="flex justify-between items-center text-mango-dark">
                             <span>📍 <FormattedMessage id="transport.destMunicipio" defaultMessage="Destination municipio" /></span>
                             <span className="font-semibold">{priceResult.destinationMunicipio}</span>
                           </div>
                         )}
                         {priceResult.breakdown.municipioMultiplierApplied && priceResult.breakdown.municipioMultiplierApplied !== 1.0 && (
-                          <div className="flex justify-between items-center rounded-lg bg-teal-50 px-2 py-2 text-teal-700 font-semibold border border-teal-100">
+                          <div className="flex justify-between items-center rounded-lg bg-lagoon-light px-2 py-2 text-lagoon-dark font-semibold border-2 border-ink/15">
                             <span>🏘️ <FormattedMessage id="transport.municipioMultiplier" defaultMessage="Municipio multiplier" /></span>
                             <span className="text-lg">{priceResult.breakdown.municipioMultiplierApplied.toFixed(2)}×</span>
                           </div>
@@ -650,23 +659,23 @@ const Transport: React.FC = () => {
                         )}
                         {routeGeometry && (
                           <div className="mt-3">
-                            <RouteMap origin={originLatLng ?? undefined} destination={destLatLng ?? undefined} geometry={routeGeometry} className="h-72 rounded-xl border border-slate-100" />
+                            <RouteMap origin={originLatLng ?? undefined} destination={destLatLng ?? undefined} geometry={routeGeometry} className="h-72 rounded-xl border-2 border-ink/15" />
                           </div>
                         )}
                         {form.nightTransfer && (
-                          <div className="flex justify-between text-amber-700">
+                          <div className="flex justify-between text-mango-dark">
                             <span>🌙 <FormattedMessage id="transport.nightFee" defaultMessage="Night fee" /></span>
                             <span className="font-medium">+15%</span>
                           </div>
                         )}
                         {priceResult.breakdown.distanceDiscountPercent !== undefined && priceResult.breakdown.distanceDiscountPercent > 0 && (
-                          <div className="flex justify-between text-teal-700">
+                          <div className="flex justify-between text-lagoon-dark">
                             <span>🏷️ <FormattedMessage id="transport.distanceDiscount" defaultMessage="Distance discount" /></span>
                             <span className="font-medium">{priceResult.breakdown.distanceDiscountPercent}%</span>
                           </div>
                         )}
                         {needsTwoVehicles && (
-                          <div className="flex justify-between text-amber-700">
+                          <div className="flex justify-between text-mango-dark">
                             <span>🚗🚗 <FormattedMessage id="transport.doubleVehicle" defaultMessage="Double vehicle" /></span>
                             <span className="font-medium">×2</span>
                           </div>
@@ -676,7 +685,7 @@ const Transport: React.FC = () => {
                   )}
 
                   {!priceResult && !priceError && (
-                    <div className="py-8 text-center text-sm text-slate-400">
+                    <div className="py-8 text-center text-sm text-ink-light">
                       <FormattedMessage id="transport.fillFields" defaultMessage="Select pickup, drop-off, and vehicle to see the price" />
                     </div>
                   )}
@@ -686,8 +695,10 @@ const Transport: React.FC = () => {
                   <button
                     onClick={handleBookNow}
                     disabled={!priceResult || !!priceError}
-                    className={`w-full rounded-2xl px-6 py-4 text-center text-base font-bold text-white shadow-lg transition active:scale-[0.97] ${
-                      priceResult && !priceError ? 'bg-teal-600 hover:bg-teal-700' : 'cursor-not-allowed bg-slate-300'
+                    className={`w-full rounded-2xl px-6 py-4 text-center text-base font-bold text-white shadow-ink-sm transition active:scale-[0.97] ${
+                      priceResult && !priceError
+                        ? 'bg-lagoon hover:bg-lagoon-light hover:text-ink'
+                        : 'cursor-not-allowed bg-ink/20'
                     }`}
                   >
                     📱 <FormattedMessage id="transport.bookNow" defaultMessage="Book via WhatsApp" />
@@ -696,7 +707,7 @@ const Transport: React.FC = () => {
                   {priceResult && !priceError && brandSettings.paypalMeLink && (
                     <button
                       onClick={handlePayWithPayPal}
-                      className="w-full rounded-2xl bg-[#0070ba] px-6 py-4 text-center text-base font-bold text-white shadow-lg transition hover:bg-[#003087] active:scale-[0.97]"
+                      className="w-full rounded-2xl bg-[#0070ba] px-6 py-4 text-center text-base font-bold text-white shadow-ink-sm transition hover:bg-[#003087] active:scale-[0.97]"
                     >
                       💳 <FormattedMessage id="payment.paypal" defaultMessage="Pay with PayPal" />
                     </button>
@@ -704,7 +715,7 @@ const Transport: React.FC = () => {
 
                   <button
                     onClick={handleChatOnWhatsApp}
-                    className="w-full rounded-2xl border-2 border-teal-200 bg-white px-6 py-4 text-center text-base font-semibold text-teal-700 transition hover:bg-teal-50 active:scale-[0.97]"
+                    className="w-full rounded-2xl border-2 border-ink bg-white px-6 py-4 text-center text-base font-semibold text-lagoon-dark transition hover:bg-lagoon-light active:scale-[0.97]"
                   >
                     💬 <FormattedMessage id="transport.chatOnWhatsApp" defaultMessage="Chat / Question" />
                   </button>

@@ -4,6 +4,8 @@ import TourCard from '../components/TourCard';
 import { Tour, getTours, getServiceSlug } from '../services/toursService';
 import { useI18n } from '../contexts/I18nContext';
 import { useBrand } from '../contexts/BrandContext';
+import PageHeader from '../components/layout/PageHeader';
+import { Sailboat, Pineapple } from '../components/ui/Illustrations';
 
 const Tours: React.FC = () => {
   const { locale } = useI18n();
@@ -23,18 +25,27 @@ const Tours: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="grid min-h-screen place-items-center">Loading...</div>;
+    return (
+      <div className="grid min-h-screen place-items-center font-display text-xl font-extrabold text-ink">
+        Loading…
+      </div>
+    );
   }
 
   return (
-    <div className="py-16">
-      <div className="section-shell">
-        <h1 className="mb-3 text-center text-5xl font-bold text-slate-900">
-          <FormattedMessage id="tours.title" />
-        </h1>
-        <p className="mx-auto mb-12 max-w-2xl text-center text-slate-600">
+    <div className="pb-20">
+      <PageHeader
+        tone="lagoon"
+        kicker="Pick your day"
+        title={<FormattedMessage id="tours.title" />}
+        subtitle={
           <FormattedMessage id="tours.dynamicSubtitle" values={{ brand: brandSettings.brandName }} />
-        </p>
+        }
+        artLeft={<Sailboat className="h-32 w-32 animate-bob" />}
+        artRight={<Pineapple className="h-28 w-24 animate-sway" />}
+      />
+
+      <div className="section-shell -mt-6">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {tours.map((tour, index) => (
             <TourCard

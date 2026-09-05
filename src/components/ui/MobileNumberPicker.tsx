@@ -34,42 +34,42 @@ const MobileNumberPicker: React.FC<Props> = ({
 
   return (
     <div className={`w-full ${className}`}>
-      <label className="mb-1.5 block text-xs font-medium text-slate-500">
+      <label className="mb-1.5 block text-xs font-medium text-ink-light">
         {label}
       </label>
 
       <div
         onClick={() => setIsOpen(true)}
-        className="relative w-full cursor-pointer rounded-2xl border border-slate-200 bg-white px-4 py-4 text-base transition focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-200"
+        className="relative w-full cursor-pointer rounded-2xl border-2 border-ink bg-white px-4 py-4 text-base transition focus-within:bg-lagoon-light"
       >
         <div className="flex items-center justify-between">
-          <span className="text-slate-700 font-semibold text-xl">{current}</span>
-          <span className="text-slate-400">⬍</span>
+          <span className="text-ink-soft font-semibold text-xl">{current}</span>
+          <span className="text-ink-light">⬍</span>
         </div>
       </div>
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end bg-black/40 md:items-center md:justify-center" onClick={() => setIsOpen(false)}>
           <div className="w-full rounded-t-3xl bg-white px-6 py-8 md:max-w-sm md:rounded-3xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="mb-6 text-lg font-semibold text-slate-800">{label}</h3>
+            <h3 className="mb-6 text-lg font-semibold text-ink-soft">{label}</h3>
 
             <div className="mb-8 flex items-center justify-center gap-6">
               <button
                 onClick={decrement}
-                className="flex h-24 w-24 items-center justify-center rounded-2xl bg-slate-100 text-4xl font-bold text-slate-700 active:bg-slate-200 transition hover:bg-slate-200"
+                className="flex h-24 w-24 items-center justify-center rounded-2xl border-[2.5px] border-ink bg-paper text-4xl font-extrabold text-ink shadow-ink-sm transition hover:bg-mango-light active:translate-y-0.5"
                 aria-label={`${ariaLabel} decrease`}
               >
                 −
               </button>
 
               <div className="flex flex-col items-center gap-2">
-                <div className="text-6xl font-bold text-teal-600">{current}</div>
-                <div className="text-sm text-slate-500">{label}</div>
+                <div className="text-6xl font-bold text-lagoon-dark">{current}</div>
+                <div className="text-sm text-ink-light">{label}</div>
               </div>
 
               <button
                 onClick={increment}
-                className="flex h-24 w-24 items-center justify-center rounded-2xl bg-slate-100 text-4xl font-bold text-slate-700 active:bg-slate-200 transition hover:bg-slate-200"
+                className="flex h-24 w-24 items-center justify-center rounded-2xl border-[2.5px] border-ink bg-paper text-4xl font-extrabold text-ink shadow-ink-sm transition hover:bg-mango-light active:translate-y-0.5"
                 aria-label={`${ariaLabel} increase`}
               >
                 +
@@ -86,8 +86,10 @@ const MobileNumberPicker: React.FC<Props> = ({
                       setIsOpen(false);
                     }}
                     className={`rounded-lg px-3 py-3 font-semibold text-sm transition ${
-                      current === num ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
+                    current === num
+                      ? 'bg-lagoon text-white'
+                      : 'bg-paper-warm text-ink-soft hover:bg-mango-light'
+                  }`}
                   >
                     {num}
                   </button>
@@ -105,11 +107,11 @@ const MobileNumberPicker: React.FC<Props> = ({
                 }}
                 min={min}
                 max={max}
-                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-center text-lg font-semibold focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+                className="w-full rounded-lg border border-ink/20 px-4 py-3 text-center text-lg font-semibold focus:bg-lagoon-light focus:outline-none"
                 inputMode="numeric"
               />
               {min !== undefined && max !== undefined && (
-                <p className="mt-2 text-xs text-slate-500 text-center">
+                <p className="mt-2 text-xs text-ink-light text-center">
                   Range: {min}–{max}
                 </p>
               )}
@@ -117,7 +119,7 @@ const MobileNumberPicker: React.FC<Props> = ({
 
             <button
               onClick={() => setIsOpen(false)}
-              className="w-full rounded-xl bg-teal-600 px-4 py-4 font-bold text-white hover:bg-teal-700 transition active:scale-[0.98]"
+              className="w-full rounded-xl bg-lagoon px-4 py-4 font-bold text-white hover:bg-lagoon transition active:scale-[0.98]"
             >
               ✓ Done
             </button>

@@ -95,27 +95,27 @@ const TourCard: React.FC<TourCardProps> = ({
   };
 
   const radiusClass = index % 3 === 0
-    ? 'rounded-[38px_16px_32px_24px]'
+    ? 'rounded-[30px_18px_28px_22px]'
     : index % 3 === 1
-    ? 'rounded-[20px_40px_24px_36px]'
-    : 'rounded-[32px_24px_40px_18px]';
+    ? 'rounded-[20px_30px_20px_28px]'
+    : 'rounded-[26px_22px_30px_18px]';
 
   return (
     <article
       onMouseEnter={() => playHoverFx()}
-      className={`group break-inside-avoid inline-block w-full mb-8 flex h-auto flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass} transition-all duration-500 hover:-translate-y-2.5 hover:shadow-[0_35px_80px_rgba(4,19,29,0.32),0_0_45px_rgba(13,148,136,0.3)] shadow-[0_24px_60px_rgba(4,19,29,0.18),0_0_35px_rgba(13,148,136,0.15)] border border-white/60`}
+      className={`group mb-8 inline-block flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
     >
       {/* Media Frame */}
-      <div className="relative overflow-hidden aspect-[16/10]">
+      <div className="relative aspect-[16/10] overflow-hidden border-b-[2.5px] border-ink">
         <Link to={detailsPath} onClick={() => playClickFx()} className="block h-full w-full" aria-label={title}>
           <img
             src={image}
             alt={title}
-            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            className="photo-pop h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         </Link>
-        <div className="absolute left-4 top-4 artsy-brick-badge">
-          <span>✦ VIP Excursion</span>
+        <div className="artsy-brick-badge absolute left-4 top-4">
+          <span>★ Excursion</span>
         </div>
       </div>
 
@@ -124,10 +124,10 @@ const TourCard: React.FC<TourCardProps> = ({
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <span className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-teal-700">
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-lagoon-dark">
                 Francisco Ferreras Collection
               </span>
-              <h3 className="mt-1 font-serif text-2xl font-bold tracking-tight text-[#04131D]">
+              <h3 className="mt-1 font-display text-2xl font-extrabold text-ink">
                 {title}
               </h3>
             </div>
@@ -135,14 +135,14 @@ const TourCard: React.FC<TourCardProps> = ({
               <Link
                 to={detailsPath}
                 onClick={() => playClickFx()}
-                className="shrink-0 text-xs font-bold uppercase tracking-wider text-teal-700 underline decoration-teal-500/30 underline-offset-4 transition hover:decoration-teal-600"
+                className="shrink-0 text-xs font-extrabold uppercase tracking-wider text-lagoon-dark underline decoration-mango decoration-2 underline-offset-4 transition hover:text-mango-dark"
               >
                 <FormattedMessage id="details.view" defaultMessage="View Details" />
               </Link>
             )}
           </div>
 
-          <div className="text-sm leading-relaxed text-slate-700">
+          <div className="text-sm font-semibold leading-relaxed text-ink-soft">
             <MarkdownRenderer content={description} />
           </div>
 
@@ -151,9 +151,9 @@ const TourCard: React.FC<TourCardProps> = ({
               {resolvedPricingOptions.map((option) => (
                 <span
                   key={`${title}-${option.tier}`}
-                  className="inline-flex items-center rounded-full bg-white/70 backdrop-blur-[3px] px-3.5 py-1 text-xs font-semibold text-[#04131D] border border-white/60 shadow-sm"
+                  className="inline-flex items-center rounded-full border-2 border-ink bg-lagoon-light px-3.5 py-1 text-xs font-extrabold text-ink"
                 >
-                  {option.tier}: <strong className="ml-1 text-teal-700">{option.price}</strong>
+                  {option.tier}: <strong className="ml-1 text-ink">{option.price}</strong>
                 </span>
               ))}
             </div>
@@ -161,11 +161,11 @@ const TourCard: React.FC<TourCardProps> = ({
         </div>
 
         {enabled && (
-          <div className="mt-6 space-y-4 border-t border-slate-200/60 pt-6">
+          <div className="mt-6 space-y-4 border-t-2 border-dashed border-ink/25 pt-6">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {resolvedPricingOptions.map((option) => (
-                <label key={option.tier} className="space-y-1.5 rounded-2xl border border-white/60 bg-white/60 backdrop-blur-[3px] p-3 text-left">
-                  <span className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                <label key={option.tier} className="space-y-1.5 rounded-2xl border-2 border-ink bg-paper p-3 text-left">
+                  <span className="block text-xs font-extrabold uppercase tracking-wider text-ink-soft">
                     {option.tier}
                   </span>
                   <input
@@ -173,29 +173,29 @@ const TourCard: React.FC<TourCardProps> = ({
                     min="0"
                     value={quantities[option.tier] ?? 0}
                     onChange={(event) => handleQuantityChange(option.tier, event.target.value)}
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-[#04131D] outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    className="w-full rounded-xl border-2 border-ink bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none transition focus:bg-lagoon-light"
                   />
                 </label>
               ))}
             </div>
 
             <label className="block space-y-1.5 text-left">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-ink-soft">
                 <FormattedMessage id="tours.dateLabel" defaultMessage="Preferred Date" />
               </span>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(event) => setSelectedDate(event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-[#04131D] outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                className="w-full rounded-xl border-2 border-ink bg-white px-4 py-2.5 text-sm font-bold text-ink outline-none transition focus:bg-lagoon-light"
               />
             </label>
 
-            <div className="flex items-center justify-between rounded-2xl bg-[#04131D] px-5 py-3.5 text-sm font-bold text-white shadow-md">
-              <span className="text-xs uppercase tracking-wider text-slate-300">
+            <div className="flex items-center justify-between rounded-2xl border-[2.5px] border-ink bg-mango px-5 py-3 shadow-ink-sm">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-ink">
                 <FormattedMessage id="payment.total" defaultMessage="Total Estimate" />
               </span>
-              <span className="text-lg font-serif text-amber-400">
+              <span className="font-display text-xl font-extrabold text-ink">
                 {totalAmount > 0 ? `$${totalAmount} USD` : price}
               </span>
             </div>

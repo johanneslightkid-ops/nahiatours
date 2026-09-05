@@ -13,7 +13,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToHash from './components/ScrollToHash';
-import OceanShaderCanvas from './components/ui/OceanShaderCanvas';
+import IllustratedBackdrop from './components/ui/IllustratedBackdrop';
 import { PlannerProvider } from './contexts/PlannerContext';
 
 const App = () => {
@@ -21,8 +21,8 @@ const App = () => {
     <PlannerProvider>
       <Router>
         <div className="flex flex-col min-h-screen">
-          {/* Fixed WebGL Ocean Shader Background */}
-          <OceanShaderCanvas />
+          {/* Fixed illustrated scene behind every page */}
+          <IllustratedBackdrop />
 
           <ScrollToHash />
           <Header />

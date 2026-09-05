@@ -12,29 +12,29 @@ const platformIcons: Record<string, React.ReactNode> = {
 
 const platformColors: Record<string, { bg: string; text: string; gradient: string }> = {
   instagram: {
-    bg: 'bg-gradient-to-br from-pink-500 to-purple-500',
+    bg: 'bg-hibiscus',
     text: 'text-pink-600',
-    gradient: 'from-pink-500 to-purple-500'
+    gradient: 'bg-hibiscus'
   },
   tiktok: {
-    bg: 'bg-gradient-to-br from-black to-slate-800',
+    bg: 'bg-ink',
     text: 'text-black',
-    gradient: 'from-black to-slate-800'
+    gradient: 'bg-lagoon'
   },
   facebook: {
-    bg: 'bg-gradient-to-br from-blue-600 to-blue-800',
+    bg: 'bg-sky-dark',
     text: 'text-blue-600',
-    gradient: 'from-blue-600 to-blue-800'
+    gradient: 'bg-lagoon'
   },
   youtube: {
-    bg: 'bg-gradient-to-br from-red-600 to-red-800',
-    text: 'text-red-600',
-    gradient: 'from-red-600 to-red-800'
+    bg: 'bg-sunset',
+    text: 'text-hibiscus-dark',
+    gradient: 'bg-lagoon'
   },
   twitter: {
-    bg: 'bg-gradient-to-br from-blue-400 to-blue-600',
+    bg: 'bg-sky',
     text: 'text-blue-400',
-    gradient: 'from-blue-400 to-blue-600'
+    gradient: 'bg-lagoon'
   }
 };
 
@@ -80,20 +80,20 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
   const platforms = Object.keys(videosByPlatform);
 
   return (
-    <section className="wavy-band-top py-28 px-4 md:px-8 bg-gradient-to-b from-slate-50 to-white relative overflow-hidden">
+    <section className="wavy-band-top py-28 px-4 md:px-8 bg-paper-warm relative overflow-hidden">
       {/* Decorative background */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-b from-pink-300 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-t from-blue-300 to-transparent rounded-full blur-3xl" />
+        <div className="parallax-wash parallax-wash-left" />
+        <div className="parallax-wash parallax-wash-right" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-ink mb-4">
             Follow Our Adventures
           </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          <p className="text-xl text-ink-soft max-w-2xl mx-auto">
             Watch exclusive behind-the-scenes content and adventure highlights from across our social media
           </p>
         </div>
@@ -103,7 +103,7 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
           {platforms.map((platform) => (
             <div key={platform} className="space-y-6">
               {/* Platform header */}
-              <div className={`inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r ${platformColors[platform].gradient} text-white rounded-full shadow-lg`}>
+              <div className={`inline-flex items-center gap-3 rounded-full border-[2.5px] border-ink px-6 py-3 text-white shadow-ink-sm ${platformColors[platform].gradient}`}>
                 {platformIcons[platform]}
                 <span className="font-bold text-lg capitalize">{platform}</span>
               </div>
@@ -113,15 +113,15 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
                 {videosByPlatform[platform].map((video, idx) => (
                   <div
                     key={video.id}
-                    className="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border border-slate-200/70 hover:border-transparent flex flex-col h-full bg-white"
+                    className="group relative rounded-2xl overflow-hidden shadow-ink-sm hover:shadow-ink-sm transition-all hover:-translate-y-2 border border-ink/20 hover:border-ink flex flex-col h-full bg-white"
                   >
                     {/* Video thumbnail/preview */}
-                    <div className={`relative h-64 bg-gradient-to-br ${platformColors[platform].gradient} flex items-center justify-center overflow-hidden`}>
+                    <div className={`relative flex h-64 items-center justify-center overflow-hidden border-b-[2.5px] border-ink ${platformColors[platform].gradient}`}>
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all" />
-                      <FaPlay className="text-6xl text-white/80 group-hover:text-white transition-all transform group-hover:scale-125" />
+                      <FaPlay className="text-6xl text-paper/85 group-hover:text-white transition-all transform group-hover:scale-125" />
 
                       {/* Video info overlay */}
-                      <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute inset-0 flex flex-col justify-end bg-ink/60 p-4 opacity-0 transition-opacity group-hover:opacity-100">
                         <p className="text-white text-sm font-semibold">{video.title}</p>
                       </div>
                     </div>
@@ -129,16 +129,16 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
                     {/* Content */}
                     <div className="flex flex-1 flex-col p-5 bg-white space-y-4">
                       <div className="space-y-3">
-                        <h3 className="font-bold text-slate-900 line-clamp-2">{video.title}</h3>
-                        <p className="text-sm text-slate-600 line-clamp-2">{video.description}</p>
-                        <p className="text-xs text-slate-500">{video.createdAt}</p>
+                        <h3 className="font-bold text-ink line-clamp-2">{video.title}</h3>
+                        <p className="text-sm text-ink-soft line-clamp-2">{video.description}</p>
+                        <p className="text-xs text-ink-light">{video.createdAt}</p>
                       </div>
 
                       <a
                         href={video.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-auto inline-flex w-full items-center justify-center py-3 px-4 bg-gradient-to-r from-pink-500 to-orange-500 text-white text-center font-bold rounded-xl hover:shadow-lg transition-all hover:scale-105"
+                        className="mt-auto inline-flex w-full items-center justify-center rounded-full border-[2.5px] border-ink bg-mango px-4 py-3 text-center font-extrabold text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-mango-light"
                       >
                         Watch on {platform.charAt(0).toUpperCase() + platform.slice(1)}
                       </a>
@@ -152,7 +152,7 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
 
         {/* View all CTA */}
         <div className="mt-16 text-center">
-          <p className="text-slate-600 mb-6">
+          <p className="text-ink-soft mb-6">
             Like what you see? Follow us on social media for daily adventure content!
           </p>
           <div className="flex justify-center gap-4">
@@ -177,7 +177,7 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${platformColors[platform].gradient} text-white font-bold rounded-lg hover:shadow-lg transition-all transform hover:scale-105`}
+                  className={`inline-flex items-center gap-2 rounded-full border-[2.5px] border-ink px-6 py-3 font-extrabold text-white shadow-ink-sm transition hover:-translate-y-0.5 ${platformColors[platform].gradient}`}
                 >
                   {platformIcons[platform]}
                   <span className="capitalize hidden sm:inline">{platform}</span>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { FoamLine } from './ui/Illustrations';
 
 interface StorySectionProps {
   id: string;
@@ -120,7 +121,7 @@ const StorySection: React.FC<StorySectionProps> = ({
     <section
       ref={sectionRef}
       id={id}
-      className={`home-section relative overflow-hidden px-4 py-24 sm:py-28 md:px-8 lg:py-32 ${
+      className={`home-section wavy-band relative overflow-hidden px-4 py-28 sm:py-32 md:px-8 lg:py-36 ${
         themeName ? themeName : isAlternate ? 'cove-section' : 'shore-section'
       }`}
     >
@@ -132,15 +133,11 @@ const StorySection: React.FC<StorySectionProps> = ({
         {/* Header with emoji and title */}
         <div className={`mb-10 text-center sm:mb-12 ${isAlternate ? 'md:text-right' : 'md:text-left'}`}>
           {emoji && <div className={`section-icon mb-5 ${isAlternate ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}>{emoji}</div>}
-          {title && <h2 className="scribble-title-bg mb-3 text-3xl font-bold leading-tight text-slate-950 sm:text-4xl md:text-5xl">{title}</h2>}
-          {/* Thick stylish underline */}
-          <div className="w-full px-4 md:px-8 mt-5 mb-5">
-            <div className={`w-full h-4 rounded-full bg-gradient-to-r ${
-              isAlternate ? 'from-transparent via-teal-600/20 to-teal-600/50' : 'from-teal-600/50 via-teal-600/20 to-transparent'
-            }`} />
-          </div>
+          {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
           {timeframe && (
-            <p className="text-base font-semibold italic text-teal-800 sm:text-lg">{timeframe}</p>
+            <p className="inline-block rounded-full border-2 border-ink bg-mango-light px-4 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-ink-sm">
+              {timeframe}
+            </p>
           )}
         </div>
 
@@ -150,8 +147,8 @@ const StorySection: React.FC<StorySectionProps> = ({
           <div className={(imageUrl || vimeoUrl) && isAlternate ? 'md:order-2' : 'md:order-1'}>
             {/* Description */}
             {description && (
-              <div className="story-copy-card mb-6 rounded-[32px_16px_36px_20px] shadow-[0_24px_70px_rgba(4,19,29,0.18),0_0_30px_rgba(13,148,136,0.14)] animate-wave-sway-2">
-                <p className="whitespace-pre-wrap text-base leading-8 text-slate-800 sm:text-lg">
+              <div className="story-copy-card mb-6 rounded-[30px_16px_30px_18px] animate-wave-sway-2">
+                <p className="whitespace-pre-wrap text-base font-semibold leading-8 text-ink sm:text-lg">
                   {description}
                 </p>
               </div>
@@ -160,7 +157,7 @@ const StorySection: React.FC<StorySectionProps> = ({
             {/* Narrative */}
             {narrative && (
               <div className="prose prose-lg max-w-none">
-                <p className="text-base italic leading-8 text-slate-700 md:text-lg">
+                <p className="text-base font-semibold italic leading-8 text-ink-soft md:text-lg">
                   {narrative}
                 </p>
               </div>
@@ -172,7 +169,9 @@ const StorySection: React.FC<StorySectionProps> = ({
                 {mood.split(', ').filter(Boolean).map((m, idx) => (
                   <span
                     key={idx}
-                    className="rounded-[18px_8px_16px_10px] bg-white/85 px-4 py-2 text-sm font-semibold text-teal-900 shadow-md ring-1 ring-white/60 transition-transform hover:-translate-y-1 hover:scale-105"
+                    className={`rounded-full border-[2.5px] border-ink px-4 py-1.5 text-sm font-extrabold text-ink shadow-ink-sm transition-transform hover:-translate-y-1 hover:rotate-2 ${
+                      ['bg-mango-light', 'bg-lagoon-light', 'bg-hibiscus-light', 'bg-jungle-light'][idx % 4]
+                    }`}
                   >
                     {m}
                   </span>
@@ -183,7 +182,6 @@ const StorySection: React.FC<StorySectionProps> = ({
             {/* Video (if we also have an image, video goes here below the text) */}
             {vimeoUrl && imageUrl && (
               <div className="mt-8 story-media-frame flex justify-center w-full animate-wave-sway-3">
-                <div className="absolute -inset-2 rounded-[32px_16px_36px_20px] bg-gradient-to-r from-teal-400 via-cyan-300 to-amber-300 opacity-60 blur-xl transition duration-700 group-hover:opacity-90" />
                 {isTikTok ? (
                   hasLoaded ? (
                     <div className="relative z-10 w-full overflow-hidden rounded-[28px_14px_30px_16px]">
@@ -197,7 +195,7 @@ const StorySection: React.FC<StorySectionProps> = ({
                       </blockquote>
                     </div>
                   ) : (
-                    <div className="relative w-full aspect-video rounded-[28px_14px_30px_16px] bg-slate-100 flex items-center justify-center text-slate-400">Loading TikTok...</div>
+                    <div className="relative w-full aspect-video rounded-[28px_14px_30px_16px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft">Loading TikTok...</div>
                   )
                 ) : (
                   <iframe
@@ -215,7 +213,6 @@ const StorySection: React.FC<StorySectionProps> = ({
           {(imageUrl || (!imageUrl && vimeoUrl)) && (
             <div className={`${isAlternate ? 'md:order-1' : 'md:order-2'} ${id === 'decision' ? 'md:mt-12' : ''}`}>
               <div className={`story-media-frame group mb-10 md:mb-0 ${id === 'afternoon_post' ? 'mt-12 md:mt-0' : ''} animate-wave-sway-1`}>
-                <div className="absolute -inset-2 rounded-[36px_18px_40px_22px] bg-gradient-to-r from-teal-400 via-amber-300 to-orange-400 opacity-60 blur-xl transition duration-700 group-hover:opacity-90" />
                 {imageUrl ? (
                   <img
                     src={imageUrl}
@@ -235,7 +232,7 @@ const StorySection: React.FC<StorySectionProps> = ({
                       </blockquote>
                     </div>
                   ) : (
-                     <div className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] bg-slate-100 flex items-center justify-center text-slate-400 sm:h-96 md:h-[520px]">Loading TikTok...</div>
+                     <div className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft sm:h-96 md:h-[520px]">Loading TikTok...</div>
                   )
                 ) : (
                   <iframe
@@ -251,12 +248,9 @@ const StorySection: React.FC<StorySectionProps> = ({
         </div>
       </div>
 
-      {/* Elegant Tropical Wave Separator */}
-      <div className="absolute bottom-0 left-0 w-full flex justify-center pb-6 opacity-30 text-teal-900 pointer-events-none">
-        <svg width="120" height="24" viewBox="0 0 120 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 12C30 12 30 0 60 0C90 0 90 12 120 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M0 24C30 24 30 12 60 12C90 12 90 24 120 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.4"/>
-        </svg>
+      {/* Closing flourish */}
+      <div className="pointer-events-none absolute bottom-0 left-0 flex w-full justify-center pb-10 opacity-30">
+        <FoamLine className="h-6 w-32" />
       </div>
     </section>
   );

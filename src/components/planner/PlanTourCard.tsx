@@ -15,10 +15,10 @@ interface PlanTourCardProps {
 }
 
 const SLOT_ACCENT: Record<string, string> = {
-  full: 'from-amber-400/90 to-orange-400/90',
-  half: 'from-teal-300/90 to-cyan-400/90',
-  short: 'from-sky-300/90 to-blue-400/90',
-  evening: 'from-fuchsia-400/90 to-indigo-400/90',
+  full: 'bg-mango',
+  half: 'bg-lagoon-light',
+  short: 'bg-sky-light',
+  evening: 'bg-grape-light',
 };
 
 export const PlanTourCard: React.FC<PlanTourCardProps> = ({
@@ -45,7 +45,7 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
       transition={{ duration: 0.5, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
       ref={cardRef}
       className={`planner-panel overflow-hidden ${
-        highlight ? 'ring-2 ring-teal-300/80 shadow-[0_0_60px_rgba(45,212,191,.35)]' : ''
+        highlight ? 'border-lagoon' : ''
       }`}
       onMouseEnter={() => playHoverFx()}
     >
@@ -58,17 +58,17 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#04131d]/85 via-[#04131d]/20 to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#04131d]/70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent md:bg-gradient-to-r md:from-transparent md:to-ink/70" />
           <span
-            className={`absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r ${
+            className={`absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-ink ${
               SLOT_ACCENT[item.slot] ?? SLOT_ACCENT.half
-            } px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-slate-950 shadow-lg`}
+            }`}
           >
             {item.slotLabel}
           </span>
 
           {item.pinned && (
-            <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-slate-900 shadow-lg">
+            <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border-2 border-ink bg-paper px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-ink">
               ★ {copy.result.addedByYou}
             </span>
           )}
@@ -78,21 +78,21 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
         <div className="flex flex-col gap-5 p-5 sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="mb-1.5 flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-teal-300">
+              <div className="mb-1.5 flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-lagoon-light">
                 <span className="text-base">{tourProfile.emoji}</span>
                 {copy.result.hours(tourProfile.durationHours)}
               </div>
-              <h4 className="font-serif text-xl font-bold leading-tight text-white sm:text-2xl">
+              <h4 className="font-display text-xl font-bold leading-tight text-paper sm:text-2xl">
                 {tour.title}
               </h4>
             </div>
 
             <div className="text-right">
-              <div className="font-serif text-2xl font-bold text-amber-300">
+              <div className="font-display text-2xl font-bold text-mango-light">
                 ${item.pricing.total}
-                <span className="ml-1 text-xs font-semibold uppercase tracking-wider text-slate-400">USD</span>
+                <span className="ml-1 text-xs font-semibold uppercase tracking-wider text-paper/60">USD</span>
               </div>
-              <div className="text-[0.7rem] font-semibold text-slate-400">
+              <div className="text-[0.7rem] font-semibold text-paper/60">
                 ${item.pricing.perPerson} {copy.result.perPerson}
               </div>
             </div>
@@ -101,13 +101,13 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
           {/* Why it fits */}
           {item.reasons.length > 0 && (
             <div>
-              <div className="mb-2 text-[0.66rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+              <div className="mb-2 text-[0.66rem] font-bold uppercase tracking-[0.18em] text-paper/60">
                 {copy.result.whyFits}
               </div>
               <ul className="space-y-1.5">
                 {item.reasons.map((reason) => (
-                  <li key={reason} className="flex items-start gap-2 text-sm text-slate-200">
-                    <HiCheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-teal-300" />
+                  <li key={reason} className="flex items-start gap-2 text-sm text-paper/85">
+                    <HiCheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-lagoon-light" />
                     <span>{reason}</span>
                   </li>
                 ))}
@@ -120,13 +120,13 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
             {item.pricing.lines.map((line) => (
               <span
                 key={`${line.label}-${line.unit}`}
-                className="rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[0.7rem] font-semibold text-slate-300"
+                className="rounded-full border-2 border-paper/25 bg-paper/5 px-3 py-1 text-[0.7rem] font-semibold text-paper/85"
               >
                 {line.qty} × {line.label} · ${line.unit}
               </span>
             ))}
             {item.pricing.childrenAtAdultRate && (
-              <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-[0.7rem] font-semibold text-amber-200">
+              <span className="rounded-full border-2 border-mango-light/45 bg-mango-light/20 px-3 py-1 text-[0.7rem] font-semibold text-mango-light">
                 {copy.result.adultRateForKids}
               </span>
             )}
@@ -137,7 +137,7 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
               {item.cautions.map((caution) => (
                 <span
                   key={caution}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/25 bg-amber-500/10 px-3 py-1 text-[0.7rem] font-semibold text-amber-200/90"
+                  className="inline-flex items-center gap-1.5 rounded-full border-2 border-mango-light/45 bg-mango-light/15 px-3 py-1 text-[0.7rem] font-semibold text-mango-light/90"
                 >
                   <HiExclamation className="h-3.5 w-3.5" />
                   {caution}
@@ -147,11 +147,11 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
           )}
 
           {/* Actions */}
-          <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
+          <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-paper/20 pt-4">
             <Link
               to={`/details/tours/${slug}#top`}
               onClick={() => playClickFx()}
-              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-teal-300 transition hover:text-teal-200"
+              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lagoon-light transition hover:text-lagoon-light"
             >
               {copy.result.viewDetails} <HiArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -161,7 +161,7 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
                 playClickFx();
                 onRemove();
               }}
-              className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-slate-300 transition hover:border-rose-400/50 hover:bg-rose-500/15 hover:text-rose-200"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-full border-2 border-paper/25 bg-paper/5 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-paper/85 transition hover:border-hibiscus-light hover:bg-hibiscus/25 hover:text-paper"
             >
               <HiTrash className="h-3.5 w-3.5" /> {copy.result.remove}
             </button>

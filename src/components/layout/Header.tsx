@@ -34,7 +34,7 @@ const Header: React.FC = () => {
 
   const adminNavClass = (section: string) => {
     const currentSection = searchParams.get('section') || 'brand';
-    return `nav-link-pill p-3 !rounded-full transition ${currentSection === section ? 'bg-teal-600/15 text-teal-800 ring-1 ring-teal-600/25' : 'text-slate-600 hover:bg-slate-100'}`;
+    return `nav-link-pill p-3 !rounded-full ${currentSection === section ? 'nav-link-pill-active' : ''}`;
   };
 
   const handleNavClick = () => {
@@ -42,12 +42,12 @@ const Header: React.FC = () => {
     setIsMenuOpen(false);
   };
 
-  // Active route gets a filled pill so guests always know where they are.
+  // Active route gets a drawn, filled pill so guests always know where they are.
   const navClass = ({ isActive }: { isActive: boolean }) =>
-    `nav-link-pill ${isActive ? 'bg-teal-600/15 text-teal-800 ring-1 ring-teal-600/25' : ''}`;
+    `nav-link-pill ${isActive ? 'nav-link-pill-active' : ''}`;
 
   return (
-    <header className="lobster-header sticky top-0 z-50 overflow-visible border-b border-white/30 bg-white/70 shadow-[0_8px_32px_rgba(8,42,62,.15)] backdrop-blur-xl">
+    <header className="lobster-header sticky top-0 z-50 overflow-visible">
       <div className="section-shell flex items-center justify-between py-3.5 pl-[7.25rem] sm:pl-[7.75rem] lg:pl-8">
         <Link
           to="/#top"
@@ -55,21 +55,20 @@ const Header: React.FC = () => {
           onClick={() => playClickFx()}
           onMouseEnter={() => playHoverFx()}
         >
-          <div className="menu-logo-icon fixed left-4 top-2 flex h-[6.125rem] w-[6.125rem] items-center justify-center rounded-full bg-gradient-to-br from-white/90 to-cyan-50/70 shadow-[0_0_30px_rgba(251,146,60,0.95),0_0_60px_rgba(251,146,60,0.6),0_0_100px_rgba(251,146,60,0.3)] ring-1 ring-white/50 overflow-hidden backdrop-blur-md transition-transform duration-500 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
+          <div className="menu-logo-icon fixed left-4 top-2 flex h-[6.125rem] w-[6.125rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
             {brandSettings.brandicon ? (
               <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
             ) : (
               <img src="/competitor-logo.svg" alt="Logo" className="h-[5.25rem] w-[5.25rem]" />
             )}
           </div>
-          <h1 className="hidden text-2xl font-bold text-slate-900 transition group-hover:text-teal-700 sm:block sm:ml-[7.5rem] lg:ml-[8rem] relative">
-            <span className="relative z-10">{brandSettings.brandName}</span>
-            <span className="absolute inset-0 -top-1 -left-2 -right-2 -bottom-1 bg-gradient-to-r from-orange-300/30 via-orange-400/20 to-amber-300/30 rounded-lg blur-sm opacity-60 group-hover:opacity-80 transition-opacity duration-300"></span>
+          <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[7.5rem] sm:block lg:ml-[8rem]">
+            {brandSettings.brandName}
           </h1>
         </Link>
 
         <button
-          className="grid h-11 w-11 place-items-center rounded-full bg-white/60 text-slate-800 ring-1 ring-white/50 backdrop-blur-md hover:bg-white/80 transition md:hidden"
+          className="grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-mango-light text-ink shadow-ink-sm transition hover:bg-mango md:hidden"
           onClick={() => {
             playClickFx();
             setIsMenuOpen(!isMenuOpen);
@@ -80,7 +79,7 @@ const Header: React.FC = () => {
         </button>
 
         <nav
-          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+10px)] flex-col gap-3 rounded-[28px] border border-white/40 bg-white/85 px-6 py-6 shadow-[0_16px_48px_rgba(8,42,62,.16)] backdrop-blur-2xl md:static md:flex md:flex-row md:items-center md:gap-3 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
+          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+12px)] flex-col gap-3 rounded-[24px] border-[3px] border-ink bg-paper px-5 py-5 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-2 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
         >
           {isAdminRoute ? (
             <>
@@ -108,8 +107,8 @@ const Header: React.FC = () => {
               <Link to="/admin?section=aiBlogGen" onClick={handleNavClick} className={adminNavClass('aiBlogGen')} title="AI Blog Gen">
                 <FaMagic className="h-5 w-5" />
               </Link>
-              <div className="w-px h-6 bg-slate-300 mx-1 hidden md:block"></div>
-              <button onClick={handleLogout} className="nav-link-pill p-3 !rounded-full text-red-600 hover:bg-red-50 ring-1 ring-red-100 transition" title="Log Out & Return">
+              <div className="mx-1 hidden h-6 w-0.5 bg-ink/30 md:block"></div>
+              <button onClick={handleLogout} className="nav-link-pill p-3 !rounded-full !text-hibiscus-dark hover:!bg-hibiscus-light" title="Log Out & Return">
                 <FaSignOutAlt className="h-5 w-5" />
               </button>
             </>
@@ -126,10 +125,8 @@ const Header: React.FC = () => {
                 onClick={handleNavClick}
                 onMouseEnter={() => playHoverFx()}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 rounded-full px-4 py-2 font-bold transition duration-300 ${
-                    isActive
-                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-[0_10px_26px_rgba(13,148,136,.35)]'
-                      : 'bg-gradient-to-r from-teal-500/15 to-amber-400/15 text-teal-800 ring-1 ring-teal-500/30 hover:from-teal-500/25 hover:to-amber-400/25'
+                  `flex items-center gap-2 rounded-full border-[2.5px] border-ink px-4 py-2 font-extrabold text-ink shadow-ink-sm transition duration-200 hover:-translate-y-0.5 ${
+                    isActive ? 'bg-mango' : 'bg-mango-light hover:bg-mango'
                   }`
                 }
               >
