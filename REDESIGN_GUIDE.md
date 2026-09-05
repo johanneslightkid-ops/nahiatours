@@ -1,5 +1,10 @@
 # Welcome Page Redesign - Complete Implementation Guide
 
+> **Note:** this guide describes the story-driven structure of the welcome
+> page, which still stands. Its visual direction (glassmorphism, dark "luxury"
+> palette, Playfair serif) has been superseded by the flat illustrated look
+> documented in [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+
 ## 🎨 Overview
 
 Your welcome page has been completely redesigned with a **story-driven**, **poetic**, and **visually stunning** approach that speaks directly to holiday-seeking tourists. The design blends tropical Caribbean aesthetics with pop art and trash polka influences, creating an engaging narrative that guides visitors through their potential micro-adventure journey.

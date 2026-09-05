@@ -13,7 +13,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   height = 200,
 }) => {
   return (
-    <div data-color-mode="light" className="rounded-2xl overflow-hidden border border-slate-200">
+    <div data-color-mode="light" className="overflow-hidden rounded-2xl border-2 border-ink">
       <MDEditor
         value={value}
         onChange={(val) => onChange(val ?? '')}

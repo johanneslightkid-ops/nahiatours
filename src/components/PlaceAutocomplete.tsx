@@ -220,7 +220,7 @@ const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
             <li
               key={s.placeId}
               onMouseDown={() => handleSelect(s)}
-              className="cursor-pointer border-b border-slate-100 px-4 py-3 text-sm text-ink-soft transition hover:bg-lagoon-light last:border-b-0"
+              className="cursor-pointer border-b-2 border-ink/10 px-4 py-3 text-sm text-ink-soft transition hover:bg-lagoon-light last:border-b-0"
             >
               <div className="flex items-center gap-2">
                 <span className="text-lagoon shrink-0">📍</span>

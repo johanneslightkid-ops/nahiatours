@@ -47,8 +47,8 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onSubmit, isLoading =
               >
                 <FaStar
                   className={`text-2xl ${
- star <= rating ? 'text-yellow-400' : 'text-slate-300'
- }`}
+                  star <= rating ? 'text-mango' : 'text-ink/25'
+                }`}
                 />
               </button>
             ))}

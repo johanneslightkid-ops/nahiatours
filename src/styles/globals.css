@@ -458,8 +458,12 @@ a:hover {
 
 /* ── Buttons ────────────────────────────────────────────────────────────── */
 
+/* Buttons that don't set their own radius stay pills, as they were before the
+   redesign — a Tailwind radius utility still overrides this. */
 button {
   font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  border-radius: 9999px;
 }
 
 /* The press interaction: the button slides into its own shadow. */

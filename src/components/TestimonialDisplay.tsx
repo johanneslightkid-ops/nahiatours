@@ -74,8 +74,8 @@ const TestimonialDisplay: React.FC<TestimonialDisplayProps> = ({ locale }) => {
                     <FaStar
                       key={idx}
                       className={`text-lg ${
- idx < testimonial.rating ? 'text-yellow-400' : 'text-slate-300'
- }`}
+                        idx < testimonial.rating ? 'text-mango' : 'text-ink/25'
+                      }`}
                     />
                   ))}
                 </div>

@@ -30,7 +30,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
     }}
     aria-pressed={selected}
   >
-    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/10 text-2xl ring-1 ring-white/15">
+    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-2 border-paper/25 bg-paper/10 text-2xl">
       {emoji}
     </span>
 
@@ -45,7 +45,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 
     <span className="ml-1 shrink-0 self-center">
       {selected ? (
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-teal-300 text-slate-950">
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-lagoon-light text-ink">
           <HiCheck className="h-4 w-4" />
         </span>
       ) : (
@@ -120,7 +120,7 @@ export const CountStepper: React.FC<CountStepperProps> = ({
           onClick={() => set(value - 1)}
           disabled={value <= min}
           aria-label={`− ${label}`}
-          className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-paper transition hover:border-teal-300/70 hover:bg-lagoon-light/20 disabled:opacity-30"
+          className="grid h-10 w-10 place-items-center rounded-full border-2 border-paper/25 bg-paper/10 text-paper transition hover:border-lagoon-light hover:bg-lagoon-light/20 disabled:opacity-30"
         >
           <HiMinus className="h-4 w-4" />
         </button>
@@ -133,7 +133,7 @@ export const CountStepper: React.FC<CountStepperProps> = ({
           onClick={() => set(value + 1)}
           disabled={value >= max}
           aria-label={`+ ${label}`}
-          className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-paper transition hover:border-teal-300/70 hover:bg-lagoon-light/20 disabled:opacity-30"
+          className="grid h-10 w-10 place-items-center rounded-full border-2 border-paper/25 bg-paper/10 text-paper transition hover:border-lagoon-light hover:bg-lagoon-light/20 disabled:opacity-30"
         >
           <HiPlus className="h-4 w-4" />
         </button>
@@ -171,20 +171,20 @@ export const EnergyScale: React.FC<EnergyScaleProps> = ({ value, steps, onChange
               aria-label={step.label}
               aria-pressed={isActive}
               className={`group relative flex flex-col items-center gap-2 rounded-2xl border px-1 py-3 transition-all duration-300 ${
- isActive
-                  ? 'border-teal-300/90 bg-lagoon-light/20'
-                  : 'border-white/12 bg-white/5 hover:border-teal-300/50 hover:bg-white/10'
+                  isActive
+                  ? 'border-lagoon-light bg-lagoon-light/20'
+                  : 'border-paper/25 bg-paper/5 hover:border-lagoon-light hover:bg-paper/10'
               }`}
             >
               <span
                 className={`block w-full rounded-full transition-all duration-300 ${
- isPassed ? 'bg-gradient-to-t from-teal-400 to-amber-300' : 'bg-white/15'
+                    isPassed ? 'bg-mango' : 'bg-paper/20'
                 }`}
                 style={{ height: `${14 + index * 10}px` }}
               />
               <span
                 className={`text-[0.6rem] font-bold uppercase tracking-wider ${
- isActive ? 'text-lagoon-light' : 'text-paper/60'
+                    isActive ? 'text-lagoon-light' : 'text-paper/60'
                 }`}
               >
                 {level}

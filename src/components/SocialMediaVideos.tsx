@@ -118,7 +118,7 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
                     {/* Video thumbnail/preview */}
                     <div className={`relative flex h-64 items-center justify-center overflow-hidden border-b-[2.5px] border-ink ${platformColors[platform].gradient}`}>
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all" />
-                      <FaPlay className="text-6xl text-white/80 group-hover:text-white transition-all transform group-hover:scale-125" />
+                      <FaPlay className="text-6xl text-paper/85 group-hover:text-white transition-all transform group-hover:scale-125" />
 
                       {/* Video info overlay */}
                       <div className="absolute inset-0 flex flex-col justify-end bg-ink/60 p-4 opacity-0 transition-opacity group-hover:opacity-100">

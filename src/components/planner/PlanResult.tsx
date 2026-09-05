@@ -48,7 +48,7 @@ export const PlanResult: React.FC = () => {
   if (loading || !plan) {
     return (
       <div className="planner-panel flex flex-col items-center gap-4 px-8 py-20 text-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-teal-400 border-t-transparent" />
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-mango border-t-transparent" />
         <p className="text-paper/85">{copy.result.building}</p>
       </div>
     );
@@ -68,7 +68,7 @@ export const PlanResult: React.FC = () => {
       >
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
-            <span className="rounded-full border border-teal-400/40 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
+            <span className="rounded-full border-2 border-lagoon-light/50 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
               {copy.result.eyebrow}
             </span>
             <h2 className="mt-4 flex flex-wrap items-center gap-3 font-display text-3xl font-bold leading-tight text-paper sm:text-5xl">
@@ -177,7 +177,7 @@ export const PlanResult: React.FC = () => {
               playClickFx();
               removeDay();
             }}
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-paper transition hover:border-teal-300/70 hover:bg-lagoon-light/20 disabled:opacity-30"
+            className="grid h-10 w-10 place-items-center rounded-full border-2 border-paper/30 bg-paper/10 text-paper transition hover:border-lagoon-light hover:bg-lagoon-light/25 disabled:opacity-30"
           >
             <HiMinus className="h-4 w-4" />
           </button>
@@ -198,7 +198,7 @@ export const PlanResult: React.FC = () => {
               playClickFx();
               addDay();
             }}
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-paper transition hover:border-teal-300/70 hover:bg-lagoon-light/20 disabled:opacity-30"
+            className="grid h-10 w-10 place-items-center rounded-full border-2 border-paper/30 bg-paper/10 text-paper transition hover:border-lagoon-light hover:bg-lagoon-light/25 disabled:opacity-30"
           >
             <HiPlus className="h-4 w-4" />
           </button>
@@ -210,7 +210,7 @@ export const PlanResult: React.FC = () => {
         <section key={day.index} className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 px-1">
             <h3 className="flex items-center gap-3 font-display text-2xl font-bold text-paper">
-              <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500 font-sans text-lg font-extrabold text-slate-950">
+              <span className="grid h-10 w-10 place-items-center rounded-2xl border-2 border-ink bg-mango font-display text-lg font-extrabold text-ink">
                 {day.index}
               </span>
               {copy.result.dayLabel(day.index)}
@@ -306,7 +306,7 @@ export const PlanResult: React.FC = () => {
                     loading="lazy"
                     className="h-full w-full object-cover"
                   />
-                  <span className="absolute inset-0 bg-gradient-to-t from-[#04131d]/85 to-transparent" />
+                  <span className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent" />
                   <span className="absolute bottom-2 left-3 right-3 truncate text-sm font-bold text-paper">
                     {alternate.entry.tour.title}
                   </span>
@@ -354,7 +354,7 @@ export const PlanResult: React.FC = () => {
               {plan.ruledOut.map((entry) => (
                 <li key={entry.title} className="flex flex-wrap items-center gap-2 text-sm text-paper/60">
                   <span className="font-semibold text-paper/85">{entry.title}</span>
-                  <span className="rounded-full border border-paper/20 bg-white/5 px-2.5 py-0.5 text-[0.68rem]">
+                  <span className="rounded-full border border-paper/20 bg-paper/5 px-2.5 py-0.5 text-[0.68rem]">
                     {entry.reason}
                   </span>
                 </li>
@@ -371,7 +371,7 @@ export const PlanResult: React.FC = () => {
         </h3>
 
         {/* What actually happens next — no surprise charges, no auto-booking. */}
-        <div className="w-full max-w-2xl rounded-3xl border border-teal-400/25 bg-lagoon-light/20 px-5 py-4 text-left">
+        <div className="w-full max-w-2xl rounded-3xl border-2 border-lagoon-light/40 bg-lagoon-light/15 px-5 py-4 text-left">
           <div className="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-lagoon-light">
             <HiShieldCheck className="h-4 w-4" />
             {copy.result.reviewTitle}

@@ -218,7 +218,7 @@ export const QuestionStep: React.FC = () => {
     >
       <header className="mb-7">
         <div className="mb-3 flex flex-wrap items-center gap-3">
-          <span className="rounded-full border border-teal-400/40 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
+          <span className="rounded-full border-2 border-lagoon-light/50 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
             {copy.ui.stepOf(stepIndex + 1, steps.length)}
           </span>
           {currentStep.optional && (

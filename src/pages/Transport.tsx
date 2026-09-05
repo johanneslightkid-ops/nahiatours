@@ -380,20 +380,20 @@ const Transport: React.FC = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setTripType('round-trip')}
-                    className={`flex-1 rounded-xl px-4 py-4 text-center font-semibold text-base transition ${
- tripType === 'round-trip'
- ? 'bg-lagoon text-white shadow-ink-sm'
-                        : 'bg-paper-warm text-ink-soft hover:bg-slate-200'
+                    className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
+                      tripType === 'round-trip'
+                        ? 'bg-lagoon text-white'
+                        : 'bg-paper text-ink hover:bg-mango-light'
                     }`}
                   >
                     🔄 <FormattedMessage id="transport.roundTrip" defaultMessage="Round Trip" />
                   </button>
                   <button
                     onClick={() => setTripType('one-way')}
-                    className={`flex-1 rounded-xl px-4 py-4 text-center font-semibold text-base transition ${
- tripType === 'one-way'
- ? 'bg-lagoon text-white shadow-ink-sm'
-                        : 'bg-paper-warm text-ink-soft hover:bg-slate-200'
+                    className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
+                      tripType === 'one-way'
+                        ? 'bg-lagoon text-white'
+                        : 'bg-paper text-ink hover:bg-mango-light'
                     }`}
                   >
                     ➡️ <FormattedMessage id="transport.oneWay" defaultMessage="One Way" />
@@ -501,7 +501,7 @@ const Transport: React.FC = () => {
                   ⚙️ <FormattedMessage id="transport.extras" defaultMessage="Extras" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="flex items-center gap-3 rounded-xl border border-ink/20 p-4 transition has-[:checked]:border-teal-300 has-[:checked]:bg-lagoon-light active:scale-[0.98]">
+                  <label className="flex items-center gap-3 rounded-xl border border-ink/20 p-4 transition has-[:checked]:border-ink has-[:checked]:bg-lagoon-light active:scale-[0.98]">
                     <input
                       type="checkbox"
                       checked={form.nightTransfer}
@@ -610,7 +610,7 @@ const Transport: React.FC = () => {
                         </p>
                       </div>
 
-                      <div className="space-y-2 border-t border-slate-100 pt-4 text-sm text-ink-soft">
+                      <div className="space-y-2 border-t-2 border-ink/15 pt-4 text-sm text-ink-soft">
                         <div className="flex justify-between">
                           <span><FormattedMessage id="transport.origin" defaultMessage="From" /></span>
                           <span className="font-medium">{priceResult.originLabel}</span>
@@ -632,7 +632,7 @@ const Transport: React.FC = () => {
                           </div>
                         )}
                         {priceResult.breakdown.municipioMultiplierApplied && priceResult.breakdown.municipioMultiplierApplied !== 1.0 && (
-                          <div className="flex justify-between items-center rounded-lg bg-lagoon-light px-2 py-2 text-lagoon-dark font-semibold border border-teal-100">
+                          <div className="flex justify-between items-center rounded-lg bg-lagoon-light px-2 py-2 text-lagoon-dark font-semibold border-2 border-ink/15">
                             <span>🏘️ <FormattedMessage id="transport.municipioMultiplier" defaultMessage="Municipio multiplier" /></span>
                             <span className="text-lg">{priceResult.breakdown.municipioMultiplierApplied.toFixed(2)}×</span>
                           </div>
@@ -659,7 +659,7 @@ const Transport: React.FC = () => {
                         )}
                         {routeGeometry && (
                           <div className="mt-3">
-                            <RouteMap origin={originLatLng ?? undefined} destination={destLatLng ?? undefined} geometry={routeGeometry} className="h-72 rounded-xl border border-slate-100" />
+                            <RouteMap origin={originLatLng ?? undefined} destination={destLatLng ?? undefined} geometry={routeGeometry} className="h-72 rounded-xl border-2 border-ink/15" />
                           </div>
                         )}
                         {form.nightTransfer && (
@@ -696,8 +696,10 @@ const Transport: React.FC = () => {
                     onClick={handleBookNow}
                     disabled={!priceResult || !!priceError}
                     className={`w-full rounded-2xl px-6 py-4 text-center text-base font-bold text-white shadow-ink-sm transition active:scale-[0.97] ${
- priceResult && !priceError ? 'bg-lagoon hover:bg-lagoon' : 'cursor-not-allowed bg-slate-300'
- }`}
+                      priceResult && !priceError
+                        ? 'bg-lagoon hover:bg-lagoon-light hover:text-ink'
+                        : 'cursor-not-allowed bg-ink/20'
+                    }`}
                   >
                     📱 <FormattedMessage id="transport.bookNow" defaultMessage="Book via WhatsApp" />
                   </button>

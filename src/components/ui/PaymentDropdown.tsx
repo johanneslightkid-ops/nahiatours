@@ -156,51 +156,51 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
         <div
           ref={dropdownRef}
           style={{ top: `${dropdownCoords.top}px`, left: `${dropdownCoords.left}px` }}
-          className="fixed z-[99999] w-72 rounded-2xl border border-ink/15 bg-[#04131D]/95 p-2 shadow-ink-sm animate-in fade-in slide-in-from-top-2 text-white"
+          className="fixed z-[99999] w-72 rounded-2xl border-[2.5px] border-ink bg-[#17313F] p-2 text-paper shadow-ink animate-in fade-in slide-in-from-top-2"
         >
-          <div className="px-3 py-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-lagoon border-b border-white/10 mb-1">
+          <div className="px-3 py-2 mb-1 border-b-2 border-paper/20 text-[0.65rem] font-extrabold uppercase tracking-[0.18em] text-mango-light">
             Choose Payment Method
           </div>
 
           <button
             onMouseEnter={() => playHoverFx()}
             onClick={handleStripe}
-            className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-white/10 text-white group"
+            className="flex w-full items-center gap-3 rounded-xl p-3 text-left group transition hover:bg-paper/10"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400 group-hover:scale-110 transition-transform">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky/25 text-sky-light group-hover:scale-110 transition-transform">
               <FaCreditCard className="h-4 w-4" />
             </div>
             <div>
               <div className="text-xs font-bold">Credit / Debit Card</div>
-              <div className="text-[0.65rem] text-slate-300">Instant Stripe Secure Payment</div>
+              <div className="text-[0.65rem] text-paper/70">Instant Stripe Secure Payment</div>
             </div>
           </button>
 
           <button
             onMouseEnter={() => playHoverFx()}
             onClick={handlePayPal}
-            className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-white/10 text-white group"
+            className="flex w-full items-center gap-3 rounded-xl p-3 text-left group transition hover:bg-paper/10"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 group-hover:scale-110 transition-transform">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-dark/30 text-sky-light group-hover:scale-110 transition-transform">
               <FaPaypal className="h-4 w-4" />
             </div>
             <div>
               <div className="text-xs font-bold">PayPal Direct</div>
-              <div className="text-[0.65rem] text-slate-300">Fast & Buyer-Protected Checkout</div>
+              <div className="text-[0.65rem] text-paper/70">Fast & Buyer-Protected Checkout</div>
             </div>
           </button>
 
           <button
             onMouseEnter={() => playHoverFx()}
             onClick={handleWhatsApp}
-            className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-white/10 text-white group"
+            className="flex w-full items-center gap-3 rounded-xl p-3 text-left group transition hover:bg-paper/10"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-jungle/20 text-emerald-400 group-hover:scale-110 transition-transform">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-jungle/25 text-jungle-light group-hover:scale-110 transition-transform">
               <FaWhatsapp className="h-4 w-4" />
             </div>
             <div>
               <div className="text-xs font-bold">VIP Concierge / Cash</div>
-              <div className="text-[0.65rem] text-slate-300">Reserve now, pay on arrival</div>
+              <div className="text-[0.65rem] text-paper/70">Reserve now, pay on arrival</div>
             </div>
           </button>
         </div>,
@@ -210,44 +210,44 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
       {/* Stripe Modal via Portal to document.body */}
       {stripeModalOpen && createPortal(
         <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 p-4">
-          <div className="w-full max-w-md rounded-3xl border border-white/20 bg-[#04131D] p-7 text-white shadow-ink-sm relative animate-in zoom-in-95">
+          <div className="w-full max-w-md rounded-[28px] border-[3px] border-ink bg-[#17313F] p-7 text-paper shadow-ink-lg animate-in zoom-in-95">
             <button
               onClick={() => {
                 playClickFx();
                 setStripeModalOpen(false);
               }}
-              className="absolute right-4 top-4 text-ink-light hover:text-white"
+              className="absolute right-4 top-4 text-paper/70 hover:text-paper"
             >
               ✕
             </button>
             <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-400 font-bold">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky/25 text-sky-light font-bold">
                 💳
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">Stripe Card Checkout</h3>
-                <p className="text-xs text-slate-300">{excursionTitle}</p>
+                <p className="text-xs text-paper/70">{excursionTitle}</p>
               </div>
             </div>
 
-            <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs">
+            <div className="space-y-4 rounded-2xl border-2 border-paper/20 bg-paper/5 p-4 text-xs">
               <div className="flex justify-between">
-                <span className="text-ink-light">Selected Option:</span>
+                <span className="text-paper/70">Selected Option:</span>
                 <span className="font-bold text-white">{selectedTier || 'Standard Excursion'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-ink-light">Total Price:</span>
-                <span className="font-bold text-lagoon text-sm">{selectedPrice || 'Inquire'}</span>
+                <span className="text-paper/70">Total Price:</span>
+                <span className="text-sm font-bold text-mango-light">{selectedPrice || 'Inquire'}</span>
               </div>
-              <div className="flex items-center gap-2 text-ink-light pt-2 border-t border-white/10">
-                <FaShieldAlt className="text-emerald-400" />
+              <div className="flex items-center gap-2 border-t-2 border-paper/20 pt-2 text-paper/70">
+                <FaShieldAlt className="text-jungle-light" />
                 <span>256-Bit SSL Encrypted Payment</span>
               </div>
             </div>
 
             {brandSettings.verifoneLink || brandSettings.stripePublishableKey ? (
               <div className="mt-5 space-y-3">
-                <p className="text-xs text-slate-300">
+                <p className="text-xs text-paper/70">
                   Click below to proceed to Stripe encrypted card payment portal.
                 </p>
                 <button
@@ -259,7 +259,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
               </div>
             ) : (
               <div className="mt-5 space-y-3">
-                <div className="rounded-xl bg-mango/20 p-3 text-xs text-amber-200 border border-amber-500/30">
+                <div className="rounded-xl border-2 border-mango-light/50 bg-mango/20 p-3 text-xs text-mango-light">
                   Stripe publishable API key or Payment Link is pending in Admin Settings. You can confirm instantly via WhatsApp Concierge or PayPal.
                 </div>
                 <button

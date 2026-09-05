@@ -56,7 +56,7 @@ const MobileNumberPicker: React.FC<Props> = ({
             <div className="mb-8 flex items-center justify-center gap-6">
               <button
                 onClick={decrement}
-                className="flex h-24 w-24 items-center justify-center rounded-2xl bg-paper-warm text-4xl font-bold text-ink-soft active:bg-slate-200 transition hover:bg-slate-200"
+                className="flex h-24 w-24 items-center justify-center rounded-2xl border-[2.5px] border-ink bg-paper text-4xl font-extrabold text-ink shadow-ink-sm transition hover:bg-mango-light active:translate-y-0.5"
                 aria-label={`${ariaLabel} decrease`}
               >
                 −
@@ -69,7 +69,7 @@ const MobileNumberPicker: React.FC<Props> = ({
 
               <button
                 onClick={increment}
-                className="flex h-24 w-24 items-center justify-center rounded-2xl bg-paper-warm text-4xl font-bold text-ink-soft active:bg-slate-200 transition hover:bg-slate-200"
+                className="flex h-24 w-24 items-center justify-center rounded-2xl border-[2.5px] border-ink bg-paper text-4xl font-extrabold text-ink shadow-ink-sm transition hover:bg-mango-light active:translate-y-0.5"
                 aria-label={`${ariaLabel} increase`}
               >
                 +
@@ -86,8 +86,10 @@ const MobileNumberPicker: React.FC<Props> = ({
                       setIsOpen(false);
                     }}
                     className={`rounded-lg px-3 py-3 font-semibold text-sm transition ${
- current === num ? 'bg-lagoon text-white' : 'bg-paper-warm text-ink-soft hover:bg-slate-200'
- }`}
+                    current === num
+                      ? 'bg-lagoon text-white'
+                      : 'bg-paper-warm text-ink-soft hover:bg-mango-light'
+                  }`}
                   >
                     {num}
                   </button>

@@ -85,18 +85,18 @@ const IllustratedBackdrop: React.FC = () => (
         wrapper so the sway animation on the frond itself is free to own
         `transform` outright. */}
     <div
-      className="absolute -left-16 bottom-[-8%] h-72 w-72 sm:h-96 sm:w-96"
+      className="absolute -left-28 bottom-[-16%] h-72 w-72 sm:h-96 sm:w-96"
       style={{ transform: 'rotate(28deg)' }}
     >
-      <PalmFrond color="jungleLight" className="animate-frond h-full w-full opacity-90" />
+      <PalmFrond color="jungleLight" className="animate-frond h-full w-full opacity-70" />
     </div>
     <div
-      className="absolute -right-20 bottom-[-10%] h-72 w-72 sm:h-[26rem] sm:w-[26rem]"
+      className="absolute -right-32 bottom-[-18%] h-72 w-72 sm:h-[26rem] sm:w-[26rem]"
       style={{ transform: 'rotate(-34deg) scaleX(-1)' }}
     >
       <PalmFrond
         color="jungle"
-        className="animate-frond h-full w-full opacity-90"
+        className="animate-frond h-full w-full opacity-70"
         style={{ animationDelay: '-3s' }}
       />
     </div>

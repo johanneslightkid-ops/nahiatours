@@ -18,8 +18,8 @@ const renderPostContent = (post: string) =>
         <p
           key={`${index}-${paragraph.substring(0, 20)}`}
           className={`leading-relaxed font-body whitespace-pre-line ${
- isFirst
- ? 'text-xl md:text-2xl text-ink-soft font-medium mb-8 border-l-4 border-lagoon pl-4 md:pl-6 italic'
+      isFirst
+        ? 'text-xl md:text-2xl text-ink-soft font-medium mb-8 border-l-4 border-lagoon pl-4 md:pl-6 italic'
               : 'text-lg text-ink-soft mb-6'
           }`}
         >

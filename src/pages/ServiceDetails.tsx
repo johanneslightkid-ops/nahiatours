@@ -195,7 +195,7 @@ const ServiceDetails: React.FC = () => {
             <img src={currentImage} alt={service.title} className="h-[420px] w-full object-cover" />
             <div className="absolute inset-x-0 bottom-0 bg-ink/75 p-8 text-white">
               <h1 className="text-4xl font-bold md:text-5xl">{service.title}</h1>
-              <div className="mt-3 max-w-3xl text-white/80">
+              <div className="mt-3 max-w-3xl text-paper/85">
                 <MarkdownRenderer content={service.description} />
               </div>
             </div>
@@ -317,7 +317,7 @@ const ServiceDetails: React.FC = () => {
                           </div>
                         ) : null}
 
-                        <div className="mt-3 rounded-lg border border-slate-100 bg-paper-warm p-3">
+                        <div className="mt-3 rounded-lg border-2 border-ink/15 bg-paper-warm p-3">
                           <div className="flex justify-between">
                             <span>{locale === 'es' ? 'Precio base' : 'Base distance price'}</span>
                             <span>{priceResult ? `USD ${priceResult.breakdown.baseDistancePrice}` : basePrice != null ? `USD ${basePrice}` : 'N/A'}</span>

@@ -38,7 +38,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
     <section className="relative isolate z-0 w-full overflow-hidden">
       {/* Scenery. Everything here is decorative and sits behind the copy. */}
       <PalmTree className="pointer-events-none absolute -left-10 bottom-0 h-64 w-48 opacity-95 sm:h-80 sm:w-60 lg:h-[26rem] lg:w-80" />
-      <Toucan className="animate-bob pointer-events-none absolute right-4 top-24 hidden h-24 w-28 lg:block" />
+      <Toucan className="animate-bob pointer-events-none absolute right-[40%] top-6 hidden h-20 w-24 xl:block" />
       <Starfish className="pointer-events-none absolute bottom-16 right-[8%] hidden h-16 w-16 rotate-12 lg:block" />
       <Hibiscus className="animate-sway pointer-events-none absolute left-[42%] top-10 hidden h-16 w-16 xl:block" />
 
@@ -162,7 +162,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
               </div>
 
               {/* Review sticker, pinned to the corner of the postcard. */}
-              <div className="absolute -bottom-8 -left-8 w-60 rotate-3 rounded-2xl border-[3px] border-ink bg-hibiscus-light p-4 shadow-ink">
+              <div className="absolute -left-14 bottom-24 w-56 rotate-3 rounded-2xl border-[3px] border-ink bg-hibiscus-light p-4 shadow-ink">
                 <div className="mb-1.5 flex gap-0.5 text-ink">
                   {[...Array(5)].map((_, i) => (
                     <HiStar key={i} className="h-4 w-4 fill-current" />
