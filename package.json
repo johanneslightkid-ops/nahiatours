@@ -9,10 +9,12 @@
     "remotedev": "vite --host",
     "generate-sitemap": "node scripts/generate-sitemap.mjs",
     "populate-local-data": "node scripts/populate-local-data.mjs",
-    "build": "npm run generate-sitemap && npm run populate-local-data && vite build",
+    "build": "npm run provision-kv && npm run generate-sitemap && npm run populate-local-data && vite build",
     "init-cloudflare-data": "node scripts/init-cloudflare-data.mjs",
     "trigger-init-data": "node scripts/trigger-init-data.mjs",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "provision-kv": "node scripts/provision-kv.mjs",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@uiw/react-md-editor": "^4.1.1",
