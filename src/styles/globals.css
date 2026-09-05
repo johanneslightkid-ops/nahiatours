@@ -1,19 +1,61 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:opsz,wght@18..192,600;18..192,700;18..192,800&family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Caveat:wght@600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ══════════════════════════════════════════════════════════════════════════
+   ILLUSTRATED TROPICAL DESIGN SYSTEM
+   ──────────────────────────────────────────────────────────────────────────
+   The site is drawn, not photographed. Three rules hold the look together:
+
+     1. Flat colour. No frosted glass, no backdrop blur, no photo-real
+        gradients — every surface is opaque poster paint.
+     2. Ink outline. Cards, buttons, badges and icons are drawn with the same
+        dark outline, the way a sticker sheet is.
+     3. Hard shadow. Depth comes from an un-blurred offset block of colour,
+        never from a soft haze.
+
+   Keep those three and anything new will sit inside the illustration.
+   ══════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  --ink: #09303d;
-  --ink-soft: #2e4f59;
-  --sand: #fff8ef;
-  --sun: #f6a56d;
-  --palm: #0f9f8e;
-  --ocean: #106f88;
-  --reef: #17b6a8;
-  --coral: #ff7c6a;
-  --card: rgba(255, 255, 255, 0.82);
+  --ink: #1e2a3a;
+  --ink-soft: #42566b;
+  --ink-light: #7c8fa3;
+
+  --paper: #fff6e5;
+  --paper-warm: #ffefd6;
+  --paper-deep: #f7e3c2;
+
+  --mango: #ffa62b;
+  --mango-light: #ffc861;
+  --mango-dark: #f07e13;
+
+  --hibiscus: #ff5d73;
+  --hibiscus-light: #ff9aa8;
+
+  --lagoon: #21c0b7;
+  --lagoon-light: #7fe3da;
+  --lagoon-dark: #128c8a;
+
+  --sky: #4cc3f0;
+  --sky-light: #a5e4ff;
+  --sky-dark: #1c86be;
+
+  --jungle: #2fa84f;
+  --jungle-light: #7bd389;
+  --jungle-dark: #1b7a3c;
+
+  --sunset: #ff7a45;
+  --grape: #9163de;
+
+  /* Every outline on the site is drawn with this one pen. */
+  --stroke: 2.5px;
+  --stroke-thin: 2px;
+  --shadow-ink: 5px 5px 0 0 var(--ink);
+  --shadow-ink-sm: 3px 3px 0 0 var(--ink);
+  --shadow-ink-lg: 8px 8px 0 0 var(--ink);
 }
 
 * {
@@ -21,13 +63,13 @@
 }
 
 html {
-  background: transparent !important;
+  background: var(--paper);
 }
 
-/* Decorative blobs, swaying cards and rotated badges all reach slightly past
-   the layout. None of them are content, so clip the overflow instead of
-   letting it produce a horizontal scrollbar. `clip` (not `hidden`) keeps the
-   viewport as the scroll container, so the sticky header still sticks. */
+/* Fronds, badges and tilted stickers all reach slightly past the layout. None
+   of them are content, so clip the overflow instead of letting it produce a
+   horizontal scrollbar. `clip` (not `hidden`) keeps the viewport as the scroll
+   container, so the sticky header still sticks. */
 html,
 body {
   overflow-x: clip;
@@ -35,40 +77,29 @@ body {
 
 body {
   min-height: 100vh;
-  font-family: 'Poppins', 'Space Grotesk', sans-serif;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 14% 15%, rgba(255, 218, 148, 0.08), transparent 24%),
-    radial-gradient(circle at 88% 10%, rgba(60, 202, 177, 0.08), transparent 18%),
-    linear-gradient(180deg, rgba(255, 250, 244, 0.25) 0%, rgba(232, 250, 255, 0.2) 42%, rgba(229, 250, 254, 0.25) 100%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* The paper colour lives on <html> so the drawn backdrop and the paper
+     grain — both negative z-index — can paint above it. A background here
+     would cover them. */
+  background-color: transparent;
 }
 
+/* Hand-drawn paper speckle. Two sparse dot layers at low opacity read as
+   printed grain without costing an image request. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url('/imgs/tropical_pattern.png');
-  opacity: 0.02;
   z-index: -2;
   pointer-events: none;
-}
-
-.home-section {
-  isolation: isolate;
-}
-
-.home-section::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
+  opacity: 0.5;
   background-image:
-    radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.16), transparent 18%),
-    radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.1), transparent 16%);
-  opacity: 0.4;
-  pointer-events: none;
+    radial-gradient(circle at 50% 50%, rgba(30, 42, 58, 0.14) 1px, transparent 1.4px),
+    radial-gradient(circle at 50% 50%, rgba(240, 126, 19, 0.12) 1px, transparent 1.4px);
+  background-size: 22px 22px, 37px 37px;
+  background-position: 0 0, 11px 14px;
 }
 
 h1,
@@ -78,129 +109,161 @@ h4,
 h5,
 h6,
 .font-lobster {
-  font-family: 'Playfair Display', 'Space Grotesk', serif;
-  letter-spacing: -0.02em;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
   color: var(--ink);
 }
 
 a {
-  color: var(--ocean);
-  transition: color 0.25s ease;
+  color: var(--lagoon-dark);
+  font-weight: 700;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--palm);
-}
-
-/* Hero section wave effect */
-section[style*="background-image"] {
-  position: relative;
-}
-
-section[style*="background-image"]::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 100px;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 120' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z' fill='rgba(255,248,240,0.95)'/%3E%3Cpath d='M0,60 Q300,10 600,60 T1200,60 L1200,120 L0,120 Z' fill='rgba(255,248,240,0.5)' opacity='0.3'/%3E%3C/svg%3E") no-repeat bottom;
-  background-size: cover;
-  background-position: bottom;
-  z-index: 10;
-  pointer-events: none;
-}
-
-button {
-  border-radius: 9999px;
+  color: var(--mango-dark);
 }
 
 .section-shell {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
-.hero-glass {
-  position: relative;
-  overflow: hidden;
-  border-radius: 40px;
-  background: rgba(255, 255, 255, 0.52);
-  border: 1.5px solid rgba(255, 255, 255, 0.68);
-  box-shadow: 0 28px 72px rgba(8, 42, 62, 0.14), 0 6px 12px rgba(23, 182, 168, 0.06);
-  backdrop-filter: blur(8px) saturate(130%);
+/* ── Type accents ───────────────────────────────────────────────────────── */
+
+/* Hand-lettered kicker above a headline. */
+.hand-note {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 1.55rem;
+  line-height: 1;
+  color: var(--mango-dark);
+  transform: rotate(-2deg);
+  display: inline-block;
 }
 
-.hero-glass::before {
+/* Marker-pen highlight behind a headline. Painted as a gradient on the inline
+   text box with `box-decoration-break: clone`, so a headline that wraps gets
+   the stroke under each line instead of one smear across the whole block. */
+.marker-highlight {
+  display: inline;
+  padding: 0 0.08em;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 58%,
+    var(--mango-light) 58%,
+    var(--mango-light) 92%,
+    transparent 92%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Used by story headings: a crayon underline sweeping under the title. */
+.scribble-title-bg {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.2em;
+}
+
+.scribble-title-bg::after {
   content: '';
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(130deg, rgba(255, 255, 255, 0.5), transparent 45%);
+  left: 0;
+  right: 0;
+  bottom: -0.12em;
+  height: 0.5rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2,8 C40,2 60,10 100,5 C140,0 165,9 198,4' stroke='%23FFA62B' stroke-width='6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
 }
 
-.nav-link-pill {
-  @apply flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-slate-700 transition duration-300;
+/* ── Section bands ──────────────────────────────────────────────────────── */
+
+.home-section {
+  isolation: isolate;
 }
 
-.nav-link-pill:hover {
-  background: rgba(15, 159, 142, 0.12);
-  color: var(--palm);
+/* Flat poster bands. Opaque on purpose — the illustrated backdrop shows
+   through the wave-shaped gaps between them, not through the paint. */
+.shore-section {
+  background: var(--paper) !important;
 }
 
-.menu-logo-icon {
+.cove-section {
+  background: var(--paper-warm) !important;
 }
 
-.shore-section, .cove-section, .lagoon-section, .bay-section {
-  background: rgba(248, 245, 239, 0.25) !important;
-  backdrop-filter: blur(6px) saturate(110%);
-  -webkit-backdrop-filter: blur(6px) saturate(110%);
+.lagoon-section {
+  background: linear-gradient(180deg, #e6f7ff 0%, #d3f0ff 100%) !important;
+}
+
+.bay-section {
+  background: linear-gradient(180deg, #e4fbf4 0%, #d0f6ea 100%) !important;
+}
+
+.dawn-section {
+  background: linear-gradient(180deg, #fff6e5 0%, #ffe6c9 100%) !important;
 }
 
 .sunset-section {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(8, 93, 111, 0.65) 0%, rgba(13, 138, 138, 0.55) 32%, rgba(17, 139, 138, 0.65) 64%, rgba(248, 181, 116, 0.55) 100%) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.sunset-section::before,
-.reef-section::before,
-.dawn-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(circle at 12% 13%, rgba(255, 255, 255, 0.2), transparent 26%),
-              radial-gradient(circle at 84% 76%, rgba(255, 220, 140, 0.2), transparent 32%),
-              radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.04), transparent 60%);
-  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, #ffc861 0%, #ff9a5b 48%, #ff5d73 100%) !important;
 }
 
 .reef-section {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(140deg, rgba(10, 62, 72, 0.65) 0%, rgba(13, 113, 122, 0.55) 36%, rgba(26, 159, 152, 0.6) 72%, rgba(45, 179, 168, 0.65) 100%) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, #7fe3da 0%, #21c0b7 45%, #128c8a 100%) !important;
 }
 
-.dawn-section {
-  background: linear-gradient(135deg, rgba(255, 252, 244, 0.35), rgba(231, 255, 251, 0.3) 54%, rgba(255, 238, 220, 0.35)) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+/* A drawn sun sitting behind the warm band, and drifting water rings behind
+   the reef band. Both are pure gradients, so they cost nothing to paint. */
+.sunset-section::before {
+  content: '';
+  position: absolute;
+  top: -14%;
+  left: 50%;
+  width: min(58vw, 620px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 245, 214, 0.95) 0%, rgba(255, 233, 175, 0.55) 42%, transparent 62%);
+  pointer-events: none;
+}
+
+/* Drawn foam ticks scattered over the water, rather than concentric rings —
+   the rings read as a printing artefact at full width. */
+.reef-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160' viewBox='0 0 240 160'%3E%3Cg stroke='%23ffffff' stroke-width='4' stroke-linecap='round' fill='none' opacity='0.55'%3E%3Cpath d='M20 34 h34'/%3E%3Cpath d='M150 22 h26'/%3E%3Cpath d='M92 86 h30'/%3E%3Cpath d='M196 104 h28'/%3E%3Cpath d='M42 132 h24'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 240px 160px;
+}
+
+/* Section copy on the two saturated bands is white, so the drawn outline is
+   white there too. */
+.sunset-section h2,
+.sunset-section h3,
+.reef-section h2,
+.reef-section h3 {
+  color: #ffffff;
+  text-shadow: 3px 3px 0 rgba(30, 42, 58, 0.28);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    Wavy section edges
-   The coloured bands used to butt against each other in dead-straight lines.
-   Instead of stacking extra SVG elements at every seam, the band itself is
-   masked with a wave at top and bottom: one composited layer, no extra DOM,
-   and the ocean shader behind stays visible through the troughs.
+   The bands are masked with a rolling wave at top and bottom: one composited
+   layer, no extra DOM, and the illustrated backdrop stays visible through the
+   troughs.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --wave-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,66 C170,116 330,10 600,46 C870,82 1040,6 1200,54 L1200,120 L0,120 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,60 C1040,112 870,30 600,72 C330,110 170,8 0,58 Z' fill='%23000'/%3E%3C/svg%3E");
+  --wave-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,72 C120,120 220,24 340,58 C460,92 540,10 660,44 C780,78 880,116 1000,74 C1090,42 1140,58 1200,44 L1200,120 L0,120 Z' fill='%23000'/%3E%3C/svg%3E");
+  --wave-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,76 C1140,62 1090,78 1000,46 C880,4 780,42 660,76 C540,110 460,28 340,62 C220,96 120,0 0,48 Z' fill='%23000'/%3E%3C/svg%3E");
   --wave-height: 3.25rem;
 }
 
@@ -244,187 +307,690 @@ button {
   }
 }
 
-.section-icon {
-  display: inline-grid;
-  width: 74px;
-  height: 74px;
-  place-items: center;
-  border-radius: 9999px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(245, 255, 255, 0.72));
-  box-shadow: 0 24px 56px rgba(9, 50, 62, 0.18), 0 0 1px rgba(255, 255, 255, 0.6) inset;
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
-  font-size: 2.4rem;
-  backdrop-filter: blur(16px);
-}
+/* ── Drawn surfaces ─────────────────────────────────────────────────────── */
 
-.parallax-wash {
-  position: absolute;
-  z-index: -1;
-  width: min(42vw, 520px);
-  aspect-ratio: 1;
-  border-radius: 9999px;
-  filter: blur(80px);
-  opacity: 0.32;
-  pointer-events: none;
-  background: conic-gradient(from 90deg, rgba(23, 182, 168, 0.8), rgba(246, 165, 109, 0.68), rgba(54, 184, 222, 0.62), rgba(23, 182, 168, 0.8));
-  box-shadow: 0 0 60px rgba(23, 182, 168, 0.3);
-}
-
-.parallax-wash-left {
-  left: -10%;
-  top: 12%;
-}
-
-.parallax-wash-right {
-  right: -10%;
-  bottom: 10%;
-}
-
-.home-feature-card {
-  border-radius: 36px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.08));
-  box-shadow: 0 32px 88px rgba(0, 0, 0, 0.16), 0 8px 16px rgba(23, 182, 168, 0.08);
-  backdrop-filter: blur(20px);
-  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease, border-color 0.35s ease;
-}
-
+/* The single card recipe the whole site draws from. */
+.sticker-card,
+.artsy-glass-card,
 .glass-card {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 28px 72px rgba(8, 42, 62, 0.12), 0 6px 12px rgba(23, 182, 168, 0.04);
-  backdrop-filter: blur(12px) saturate(120%);
-  -webkit-backdrop-filter: blur(12px) saturate(120%);
-  transition: all 0.3s ease;
+  position: relative;
+  background: #fffdf7;
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
 }
 
+.sticker-card:hover,
+.artsy-glass-card:hover,
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 36px 96px rgba(8, 42, 62, 0.16), 0 10px 20px rgba(23, 182, 168, 0.08);
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 0 var(--ink);
+}
+
+/* Feature cards live on the saturated bands, so they are painted in poster
+   colours and cycle hue by position. */
+.home-feature-card {
+  position: relative;
+  border-radius: 26px;
+  border: var(--stroke) solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-ink);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
 }
 
 .home-feature-card:hover {
-  transform: translateY(-12px) scale(1.02);
-  border-color: rgba(255, 255, 255, 0.42);
-  box-shadow: 0 48px 120px rgba(0, 0, 0, 0.22), 0 12px 24px rgba(23, 182, 168, 0.15);
+  transform: translate(-4px, -4px);
+  box-shadow: 9px 9px 0 0 var(--ink);
+}
+
+.home-feature-card:nth-child(3n + 1) {
+  background: #fff2d9;
+}
+
+.home-feature-card:nth-child(3n + 2) {
+  background: #e2fbf5;
+}
+
+.home-feature-card:nth-child(3n + 3) {
+  background: #ffe8ea;
+}
+
+/* Feature-card copy is dark now that the cards are cream, so neutralise the
+   light text utilities the markup still carries. */
+.home-feature-card h3,
+.home-feature-card p {
+  color: var(--ink);
 }
 
 .story-copy-card {
-  border-radius: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.75);
-  padding: 2rem;
-  box-shadow: 0 28px 72px rgba(15, 79, 103, 0.18), 0 8px 16px rgba(23, 182, 168, 0.1);
-  backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
+  border-radius: 24px;
+  border: var(--stroke) solid var(--ink);
+  background: #fffdf7;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-ink);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
 }
 
 .story-copy-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 40px 100px rgba(15, 79, 103, 0.22), 0 12px 24px rgba(23, 182, 168, 0.15);
-  border-color: rgba(255, 255, 255, 0.85);
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 0 var(--ink);
 }
 
+/* Photographs are framed as if pasted into a scrapbook: ink border, hard
+   shadow, and a small colour lift so they sit with the drawn palette. */
 .story-media-frame {
   position: relative;
 }
 
-.story-media-frame::before {
-  content: '';
-  position: absolute;
-  inset: -16px;
-  z-index: -1;
-  border-radius: 32px;
-  background: linear-gradient(145deg, rgba(58, 226, 205, 0.32), rgba(255, 187, 134, 0.24));
-  filter: blur(24px);
-  box-shadow: 0 0 40px rgba(23, 182, 168, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.04);
-}
-
 .story-media-frame img,
 .story-media-frame iframe {
-  border-radius: 28px;
-  box-shadow: 0 20px 60px rgba(8, 42, 62, 0.2), 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  border-radius: 24px;
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink-lg);
+  filter: saturate(1.18) contrast(1.05);
+}
+
+.photo-sticker {
+  border: var(--stroke) solid var(--ink);
+  filter: saturate(1.2) contrast(1.06);
+}
+
+/* Photography sits inside a drawn page, so it is pushed a little towards the
+   poster palette: more saturation, a touch more contrast, slightly warmer. */
+.photo-pop {
+  filter: saturate(1.22) contrast(1.07) brightness(1.02);
+}
+
+.hero-glass {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32px;
+  background: var(--paper);
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink-lg);
+}
+
+/* Round sticker holding a section's emoji. */
+.section-icon {
+  display: inline-grid;
+  width: 78px;
+  height: 78px;
+  place-items: center;
+  border-radius: 9999px;
+  background: var(--mango-light);
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink);
+  font-size: 2.3rem;
+  line-height: 1;
+  transform: rotate(-3deg);
+  transition: transform 0.25s ease;
+}
+
+.section-icon:hover {
+  transform: rotate(3deg) scale(1.05);
+}
+
+/* Loose colour washes behind sections. Kept soft and sparse — they suggest
+   painted paper rather than a photographic glow. */
+.parallax-wash {
+  position: absolute;
+  z-index: -1;
+  width: min(40vw, 460px);
+  aspect-ratio: 1;
+  border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
+  opacity: 0.35;
+  pointer-events: none;
+  background: var(--mango-light);
+}
+
+.parallax-wash-left {
+  left: -12%;
+  top: 10%;
+  background: var(--lagoon-light);
+}
+
+.parallax-wash-right {
+  right: -12%;
+  bottom: 8%;
+  background: var(--mango-light);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+
+button {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+}
+
+/* The press interaction: the button slides into its own shadow. */
+.tropical-button,
+.tropical-button-outline,
+.planner-cta,
+.planner-cta-ghost {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
 }
 
 .tropical-button {
-  @apply inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 via-cyan-500 to-fuchsia-500 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-[0_12px_36px_rgba(16,146,166,.32),0_4px_8px_rgba(0,0,0,.1)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(16,146,166,.4),0_6px_12px_rgba(0,0,0,.15)] active:shadow-[0_6px_16px_rgba(16,146,166,.25)];
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
+  background: var(--mango);
+  color: var(--ink);
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+
+.tropical-button:hover {
+  background: var(--mango-light);
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 0 var(--ink);
+}
+
+.tropical-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 0 var(--ink);
 }
 
 .tropical-button-outline {
-  @apply inline-flex items-center justify-center rounded-full border-2 border-white/70 bg-white/20 px-6 py-3 text-sm font-bold uppercase tracking-wide text-slate-950 transition duration-300 shadow-[0_8px_24px_rgba(0,0,0,.12)] hover:bg-white/35 hover:border-white hover:shadow-[0_12px_36px_rgba(0,0,0,.16)] active:shadow-[0_4px_12px_rgba(0,0,0,.1)];
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
+  background: #fffdf7;
+  color: var(--ink);
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
 }
 
-.language-toggle {
-  @apply inline-flex items-center rounded-full bg-white/95 p-1 shadow-lg ring-1 ring-slate-200/70;
+.tropical-button-outline:hover {
+  background: var(--lagoon-light);
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 0 var(--ink);
 }
 
-.language-toggle-button {
-  @apply inline-flex h-10 min-w-[52px] items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-700 transition duration-200;
+.tropical-button-outline:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 0 var(--ink);
 }
 
-.language-toggle-button.active {
-  @apply bg-teal-700 text-white shadow-lg;
+/* Colour variants for the same shape. */
+.btn-lagoon {
+  background: var(--lagoon);
+  color: #ffffff;
 }
 
-.language-toggle-button:not(.active):hover {
-  @apply bg-slate-100;
+.btn-lagoon:hover {
+  background: var(--lagoon-light);
+  color: var(--ink);
+}
+
+.btn-hibiscus {
+  background: var(--hibiscus);
+  color: #ffffff;
+}
+
+.btn-hibiscus:hover {
+  background: var(--hibiscus-light);
+  color: var(--ink);
 }
 
 button,
 input,
 textarea,
 select {
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
-/* Additional button styles with enhanced shadows */
-button:not(.language-toggle-button):not(:disabled) {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* Form fields are drawn with the same pen as everything else. These are
+   element selectors, so any component that sets its own border/background
+   utilities still wins — this is only the default for fields that don't. */
+input:not([type='range']),
+textarea,
+select {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--ink);
 }
 
-button:not(.language-toggle-button):not(:disabled):hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+input[type='text'],
+input[type='email'],
+input[type='tel'],
+input[type='number'],
+input[type='date'],
+input[type='time'],
+input[type='search'],
+input[type='password'],
+textarea,
+select {
+  border: var(--stroke-thin) solid var(--ink);
+  border-radius: 14px;
+  background: #ffffff;
 }
 
-button:not(.language-toggle-button):not(:disabled):active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='tel']:focus,
+input[type='number']:focus,
+input[type='date']:focus,
+input[type='time']:focus,
+input[type='search']:focus,
+input[type='password']:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  background: #f0fdfa;
 }
 
-/* Link hover effects */
-a {
+::placeholder {
+  color: var(--ink-light);
+  font-weight: 600;
+}
+
+/* ── Navigation ─────────────────────────────────────────────────────────── */
+
+.lobster-header {
+  background: var(--paper);
+  border-bottom: 3px solid var(--ink);
+}
+
+.nav-link-pill {
+  @apply flex items-center gap-2 rounded-full px-4 py-2 font-bold transition duration-200;
+  color: var(--ink);
+  border: var(--stroke-thin) solid transparent;
+}
+
+.nav-link-pill:hover {
+  background: var(--mango-light);
+  border-color: var(--ink);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.nav-link-pill-active {
+  background: var(--lagoon-light);
+  border-color: var(--ink);
+  box-shadow: var(--shadow-ink-sm);
+}
+
+.language-toggle {
+  @apply inline-flex items-center rounded-full p-1;
+  background: #fffdf7;
+  border: var(--stroke-thin) solid var(--ink);
+  box-shadow: var(--shadow-ink-sm);
+}
+
+.language-toggle-button {
+  @apply inline-flex h-9 min-w-[48px] items-center justify-center rounded-full px-3.5 text-sm font-extrabold transition duration-150;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  color: var(--ink);
+}
+
+.language-toggle-button.active {
+  background: var(--lagoon);
+  color: #ffffff;
+}
+
+.language-toggle-button:not(.active):hover {
+  background: var(--mango-light);
+}
+
+/* ── Stickers & badges ──────────────────────────────────────────────────── */
+
+.artsy-brick-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+  background: var(--mango);
+  color: var(--ink);
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: var(--stroke-thin) solid var(--ink);
+  box-shadow: var(--shadow-ink-sm);
+  transform: rotate(-3deg);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.artsy-brick-badge:hover {
+  transform: rotate(0deg) scale(1.06);
+}
+
+.artsy-brick-badge-inverted {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+  background: var(--lagoon-light);
+  color: var(--ink);
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: var(--stroke-thin) solid var(--ink);
+  box-shadow: var(--shadow-ink-sm);
+  transform: rotate(2deg);
+}
+
+.artsy-title-card {
+  display: inline-block;
+  padding: 0.7rem 1.5rem;
+  background: var(--lagoon);
+  color: #ffffff;
+  border-radius: 20px;
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink);
+  transform: rotate(-1.5deg);
+}
+
+.artsy-title-card-light {
+  display: inline-block;
+  padding: 0.7rem 1.5rem;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 20px;
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink);
+  transform: rotate(1.5deg);
+}
+
+/* A postage-stamp edge, used on the hero portrait and highlight tiles. */
+.stamp-edge {
+  --stamp-notch: 9px;
+  background: var(--ink);
+  padding: var(--stroke);
+  -webkit-mask-image: radial-gradient(circle at center, #000 68%, transparent 70%);
+  -webkit-mask-size: var(--stamp-notch) var(--stamp-notch);
+  -webkit-mask-repeat: repeat;
+  mask-image: radial-gradient(circle at center, #000 68%, transparent 70%);
+  mask-size: var(--stamp-notch) var(--stamp-notch);
+  mask-repeat: repeat;
+}
+
+/* ── Pathway cards ──────────────────────────────────────────────────────── */
+
+.pathway-card {
   position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  border: var(--stroke) solid var(--ink);
+  background: #fffdf7;
+  box-shadow: var(--shadow-ink-lg);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
 }
 
-a::after {
-  content: '';
+.pathway-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0 0 var(--ink);
+}
+
+.pathway-card-dark {
+  background: #1b3a4b;
+  color: #fff6e5;
+}
+
+.pathway-card-dark h3,
+.pathway-card-dark h2 {
+  color: #fff6e5;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Plan My Day — the night-market panel
+   The planner is the one deliberately dark surface: a flat midnight-teal
+   poster with mango and lagoon accents, so the guided flow reads as its own
+   place without breaking the drawn language.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.planner {
+  --planner-teal: var(--lagoon-light);
+  --planner-amber: var(--mango-light);
+  position: relative;
+  isolation: isolate;
+}
+
+.planner-glow {
   position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--palm);
-  transition: width 0.3s ease;
+  z-index: -1;
+  border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
+  opacity: 0.4;
+  pointer-events: none;
 }
 
-a:hover::after {
+.planner-panel {
+  border-radius: 30px;
+  border: var(--stroke) solid var(--ink);
+  background: #17313f;
+  color: #fff6e5;
+  box-shadow: var(--shadow-ink-lg);
+}
+
+.planner-panel-soft {
+  border-radius: 22px;
+  border: var(--stroke-thin) solid rgba(255, 246, 229, 0.35);
+  background: #1f3d4d;
+}
+
+.planner-option {
+  position: relative;
+  display: flex;
   width: 100%;
+  align-items: flex-start;
+  gap: 1rem;
+  border-radius: 20px;
+  border: var(--stroke-thin) solid var(--ink);
+  background: #f7fbfb;
+  padding: 1.1rem 1.2rem;
+  text-align: left;
+  color: var(--ink);
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.planner-option:hover {
+  transform: translate(-2px, -2px);
+  background: var(--lagoon-light);
+  box-shadow: 6px 6px 0 0 var(--ink);
+}
+
+.planner-option[data-selected='true'] {
+  background: var(--mango-light);
+  box-shadow: 6px 6px 0 0 var(--ink);
+}
+
+/* The option markup carries light-on-dark text utilities; the tiles are cream
+   now, so pin their contents back to ink. */
+.planner-option,
+.planner-option * {
+  color: var(--ink) !important;
+}
+
+.planner-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: var(--stroke-thin) solid var(--ink);
+  background: #fffdf7;
+  padding: 0.5rem 1rem;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 0 var(--ink);
+  transition: transform 0.18s ease, background 0.2s ease;
+}
+
+.planner-chip:hover {
+  background: var(--lagoon-light);
+  transform: translate(-1px, -1px);
+}
+
+.planner-chip[data-selected='true'] {
+  background: var(--mango);
+  color: var(--ink);
+}
+
+.planner-rail {
+  height: 12px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: var(--stroke-thin) solid var(--ink);
+  background: #fffdf7;
+}
+
+.planner-rail-fill {
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--mango) 0 10px,
+    var(--mango-light) 10px 20px
+  );
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.planner-cta {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
+  background: var(--mango);
+  color: var(--ink);
+  border: var(--stroke) solid var(--ink);
+  box-shadow: var(--shadow-ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.planner-cta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 0 var(--ink);
+}
+
+.planner-cta:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 0 var(--ink);
+}
+
+.planner-cta-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-wide;
+  border: var(--stroke) solid #fff6e5;
+  background: transparent;
+  color: #fff6e5;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.planner-cta-ghost:hover {
+  background: #fff6e5;
+  color: var(--ink);
+}
+
+.planner-key {
+  display: inline-grid;
+  height: 1.6rem;
+  min-width: 1.6rem;
+  place-items: center;
+  border-radius: 0.5rem;
+  border: var(--stroke-thin) solid var(--ink);
+  background: var(--paper);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.planner-marquee {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  animation: drift 48s linear infinite;
+}
+
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* ── Drawn motion ───────────────────────────────────────────────────────── */
+
+/* Ten gentle tilt/bob variants. Cards nudge like paper cut-outs pinned to a
+   board — small amplitudes, no skew, so outlines stay crisp. */
+@keyframes tilt1 { 0%, 100% { transform: translateY(0) rotate(-0.8deg); } 50% { transform: translateY(-7px) rotate(0.7deg); } }
+@keyframes tilt2 { 0%, 100% { transform: translateY(0) rotate(0.9deg); } 50% { transform: translateY(-6px) rotate(-0.8deg); } }
+@keyframes tilt3 { 0%, 100% { transform: translateY(0) rotate(-1.1deg); } 50% { transform: translateY(-8px) rotate(0.5deg); } }
+@keyframes tilt4 { 0%, 100% { transform: translateY(0) rotate(0.6deg); } 50% { transform: translateY(-5px) rotate(-1deg); } }
+@keyframes tilt5 { 0%, 100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-9px) rotate(0.9deg); } }
+
+.animate-wave-sway-1 { animation: tilt1 7s ease-in-out infinite; }
+.animate-wave-sway-2 { animation: tilt2 8.5s ease-in-out infinite; animation-delay: -1.5s; }
+.animate-wave-sway-3 { animation: tilt3 7.5s ease-in-out infinite; animation-delay: -3.5s; }
+.animate-wave-sway-4 { animation: tilt4 9s ease-in-out infinite; animation-delay: -1s; }
+.animate-wave-sway-5 { animation: tilt5 6.5s ease-in-out infinite; animation-delay: -4s; }
+.animate-wave-sway-6 { animation: tilt1 8s ease-in-out infinite; animation-delay: -2.5s; }
+.animate-wave-sway-7 { animation: tilt2 9.5s ease-in-out infinite; animation-delay: -5s; }
+.animate-wave-sway-8 { animation: tilt3 6s ease-in-out infinite; animation-delay: -0.5s; }
+.animate-wave-sway-9 { animation: tilt4 8.8s ease-in-out infinite; animation-delay: -6s; }
+.animate-wave-sway-10 { animation: tilt5 7.2s ease-in-out infinite; animation-delay: -3.8s; }
+
+/* A hovered card should settle: stop the drift so the lift reads cleanly. */
+[class*='animate-wave-sway-']:hover {
+  animation-play-state: paused;
+}
+
+@keyframes fabPulse {
+  0%, 100% { box-shadow: 4px 4px 0 0 var(--ink); }
+  50% { box-shadow: 4px 4px 0 0 var(--ink), 0 0 0 10px rgba(47, 168, 79, 0.18); }
+}
+
+.animate-fab-glow-wave {
+  animation: fabPulse 3s ease-in-out infinite;
+}
+
+/* Palm fronds and clouds in the backdrop breathe rather than sway hard. */
+@keyframes frondSway {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(2.5deg); }
+}
+
+.animate-frond {
+  animation: frondSway 9s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* Clouds cross the viewport, so the distance is measured in viewport widths
+   rather than in multiples of the cloud's own box. */
+@keyframes cloudDrift {
+  from { transform: translateX(-25vw); }
+  to { transform: translateX(125vw); }
+}
+
+/* ── Long-form copy ─────────────────────────────────────────────────────── */
+
+.prose {
+  --tw-prose-body: var(--ink-soft);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-links: var(--lagoon-dark);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-quotes: var(--ink);
 }
 
 @media (max-width: 640px) {
+  :root {
+    --stroke: 2px;
+    --shadow-ink: 4px 4px 0 0 var(--ink);
+    --shadow-ink-lg: 5px 5px 0 0 var(--ink);
+  }
+
   .hero-glass {
-    border-radius: 28px;
+    border-radius: 24px;
   }
 
   .section-shell {
     @apply px-4;
   }
 
-  .story-copy-card,
-  .story-media-frame::before {
-    border-radius: 24px;
+  .section-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 1.9rem;
   }
 }
 
@@ -435,374 +1001,6 @@ a:hover::after {
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
     animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
-
-/* Organic ocean wave toss & sway keyframe animations (10 distinct visible variations - GPU Accelerated) */
-@keyframes waveSway1 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  25% { transform: translate3d(0px, -12px, 0px) rotate(1.8deg) skewX(-1.2deg); }
-  55% { transform: translate3d(0px, 10px, 0px) rotate(-1.5deg) skewX(1.4deg); }
-  80% { transform: translate3d(0px, -8px, 0px) rotate(1.1deg) skewX(-0.8deg); }
-}
-@keyframes waveSway2 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  30% { transform: translate3d(0px, 14px, 0px) rotate(-2.2deg) skewX(1.5deg); }
-  60% { transform: translate3d(0px, -15px, 0px) rotate(1.9deg) skewX(-1.3deg); }
-  85% { transform: translate3d(0px, 8px, 0px) rotate(-1.0deg) skewX(0.9deg); }
-}
-@keyframes waveSway3 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  22% { transform: translate3d(0px, -14px, 0px) rotate(-1.9deg) skewX(1.6deg); }
-  52% { transform: translate3d(0px, 15px, 0px) rotate(2.1deg) skewX(-1.8deg); }
-  78% { transform: translate3d(0px, -7px, 0px) rotate(-1.2deg) skewX(1.0deg); }
-}
-@keyframes waveSway4 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  35% { transform: translate3d(0px, 13px, 0px) rotate(1.7deg) skewX(-1.3deg); }
-  68% { transform: translate3d(0px, -13px, 0px) rotate(-1.8deg) skewX(1.4deg); }
-  90% { transform: translate3d(0px, 9px, 0px) rotate(1.0deg) skewX(-0.8deg); }
-}
-@keyframes waveSway5 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  28% { transform: translate3d(0px, -16px, 0px) rotate(-2.4deg) skewX(1.3deg); }
-  58% { transform: translate3d(0px, 11px, 0px) rotate(1.6deg) skewX(-1.5deg); }
-  82% { transform: translate3d(0px, -9px, 0px) rotate(-1.1deg) skewX(0.7deg); }
-}
-@keyframes waveSway6 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  20% { transform: translate3d(0px, 11px, 0px) rotate(2.0deg) skewX(-1.6deg); }
-  50% { transform: translate3d(0px, -14px, 0px) rotate(-1.7deg) skewX(1.8deg); }
-  75% { transform: translate3d(0px, 12px, 0px) rotate(1.3deg) skewX(-1.0deg); }
-}
-@keyframes waveSway7 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  32% { transform: translate3d(0px, -13px, 0px) rotate(-1.6deg) skewX(1.7deg); }
-  62% { transform: translate3d(0px, 16px, 0px) rotate(1.8deg) skewX(-1.3deg); }
-  84% { transform: translate3d(0px, -7px, 0px) rotate(-1.1deg) skewX(0.8deg); }
-}
-@keyframes waveSway8 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  26% { transform: translate3d(0px, 14px, 0px) rotate(1.9deg) skewX(-1.9deg); }
-  56% { transform: translate3d(0px, -13px, 0px) rotate(-2.1deg) skewX(1.4deg); }
-  88% { transform: translate3d(0px, 10px, 0px) rotate(1.2deg) skewX(-1.0deg); }
-}
-@keyframes waveSway9 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  24% { transform: translate3d(0px, -11px, 0px) rotate(-1.8deg) skewX(1.3deg); }
-  54% { transform: translate3d(0px, 14px, 0px) rotate(2.0deg) skewX(-1.7deg); }
-  79% { transform: translate3d(0px, -8px, 0px) rotate(-0.9deg) skewX(0.9deg); }
-}
-@keyframes waveSway10 {
-  0%, 100% { transform: translate3d(0px, 0px, 0px) rotate(0deg) skewX(0deg); }
-  34% { transform: translate3d(0px, 12px, 0px) rotate(1.5deg) skewX(-1.1deg); }
-  66% { transform: translate3d(0px, -15px, 0px) rotate(-1.9deg) skewX(1.6deg); }
-  87% { transform: translate3d(0px, 7px, 0px) rotate(1.0deg) skewX(-0.7deg); }
-}
-
-.animate-wave-sway-1 { animation: waveSway1 7s ease-in-out infinite; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-2 { animation: waveSway2 8.5s ease-in-out infinite; animation-delay: -1.5s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-3 { animation: waveSway3 7.5s ease-in-out infinite; animation-delay: -3.5s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-4 { animation: waveSway4 9s ease-in-out infinite; animation-delay: -1s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-5 { animation: waveSway5 6.5s ease-in-out infinite; animation-delay: -4s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-6 { animation: waveSway6 8s ease-in-out infinite; animation-delay: -2.5s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-7 { animation: waveSway7 9.5s ease-in-out infinite; animation-delay: -5s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-8 { animation: waveSway8 6s ease-in-out infinite; animation-delay: -0.5s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-9 { animation: waveSway9 8.8s ease-in-out infinite; animation-delay: -6s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-.animate-wave-sway-10 { animation: waveSway10 7.2s ease-in-out infinite; animation-delay: -3.8s; will-change: transform; transform: translateZ(0); backface-visibility: hidden; }
-
-/* Artsy title cards & badges */
-.artsy-title-card {
-  display: inline-block;
-  padding: 0.85rem 1.75rem;
-  background: #04131D;
-  color: #FAF7F2;
-  border-radius: 1.5rem;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 4px 4px 0px rgba(10, 114, 128, 0.85), 0 15px 35px rgba(4, 19, 29, 0.3);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  animation: waveSway4 18s ease-in-out infinite;
-}
-
-.artsy-title-card-light {
-  display: inline-block;
-  padding: 0.85rem 1.75rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.75));
-  color: #04131D;
-  border-radius: 1.5rem;
-  border: 2px solid #04131D;
-  box-shadow: 4px 4px 0px #0d9488, 0 15px 35px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  animation: waveSway2 16s ease-in-out infinite;
-}
-
-.artsy-brick-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.85rem;
-  background: #04131D;
-  color: #fbbf24;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.725rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  border: 2px solid #ffffff;
-  box-shadow: 4px 4px 0px rgba(10, 114, 128, 0.85), 0 10px 25px rgba(4, 19, 29, 0.3);
-  transform: rotate(-1.5deg);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.artsy-brick-badge:hover {
-  transform: rotate(0deg) scale(1.05);
-  box-shadow: 6px 6px 0px #04131D;
-}
-
-.artsy-brick-badge-inverted {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.85rem;
-  background: #ffffff;
-  color: #04131D;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.725rem;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  border: 2px solid #04131D;
-  box-shadow: 4px 4px 0px #0d9488, 0 10px 25px rgba(0, 0, 0, 0.15);
-  transform: rotate(1.2deg);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.artsy-glass-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(240, 249, 255, 0.28) 60%, rgba(224, 242, 254, 0.38));
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 20px 50px rgba(6, 29, 43, 0.16), 0 0 30px rgba(10, 114, 128, 0.14);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.artsy-glass-card:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(240, 249, 255, 0.38) 60%, rgba(224, 242, 254, 0.48));
-  box-shadow: 0 30px 70px rgba(6, 29, 43, 0.22), 0 0 45px rgba(10, 114, 128, 0.22);
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
-   Plan My Day — deep-ocean glass surface
-   The planner sits on top of the WebGL water, so every panel is translucent
-   navy: the shader keeps moving underneath while text stays fully legible.
-   ══════════════════════════════════════════════════════════════════════════ */
-
-.planner {
-  --planner-teal: #2dd4bf;
-  --planner-amber: #fbbf24;
-  position: relative;
-  isolation: isolate;
-}
-
-/* The global animated link underline would fight the planner's own states. */
-.planner a::after {
-  content: none;
-}
-
-.planner-glow {
-  position: absolute;
-  z-index: -1;
-  border-radius: 9999px;
-  filter: blur(90px);
-  pointer-events: none;
-  opacity: 0.55;
-}
-
-.planner-panel {
-  border-radius: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(155deg, rgba(4, 19, 29, 0.9) 0%, rgba(7, 44, 60, 0.82) 55%, rgba(4, 19, 29, 0.9) 100%);
-  box-shadow: 0 44px 110px rgba(2, 12, 20, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.09);
-  backdrop-filter: blur(20px) saturate(130%);
-  -webkit-backdrop-filter: blur(20px) saturate(130%);
-}
-
-.planner-panel-soft {
-  border-radius: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.planner-option {
-  position: relative;
-  display: flex;
-  width: 100%;
-  align-items: flex-start;
-  gap: 1rem;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(150deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
-  padding: 1.15rem 1.25rem;
-  text-align: left;
-  color: #f1f5f9;
-  box-shadow: 0 12px 30px rgba(2, 12, 20, 0.3);
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease,
-    background 0.28s ease, box-shadow 0.28s ease;
-}
-
-.planner-option:hover {
-  transform: translateY(-3px);
-  border-color: rgba(45, 212, 191, 0.55);
-  background: linear-gradient(150deg, rgba(45, 212, 191, 0.16), rgba(255, 255, 255, 0.03));
-  box-shadow: 0 22px 50px rgba(13, 148, 136, 0.28);
-}
-
-.planner-option[data-selected='true'] {
-  border-color: rgba(45, 212, 191, 0.9);
-  background: linear-gradient(150deg, rgba(13, 148, 136, 0.4), rgba(4, 19, 29, 0.55));
-  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.55), 0 26px 60px rgba(13, 148, 136, 0.32);
-}
-
-.planner-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 0.55rem 1rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  transition: all 0.25s ease;
-}
-
-.planner-chip:hover {
-  border-color: rgba(45, 212, 191, 0.6);
-  background: rgba(45, 212, 191, 0.14);
-  color: #ffffff;
-}
-
-.planner-chip[data-selected='true'] {
-  border-color: rgba(45, 212, 191, 0.9);
-  background: linear-gradient(120deg, rgba(45, 212, 191, 0.85), rgba(14, 165, 233, 0.75));
-  color: #04131d;
-  box-shadow: 0 10px 26px rgba(45, 212, 191, 0.35);
-}
-
-.planner-rail {
-  height: 4px;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.planner-rail-fill {
-  height: 100%;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #2dd4bf, #38bdf8 55%, #fbbf24);
-  box-shadow: 0 0 18px rgba(45, 212, 191, 0.6);
-  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.planner-cta {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold uppercase tracking-[0.12em] transition duration-300;
-  background: linear-gradient(120deg, #2dd4bf 0%, #22d3ee 45%, #fbbf24 100%);
-  color: #04131d;
-  box-shadow: 0 18px 44px rgba(45, 212, 191, 0.35);
-}
-
-.planner-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 26px 60px rgba(45, 212, 191, 0.45);
-}
-
-.planner-cta-ghost {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold uppercase tracking-[0.12em] transition duration-300;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.07);
-  color: #e2e8f0;
-}
-
-.planner-cta-ghost:hover {
-  border-color: rgba(255, 255, 255, 0.55);
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
-}
-
-.planner-key {
-  display: inline-grid;
-  height: 1.5rem;
-  min-width: 1.5rem;
-  place-items: center;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #cbd5f5;
-}
-
-.planner-marquee {
-  display: flex;
-  gap: 1rem;
-  width: max-content;
-  animation: plannerDrift 48s linear infinite;
-}
-
-@keyframes plannerDrift {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-50%, 0, 0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .planner-marquee { animation: none; }
-}
-
-/* Home page — the two ways in (catalogue vs. planner) */
-.pathway-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: linear-gradient(150deg, rgba(255, 255, 255, 0.72), rgba(236, 254, 255, 0.5));
-  box-shadow: 0 30px 80px rgba(6, 29, 43, 0.18);
-  backdrop-filter: blur(14px) saturate(120%);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
-}
-
-.pathway-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 44px 110px rgba(6, 29, 43, 0.26);
-}
-
-.pathway-card-dark {
-  border-color: rgba(45, 212, 191, 0.35);
-  background: linear-gradient(150deg, rgba(4, 19, 29, 0.92), rgba(9, 60, 78, 0.86));
-  box-shadow: 0 34px 90px rgba(2, 12, 20, 0.45);
-}
-
-@keyframes fabGlowPulse {
-  0%, 100% {
-    background-color: rgba(4, 19, 29, 0.92);
-    box-shadow: 0 15px 35px rgba(4, 19, 29, 0.6), 0 0 20px rgba(52, 211, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border-color: rgba(52, 211, 153, 0.4);
-  }
-  50% {
-    background-color: rgba(14, 68, 92, 0.98);
-    box-shadow: 0 22px 50px rgba(6, 29, 43, 0.85), 0 0 38px rgba(52, 211, 153, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-    border-color: rgba(52, 211, 153, 0.9);
-  }
-}
-
-.animate-fab-glow-wave {
-  animation: waveSway1 12s ease-in-out infinite, fabGlowPulse 4s ease-in-out infinite;
-  will-change: transform, box-shadow, background-color;
-}
-

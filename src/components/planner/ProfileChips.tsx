@@ -99,7 +99,7 @@ export const ProfileChips: React.FC<{ compact?: boolean }> = ({ compact = false 
   return (
     <div className={compact ? 'space-y-2' : 'space-y-3'}>
       {!compact && (
-        <div className="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+        <div className="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-paper/60">
           <HiPencil className="h-3.5 w-3.5" />
           {copy.ui.tapToEdit}
         </div>

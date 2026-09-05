@@ -52,25 +52,25 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
   };
 
   const radiusClass = index % 3 === 0
-    ? 'rounded-[36px_20px_32px_24px]'
+    ? 'rounded-[30px_20px_28px_22px]'
     : index % 3 === 1
-    ? 'rounded-[24px_38px_20px_34px]'
-    : 'rounded-[32px_22px_38px_18px]';
+    ? 'rounded-[22px_30px_20px_28px]'
+    : 'rounded-[28px_20px_30px_18px]';
 
   return (
     <div
       onMouseEnter={() => playHoverFx()}
-      className={`group flex h-full flex-col overflow-hidden ${radiusClass} artsy-glass-card ${swayClass} transition-all duration-500 hover:-translate-y-2.5 hover:shadow-[0_36px_100px_rgba(4,19,29,0.32),0_0_45px_rgba(13,148,136,0.28)] shadow-[0_24px_60px_rgba(4,19,29,0.18),0_0_35px_rgba(13,148,136,0.15)] border border-white/60`}
+      className={`group flex h-full flex-col overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
     >
       {/* Image container */}
-      <div className="relative h-60 overflow-hidden bg-slate-200 sm:h-64 md:h-80">
+      <div className="relative h-60 overflow-hidden border-b-[2.5px] border-ink bg-paper-warm sm:h-64 md:h-80">
         <img
           src={adventure.imageUrl}
           alt={adventure.title}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="photo-pop h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#04131D]/85 via-[#04131D]/15 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+        {/* Ink wash on hover, so the play button has something to sit against */}
+        <div className="absolute inset-0 bg-ink/45 opacity-0 transition-opacity group-hover:opacity-100" />
 
         {/* Video button overlay */}
         {!showVideo && (
@@ -81,12 +81,12 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
             }}
             className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
           >
-            <FaPlayCircle className="text-white text-6xl drop-shadow-lg hover:scale-110 transition-transform" />
+            <FaPlayCircle className="text-6xl text-paper transition-transform hover:scale-110" />
           </button>
         )}
 
         {/* Emoji badge */}
-        <div className="absolute right-4 top-4 rounded-full bg-white/90 p-3 text-3xl shadow-lg backdrop-blur border border-white/60">
+        <div className="absolute right-4 top-4 rotate-3 rounded-full border-[2.5px] border-ink bg-mango-light p-3 text-3xl leading-none shadow-ink-sm">
           {adventure.emoji}
         </div>
       </div>
@@ -108,7 +108,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
               playClickFx();
               setShowVideo(false);
             }}
-            className="absolute top-2 right-2 z-10 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold"
+            className="absolute right-2 top-2 z-10 rounded-full border-2 border-ink bg-hibiscus px-3 py-1 text-xs font-extrabold text-white"
           >
             Close Video
           </button>
@@ -117,22 +117,22 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
 
       {/* Content */}
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <h3 className="mb-3 font-serif text-2xl font-bold leading-tight text-[#04131D]">{adventure.title}</h3>
+        <h3 className="mb-3 font-display text-2xl font-extrabold leading-tight text-ink">{adventure.title}</h3>
 
         {/* Quick info */}
         <div className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-bold uppercase tracking-wider">
-          <div className="flex items-center gap-1.5 text-teal-700">
+          <div className="flex items-center gap-1.5 text-lagoon-dark">
             <FaClock className="text-base" />
             <span>{adventure.duration}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-amber-600">
+          <div className="flex items-center gap-1.5 text-mango-dark">
             <FaUsers className="text-base" />
             <span>{adventure.vibe}</span>
           </div>
         </div>
 
         {/* Description */}
-        <p className="mb-4 flex-1 italic leading-relaxed text-slate-700">{adventure.description}</p>
+        <p className="mb-4 flex-1 font-semibold italic leading-relaxed text-ink-soft">{adventure.description}</p>
 
         {/* Expandable section */}
         <div
@@ -140,15 +140,15 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
             isExpanded ? 'max-h-96' : 'max-h-0'
           }`}
         >
-          <div className="mt-4 border-t border-slate-200/80 pt-4">
+          <div className="mt-4 border-t-2 border-dashed border-ink/25 pt-4">
             <div className="mb-4">
-              <h4 className="font-bold text-slate-900 mb-2">
+              <h4 className="mb-2 font-display font-extrabold text-ink">
                 <FormattedMessage id="story.highlights" />
               </h4>
               <ul className="space-y-2">
                 {adventure.highlights.map((highlight, idx) => (
-                  <li key={idx} className="flex gap-2 text-sm text-slate-600">
-                    <span className="font-bold text-teal-600">✓</span>
+                  <li key={idx} className="flex gap-2 text-sm font-semibold text-ink-soft">
+                    <span className="font-extrabold text-jungle">✓</span>
                     <span>{highlight}</span>
                   </li>
                 ))}
@@ -156,17 +156,17 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
             </div>
 
             <div className="mb-4">
-              <h4 className="font-bold text-slate-900 mb-2">
+              <h4 className="mb-2 font-display font-extrabold text-ink">
                 <FormattedMessage id="story.bestFor" />
               </h4>
-              <p className="text-sm text-slate-600">{adventure.bestFor}</p>
+              <p className="text-sm font-semibold text-ink-soft">{adventure.bestFor}</p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               {adventure.mood.split(', ').map((mood, idx) => (
                 <span
                   key={idx}
-                  className="rounded-full bg-white/80 border border-white/60 px-3 py-1 text-xs font-semibold text-slate-800 shadow-sm"
+                  className="rounded-full border-2 border-ink bg-lagoon-light px-3 py-1 text-xs font-extrabold text-ink"
                 >
                   {mood}
                 </span>
@@ -182,20 +182,20 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
               playClickFx();
               setIsExpanded(!isExpanded);
             }}
-            className="flex-1 rounded-full bg-slate-900 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-teal-700"
+            className="flex-1 rounded-full border-[2.5px] border-ink bg-paper px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-lagoon-light"
           >
             {isExpanded ? 'Show Less' : 'Details'}
           </button>
           <button
             onClick={handleWhatsAppClick}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-600 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-emerald-500 shadow-md"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-mango px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-mango-light"
           >
             <FaMapPin className="text-base" />
             Book Now
           </button>
           <button
             onClick={handleShowDetails}
-            className="flex flex-1 items-center justify-center rounded-full border border-slate-300 bg-white/80 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-900 transition-all hover:border-teal-600 hover:text-teal-700"
+            className="flex flex-1 items-center justify-center rounded-full border-[2.5px] border-ink bg-paper px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-hibiscus-light"
           >
             All Details
           </button>

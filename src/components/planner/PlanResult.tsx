@@ -49,7 +49,7 @@ export const PlanResult: React.FC = () => {
     return (
       <div className="planner-panel flex flex-col items-center gap-4 px-8 py-20 text-center">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-teal-400 border-t-transparent" />
-        <p className="text-slate-300">{copy.result.building}</p>
+        <p className="text-paper/85">{copy.result.building}</p>
       </div>
     );
   }
@@ -68,14 +68,14 @@ export const PlanResult: React.FC = () => {
       >
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
-            <span className="rounded-full border border-teal-400/40 bg-teal-500/15 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-teal-200">
+            <span className="rounded-full border border-teal-400/40 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
               {copy.result.eyebrow}
             </span>
-            <h2 className="mt-4 flex flex-wrap items-center gap-3 font-serif text-3xl font-bold leading-tight text-white sm:text-5xl">
+            <h2 className="mt-4 flex flex-wrap items-center gap-3 font-display text-3xl font-bold leading-tight text-paper sm:text-5xl">
               <span className="text-4xl sm:text-5xl">{plan.persona.emoji}</span>
               {plan.persona.title}
             </h2>
-            <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-300">
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-paper/85">
               {plan.persona.blurb}
             </p>
           </div>
@@ -105,7 +105,7 @@ export const PlanResult: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-7 border-t border-white/10 pt-6">
+        <div className="mt-7 border-t border-paper/20 pt-6">
           <ProfileChips />
         </div>
       </motion.header>
@@ -113,32 +113,32 @@ export const PlanResult: React.FC = () => {
       {/* ── Money bar ───────────────────────────────────────────────────── */}
       <section className="planner-panel grid gap-6 px-6 py-6 sm:grid-cols-3 sm:px-9">
         <div>
-          <div className="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+          <div className="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-paper/60">
             {copy.result.grandTotal}
           </div>
-          <div className="mt-1 font-serif text-4xl font-bold text-amber-300">
+          <div className="mt-1 font-display text-4xl font-bold text-mango-light">
             ${plan.grandTotal}
-            <span className="ml-1.5 text-sm font-semibold uppercase text-slate-400">USD</span>
+            <span className="ml-1.5 text-sm font-semibold uppercase text-paper/60">USD</span>
           </div>
-          <div className="mt-1 text-xs text-slate-400">
+          <div className="mt-1 text-xs text-paper/60">
             {copy.result.priceFor(profile.adults, profile.children)} · 🎟️ {totalItems} · 🗓️{' '}
             {plan.days.length}
           </div>
         </div>
 
         <div>
-          <div className="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+          <div className="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-paper/60">
             {copy.result.perPerson}
           </div>
-          <div className="mt-1 font-serif text-4xl font-bold text-white">${plan.perPersonTotal}</div>
-          <div className="mt-1 text-xs text-slate-400">${perDay} / {copy.questions.days.unit.replace(/s$/, '')}</div>
+          <div className="mt-1 font-display text-4xl font-bold text-paper">${plan.perPersonTotal}</div>
+          <div className="mt-1 text-xs text-paper/60">${perDay} / {copy.questions.days.unit.replace(/s$/, '')}</div>
         </div>
 
         <div className="flex flex-col justify-center">
           {plan.budgetCapPerPersonPerDay !== null && (
             <>
               <div className="mb-2 flex items-center justify-between text-[0.66rem] font-bold uppercase tracking-[0.16em]">
-                <span className={plan.overBudget ? 'text-amber-300' : 'text-teal-300'}>
+                <span className={plan.overBudget ? 'text-mango-light' : 'text-lagoon-light'}>
                   {plan.overBudget ? '⚠︎' : '✓'} ${perDay} / ${plan.budgetCapPerPersonPerDay}
                 </span>
               </div>
@@ -150,7 +150,7 @@ export const PlanResult: React.FC = () => {
                   }}
                 />
               </div>
-              <p className={`mt-2 text-xs ${plan.overBudget ? 'text-amber-200/90' : 'text-slate-400'}`}>
+              <p className={`mt-2 text-xs ${plan.overBudget ? 'text-mango-light/90' : 'text-paper/60'}`}>
                 {plan.overBudget ? copy.result.budgetOver : copy.result.budgetOk}
               </p>
             </>
@@ -161,10 +161,10 @@ export const PlanResult: React.FC = () => {
       {/* ── Length of the trip ──────────────────────────────────────────── */}
       <section className="planner-panel flex flex-wrap items-center justify-between gap-4 px-6 py-5 sm:px-9">
         <div>
-          <div className="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+          <div className="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-paper/60">
             {copy.result.daysLabel}
           </div>
-          <p className="mt-1 text-sm text-slate-400">{copy.questions.days.hint}</p>
+          <p className="mt-1 text-sm text-paper/60">{copy.questions.days.hint}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -177,14 +177,14 @@ export const PlanResult: React.FC = () => {
               playClickFx();
               removeDay();
             }}
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:border-teal-300/70 hover:bg-teal-400/20 disabled:opacity-30"
+            className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-paper transition hover:border-teal-300/70 hover:bg-lagoon-light/20 disabled:opacity-30"
           >
             <HiMinus className="h-4 w-4" />
           </button>
 
-          <span className="min-w-[4.5rem] text-center font-serif text-3xl font-bold text-white tabular-nums">
+          <span className="min-w-[4.5rem] text-center font-display text-3xl font-bold text-paper tabular-nums">
             {plan.days.length}
-            <span className="ml-1.5 text-sm font-semibold text-slate-400">
+            <span className="ml-1.5 text-sm font-semibold text-paper/60">
               {copy.questions.days.unit}
             </span>
           </span>
@@ -198,7 +198,7 @@ export const PlanResult: React.FC = () => {
               playClickFx();
               addDay();
             }}
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:border-teal-300/70 hover:bg-teal-400/20 disabled:opacity-30"
+            className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-paper transition hover:border-teal-300/70 hover:bg-lagoon-light/20 disabled:opacity-30"
           >
             <HiPlus className="h-4 w-4" />
           </button>
@@ -209,24 +209,24 @@ export const PlanResult: React.FC = () => {
       {plan.days.map((day) => (
         <section key={day.index} className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-            <h3 className="flex items-center gap-3 font-serif text-2xl font-bold text-white">
+            <h3 className="flex items-center gap-3 font-display text-2xl font-bold text-paper">
               <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500 font-sans text-lg font-extrabold text-slate-950">
                 {day.index}
               </span>
               {copy.result.dayLabel(day.index)}
             </h3>
-            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">
+            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-[0.14em] text-paper/60">
               <span className="inline-flex items-center gap-1.5">
                 <HiOutlineClock className="h-4 w-4" /> {copy.result.hours(day.activeHours)}
               </span>
-              <span className="text-amber-300">
+              <span className="text-mango-light">
                 {copy.result.dayTotal}: ${day.dayTotal}
               </span>
             </div>
           </div>
 
           {day.items.length === 0 ? (
-            <div className="planner-panel px-6 py-10 text-center text-slate-400">
+            <div className="planner-panel px-6 py-10 text-center text-paper/60">
               {copy.result.empty}
             </div>
           ) : (
@@ -242,7 +242,7 @@ export const PlanResult: React.FC = () => {
               ))}
 
               {day.note && (
-                <p className="planner-panel-soft px-5 py-3 text-center text-xs text-slate-400">
+                <p className="planner-panel-soft px-5 py-3 text-center text-xs text-paper/60">
                   {day.note}
                 </p>
               )}
@@ -254,14 +254,14 @@ export const PlanResult: React.FC = () => {
       {/* ── Transport ───────────────────────────────────────────────────── */}
       <section className="planner-panel flex flex-col gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-9">
         <div className="flex items-start gap-4">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-teal-500/15 text-2xl text-teal-300 ring-1 ring-teal-400/30">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-lagoon-light/20 text-2xl text-lagoon-light border-2 border-lagoon-light/40">
             <HiTruck />
           </span>
           <div>
-            <h4 className="font-serif text-lg font-bold text-white">{copy.result.transportTitle}</h4>
-            <p className="mt-1 max-w-xl text-sm text-slate-300">{plan.transport.vehicleNote}</p>
+            <h4 className="font-display text-lg font-bold text-paper">{copy.result.transportTitle}</h4>
+            <p className="mt-1 max-w-xl text-sm text-paper/85">{plan.transport.vehicleNote}</p>
             {plan.transport.choice !== 'included' && (
-              <p className="mt-1 text-sm font-semibold text-teal-300">
+              <p className="mt-1 text-sm font-semibold text-lagoon-light">
                 {copy.result.vehicleSuggestion(plan.transport.vehicleLabel, plan.transport.passengers)}
               </p>
             )}
@@ -283,8 +283,8 @@ export const PlanResult: React.FC = () => {
       {plan.alternates.length > 0 && (
         <section className="planner-panel px-6 py-7 sm:px-9">
           <div className="mb-5">
-            <h3 className="font-serif text-xl font-bold text-white">{copy.result.alternates}</h3>
-            <p className="mt-1 text-sm text-slate-400">{copy.result.alternatesHint}</p>
+            <h3 className="font-display text-xl font-bold text-paper">{copy.result.alternates}</h3>
+            <p className="mt-1 text-sm text-paper/60">{copy.result.alternatesHint}</p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -307,21 +307,21 @@ export const PlanResult: React.FC = () => {
                     className="h-full w-full object-cover"
                   />
                   <span className="absolute inset-0 bg-gradient-to-t from-[#04131d]/85 to-transparent" />
-                  <span className="absolute bottom-2 left-3 right-3 truncate text-sm font-bold text-white">
+                  <span className="absolute bottom-2 left-3 right-3 truncate text-sm font-bold text-paper">
                     {alternate.entry.tour.title}
                   </span>
                 </span>
 
                 <span className="flex items-center justify-between gap-2 px-1">
-                  <span className="truncate text-xs text-slate-300">
+                  <span className="truncate text-xs text-paper/85">
                     {alternate.reasons[0] ?? copy.reasons.variety}
                   </span>
-                  <span className="shrink-0 text-sm font-bold text-amber-300">
+                  <span className="shrink-0 text-sm font-bold text-mango-light">
                     ${alternate.pricing.total}
                   </span>
                 </span>
 
-                <span className="inline-flex items-center justify-center gap-1.5 rounded-full bg-teal-400/15 px-3 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-teal-200">
+                <span className="inline-flex items-center justify-center gap-1.5 rounded-full bg-lagoon-light/20 px-3 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-lagoon-light">
                   <HiPlus className="h-3.5 w-3.5" /> {copy.result.add}
                 </span>
               </button>
@@ -341,20 +341,20 @@ export const PlanResult: React.FC = () => {
             }}
             className="flex w-full items-center justify-between gap-3 text-left"
           >
-            <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+            <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-paper/60">
               {copy.result.ruledOut} ({plan.ruledOut.length})
             </span>
             <HiChevronDown
-              className={`h-4 w-4 text-slate-400 transition-transform ${showRuledOut ? 'rotate-180' : ''}`}
+              className={`h-4 w-4 text-paper/60 transition-transform ${showRuledOut ? 'rotate-180' : ''}`}
             />
           </button>
 
           {showRuledOut && (
             <ul className="mt-4 space-y-2">
               {plan.ruledOut.map((entry) => (
-                <li key={entry.title} className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
-                  <span className="font-semibold text-slate-300">{entry.title}</span>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[0.68rem]">
+                <li key={entry.title} className="flex flex-wrap items-center gap-2 text-sm text-paper/60">
+                  <span className="font-semibold text-paper/85">{entry.title}</span>
+                  <span className="rounded-full border border-paper/20 bg-white/5 px-2.5 py-0.5 text-[0.68rem]">
                     {entry.reason}
                   </span>
                 </li>
@@ -366,20 +366,20 @@ export const PlanResult: React.FC = () => {
 
       {/* ── Hand-off ────────────────────────────────────────────────────── */}
       <section className="planner-panel flex flex-col items-center gap-4 px-6 py-9 text-center sm:px-10">
-        <h3 className="font-serif text-2xl font-bold text-white sm:text-3xl">
+        <h3 className="font-display text-2xl font-bold text-paper sm:text-3xl">
           {plan.persona.title} · ${plan.grandTotal} USD
         </h3>
 
         {/* What actually happens next — no surprise charges, no auto-booking. */}
-        <div className="w-full max-w-2xl rounded-3xl border border-teal-400/25 bg-teal-500/10 px-5 py-4 text-left">
-          <div className="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-teal-200">
+        <div className="w-full max-w-2xl rounded-3xl border border-teal-400/25 bg-lagoon-light/20 px-5 py-4 text-left">
+          <div className="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-lagoon-light">
             <HiShieldCheck className="h-4 w-4" />
             {copy.result.reviewTitle}
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-slate-300">{copy.result.reviewBody}</p>
+          <p className="mt-2 text-sm leading-relaxed text-paper/85">{copy.result.reviewBody}</p>
         </div>
 
-        <p className="max-w-xl text-sm text-slate-300">{copy.result.bookHint}</p>
+        <p className="max-w-xl text-sm text-paper/85">{copy.result.bookHint}</p>
 
         <a
           href={whatsappUrl}
@@ -396,7 +396,7 @@ export const PlanResult: React.FC = () => {
           {copy.hero.browse}
         </Link>
 
-        <p className="text-[0.68rem] text-slate-500">{copy.result.savedNote}</p>
+        <p className="text-[0.68rem] text-paper/60">{copy.result.savedNote}</p>
       </section>
     </div>
   );

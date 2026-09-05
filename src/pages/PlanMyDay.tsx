@@ -38,17 +38,17 @@ const PlanMyDay: React.FC = () => {
     <div className="planner relative min-h-screen px-4 py-12 sm:py-16 md:px-8">
       <FABWhatsApp phoneNumber={brandSettings.phoneNumber} />
 
-      {/* Ambient light behind the glass. The blobs deliberately bleed past the
+      {/* Painted washes behind the panels. They deliberately bleed past the
           page edges, so they live in a clipping wrapper — otherwise they widen
           the document and summon a horizontal scrollbar. */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div
           className="planner-glow left-[-10%] top-24 h-[28rem] w-[28rem]"
-          style={{ background: 'radial-gradient(circle, rgba(13,148,136,.55), transparent 65%)' }}
+          style={{ background: '#7FE3DA' }}
         />
         <div
           className="planner-glow bottom-10 right-[-8%] h-[24rem] w-[24rem]"
-          style={{ background: 'radial-gradient(circle, rgba(251,191,36,.4), transparent 65%)' }}
+          style={{ background: '#FFC861' }}
         />
       </div>
 
@@ -57,8 +57,8 @@ const PlanMyDay: React.FC = () => {
         {stage === 'questions' && (
           <div className="mb-6 space-y-4">
             <div className="flex items-center justify-between gap-4">
-              <span className="font-serif text-lg font-bold text-white/90">{copy.tab}</span>
-              <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+              <span className="font-display text-lg font-extrabold text-ink">{copy.tab}</span>
+              <span className="text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-ink-soft">
                 {copy.ui.stepOf(stepIndex + 1, steps.length)}
               </span>
             </div>
@@ -91,7 +91,7 @@ const PlanMyDay: React.FC = () => {
         </div>
 
         {loading && stage === 'intro' && (
-          <p className="mt-6 text-center text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="mt-6 text-center text-xs font-extrabold uppercase tracking-[0.18em] text-ink-soft">
             {copy.result.building}
           </p>
         )}

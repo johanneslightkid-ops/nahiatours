@@ -193,13 +193,13 @@ const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
             setTimeout(() => setShowSuggestions(false), 200);
           }}
           placeholder={placeholder}
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-base focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+          className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
         />
         {inputValue && (
           <button
             type="button"
             onClick={handleClear}
-            className="text-slate-400 transition hover:text-slate-600"
+            className="text-ink-light transition hover:text-ink-soft"
             aria-label="Clear location"
           >
             ✕
@@ -208,22 +208,22 @@ const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
       </div>
 
       {loading && inputValue.length >= 3 && (
-        <div className="mt-1 flex items-center gap-2 px-1 text-xs text-slate-400">
-          <div className="h-3 w-3 animate-spin rounded-full border-2 border-teal-400 border-t-transparent" />
+        <div className="mt-1 flex items-center gap-2 px-1 text-xs text-ink-light">
+          <div className="h-3 w-3 animate-spin rounded-full border-2 border-lagoon border-t-transparent" />
           Searching...
         </div>
       )}
 
       {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-2xl border-2 border-ink bg-white shadow-ink-sm">
           {suggestions.map((s) => (
             <li
               key={s.placeId}
               onMouseDown={() => handleSelect(s)}
-              className="cursor-pointer border-b border-slate-100 px-4 py-3 text-sm text-slate-700 transition hover:bg-teal-50 last:border-b-0"
+              className="cursor-pointer border-b border-slate-100 px-4 py-3 text-sm text-ink-soft transition hover:bg-lagoon-light last:border-b-0"
             >
               <div className="flex items-center gap-2">
-                <span className="text-teal-500 shrink-0">📍</span>
+                <span className="text-lagoon shrink-0">📍</span>
                 <span className="line-clamp-2">{s.description}</span>
               </div>
             </li>
@@ -232,7 +232,7 @@ const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
       )}
 
       {!available && (
-        <p className="mt-1 text-xs text-amber-600">Map services unavailable</p>
+        <p className="mt-1 text-xs text-mango-dark">Map services unavailable</p>
       )}
     </div>
   );

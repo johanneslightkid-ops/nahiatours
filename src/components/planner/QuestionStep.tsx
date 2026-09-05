@@ -218,19 +218,19 @@ export const QuestionStep: React.FC = () => {
     >
       <header className="mb-7">
         <div className="mb-3 flex flex-wrap items-center gap-3">
-          <span className="rounded-full border border-teal-400/40 bg-teal-500/15 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-teal-200">
+          <span className="rounded-full border border-teal-400/40 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
             {copy.ui.stepOf(stepIndex + 1, steps.length)}
           </span>
           {currentStep.optional && (
-            <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+            <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-paper/60">
               {copy.ui.optional}
             </span>
           )}
         </div>
-        <h2 className="font-serif text-2xl font-bold leading-tight text-white sm:text-4xl">
+        <h2 className="font-display text-2xl font-bold leading-tight text-paper sm:text-4xl">
           {questionCopy.title}
         </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-paper/85 sm:text-base">
           {questionCopy.hint}
         </p>
       </header>
@@ -267,7 +267,7 @@ export const QuestionStep: React.FC = () => {
               />
             ))}
           </div>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-paper/60">
             {profile.interests.length === 0
               ? copy.ui.pickAtLeastOne
               : `${copy.ui.selected}: ${profile.interests.length}/${MAX_INTERESTS}`}
@@ -317,7 +317,7 @@ export const QuestionStep: React.FC = () => {
 
           {profile.children > 0 && (
             <div className="planner-panel-soft space-y-3 px-5 py-4">
-              <p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-300">
+              <p className="text-sm font-bold uppercase tracking-[0.14em] text-paper/85">
                 {copy.ui.kidsAges}
               </p>
               <div className="flex flex-wrap gap-2.5">
@@ -367,18 +367,18 @@ export const QuestionStep: React.FC = () => {
       {stepId === 'logistics' && (
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="planner-panel-soft block space-y-2 px-5 py-4">
-            <span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-300">
+            <span className="text-xs font-bold uppercase tracking-[0.14em] text-paper/85">
               {copy.questions.logistics.dateLabel}
             </span>
             <input
               type="date"
               value={profile.startDate ?? ''}
               onChange={(event) => patchProfile({ startDate: event.target.value })}
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white outline-none transition focus:border-teal-300 focus:ring-2 focus:ring-teal-400/30"
+              className="w-full rounded-xl border-2 border-paper/30 bg-paper/10 px-4 py-2.5 text-sm font-semibold text-paper outline-none transition focus:border-lagoon-light"
             />
           </label>
           <label className="planner-panel-soft block space-y-2 px-5 py-4">
-            <span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-300">
+            <span className="text-xs font-bold uppercase tracking-[0.14em] text-paper/85">
               {copy.questions.logistics.zoneLabel}
             </span>
             <input
@@ -386,14 +386,14 @@ export const QuestionStep: React.FC = () => {
               value={profile.pickupZone ?? ''}
               placeholder={copy.questions.logistics.zonePlaceholder}
               onChange={(event) => patchProfile({ pickupZone: event.target.value })}
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white placeholder:text-slate-500 outline-none transition focus:border-teal-300 focus:ring-2 focus:ring-teal-400/30"
+              className="w-full rounded-xl border-2 border-paper/30 bg-paper/10 px-4 py-2.5 text-sm font-semibold text-paper placeholder:text-paper/60 outline-none transition focus:border-lagoon-light"
             />
           </label>
         </div>
       )}
 
       {/* ── Footer nav ────────────────────────────────────────────────── */}
-      <footer className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6">
+      <footer className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-paper/20 pt-6">
         <button
           type="button"
           onClick={() => {
@@ -408,7 +408,7 @@ export const QuestionStep: React.FC = () => {
         </button>
 
         <div className="flex items-center gap-3">
-          <span className="hidden text-[0.7rem] font-medium text-slate-500 lg:block">
+          <span className="hidden text-[0.7rem] font-medium text-paper/60 lg:block">
             {copy.ui.keyboardHint}
           </span>
           <button

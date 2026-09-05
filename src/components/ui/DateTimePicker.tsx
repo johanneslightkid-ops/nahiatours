@@ -27,7 +27,7 @@ const DateTimePicker: React.FC<Props> = ({ value, onChange, type, label, placeho
 
   return (
     <div className={`w-full ${className}`}>
-      <label className="mb-1.5 block text-xs font-medium text-slate-500">
+      <label className="mb-1.5 block text-xs font-medium text-ink-light">
         {label}
       </label>
       <div onClick={handleFieldClick} className="relative cursor-pointer">
@@ -38,9 +38,9 @@ const DateTimePicker: React.FC<Props> = ({ value, onChange, type, label, placeho
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="w-full rounded-2xl border border-slate-200 px-4 py-4 text-base cursor-pointer focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200 transition"
+          className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base cursor-pointer focus:bg-lagoon-light focus:outline-none transition"
         />
-        <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+        <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-light">
           {type === 'date' ? '📅' : '🕐'}
         </div>
       </div>

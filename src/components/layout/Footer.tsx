@@ -5,6 +5,7 @@ import { MdAdminPanelSettings } from 'react-icons/md';
 import { FaInstagram, FaTiktok, FaFacebook, FaYoutube, FaTwitter, FaLinkedin } from 'react-icons/fa';
 import { useBrand } from '../../contexts/BrandContext';
 import { getSocialMediaData, SocialMediaAccount } from '../../services/socialMediaService';
+import { PalmTree, Sailboat, Starfish, WaveBand } from '../ui/Illustrations';
 
 const platformIcons: Record<string, React.ReactNode> = {
   instagram: <FaInstagram className="w-5 h-5" />,
@@ -15,6 +16,10 @@ const platformIcons: Record<string, React.ReactNode> = {
   linkedin: <FaLinkedin className="w-5 h-5" />
 };
 
+/**
+ * The footer closes the page with the far shore: a drawn wave line, a strip of
+ * evening water, and palms on the horizon.
+ */
 const Footer = () => {
   const { brandSettings } = useBrand();
   const [socialAccounts, setSocialAccounts] = useState<SocialMediaAccount[]>([]);
@@ -28,87 +33,97 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="relative overflow-hidden border-t border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-850 py-16 text-slate-100 shadow-[inset_0_0_80px_rgba(0,0,0,0.3)]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(255,214,126,.12),transparent_30%),radial-gradient(circle_at_88%_18%,rgba(125,211,252,.12),transparent_34%),radial-gradient(circle_at_50%_50%,rgba(23,182,168,.08),transparent_60%)]" />
-      <div className="section-shell relative z-10">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <div className="mb-6 flex items-center gap-3">
-              <div className="h-14 w-14 rounded-full bg-gradient-to-br from-white/10 to-cyan-50/10 flex items-center justify-center ring-1 ring-white/20 backdrop-blur-md shadow-lg overflow-hidden">
-                {brandSettings.brandicon ? (
-                  <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
-                ) : (
-                  <img src="/competitor-logo.svg" alt="Logo" className="h-10 w-10" />
-                )}
+    <footer className="relative mt-auto">
+      {/* The shoreline that hands the page over to the footer. */}
+      <WaveBand tone="sky" className="block h-12 w-full sm:h-16" />
+
+      <div className="relative overflow-hidden border-t-[3px] border-ink bg-[#17313f] pt-16 pb-10 text-paper">
+        {/* Horizon scenery */}
+        <PalmTree className="pointer-events-none absolute -left-6 bottom-0 h-56 w-40 opacity-30" />
+        <PalmTree className="pointer-events-none absolute -right-8 bottom-0 h-64 w-44 -scale-x-100 opacity-25" />
+        <Sailboat className="animate-bob pointer-events-none absolute right-[18%] top-8 hidden h-20 w-20 opacity-40 lg:block" />
+        <Starfish className="pointer-events-none absolute left-[46%] bottom-6 hidden h-10 w-10 rotate-12 opacity-30 md:block" />
+
+        <div className="section-shell relative z-10">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <div className="mb-6 flex items-center gap-3">
+                <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink-sm">
+                  {brandSettings.brandicon ? (
+                    <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
+                  ) : (
+                    <img src="/competitor-logo.svg" alt="Logo" className="h-10 w-10" />
+                  )}
+                </div>
+                <h3 className="font-display text-2xl font-extrabold text-paper">{brandSettings.brandName}</h3>
               </div>
-              <h3 className="text-2xl font-bold text-white">{brandSettings.brandName}</h3>
+              <p className="max-w-md font-semibold text-paper/85">
+                <FormattedMessage id="footer.description" />
+              </p>
+
+              {/* Social Media Icons */}
+              {socialAccounts.length > 0 && (
+                <div className="mt-8 flex flex-wrap gap-3">
+                  {socialAccounts.map((account) => (
+                    <a
+                      key={account.platform}
+                      href={account.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="grid h-12 w-12 place-items-center rounded-full border-[2.5px] border-ink bg-mango-light text-ink shadow-ink-sm transition hover:-translate-y-1 hover:bg-mango"
+                      title={`Follow on ${account.platform}`}
+                    >
+                      {platformIcons[account.platform]}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
-            <p className="max-w-md text-slate-200/95">
-              <FormattedMessage id="footer.description" />
-            </p>
-            
-            {/* Social Media Icons */}
+
+            <div>
+              <h4 className="mb-4 font-display text-lg font-extrabold text-mango-light">
+                <FormattedMessage id="footer.quickLinks" />
+              </h4>
+              <ul className="space-y-2.5 font-semibold">
+                <li><Link to="/#top" className="text-paper hover:text-mango-light"><FormattedMessage id="footer.home" /></Link></li>
+                <li><Link to="/tours#top" className="text-paper hover:text-mango-light"><FormattedMessage id="footer.tours" /></Link></li>
+                <li><Link to="/transport#top" className="text-paper hover:text-mango-light"><FormattedMessage id="footer.transport" defaultMessage="Transport" /></Link></li>
+                <li><Link to="/contact#top" className="text-paper hover:text-mango-light"><FormattedMessage id="footer.contact" /></Link></li>
+                <li>
+                  <Link to="/admin" className="inline-flex items-center gap-1 text-paper hover:text-mango-light">
+                    <MdAdminPanelSettings />
+                    <FormattedMessage id="footer.admin" />
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Social Media Accounts Info */}
             {socialAccounts.length > 0 && (
-              <div className="mt-8 flex gap-3">
-                {socialAccounts.map((account) => (
-                  <a
-                    key={account.platform}
-                    href={account.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="grid h-12 w-12 place-items-center rounded-full bg-white/12 text-white transition hover:scale-110 hover:bg-white/90 hover:text-teal-700 shadow-[0_8px_20px_rgba(0,0,0,.2)]"
-                    title={`Follow on ${account.platform}`}
-                  >
-                    {platformIcons[account.platform]}
-                  </a>
-                ))}
+              <div>
+                <h4 className="mb-4 font-display text-lg font-extrabold text-mango-light">Follow Us</h4>
+                <div className="space-y-2 text-sm font-semibold text-paper/85">
+                  {socialAccounts.map((account) => (
+                    <div key={account.platform} className="flex items-center gap-2">
+                      <span className="text-lagoon-light">{platformIcons[account.platform]}</span>
+                      <a
+                        href={account.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="capitalize text-paper transition-colors hover:text-mango-light"
+                      >
+                        {account.platform} @{account.username}
+                      </a>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          <div>
-            <h4 className="mb-4 text-lg font-semibold text-white">
-              <FormattedMessage id="footer.quickLinks" />
-            </h4>
-            <ul className="space-y-2 text-slate-100/90">
-              <li><Link to="/#top" className="text-slate-100 hover:text-amber-200"><FormattedMessage id="footer.home" /></Link></li>
-              <li><Link to="/tours#top" className="text-slate-100 hover:text-amber-200"><FormattedMessage id="footer.tours" /></Link></li>
-              <li><Link to="/transport#top" className="text-slate-100 hover:text-amber-200"><FormattedMessage id="footer.transport" defaultMessage="Transport" /></Link></li>
-              <li><Link to="/contact#top" className="text-slate-100 hover:text-amber-200"><FormattedMessage id="footer.contact" /></Link></li>
-              <li>
-                <Link to="/admin" className="inline-flex items-center gap-1 text-slate-100 hover:text-amber-200">
-                  <MdAdminPanelSettings />
-                  <FormattedMessage id="footer.admin" />
-                </Link>
-              </li>
-            </ul>
+          <div className="mt-10 border-t-2 border-dashed border-paper/30 pt-6 text-sm font-semibold text-paper/75">
+            <FormattedMessage id="footer.copyright" values={{ year: new Date().getFullYear() }} />
           </div>
-
-          {/* Social Media Accounts Info */}
-          {socialAccounts.length > 0 && (
-            <div>
-              <h4 className="mb-4 text-lg font-semibold text-white">Follow Us</h4>
-              <div className="space-y-2 text-sm text-white/[.78]">
-                {socialAccounts.map((account) => (
-                  <div key={account.platform} className="flex items-center gap-2">
-                    <span className="text-amber-200">{platformIcons[account.platform]}</span>
-                    <a
-                      href={account.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="capitalize transition-colors hover:text-amber-200"
-                    >
-                      {account.platform} @{account.username}
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-10 border-t border-white/15 pt-6 text-sm text-slate-100/80">
-          <FormattedMessage id="footer.copyright" values={{ year: new Date().getFullYear() }} />
         </div>
       </div>
     </footer>

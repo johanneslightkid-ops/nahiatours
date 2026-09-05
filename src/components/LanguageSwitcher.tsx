@@ -11,7 +11,7 @@ const LanguageSwitcher: React.FC = () => {
   };
 
   return (
-    <div className="language-toggle inline-flex rounded-full bg-white/95 p-1 shadow-lg ring-1 ring-slate-200/70">
+    <div className="language-toggle inline-flex rounded-full bg-paper p-1 shadow-lg">
       <button
         type="button"
         aria-pressed={locale === 'en'}

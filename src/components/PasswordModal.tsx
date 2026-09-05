@@ -23,28 +23,28 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onAuthenticate }) => {
 	};
 
 	return (
-		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
-			<div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
-				<h2 className="mb-4 text-lg font-semibold">Admin login</h2>
+		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-ink/60 p-4">
+			<div className="w-full max-w-md rounded-[26px] border-[3px] border-ink bg-paper p-6 shadow-ink-lg">
+				<h2 className="mb-4 font-display text-xl font-extrabold text-ink">Admin login</h2>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<input
 						type="password"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 						placeholder="Enter admin password"
-						className="w-full rounded-lg border border-slate-200 px-4 py-3"
+						className="w-full rounded-xl border-2 border-ink px-4 py-3"
 					/>
-					{error && <div className="text-sm text-red-600">{error}</div>}
+					{error && <div className="text-sm font-bold text-hibiscus-dark">{error}</div>}
 					<div className="flex justify-end">
 						<button
 							type="submit"
-							className="rounded-full bg-teal-600 px-5 py-2 text-white hover:bg-teal-700"
+							className="tropical-button"
 						>
 							Enter
 						</button>
 					</div>
 				</form>
-				<p className="mt-3 text-xs text-slate-400">Enter admin password to access dashboard.</p>
+				<p className="mt-3 text-xs font-semibold text-ink-light">Enter admin password to access dashboard.</p>
 			</div>
 		</div>
 	);

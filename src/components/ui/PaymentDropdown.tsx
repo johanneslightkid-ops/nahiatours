@@ -142,7 +142,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
           playClickFx();
           setIsOpen(!isOpen);
         }}
-        className="inline-flex items-center justify-between gap-2.5 rounded-full bg-gradient-to-r from-teal-700 via-teal-600 to-cyan-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-cyan-500/25 active:scale-95"
+        className="inline-flex items-center justify-between gap-2.5 rounded-full border-[2.5px] border-ink bg-lagoon px-6 py-3 font-extrabold text-white shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-lagoon-light hover:text-ink active:translate-y-0"
       >
         <span className="flex items-center gap-2">
           <span>💳</span>
@@ -156,9 +156,9 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
         <div
           ref={dropdownRef}
           style={{ top: `${dropdownCoords.top}px`, left: `${dropdownCoords.left}px` }}
-          className="fixed z-[99999] w-72 rounded-2xl border border-white/60 bg-[#04131D]/95 p-2 shadow-[0_25px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 text-white"
+          className="fixed z-[99999] w-72 rounded-2xl border border-ink/15 bg-[#04131D]/95 p-2 shadow-ink-sm animate-in fade-in slide-in-from-top-2 text-white"
         >
-          <div className="px-3 py-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-teal-300 border-b border-white/10 mb-1">
+          <div className="px-3 py-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-lagoon border-b border-white/10 mb-1">
             Choose Payment Method
           </div>
 
@@ -195,7 +195,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
             onClick={handleWhatsApp}
             className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-white/10 text-white group"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400 group-hover:scale-110 transition-transform">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-jungle/20 text-emerald-400 group-hover:scale-110 transition-transform">
               <FaWhatsapp className="h-4 w-4" />
             </div>
             <div>
@@ -209,14 +209,14 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
 
       {/* Stripe Modal via Portal to document.body */}
       {stripeModalOpen && createPortal(
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md">
-          <div className="w-full max-w-md rounded-3xl border border-white/20 bg-[#04131D] p-7 text-white shadow-2xl relative animate-in zoom-in-95">
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 p-4">
+          <div className="w-full max-w-md rounded-3xl border border-white/20 bg-[#04131D] p-7 text-white shadow-ink-sm relative animate-in zoom-in-95">
             <button
               onClick={() => {
                 playClickFx();
                 setStripeModalOpen(false);
               }}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white"
+              className="absolute right-4 top-4 text-ink-light hover:text-white"
             >
               ✕
             </button>
@@ -232,14 +232,14 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
 
             <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Selected Option:</span>
+                <span className="text-ink-light">Selected Option:</span>
                 <span className="font-bold text-white">{selectedTier || 'Standard Excursion'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Total Price:</span>
-                <span className="font-bold text-teal-400 text-sm">{selectedPrice || 'Inquire'}</span>
+                <span className="text-ink-light">Total Price:</span>
+                <span className="font-bold text-lagoon text-sm">{selectedPrice || 'Inquire'}</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-400 pt-2 border-t border-white/10">
+              <div className="flex items-center gap-2 text-ink-light pt-2 border-t border-white/10">
                 <FaShieldAlt className="text-emerald-400" />
                 <span>256-Bit SSL Encrypted Payment</span>
               </div>
@@ -252,19 +252,19 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
                 </p>
                 <button
                   onClick={handleStripeProceed}
-                  className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 py-3 text-xs font-bold uppercase tracking-wider text-slate-950 shadow-lg hover:brightness-110"
+                  className="w-full rounded-full border-[2.5px] border-ink bg-lagoon-light py-3 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:bg-mango-light"
                 >
                   Pay {selectedPrice ? selectedPrice : ''} with Card via Stripe
                 </button>
               </div>
             ) : (
               <div className="mt-5 space-y-3">
-                <div className="rounded-xl bg-amber-500/20 p-3 text-xs text-amber-200 border border-amber-500/30">
+                <div className="rounded-xl bg-mango/20 p-3 text-xs text-amber-200 border border-amber-500/30">
                   Stripe publishable API key or Payment Link is pending in Admin Settings. You can confirm instantly via WhatsApp Concierge or PayPal.
                 </div>
                 <button
                   onClick={handleStripeProceed}
-                  className="w-full rounded-full bg-emerald-600 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-lg hover:bg-emerald-500"
+                  className="w-full rounded-full bg-jungle py-3 text-xs font-bold uppercase tracking-wider text-white shadow-ink-sm hover:bg-jungle"
                 >
                   Confirm Reservation & Open WhatsApp
                 </button>

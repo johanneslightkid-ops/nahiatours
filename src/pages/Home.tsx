@@ -100,13 +100,13 @@ const Home: React.FC = () => {
         {!storyData ? (
           <section className="home-section shore-section py-24">
             <div className="section-shell grid gap-10 md:grid-cols-2 md:items-center">
-              <div className="space-y-4 animate-pulse">
-                <div className="h-4 w-32 rounded-full bg-teal-900/10" />
-                <div className="h-10 w-3/4 rounded-2xl bg-teal-900/10" />
-                <div className="h-24 w-full rounded-3xl bg-white/40" />
-                <div className="h-4 w-2/3 rounded-full bg-teal-900/10" />
+              <div className="animate-pulse space-y-4">
+                <div className="h-4 w-32 rounded-full bg-ink/10" />
+                <div className="h-10 w-3/4 rounded-2xl bg-ink/10" />
+                <div className="h-24 w-full rounded-3xl border-2 border-ink/15 bg-paper-warm" />
+                <div className="h-4 w-2/3 rounded-full bg-ink/10" />
               </div>
-              <div className="h-64 w-full animate-pulse rounded-[32px_14px_36px_20px] bg-white/40 md:h-80" />
+              <div className="h-64 w-full animate-pulse rounded-[28px_16px_30px_18px] border-2 border-ink/15 bg-paper-warm md:h-80" />
             </div>
           </section>
         ) : (
@@ -117,7 +117,7 @@ const Home: React.FC = () => {
                 <section
                   key={section.id}
                   id={section.id}
-                  className="home-section lagoon-section relative overflow-hidden px-4 py-24 sm:py-28 md:px-8 lg:py-32"
+                  className="home-section lagoon-section wavy-band relative overflow-hidden px-4 py-28 sm:py-32 md:px-8 lg:py-36"
                 >
                   <div className="parallax-wash parallax-wash-left" />
                   <div className="parallax-wash parallax-wash-right" />
@@ -128,10 +128,10 @@ const Home: React.FC = () => {
                       <div className="section-icon mx-auto mb-5">
                         {section.emoji}
                       </div>
-                      <h2 className="mb-4 text-3xl font-bold leading-tight text-slate-950 sm:text-4xl md:text-5xl">
+                      <h2 className="scribble-title-bg mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
                         {section.title}
                       </h2>
-                      <p className="mx-auto max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+                      <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold leading-8 text-ink-soft sm:text-xl">
                         {section.description}
                       </p>
                     </div>
@@ -174,11 +174,11 @@ const Home: React.FC = () => {
       {!storyData ? null : storyData.callToActions && storyData.callToActions.length > 0 ? (
         <section className="home-section sunset-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
+            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
               {storyData.storyTitle || 'Ready for Your Perfect Day in Paradise?'}
             </h2>
             {storyData.storyTagline && (
-              <p className="mx-auto mb-8 max-w-2xl text-lg leading-8 text-white/90 sm:text-xl">
+              <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
                 {storyData.storyTagline}
               </p>
             )}
@@ -206,10 +206,10 @@ const Home: React.FC = () => {
       ) : (
         <section className="home-section sunset-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
+            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
               Ready for Your Perfect Day in Paradise?
             </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-lg leading-8 text-white/90 sm:text-xl">
+            <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
               Your adventure is just one click away. Contact us on WhatsApp or choose your adventure below.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
@@ -251,20 +251,20 @@ const Home: React.FC = () => {
       <section className="home-section reef-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
-            <h2 className="mb-4 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
+            <h2 className="mb-4 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
               <FormattedMessage id="features.title" />
             </h2>
-            <p className="text-lg leading-8 text-white/[.78] sm:text-xl">Thoughtful service from arrival to return with Francisco Ferreras</p>
+            <p className="text-lg font-bold leading-8 text-white sm:text-xl">Thoughtful service from arrival to return with Francisco Ferreras</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
             {/* Safety First */}
             <div className="home-feature-card group p-8 animate-wave-sway-1">
               <div className="text-5xl mb-4">🛡️</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">
+              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
                 <FormattedMessage id="features.safety.title" />
               </h3>
-              <p className="text-slate-200">
+              <p className="font-semibold text-ink-soft">
                 <FormattedMessage id="features.safety.description" />
               </p>
             </div>
@@ -272,10 +272,10 @@ const Home: React.FC = () => {
             {/* Curated Experiences */}
             <div className="home-feature-card group p-8 animate-wave-sway-2">
               <div className="text-5xl mb-4">🌿</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">
+              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
                 <FormattedMessage id="features.experiences.title" />
               </h3>
-              <p className="text-slate-200">
+              <p className="font-semibold text-ink-soft">
                 <FormattedMessage id="features.experiences.description" />
               </p>
             </div>
@@ -283,10 +283,10 @@ const Home: React.FC = () => {
             {/* Transportation */}
             <div className="home-feature-card group p-8 animate-wave-sway-3">
               <div className="text-5xl mb-4">🚗</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">
+              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
                 <FormattedMessage id="features.transportation.title" />
               </h3>
-              <p className="text-slate-200">
+              <p className="font-semibold text-ink-soft">
                 <FormattedMessage id="features.transportation.description" />
               </p>
             </div>

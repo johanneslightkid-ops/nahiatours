@@ -1,3 +1,12 @@
+/**
+ * Illustrated tropical design system.
+ *
+ * The site used to be a dark "luxury" theme leaning on photography, glass and
+ * blur. It is now drawn rather than photographed: flat poster colours, ink
+ * outlines, hard offset shadows and rounded sticker shapes. Everything here is
+ * intentionally opaque — no translucent surfaces — so the illustration reads
+ * cleanly at any size.
+ */
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -5,88 +14,123 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        tropicalGreen: '#2BB673',
-        tropicalBlue: '#0095D9',
-        sandyBeige: '#F4E1B1',
-        sunsetOrange: '#FF6F20',
-        oceanWave: '#007BFF',
-        luxury: {
-          navy: '#04131D',
-          dark: '#061D2B',
-          deep: '#0A2B3D',
-          turquoise: '#0D9488',
-          cyan: '#06B6D4',
-          sand: '#FAF7F2',
-          sandDark: '#F4EFE6',
-          sandWarm: '#E8DFC8',
-          gold: '#D97706',
-          amber: '#EAB308',
-          coral: '#E15B45',
-          fog: '#F1F5F9',
-          muted: '#64748B',
+        // Poster palette. Each hue is flat and saturated enough to hold its own
+        // next to a black ink outline.
+        ink: {
+          DEFAULT: '#1E2A3A',
+          soft: '#42566B',
+          light: '#7C8FA3',
         },
-        caribbean: {
-          rum: '#6B3E1F',
-          tobacco: '#524620',
-          coral: '#E15B45',
-          ocean: '#0A2B3D',
-          turquoise: '#0D9488',
-          gold: '#D97706',
-          palm: '#1B4332',
-          bronze: '#B45309',
-          amber: '#EAB308',
-          sunset: '#EA580C',
+        paper: {
+          DEFAULT: '#FFF6E5',
+          warm: '#FFEFD6',
+          deep: '#F7E3C2',
         },
+        mango: {
+          light: '#FFC861',
+          DEFAULT: '#FFA62B',
+          dark: '#F07E13',
+        },
+        hibiscus: {
+          light: '#FF9AA8',
+          DEFAULT: '#FF5D73',
+          dark: '#E03B57',
+        },
+        lagoon: {
+          light: '#7FE3DA',
+          DEFAULT: '#21C0B7',
+          dark: '#128C8A',
+        },
+        sky: {
+          light: '#A5E4FF',
+          DEFAULT: '#4CC3F0',
+          dark: '#1C86BE',
+        },
+        jungle: {
+          light: '#7BD389',
+          DEFAULT: '#2FA84F',
+          dark: '#1B7A3C',
+        },
+        sunset: {
+          light: '#FFB38A',
+          DEFAULT: '#FF7A45',
+          dark: '#DD4F1E',
+        },
+        grape: {
+          light: '#C9A7F5',
+          DEFAULT: '#9163DE',
+          dark: '#6B3FB5',
+        },
+        // Legacy aliases kept so any stray class name still resolves to a
+        // colour inside the new palette instead of disappearing.
+        tropicalGreen: '#2FA84F',
+        tropicalBlue: '#4CC3F0',
+        sandyBeige: '#FFEFD6',
+        sunsetOrange: '#FF7A45',
+        oceanWave: '#21C0B7',
       },
       fontFamily: {
-        heading: ['Playfair Display', 'Cormorant Garamond', 'Georgia', 'serif'],
-        serif: ['Playfair Display', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
-        accent: ['Inter', 'sans-serif'],
-        script: ['Dancing Script', 'cursive'],
+        // Rounded poster display + a friendly humanist body face.
+        heading: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
+        display: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
+        // `font-serif` is still sprinkled through the markup; point it at the
+        // display face so nothing falls back to Times.
+        serif: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
+        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        body: ['Nunito', 'system-ui', 'sans-serif'],
+        accent: ['Caveat', '"Baloo 2"', 'cursive'],
+        script: ['Caveat', 'cursive'],
       },
       backgroundImage: {
-        'tropical-pattern': "url('/public/tropical-background.jpg')",
-        'luxury-hero': 'linear-gradient(180deg, rgba(4,19,29,0.75) 0%, rgba(6,29,43,0.85) 60%, rgba(4,19,29,0.98) 100%)',
-        'luxury-gradient': 'linear-gradient(135deg, #0A2B3D 0%, #061D2B 50%, #04131D 100%)',
-        'gold-shimmer': 'linear-gradient(135deg, #D97706 0%, #F59E0B 50%, #EAB308 100%)',
-        'sand-radial': 'radial-gradient(circle at 50% 0%, #FAF7F2 0%, #F4EFE6 100%)',
-        'turquoise-glow': 'radial-gradient(circle, rgba(13,148,136,0.15) 0%, transparent 70%)',
+        'sun-rays': 'repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,200,97,0.35) 0deg 9deg, transparent 9deg 18deg)',
+        'sky-wash': 'linear-gradient(180deg, #A5E4FF 0%, #CFF1FF 45%, #FFF6E5 100%)',
+        'sunset-wash': 'linear-gradient(180deg, #FFC861 0%, #FF9A5B 55%, #FF5D73 100%)',
+        'lagoon-wash': 'linear-gradient(180deg, #7FE3DA 0%, #21C0B7 60%, #128C8A 100%)',
+        'jungle-wash': 'linear-gradient(180deg, #7BD389 0%, #2FA84F 60%, #1B7A3C 100%)',
+        'paper-wash': 'linear-gradient(180deg, #FFF6E5 0%, #FFEFD6 100%)',
       },
       boxShadow: {
-        'tropical': '0 4px 30px rgba(0, 0, 0, 0.1)',
-        'luxury-sm': '0 4px 20px -2px rgba(4, 19, 29, 0.06)',
-        'luxury': '0 12px 40px -4px rgba(4, 19, 29, 0.08), 0 4px 12px -2px rgba(4, 19, 29, 0.04)',
-        'luxury-hover': '0 24px 60px -8px rgba(4, 19, 29, 0.16), 0 8px 24px -4px rgba(13, 148, 136, 0.12)',
-        'glass': '0 8px 32px 0 rgba(4, 19, 29, 0.08)',
-        'glass-hover': '0 16px 48px 0 rgba(4, 19, 29, 0.15)',
-        'glow-teal': '0 0 40px rgba(13, 148, 136, 0.25)',
-        'glow-gold': '0 0 40px rgba(217, 119, 6, 0.25)',
+        // Hard, un-blurred drop shadows: the sticker look.
+        'ink-sm': '2px 2px 0 0 #1E2A3A',
+        'ink': '4px 4px 0 0 #1E2A3A',
+        'ink-lg': '7px 7px 0 0 #1E2A3A',
+        'ink-xl': '10px 10px 0 0 #1E2A3A',
+        'mango': '4px 4px 0 0 #F07E13',
+        'lagoon': '4px 4px 0 0 #128C8A',
+        'hibiscus': '4px 4px 0 0 #E03B57',
+        // A very soft lift used sparingly under floating elements.
+        'lift': '0 12px 24px -12px rgba(30, 42, 58, 0.45)',
       },
       borderRadius: {
-        'sm': '8px',
-        'md': '12px',
-        'lg': '16px',
-        'xl': '20px',
-        '2xl': '24px',
-        '3xl': '32px',
+        'sm': '10px',
+        'md': '14px',
+        'lg': '20px',
+        'xl': '26px',
+        '2xl': '32px',
+        '3xl': '40px',
+        'blob': '46% 54% 52% 48% / 52% 46% 54% 48%',
       },
       animation: {
-        'shimmer': 'shimmer 2.5s ease-in-out infinite',
         'float': 'float 6s ease-in-out infinite',
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'fade-in': 'fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'sway': 'sway 7s ease-in-out infinite',
+        'spin-slow': 'spin 40s linear infinite',
+        'bob': 'bob 4.5s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.7s ease-out forwards',
+        'slide-up': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'drift': 'drift 60s linear infinite',
       },
       keyframes: {
-        shimmer: {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100%)' },
-        },
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        sway: {
+          '0%, 100%': { transform: 'rotate(-2deg)' },
+          '50%': { transform: 'rotate(2deg)' },
+        },
+        bob: {
+          '0%, 100%': { transform: 'translateY(0) rotate(-1deg)' },
+          '50%': { transform: 'translateY(-8px) rotate(1deg)' },
         },
         fadeIn: {
           '0%': { opacity: '0' },
@@ -95,6 +139,10 @@ module.exports = {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        drift: {
+          from: { transform: 'translate3d(0, 0, 0)' },
+          to: { transform: 'translate3d(-50%, 0, 0)' },
         },
       },
       maxWidth: {

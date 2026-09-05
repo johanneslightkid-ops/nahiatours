@@ -146,7 +146,7 @@ const ServiceDetails: React.FC = () => {
   if (!service) {
     return (
       <div className="section-shell py-20 text-center">
-        <p className="text-lg text-slate-600">
+        <p className="text-lg text-ink-soft">
           <FormattedMessage id="details.notFound" defaultMessage="Service details could not be found." />
         </p>
       </div>
@@ -182,18 +182,18 @@ const ServiceDetails: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-cyan-50 via-white to-amber-50 py-16">
+    <div className="bg-paper py-16">
       <div className="section-shell space-y-8">
         <div className="flex items-center justify-between gap-4">
-          <Link to={category === 'transport' ? '/transport' : '/tours'} className="text-sm font-semibold text-teal-700 hover:text-teal-900">
+          <Link to={category === 'transport' ? '/transport' : '/tours'} className="text-sm font-semibold text-lagoon-dark hover:text-lagoon-dark">
             <FormattedMessage id="details.back" defaultMessage="← Back to listings" />
           </Link>
         </div>
 
         <article className="glass-card overflow-hidden rounded-[2rem]">
-          <div className="relative bg-slate-950">
+          <div className="relative bg-ink">
             <img src={currentImage} alt={service.title} className="h-[420px] w-full object-cover" />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent p-8 text-white">
+            <div className="absolute inset-x-0 bottom-0 bg-ink/75 p-8 text-white">
               <h1 className="text-4xl font-bold md:text-5xl">{service.title}</h1>
               <div className="mt-3 max-w-3xl text-white/80">
                 <MarkdownRenderer content={service.description} />
@@ -201,12 +201,12 @@ const ServiceDetails: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 border-b border-slate-200 bg-white px-6 py-6 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 border-b border-ink/20 bg-white px-6 py-6 md:grid-cols-4">
             {images.map((image, index) => (
               <button
                 key={`${image}-${index}`}
                 onClick={() => setActiveIndex(index)}
-                className={`overflow-hidden rounded-2xl border-2 transition ${index === activeIndex ? 'border-teal-500' : 'border-transparent'}`}
+                className={`overflow-hidden rounded-2xl border-2 transition ${index === activeIndex ? 'border-lagoon' : 'border-ink'}`}
                 aria-label={`Show image ${index + 1}`}
               >
                 <img src={image} alt={`${service.title} ${index + 1}`} className="h-24 w-full object-cover" />
@@ -216,13 +216,13 @@ const ServiceDetails: React.FC = () => {
 
           <div className="space-y-8 p-8">
             <section>
-              <h2 className="mb-4 text-2xl font-bold text-slate-900">
+              <h2 className="mb-4 text-2xl font-bold text-ink">
                 <FormattedMessage id="details.pricing" defaultMessage="Pricing" />
               </h2>
 
               {service.transferRoutes?.length ? (
-                <div className="space-y-6 rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                  <p className="text-slate-700">
+                <div className="space-y-6 rounded-3xl border border-ink/20 bg-paper-warm p-6">
+                  <p className="text-ink-soft">
                     <FormattedMessage
                       id="transport.routeCalculator"
                       defaultMessage="Use the origin and destination selectors to estimate your transfer price."
@@ -231,13 +231,13 @@ const ServiceDetails: React.FC = () => {
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <label className="space-y-2">
-                      <span className="text-sm font-semibold text-slate-700">
+                      <span className="text-sm font-semibold text-ink-soft">
                         <FormattedMessage id="transport.origin" defaultMessage="Origin" />
                       </span>
                       <select
                         value={selectedOrigin}
                         onChange={(event) => setSelectedOrigin(event.target.value)}
-                        className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-700 outline-none"
+                        className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
                       >
                         {Array.from(new Set(availableOrigins)).map((origin) => (
                           <option key={origin} value={origin}>
@@ -248,13 +248,13 @@ const ServiceDetails: React.FC = () => {
                     </label>
 
                     <label className="space-y-2">
-                      <span className="text-sm font-semibold text-slate-700">
+                      <span className="text-sm font-semibold text-ink-soft">
                         <FormattedMessage id="transport.destination" defaultMessage="Destination" />
                       </span>
                       <select
                         value={selectedDestination}
                         onChange={(event) => setSelectedDestination(event.target.value)}
-                        className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-700 outline-none"
+                        className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
                       >
                         {availableDestinations.map((destination) => (
                           <option key={destination} value={destination}>
@@ -265,22 +265,22 @@ const ServiceDetails: React.FC = () => {
                     </label>
                   </div>
 
-                  <div className="rounded-3xl bg-white p-5 shadow-sm">
-                    <p className="text-sm font-semibold text-slate-700">
+                  <div className="rounded-3xl border-[2.5px] border-ink bg-white p-5 shadow-ink-sm">
+                    <p className="text-sm font-semibold text-ink-soft">
                       <FormattedMessage id="transport.estimate" defaultMessage="Estimated transfer price" />
                     </p>
-                    <p className="mt-3 text-3xl font-bold text-teal-700">
+                    <p className="mt-3 text-3xl font-bold text-lagoon-dark">
                       {priceResult ? `USD ${priceResult.estimatedPrice}` : selectedRoute?.price || service.price}
                     </p>
 
                     {transferConfig?.vehicleTypes.length ? (
                       <div className="mt-4 grid gap-4 sm:grid-cols-2">
                         <label className="space-y-2">
-                          <span className="text-sm font-semibold text-slate-700">Vehicle</span>
+                          <span className="text-sm font-semibold text-ink-soft">Vehicle</span>
                           <select
                             value={selectedVehicleKey}
                             onChange={(event) => setSelectedVehicleKey(event.target.value)}
-                            className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-700 outline-none"
+                            className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
                           >
                             {transferConfig.vehicleTypes.map((vehicle) => (
                               <option key={vehicle.key} value={vehicle.key}>
@@ -290,21 +290,21 @@ const ServiceDetails: React.FC = () => {
                           </select>
                         </label>
                         <label className="space-y-2">
-                          <span className="text-sm font-semibold text-slate-700">Passengers</span>
+                          <span className="text-sm font-semibold text-ink-soft">Passengers</span>
                           <input
                             type="number"
                             min={1}
                             max={service.transferRoutes?.length ? 30 : 10}
                             value={passengers}
                             onChange={(event) => setPassengers(Number(event.target.value))}
-                            className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-700 outline-none"
+                            className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
                           />
                         </label>
                       </div>
                     ) : null}
 
                     {selectedRoute && (
-                      <div className="mt-3 grid gap-2 text-sm text-slate-600">
+                      <div className="mt-3 grid gap-2 text-sm text-ink-soft">
                         <div>{selectedRoute.origin} → {selectedRoute.destination}</div>
                         <div>
                           <strong>{locale === 'es' ? 'Zona/Región:' : 'Zone/Region:'}</strong>{' '}
@@ -317,7 +317,7 @@ const ServiceDetails: React.FC = () => {
                           </div>
                         ) : null}
 
-                        <div className="mt-3 rounded-lg border border-slate-100 bg-slate-50 p-3">
+                        <div className="mt-3 rounded-lg border border-slate-100 bg-paper-warm p-3">
                           <div className="flex justify-between">
                             <span>{locale === 'es' ? 'Precio base' : 'Base distance price'}</span>
                             <span>{priceResult ? `USD ${priceResult.breakdown.baseDistancePrice}` : basePrice != null ? `USD ${basePrice}` : 'N/A'}</span>
@@ -345,7 +345,7 @@ const ServiceDetails: React.FC = () => {
                         </div>
 
                         <div className="mt-3">
-                          <button onClick={handleContactWhatsApp} className="rounded-full bg-teal-600 px-5 py-2 font-semibold text-white">
+                          <button onClick={handleContactWhatsApp} className="rounded-full bg-lagoon px-5 py-2 font-semibold text-white">
                             {locale === 'es' ? 'Contactar por WhatsApp' : 'Contact on WhatsApp'}
                           </button>
                         </div>
@@ -356,7 +356,7 @@ const ServiceDetails: React.FC = () => {
               ) : (
                 <div className="flex flex-wrap gap-3">
                   {service.pricingOptions.map((option) => (
-                    <span key={option.tier} className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800">
+                    <span key={option.tier} className="rounded-full bg-paper-warm px-4 py-2 text-sm font-semibold text-ink-soft">
                       {option.tier}: {option.price}
                     </span>
                   ))}
@@ -365,7 +365,7 @@ const ServiceDetails: React.FC = () => {
             </section>
 
             <section>
-              <h2 className="mb-4 text-2xl font-bold text-slate-900">
+              <h2 className="mb-4 text-2xl font-bold text-ink">
                 <FormattedMessage id="details.description" defaultMessage="Description" />
               </h2>
               <MarkdownRenderer content={service.details.description} />

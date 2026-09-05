@@ -18,7 +18,7 @@ const CatalogueDrift: React.FC<{ images: string[] }> = ({ images }) => {
         {strip.map((src, index) => (
           <span
             key={`${src}-${index}`}
-            className="block h-24 w-36 shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:h-28 sm:w-44"
+            className="block h-24 w-36 shrink-0 overflow-hidden rounded-2xl border border-paper/20 sm:h-28 sm:w-44"
           >
             <img src={src} alt="" loading="lazy" className="h-full w-full object-cover opacity-70" />
           </span>
@@ -43,16 +43,16 @@ export const PlannerIntro: React.FC = () => {
     >
       <div className="planner-panel overflow-hidden">
         <div className="px-6 py-10 sm:px-12 sm:py-14">
-          <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-400/10 px-3.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-amber-200">
+          <span className="inline-flex items-center gap-2 rounded-full border border-mango-light/50 bg-mango-light/20 px-3.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-mango-light">
             <HiSparkles className="h-3.5 w-3.5" />
             {copy.hero.eyebrow}
           </span>
 
-          <h1 className="mt-6 whitespace-pre-line font-serif text-4xl font-bold leading-[1.05] text-white sm:text-6xl">
+          <h1 className="mt-6 whitespace-pre-line font-display text-4xl font-bold leading-[1.05] text-paper sm:text-6xl">
             {copy.hero.title}
           </h1>
 
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-paper/85 sm:text-lg">
             {copy.hero.subtitle}
           </p>
 
@@ -87,12 +87,12 @@ export const PlannerIntro: React.FC = () => {
             </Link>
           </div>
 
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-paper/60">
             {copy.hero.minutes}
           </p>
 
           {hasProgress && (
-            <div className="mt-8 border-t border-white/10 pt-6">
+            <div className="mt-8 border-t border-paper/20 pt-6">
               <ProfileChips compact />
             </div>
           )}
@@ -111,8 +111,8 @@ export const PlannerIntro: React.FC = () => {
             className="planner-panel-soft px-6 py-6"
           >
             <div className="text-3xl">{bullet.emoji}</div>
-            <h3 className="mt-3 font-serif text-lg font-bold text-white">{bullet.title}</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-slate-300">{bullet.text}</p>
+            <h3 className="mt-3 font-display text-lg font-bold text-paper">{bullet.title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-paper/85">{bullet.text}</p>
           </motion.div>
         ))}
       </div>

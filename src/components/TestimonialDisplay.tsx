@@ -47,10 +47,10 @@ const TestimonialDisplay: React.FC<TestimonialDisplayProps> = ({ locale }) => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-ink mb-4">
             <FormattedMessage id="testimonials.title" />
           </h2>
-          <p className="text-lg text-slate-600">
+          <p className="text-lg text-ink-soft">
             Join travelers who came home with brighter stories from the Caribbean
           </p>
         </div>
@@ -66,7 +66,7 @@ const TestimonialDisplay: React.FC<TestimonialDisplayProps> = ({ locale }) => {
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
-                className="group rounded-[28px] border border-white/70 bg-white/80 p-7 shadow-[0_20px_60px_rgba(8,42,62,.14),0_8px_16px_rgba(23,182,168,.08)] backdrop-blur-sm transition-all hover:-translate-y-2 hover:shadow-[0_32px_88px_rgba(8,42,62,.2),0_12px_24px_rgba(23,182,168,.12)]"
+                className="group rounded-[28px] border border-ink/15 bg-paper p-7 shadow-ink-sm transition-all hover:-translate-y-2 hover: shadow-ink-sm"
               >
                 {/* Rating */}
                 <div className="flex gap-1 mb-4">
@@ -74,28 +74,28 @@ const TestimonialDisplay: React.FC<TestimonialDisplayProps> = ({ locale }) => {
                     <FaStar
                       key={idx}
                       className={`text-lg ${
-                        idx < testimonial.rating ? 'text-yellow-400' : 'text-slate-300'
-                      }`}
+ idx < testimonial.rating ? 'text-yellow-400' : 'text-slate-300'
+ }`}
                     />
                   ))}
                 </div>
 
                 {/* Review */}
-                <p className="text-slate-700 mb-4 leading-relaxed italic">
+                <p className="text-ink-soft mb-4 leading-relaxed italic">
                   "{testimonial.review}"
                 </p>
 
                 {/* Author */}
-                <div className="border-t-2 border-slate-200 pt-4">
-                  <p className="font-bold text-slate-900">{testimonial.name}</p>
-                  <p className="text-sm text-slate-500">{testimonial.createdAt}</p>
+                <div className="border-t-2 border-ink/20 pt-4">
+                  <p className="font-bold text-ink">{testimonial.name}</p>
+                  <p className="text-sm text-ink-light">{testimonial.createdAt}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-orange-200">
-            <p className="text-slate-500 text-lg">
+          <div className="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-mango-light">
+            <p className="text-ink-light text-lg">
               <FormattedMessage id="testimonials.noTestimonials" />
             </p>
           </div>
