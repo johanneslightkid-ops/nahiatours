@@ -1,27 +1,66 @@
-name = "punta-cana-adventures"
+# ==============================================================================
+# Cloudflare Worker configuration (static assets + API routes)
+# ==============================================================================
+#
+# The Cloudflare project deploys with `npx wrangler deploy`, the Workers
+# command. It needs `main` (a script entry point) and `[assets]` (a directory to
+# upload); a Pages config with `pages_build_output_dir` provides neither, which
+# is what produced:
+#
+#   ✘ [ERROR] Missing entry-point to Worker script or to assets directory
+#
+# `main` and `pages_build_output_dir` are mutually exclusive, so this file is
+# now Workers-shaped. worker/index.ts dispatches to the same functions/*
+# handlers the Pages deployment used, so no endpoint logic is duplicated.
+
+name = "nahiatours"
+main = "worker/index.ts"
 compatibility_date = "2024-05-01"
-pages_build_output_dir = "dist"
 
-# KV namespace binding is configured via Cloudflare Pages dashboard:
-#   Settings → Functions → KV namespace bindings → Add binding
-#   Variable name: DATA_KV
-#   KV namespace: (your KV namespace)
-# Do NOT add [[kv_namespaces]] here — Pages builds validate the IDs
-# and will fail if they are not valid hex strings.
+# Static build output. `single-page-application` serves index.html for paths
+# with no matching file, which is what React Router needs for /tours, /plan and
+# the rest. API routes never reach this: worker/index.ts matches them first.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+# Without this, the asset server answers before the Worker for any path that
+# matches a file, so the canonical-host redirect would silently stop applying
+# to page loads. Pages ran _middleware.ts on every path (_routes.json includes
+# "/*"), and this keeps that true.
+run_worker_first = true
 
 # ==============================================================================
-# Environment variables (Cloudflare Pages dashboard overrides these in production)
+# KV
 # ==============================================================================
 #
-# Set these in your Cloudflare Pages dashboard:
-#   Settings → Environment variables → Production
+# Uncomment once the namespace exists and paste its id. Create it with either:
 #
-# All VITE_* variables are also needed as Pages environment variables
-# so they are available to both the Vite build and the Functions runtime.
+#   npx wrangler kv namespace create nahiatours-data
+#   ./scripts/deploy-cloudflare.sh      (creates, binds and deploys in one go)
 #
-# Additionally, set these non-VITE variables:
-#   INIT_DATA_SECRET = "your-secret"
-#   INIT_DATA_URL    = "https://your-project.pages.dev/api/init-data"
+# The handlers read DATA_KV_F first and fall back to DATA_KV
+# (functions/api/data.ts), so binding either name is enough.
+#
+# Until then the site still works: reads fall back to the JSON bundled at
+# /data/*.json. Only admin writes and /api/init-data need KV.
+#
+# Note this is a Worker, so wrangler.toml is the source of truth for bindings —
+# a binding added in the dashboard is overwritten by the next deploy.
+#
+# [[kv_namespaces]]
+# binding = "DATA_KV_F"
+# id = "<namespace id>"
+
+# ==============================================================================
+# Environment variables
+# ==============================================================================
+#
+# TODO: CLOUDINARY_API_SECRET and ADMIN_PASSWORD are secrets and do not belong
+# in a committed file. Move them to `npx wrangler secret put <NAME>` and delete
+# them here. The VITE_-prefixed copies are additionally compiled into the client
+# bundle, where any visitor can read them, so those need rotating rather than
+# just relocating.
 
 [vars]
 ADMIN_PASSWORD = "toursadmin"
@@ -29,25 +68,8 @@ VITE_ADMIN_PASSWORD = "toursadmin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
 CLOUDINARY_API_KEY = "896279918126553"
 CLOUDINARY_API_SECRET = "stWvhkCOQi_2Q_Ko0d1it8LXWr8"
-CLOUDINARY_UPLOAD_PRESET =""
+CLOUDINARY_UPLOAD_PRESET = ""
 VITE_CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
 VITE_CLOUDINARY_API_KEY = "896279918126553"
 VITE_CLOUDINARY_API_SECRET = "stWvhkCOQi_2Q_Ko0d1it8LXWr8"
-VITE_CLOUDINARY_UPLOAD_PRESET =""
-
-[[env.production.kv_namespaces]]
-binding = "DATA_KV_F"
-id = "47b690e5db594d6a9638e793da63e631"
-
-[env.production.vars]
-ADMIN_PASSWORD = "toursadmin"
-VITE_ADMIN_PASSWORD = "toursadmin"
-CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
-CLOUDINARY_API_KEY = "896279918126553"
-CLOUDINARY_API_SECRET = "stWvhkCOQi_2Q_Ko0d1it8LXWr8"
-CLOUDINARY_UPLOAD_PRESET =""
-VITE_CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
-VITE_CLOUDINARY_API_KEY = "896279918126553"
-VITE_CLOUDINARY_API_SECRET = "stWvhkCOQi_2Q_Ko0d1it8LXWr8"
-VITE_CLOUDINARY_UPLOAD_PRESET =""
-
+VITE_CLOUDINARY_UPLOAD_PRESET = ""

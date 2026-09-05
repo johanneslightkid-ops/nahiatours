@@ -1,15 +1,18 @@
-const CANONICAL_HOST = 'ferreras.tours';
-const REDIRECT_STATUS = 301; // Permanent redirect for SEO
+import { canonicalRedirect } from '../shared/canonical';
 
+/**
+ * Canonical-host redirect for the Pages deployment.
+ *
+ * The policy itself lives in shared/canonical.ts so the Worker entry point
+ * (worker/index.ts) applies exactly the same rule. Preview hosts are no longer
+ * redirected away — see that module for why.
+ */
 export async function onRequest(context: { request: Request; next: () => Promise<Response> }) {
   const { request, next } = context;
-  const url = new URL(request.url);
-  const host = url.hostname;
 
-  // If it's the Cloudflare Pages default domain, redirect to the canonical domain
-  if (host !== CANONICAL_HOST) {
-    const redirectUrl = `https://${CANONICAL_HOST}${url.pathname}${url.search}`;
-    return Response.redirect(redirectUrl, REDIRECT_STATUS);
+  const redirect = canonicalRedirect(new URL(request.url));
+  if (redirect) {
+    return redirect;
   }
 
   return next();
