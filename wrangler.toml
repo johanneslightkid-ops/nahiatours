@@ -57,16 +57,21 @@ run_worker_first = true
 # ==============================================================================
 #
 # ADMIN_PASSWORD is read only on the server (shared/adminAuth.ts) and never
-# reaches the browser. It is still committed in plaintext, so it belongs in
-# `npx wrangler secret put ADMIN_PASSWORD` — and since this value has been in a
-# public repo, it wants replacing at the same time.
+# reaches the browser — but it is committed here in plaintext, so treat it as
+# public. It is the default, not a secret.
+#
+# To use a real one without putting it in the repo:
+#   1. delete the ADMIN_PASSWORD line below
+#   2. npx wrangler secret put ADMIN_PASSWORD
+# Do both: a [vars] entry and a secret of the same name collide, and the
+# plaintext var can win on deploy.
 #
 # TODO: the same goes for CLOUDINARY_API_SECRET. Its VITE_ copy is compiled
 # into the client bundle where any visitor can read it, so that one needs
 # rotating, not just relocating.
 
 [vars]
-ADMIN_PASSWORD = "toursadmin"
+ADMIN_PASSWORD = "admin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
 CLOUDINARY_API_KEY = "896279918126553"
 CLOUDINARY_API_SECRET = "stWvhkCOQi_2Q_Ko0d1it8LXWr8"
