@@ -1,9 +1,34 @@
+<!--
+  LD VIP mark: the site's whole design system at 16 pixels.
+
+  Bone stock, a black plate, the red plate slipped out of register, and a
+  radiant burning through — which is the page's own hierarchy in miniature.
+  No gradients, no rounded corners, no third colour.
+-->
 <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-  <rect width="120" height="120" fill="#e8fafb"/>
-  <circle cx="60" cy="60" r="55" fill="#17b6a8" opacity="0.15" stroke="#17b6a8" stroke-width="1.5"/>
-  <circle cx="60" cy="40" r="15" fill="#f6aa5c"/>
-  <path d="M 50 55 Q 45 50, 40 48" stroke="#0f9f8e" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M 70 55 Q 75 50, 80 48" stroke="#0f9f8e" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M 45 65 Q 40 70, 45 80" stroke="#17b6a8" stroke-width="1.5" fill="none" opacity="0.7"/>
-  <path d="M 75 65 Q 80 70, 75 80" stroke="#17b6a8" stroke-width="1.5" fill="none" opacity="0.7"/>
+  <rect width="120" height="120" fill="#EFE9DD"/>
+
+  <!-- The red plate, printed first and slipped up-left. -->
+  <rect x="10" y="10" width="88" height="88" fill="#C1121F"/>
+
+  <!-- The black plate over it, out of register by six units. -->
+  <g>
+    <rect x="22" y="22" width="88" height="88" fill="#0C0C0D"/>
+    <!-- Radiant knocked out of the black. -->
+    <g fill="#EFE9DD" opacity="0.9">
+      <path d="M66 66 L64 18 L68 18 Z"/>
+      <path d="M66 66 L84 22 L88 25 Z"/>
+      <path d="M66 66 L104 46 L106 50 Z"/>
+      <path d="M66 66 L110 68 L110 72 Z"/>
+      <path d="M66 66 L100 92 L97 95 Z"/>
+      <path d="M66 66 L72 110 L68 110 Z"/>
+      <path d="M66 66 L40 100 L37 97 Z"/>
+      <path d="M66 66 L24 84 L23 80 Z"/>
+      <path d="M66 66 L22 62 L23 58 Z"/>
+      <path d="M66 66 L34 30 L38 27 Z"/>
+    </g>
+    <!-- The red disc at the centre: the action colour, always. -->
+    <circle cx="66" cy="66" r="16" fill="#C1121F"/>
+    <circle cx="66" cy="66" r="9" fill="none" stroke="#EFE9DD" stroke-width="3"/>
+  </g>
 </svg>

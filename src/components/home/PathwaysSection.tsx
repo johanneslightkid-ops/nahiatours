@@ -72,10 +72,10 @@ const PathwaysSection: React.FC = () => {
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <span className="artsy-brick-badge-inverted mb-5 inline-flex">{copy.eyebrow}</span>
-          <h2 className="mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
+          <h2 className="mb-4 font-display text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
             {copy.title}
           </h2>
-          <p className="text-lg font-semibold leading-8 text-ink-soft">{copy.subtitle}</p>
+          <p className="text-lg font-medium leading-8 text-ink-soft">{copy.subtitle}</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -87,9 +87,13 @@ const PathwaysSection: React.FC = () => {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="pathway-card flex flex-col p-8 sm:p-10"
           >
-            <span className="text-4xl">🗂️</span>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-ink">{copy.catalogueTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-ink-soft">{copy.catalogueText}</p>
+            <div className="flex items-center justify-between">
+              <span className="text-4xl" style={{ filter: 'grayscale(1) contrast(1.3)' }}>🗂️</span>
+              <span className="tp-index">01</span>
+            </div>
+            <span className="mt-4 block h-[3px] w-12 bg-mango" />
+            <h3 className="mt-3 font-display text-2xl text-ink">{copy.catalogueTitle}</h3>
+            <p className="mt-3 flex-1 text-base font-medium leading-relaxed text-ink-soft">{copy.catalogueText}</p>
             <Link
               to="/tours#top"
               onClick={() => playClickFx()}
@@ -109,13 +113,14 @@ const PathwaysSection: React.FC = () => {
             className="pathway-card pathway-card-dark flex flex-col p-8 sm:p-10"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="text-4xl">🧭</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-mango-light px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-ink">
+              <span className="text-4xl" style={{ filter: 'grayscale(1) contrast(1.3) brightness(1.8)' }}>🧭</span>
+              <span className="inline-flex items-center gap-1.5 border-2 border-mango bg-mango px-3 py-1 font-condensed text-[0.68rem] uppercase tracking-[0.18em] text-paper">
                 <HiSparkles className="h-3 w-3" /> {copy.plannerBadge}
               </span>
             </div>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-paper">{copy.plannerTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-paper/85">{copy.plannerText}</p>
+            <span className="mt-4 block h-[3px] w-12 bg-mango" />
+            <h3 className="mt-3 font-display text-2xl text-paper">{copy.plannerTitle}</h3>
+            <p className="mt-3 flex-1 text-base font-medium leading-relaxed text-paper/85">{copy.plannerText}</p>
             <Link
               to="/plan#top"
               onClick={() => playClickFx()}

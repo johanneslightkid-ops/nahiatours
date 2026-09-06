@@ -1,61 +1,79 @@
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Caveat:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Special+Elite&family=Permanent+Marker&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ILLUSTRATED TROPICAL DESIGN SYSTEM
+   LD VIP — TRASH POLKA / TATTOO FLASH
    ──────────────────────────────────────────────────────────────────────────
-   The site is drawn, not photographed. Three rules hold the look together:
+   The site is tattooed, not illustrated. Four rules hold the collage
+   together, and each of them is doing a job for the interface as well as for
+   the look:
 
-     1. Flat colour. No frosted glass, no backdrop blur, no photo-real
-        gradients — every surface is opaque poster paint.
-     2. Ink outline. Cards, buttons, badges and icons are drawn with the same
-        dark outline, the way a sticker sheet is.
-     3. Hard shadow. Depth comes from an un-blurred offset block of colour,
-        never from a soft haze.
+     1. RED MEANS ACT. Bone, black and grey build the page; the one red is
+        spent only on what a visitor can do — book, plan, call, submit, the
+        chosen option, the live total. Scanning the page for red is the same
+        as scanning it for the next move.
+     2. NOTHING IS ROUNDED. Every corner is cut square. The border radius
+        scale collapses to zero in tailwind.config.cjs, so shapes are slabs,
+        stencils and torn strips.
+     3. OUT OF REGISTER. Depth is a misprint — a hard black offset, sometimes
+        with the red plate slipped the other way — never a blur.
+     4. PHOTOS ARE ENGRAVINGS UNTIL YOU TOUCH THEM. Photography is pushed to
+        high-contrast near-monochrome and blooms back to full colour on hover
+        and focus, so the picture you are pointing at is the one alive.
 
-   Keep those three and anything new will sit inside the illustration.
+   Everything below is CSS and inline SVG. There are no texture images.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --ink: #1e2a3a;
-  --ink-soft: #42566b;
-  --ink-light: #7c8fa3;
+  /* ── Ink & paper ─────────────────────────────────────────────────────── */
+  --ink: #0c0c0d;
+  --ink-soft: #3b3b3f;
+  --ink-light: #6f6f76;
 
-  --paper: #fff6e5;
-  --paper-warm: #ffefd6;
-  --paper-deep: #f7e3c2;
+  --paper: #efe9dd;
+  --paper-warm: #e5ddcd;
+  --paper-deep: #d5cab4;
+  --bone: #f5f1e8;
 
-  --mango: #ffa62b;
-  --mango-light: #ffc861;
-  --mango-dark: #f07e13;
+  /* ── The one red ─────────────────────────────────────────────────────── */
+  --blood: #c1121f;
+  --blood-light: #e63946;
+  --blood-dark: #8b0a15;
+  --oxblood: #6a040f;
 
-  --hibiscus: #ff5d73;
-  --hibiscus-light: #ff9aa8;
+  /* Legacy token names, remapped. Anything in the markup still reaching for
+     a tropical hue lands on ink, bone or red. */
+  --mango: var(--blood);
+  --mango-light: var(--blood-light);
+  --mango-dark: var(--blood-dark);
+  --hibiscus: #a4161a;
+  --hibiscus-light: var(--blood-light);
+  --lagoon: #4a4a4e;
+  --lagoon-light: #cfc7b7;
+  --lagoon-dark: #151517;
+  --sky: #8a8a90;
+  --sky-light: #ded7c9;
+  --sky-dark: #26262a;
+  --jungle: #3e4a38;
+  --jungle-light: #8a8f79;
+  --jungle-dark: #1f261c;
+  --sunset: var(--blood);
+  --grape: #3a3542;
 
-  --lagoon: #21c0b7;
-  --lagoon-light: #7fe3da;
-  --lagoon-dark: #128c8a;
-
-  --sky: #4cc3f0;
-  --sky-light: #a5e4ff;
-  --sky-dark: #1c86be;
-
-  --jungle: #2fa84f;
-  --jungle-light: #7bd389;
-  --jungle-dark: #1b7a3c;
-
-  --sunset: #ff7a45;
-  --grape: #9163de;
-
-  /* Every outline on the site is drawn with this one pen. */
-  --stroke: 2.5px;
+  /* One pen draws every outline on the site. It is heavier than the old
+     illustrated line — this is a woodcut, not a sticker. */
+  --stroke: 3px;
   --stroke-thin: 2px;
+  --stroke-hair: 1px;
+
   --shadow-ink: 5px 5px 0 0 var(--ink);
   --shadow-ink-sm: 3px 3px 0 0 var(--ink);
-  --shadow-ink-lg: 8px 8px 0 0 var(--ink);
+  --shadow-ink-lg: 9px 9px 0 0 var(--ink);
+  /* The misprint: black plate down-right, red plate up-left. */
+  --shadow-misprint: 5px 5px 0 0 var(--ink), -3px -3px 0 0 var(--blood);
 }
 
 * {
@@ -66,10 +84,9 @@ html {
   background: var(--paper);
 }
 
-/* Fronds, badges and tilted stickers all reach slightly past the layout. None
-   of them are content, so clip the overflow instead of letting it produce a
-   horizontal scrollbar. `clip` (not `hidden`) keeps the viewport as the scroll
-   container, so the sticky header still sticks. */
+/* Splatters, torn strips and rotated stamps deliberately overhang the layout.
+   None of them are content, so clip rather than scroll. `clip` (not `hidden`)
+   keeps the viewport as the scroll container so the sticky header sticks. */
 html,
 body {
   overflow-x: clip;
@@ -77,17 +94,21 @@ body {
 
 body {
   min-height: 100vh;
-  font-family: 'Nunito', system-ui, sans-serif;
-  font-weight: 600;
+  font-family: 'Barlow', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 1.0125rem;
+  line-height: 1.6;
   color: var(--ink);
-  /* The paper colour lives on <html> so the drawn backdrop and the paper
-     grain — both negative z-index — can paint above it. A background here
-     would cover them. */
+  /* The paper colour lives on <html> so the collage backdrop and the grain —
+     both negative z-index — paint above it. */
   background-color: transparent;
 }
 
-/* Hand-drawn paper speckle. Two sparse dot layers at low opacity read as
-   printed grain without costing an image request. */
+/* ── Paper ─────────────────────────────────────────────────────────────────
+   Two stacked layers: fibrous noise from feTurbulence, and a coarse halftone
+   screen. Together they stop the bone ground from reading as flat digital
+   beige. Both are fixed, so the texture belongs to the paper and not to the
+   scroll. */
 body::before {
   content: '';
   position: fixed;
@@ -95,176 +116,331 @@ body::before {
   z-index: -2;
   pointer-events: none;
   opacity: 0.5;
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(30, 42, 58, 0.14) 1px, transparent 1.4px),
-    radial-gradient(circle at 50% 50%, rgba(240, 126, 19, 0.12) 1px, transparent 1.4px);
-  background-size: 22px 22px, 37px 37px;
-  background-position: 0 0, 11px 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
 }
 
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.16;
+  background-image: radial-gradient(circle at 50% 50%, rgba(12, 12, 13, 0.55) 1px, transparent 1.4px);
+  background-size: 5px 5px;
+}
+
+/* ── Type ─────────────────────────────────────────────────────────────────
+   Anton shouts, Oswald labels, Barlow explains, Special Elite stamps and
+   Permanent Marker annotates. Anton ships one weight, so headings are pinned
+   to 400 and font synthesis is switched off — a faux-bold Anton smears. */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6,
+.font-display,
+.font-heading,
+.font-serif,
 .font-lobster {
-  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1.12;
+  font-family: 'Anton', 'Oswald', Impact, sans-serif;
+  font-weight: 400;
+  font-synthesis-weight: none;
+  letter-spacing: 0.005em;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+/* Colour is set on the elements only, never on `.font-display`. A class
+   selector here would tie with `text-paper` and — being later in the file —
+   win, which would paint every heading on a black panel black. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--ink);
 }
 
+/* Headings that sit on one of the dark plates and carry no colour utility of
+   their own. */
+.planner-panel :is(h1, h2, h3, h4, h5, h6),
+.planner-panel-soft :is(h1, h2, h3, h4, h5, h6),
+.pathway-card-dark :is(h1, h2, h3, h4, h5, h6),
+.lobster-header :is(h1, h2, h3, h4, h5, h6),
+.sunset-section :is(h1, h2, h3, h4, h5, h6),
+.reef-section :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--bone);
+}
+
+h1 {
+  letter-spacing: -0.012em;
+}
+
+/* Small headings drop the poster face for the condensed one — Anton below
+   about 20px turns into a smudge. */
+h4,
+h5,
+h6 {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+}
+
 a {
-  color: var(--lagoon-dark);
+  color: var(--ink);
   font-weight: 700;
-  transition: color 0.2s ease;
+  text-decoration-color: var(--blood);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
 a:hover {
-  color: var(--mango-dark);
+  color: var(--blood);
+}
+
+/* The keyboard is a first-class way through this site, so the focus ring is
+   drawn in the action colour, in the same square language as everything
+   else. */
+:focus-visible {
+  outline: 3px solid var(--blood);
+  outline-offset: 2px;
 }
 
 .section-shell {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+/* ── Nothing is rounded ───────────────────────────────────────────────────
+   The radius scale is already collapsed to zero in tailwind.config.cjs, but
+   the markup carries a few dozen arbitrary radii (`rounded-[32px_14px_36px_20px]`
+   and friends) that the config cannot reach. The rule is stated once here
+   rather than chased through every file. */
+[class*='rounded-['] {
+  border-radius: 0 !important;
+}
+
+/* Opt back in where a circle is the meaning rather than a decoration. */
+.is-round,
+[class*='rounded-['].is-round {
+  border-radius: 9999px !important;
+}
+
 /* ── Type accents ───────────────────────────────────────────────────────── */
 
-/* Hand-lettered kicker above a headline. */
+/* Marker scrawl above a headline — the note someone left on the flash sheet. */
 .hand-note {
-  font-family: 'Caveat', cursive;
-  font-weight: 700;
-  font-size: 1.55rem;
+  font-family: 'Permanent Marker', cursive;
+  font-weight: 400;
+  font-size: 1.25rem;
   line-height: 1;
-  color: var(--mango-dark);
-  transform: rotate(-2deg);
+  letter-spacing: 0.01em;
+  color: var(--blood);
+  transform: rotate(-3deg);
   display: inline-block;
 }
 
-/* Marker-pen highlight behind a headline. Painted as a gradient on the inline
-   text box with `box-decoration-break: clone`, so a headline that wraps gets
-   the stroke under each line instead of one smear across the whole block. */
+/* Brush stroke slashed behind a headline. Painted on the inline text box with
+   `box-decoration-break: clone`, so a wrapping headline gets one stroke per
+   line rather than a single smear. The mask ragged-edges it. */
 .marker-highlight {
   display: inline;
-  padding: 0 0.08em;
+  padding: 0 0.14em;
+  color: var(--bone);
   background-image: linear-gradient(
     to bottom,
-    transparent 58%,
-    var(--mango-light) 58%,
-    var(--mango-light) 92%,
-    transparent 92%
+    transparent 4%,
+    var(--blood) 4%,
+    var(--blood) 96%,
+    transparent 96%
   );
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100' preserveAspectRatio='none'%3E%3Cpath d='M2,14 C60,4 120,18 190,8 C260,-2 330,16 398,6 L399,92 C330,100 268,84 196,94 C124,104 62,88 3,96 Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100' preserveAspectRatio='none'%3E%3Cpath d='M2,14 C60,4 120,18 190,8 C260,-2 330,16 398,6 L399,92 C330,100 268,84 196,94 C124,104 62,88 3,96 Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
 }
 
-/* Used by story headings: a crayon underline sweeping under the title. */
+/* A dry-brush swipe dragged under a title. */
 .scribble-title-bg {
   position: relative;
   display: inline-block;
-  padding-bottom: 0.2em;
+  padding-bottom: 0.24em;
 }
 
 .scribble-title-bg::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.12em;
-  height: 0.5rem;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2,8 C40,2 60,10 100,5 C140,0 165,9 198,4' stroke='%23FFA62B' stroke-width='6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  left: -0.06em;
+  right: -0.06em;
+  bottom: -0.06em;
+  height: 0.42rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M1,9 C34,3 52,11 88,6 C126,1 150,10 199,3 L199,12 C150,14 128,7 90,12 C54,17 32,10 1,13 Z' fill='%23C1121F'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
 }
 
-/* ── Section bands ──────────────────────────────────────────────────────── */
+/* ── Section bands ────────────────────────────────────────────────────────
+   The bands are printing plates stacked on the sheet. Each one declares two
+   things and nothing else: `--band`, the paint, and `--band-texture`, the
+   screen laid over it. The torn-edge rules below read those variables, which
+   is what lets one rule rip every band without knowing what colour it is.
+
+   Values step in tone from one band to the next — bone, deep, warm, black,
+   red — so a tear between two of them actually reads. */
 
 .home-section {
   isolation: isolate;
+  background-color: var(--band, transparent);
+  background-image: var(--band-texture, none);
+  background-size: var(--band-texture-size, auto);
+  background-repeat: repeat;
 }
 
-/* Flat poster bands. Opaque on purpose — the illustrated backdrop shows
-   through the wave-shaped gaps between them, not through the paint. */
 .shore-section {
-  background: var(--paper) !important;
+  --band: var(--paper);
+  --band-texture: none;
 }
 
+/* Halftone screen, coarse. */
 .cove-section {
-  background: var(--paper-warm) !important;
+  --band: var(--paper-deep);
+  --band-texture: radial-gradient(circle at 50% 50%, rgba(12, 12, 13, 0.16) 1.4px, transparent 1.8px);
+  --band-texture-size: 9px 9px;
 }
 
+/* Engraver's crosshatch, drawn as one layer so the band can carry a torn
+   margin in the layers above it. */
 .lagoon-section {
-  background: linear-gradient(180deg, #e6f7ff 0%, #d3f0ff 100%) !important;
+  --band: #f5f1e8;
+  --band-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cg stroke='%230C0C0D' stroke-width='0.9' opacity='0.16'%3E%3Cpath d='M-4 4 L4 -4 M0 16 L16 0 M12 20 L20 12'/%3E%3Cpath d='M-4 12 L4 20 M0 0 L16 16 M12 -4 L20 4'/%3E%3C/g%3E%3C/svg%3E");
+  --band-texture-size: 16px 16px;
 }
 
+/* Ledger ruling in red — the sheet the itinerary was worked out on. */
 .bay-section {
-  background: linear-gradient(180deg, #e4fbf4 0%, #d0f6ea 100%) !important;
+  --band: var(--paper-warm);
+  --band-texture: repeating-linear-gradient(180deg, rgba(193, 18, 31, 0.16) 0 1px, transparent 1px 34px);
+  --band-texture-size: 100% 34px;
 }
 
+/* Deep stock with a red hazard rule holding the top edge. */
 .dawn-section {
-  background: linear-gradient(180deg, #fff6e5 0%, #ffe6c9 100%) !important;
-}
-
-.sunset-section {
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #ffc861 0%, #ff9a5b 48%, #ff5d73 100%) !important;
+  --band: var(--paper-deep);
+  --band-texture: none;
 }
 
-.reef-section {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #7fe3da 0%, #21c0b7 45%, #128c8a 100%) !important;
-}
-
-/* A drawn sun sitting behind the warm band, and drifting water rings behind
-   the reef band. Both are pure gradients, so they cost nothing to paint. */
-.sunset-section::before {
+.dawn-section::after {
   content: '';
   position: absolute;
-  top: -14%;
-  left: 50%;
-  width: min(58vw, 620px);
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  border-radius: 9999px;
-  background: radial-gradient(circle, rgba(255, 245, 214, 0.95) 0%, rgba(255, 233, 175, 0.55) 42%, transparent 62%);
+  inset: 0 0 auto 0;
+  height: 10px;
+  background-image: repeating-linear-gradient(45deg, var(--blood) 0 10px, transparent 10px 20px);
   pointer-events: none;
 }
 
-/* Drawn foam ticks scattered over the water, rather than concentric rings —
-   the rings read as a printing artefact at full width. */
+/* THE BLACK PLATE. Where the page shouts. Its torn margin prints red, since a
+   black margin on black would show nothing. */
+.sunset-section {
+  position: relative;
+  overflow: hidden;
+  --band: var(--ink);
+  --band-texture: none;
+  --tear-ink: var(--blood);
+  color: var(--bone);
+}
+
+/* A red ray burst thrown behind the black band, and a splatter over it. */
+.sunset-section::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(120vw, 1100px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(193, 18, 31, 0.55) 0deg 3.2deg,
+    transparent 3.2deg 11deg
+  );
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 12%, transparent 62%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 12%, transparent 62%);
+  pointer-events: none;
+}
+
+.sunset-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.9;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='400' viewBox='0 0 560 400'%3E%3Cg fill='%23C1121F'%3E%3Ccircle cx='62' cy='58' r='13'/%3E%3Ccircle cx='96' cy='96' r='5'/%3E%3Ccircle cx='38' cy='104' r='3.5'/%3E%3Ccircle cx='120' cy='42' r='3'/%3E%3Cpath d='M470 300 c14 -18 34 -10 30 8 c-4 18 -26 24 -34 12 z'/%3E%3Ccircle cx='508' cy='342' r='6'/%3E%3Ccircle cx='452' cy='344' r='3'/%3E%3Ccircle cx='296' cy='30' r='4'/%3E%3Ccircle cx='268' cy='372' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* THE RED PLATE. */
+.reef-section {
+  position: relative;
+  overflow: hidden;
+  --band: var(--oxblood);
+  --band-texture: linear-gradient(170deg, #a4161a 0%, #6a040f 55%, #0c0c0d 100%);
+  --band-texture-size: 100% 100%;
+  color: var(--bone);
+}
+
+/* Ink splatter thrown across the red. */
 .reef-section::before {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: -1;
   pointer-events: none;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160' viewBox='0 0 240 160'%3E%3Cg stroke='%23ffffff' stroke-width='4' stroke-linecap='round' fill='none' opacity='0.55'%3E%3Cpath d='M20 34 h34'/%3E%3Cpath d='M150 22 h26'/%3E%3Cpath d='M92 86 h30'/%3E%3Cpath d='M196 104 h28'/%3E%3Cpath d='M42 132 h24'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 240px 160px;
+  opacity: 0.55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='300' viewBox='0 0 420 300'%3E%3Cg fill='%230C0C0D'%3E%3Cpath d='M40 40 c26 -30 68 -14 58 18 c-8 26 -50 34 -66 16 c-10 -12 -6 -24 8 -34 z'/%3E%3Ccircle cx='128' cy='24' r='7'/%3E%3Ccircle cx='16' cy='96' r='5'/%3E%3Ccircle cx='150' cy='72' r='3.5'/%3E%3Cpath d='M330 236 c22 -22 56 -8 46 18 c-8 22 -44 26 -54 10 c-6 -10 -2 -20 8 -28 z'/%3E%3Ccircle cx='396' cy='210' r='6'/%3E%3Ccircle cx='300' cy='282' r='4'/%3E%3Ccircle cx='224' cy='150' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 420px 300px;
 }
 
-/* Section copy on the two saturated bands is white, so the drawn outline is
-   white there too. */
+/* Copy on the two dark plates is bone, and its offset is the red plate rather
+   than a soft shadow. */
+.sunset-section h1,
 .sunset-section h2,
 .sunset-section h3,
+.reef-section h1,
 .reef-section h2,
 .reef-section h3 {
-  color: #ffffff;
-  text-shadow: 3px 3px 0 rgba(30, 42, 58, 0.28);
+  color: var(--bone);
+  text-shadow: 4px 4px 0 var(--blood-dark);
+}
+
+.sunset-section p,
+.reef-section p {
+  color: rgba(245, 241, 232, 0.88);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   Wavy section edges
-   The bands are masked with a rolling wave at top and bottom: one composited
-   layer, no extra DOM, and the illustrated backdrop stays visible through the
-   troughs.
+   Torn edges
+   The bands used to roll into each other on a wave. They are now ripped
+   apart, and the rip has to be visible: a mask alone would only reveal the
+   bone collage behind, bone on bone.
+
+   So each band paints an ink margin along its own top and bottom — a strip
+   exactly as tall as the tear — and the mask then rips through that strip.
+   What is left is a ragged black (or red) fibre edge, printed by the band
+   itself, with the collage showing through the deepest bites.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --wave-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,72 C120,120 220,24 340,58 C460,92 540,10 660,44 C780,78 880,116 1000,74 C1090,42 1140,58 1200,44 L1200,120 L0,120 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,76 C1140,62 1090,78 1000,46 C880,4 780,42 660,76 C540,110 460,28 340,62 C220,96 120,0 0,48 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-height: 3.25rem;
+  --tear-top: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%2040'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,24.0%20L34,20.1%20L65,30.9%20L83,35.6%20L100,6.1%20L119,27%20L133,30.9%20L152,31.2%20L180,29%20L194,20.4%20L221,18.1%20L241,12.8%20L275,2.9%20L299,30%20L323,28.2%20L355,12.9%20L364,34.2%20L386,25.6%20L416,28.1%20L427,32.7%20L441,5.1%20L470,9.9%20L499,35%20L530,22.6%20L548,29.5%20L565,32.9%20L587,19.4%20L605,23.8%20L625,20.3%20L644,26%20L673,24%20L703,16.9%20L719,30%20L730,20.7%20L760,23.6%20L785,24.6%20L813,27.9%20L825,17.4%20L835,22.9%20L852,20.6%20L877,8.5%20L904,12.2%20L922,35%20L943,10.4%20L955,8.6%20L967,33.7%20L987,32.9%20L1013,30.9%20L1023,12.7%20L1039,36.8%20L1059,36.6%20L1080,25.4%20L1112,17.4%20L1137,5.4%20L1169,27%20L1199,21.5%20L1200,32.1%20L1200,40%20L0,40%20Z'%20fill='%23000'/%3E%3C/svg%3E");
+  --tear-bottom: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%2040'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,24.0%20L15,4.4%20L34,14.2%20L65,28.2%20L89,7.1%20L111,38%20L141,20.5%20L169,4.2%20L193,20.8%20L223,6.1%20L250,18.8%20L277,19%20L306,29.6%20L334,30.2%20L360,20.7%20L394,30%20L419,5.1%20L442,11.6%20L470,19.8%20L485,36.7%20L518,11%20L528,14.2%20L548,7.6%20L566,15.3%20L599,4%20L611,29.3%20L627,8.9%20L646,34%20L662,5.9%20L677,19.5%20L700,17.1%20L728,5.7%20L740,12.8%20L769,6.9%20L799,15.2%20L832,22.6%20L857,36.1%20L891,22.1%20L909,12.4%20L938,17%20L969,12.3%20L993,20%20L1021,17.8%20L1033,20.4%20L1056,9.1%20L1077,7%20L1102,32%20L1127,5.3%20L1149,8.9%20L1174,31.1%20L1189,15.8%20L1200,5%20L1200,0%20L0,0%20Z'%20fill='%23000'/%3E%3C/svg%3E");
+  --tear-height: 2.5rem;
 }
 
 .wavy-band,
@@ -272,284 +448,399 @@ a:hover {
 .wavy-band-bottom {
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+  /* The ink margin. Two solid strips painted over the band's own texture; the
+     mask above rips them into fibres. */
+  background-image:
+    linear-gradient(var(--tear-ink, var(--ink)), var(--tear-ink, var(--ink))),
+    linear-gradient(var(--tear-ink, var(--ink)), var(--tear-ink, var(--ink))),
+    var(--band-texture, none);
+  background-size:
+    100% var(--tear-height),
+    100% var(--tear-height),
+    var(--band-texture-size, auto);
+  background-position: top center, bottom center, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat;
+}
+
+/* A band ripped along one edge only has to park the other margin somewhere
+   off the element. It has to be parked with a *length*: a percentage offset is
+   resolved against (container − image), and these stripes are 100% wide, so
+   any percentage — including -200% — collapses to 0 and prints the stripe at
+   the top edge instead of hiding it. */
+.wavy-band-top {
+  background-position: top center, 0 -9999px, 0 0;
+}
+
+.wavy-band-bottom {
+  background-position: 0 -9999px, bottom center, 0 0;
 }
 
 .wavy-band {
-  -webkit-mask-image: var(--wave-top), linear-gradient(#000, #000), var(--wave-bottom);
-  -webkit-mask-size: 100% var(--wave-height), 100% calc(100% - var(--wave-height) * 2), 100% var(--wave-height);
+  -webkit-mask-image: var(--tear-top), linear-gradient(#000, #000), var(--tear-bottom);
+  -webkit-mask-size: 100% var(--tear-height), 100% calc(100% - var(--tear-height) * 2), 100% var(--tear-height);
   -webkit-mask-position: top center, center, bottom center;
-  mask-image: var(--wave-top), linear-gradient(#000, #000), var(--wave-bottom);
-  mask-size: 100% var(--wave-height), 100% calc(100% - var(--wave-height) * 2), 100% var(--wave-height);
+  mask-image: var(--tear-top), linear-gradient(#000, #000), var(--tear-bottom);
+  mask-size: 100% var(--tear-height), 100% calc(100% - var(--tear-height) * 2), 100% var(--tear-height);
   mask-position: top center, center, bottom center;
 }
 
 .wavy-band-top {
-  -webkit-mask-image: var(--wave-top), linear-gradient(#000, #000);
-  -webkit-mask-size: 100% var(--wave-height), 100% calc(100% - var(--wave-height));
+  -webkit-mask-image: var(--tear-top), linear-gradient(#000, #000);
+  -webkit-mask-size: 100% var(--tear-height), 100% calc(100% - var(--tear-height));
   -webkit-mask-position: top center, bottom center;
-  mask-image: var(--wave-top), linear-gradient(#000, #000);
-  mask-size: 100% var(--wave-height), 100% calc(100% - var(--wave-height));
+  mask-image: var(--tear-top), linear-gradient(#000, #000);
+  mask-size: 100% var(--tear-height), 100% calc(100% - var(--tear-height));
   mask-position: top center, bottom center;
 }
 
 .wavy-band-bottom {
-  -webkit-mask-image: linear-gradient(#000, #000), var(--wave-bottom);
-  -webkit-mask-size: 100% calc(100% - var(--wave-height)), 100% var(--wave-height);
+  -webkit-mask-image: linear-gradient(#000, #000), var(--tear-bottom);
+  -webkit-mask-size: 100% calc(100% - var(--tear-height)), 100% var(--tear-height);
   -webkit-mask-position: top center, bottom center;
-  mask-image: linear-gradient(#000, #000), var(--wave-bottom);
-  mask-size: 100% calc(100% - var(--wave-height)), 100% var(--wave-height);
+  mask-image: linear-gradient(#000, #000), var(--tear-bottom);
+  mask-size: 100% calc(100% - var(--tear-height)), 100% var(--tear-height);
   mask-position: top center, bottom center;
 }
 
 @media (max-width: 640px) {
   :root {
-    --wave-height: 2rem;
+    --tear-height: 1.6rem;
   }
 }
 
-/* ── Drawn surfaces ─────────────────────────────────────────────────────── */
+/* ── Plates & cards ────────────────────────────────────────────────────────
+   One recipe, used everywhere: bone stock, heavy black keyline, hard offset,
+   and a red registration tick in the top-right corner so every plate carries
+   a mark of the second colour. */
 
-/* The single card recipe the whole site draws from. */
 .sticker-card,
 .artsy-glass-card,
 .glass-card {
   position: relative;
-  background: #fffdf7;
+  background: var(--bone);
   border: var(--stroke) solid var(--ink);
   box-shadow: var(--shadow-ink);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
 }
 
+.sticker-card::after,
+.artsy-glass-card::after,
+.glass-card::after,
+.home-feature-card::after,
+.story-copy-card::after,
+.pathway-card::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+  z-index: 2;
+  /* Registration crosshair: two hairlines and a ring, printed in red. */
+  background-image:
+    linear-gradient(var(--blood), var(--blood)),
+    linear-gradient(var(--blood), var(--blood));
+  background-size: 100% 1.5px, 1.5px 100%;
+  background-position: center, center;
+  background-repeat: no-repeat;
+  opacity: 0.85;
+}
+
+/* On hover the plate slips further out of register and the red plate appears
+   behind it. */
 .sticker-card:hover,
 .artsy-glass-card:hover,
 .glass-card:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 0 var(--ink);
+  box-shadow: 9px 9px 0 0 var(--ink), -4px -4px 0 0 var(--blood);
 }
 
-/* Feature cards live on the saturated bands, so they are painted in poster
-   colours and cycle hue by position. */
+/* Feature plates. They sit on the red band, so they are the bone counterpoint
+   and the tint cycles by position. */
 .home-feature-card {
   position: relative;
-  border-radius: 26px;
   border: var(--stroke) solid var(--ink);
-  background: var(--paper);
+  background: var(--bone);
   color: var(--ink);
   box-shadow: var(--shadow-ink);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
 }
 
 .home-feature-card:hover {
   transform: translate(-4px, -4px);
-  box-shadow: 9px 9px 0 0 var(--ink);
+  box-shadow: 10px 10px 0 0 var(--ink), -4px -4px 0 0 var(--blood);
 }
 
 .home-feature-card:nth-child(3n + 1) {
-  background: #fff2d9;
+  background: var(--bone);
 }
 
 .home-feature-card:nth-child(3n + 2) {
-  background: #e2fbf5;
+  background: var(--paper-warm);
+  background-image: radial-gradient(circle at 50% 50%, rgba(12, 12, 13, 0.14) 1.2px, transparent 1.6px);
+  background-size: 8px 8px;
 }
 
 .home-feature-card:nth-child(3n + 3) {
-  background: #ffe8ea;
+  background: var(--paper);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(12, 12, 13, 0.07) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-45deg, rgba(12, 12, 13, 0.07) 0 1px, transparent 1px 7px);
 }
 
-/* Feature-card copy is dark now that the cards are cream, so neutralise the
-   light text utilities the markup still carries. */
+/* The markup carries light-on-dark text utilities from the band above; the
+   plates are bone, so pin their copy back to ink — and drop the band's
+   heading shadow, which would otherwise ghost in red behind black type. */
 .home-feature-card h3,
-.home-feature-card p {
+.home-feature-card p,
+.home-feature-card :is(h1, h2, h4, h5, h6) {
   color: var(--ink);
+  text-shadow: none;
 }
 
 .story-copy-card {
-  border-radius: 24px;
+  position: relative;
   border: var(--stroke) solid var(--ink);
-  background: #fffdf7;
-  padding: 1.75rem;
+  background: var(--bone);
+  padding: 1.9rem;
   box-shadow: var(--shadow-ink);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
 }
 
 .story-copy-card:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 0 var(--ink);
+  box-shadow: 9px 9px 0 0 var(--ink), -4px -4px 0 0 var(--blood);
 }
 
-/* Photographs are framed as if pasted into a scrapbook: ink border, hard
-   shadow, and a small colour lift so they sit with the drawn palette. */
+/* ── Photography ──────────────────────────────────────────────────────────
+   Photographs enter the page as engravings: near-monochrome, hard contrast,
+   red plate laid over them. They come back to full colour when the visitor
+   hovers or focuses the thing they belong to — the picture you are reaching
+   for is the one that is alive. */
+
 .story-media-frame {
   position: relative;
 }
 
 .story-media-frame img,
 .story-media-frame iframe {
-  border-radius: 24px;
   border: var(--stroke) solid var(--ink);
   box-shadow: var(--shadow-ink-lg);
-  filter: saturate(1.18) contrast(1.05);
+}
+
+.photo-pop,
+.story-media-frame img,
+.photo-sticker {
+  filter: grayscale(0.88) contrast(1.28) brightness(0.96);
+  transition: filter 0.4s ease, transform 0.5s ease;
 }
 
 .photo-sticker {
   border: var(--stroke) solid var(--ink);
-  filter: saturate(1.2) contrast(1.06);
 }
 
-/* Photography sits inside a drawn page, so it is pushed a little towards the
-   poster palette: more saturation, a touch more contrast, slightly warmer. */
-.photo-pop {
-  filter: saturate(1.22) contrast(1.07) brightness(1.02);
+/* Any hovered or keyboard-focused ancestor brings the photograph back. */
+.group:hover .photo-pop,
+.group:focus-within .photo-pop,
+a:hover .photo-pop,
+a:focus-visible .photo-pop,
+.photo-pop:hover,
+.story-media-frame:hover img,
+.photo-sticker:hover {
+  filter: grayscale(0) contrast(1.06) brightness(1);
 }
 
 .hero-glass {
   position: relative;
   overflow: hidden;
-  border-radius: 32px;
-  background: var(--paper);
+  background: var(--bone);
   border: var(--stroke) solid var(--ink);
   box-shadow: var(--shadow-ink-lg);
 }
 
-/* Round sticker holding a section's emoji. */
+/* Section mark: a black seal with the red ring bitten out of its edge. */
 .section-icon {
+  position: relative;
   display: inline-grid;
-  width: 78px;
-  height: 78px;
+  width: 76px;
+  height: 76px;
   place-items: center;
   border-radius: 9999px;
-  background: var(--mango-light);
+  background: var(--ink);
   border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
-  font-size: 2.3rem;
+  box-shadow: 0 0 0 4px var(--paper), 0 0 0 7px var(--blood);
+  font-size: 2rem;
   line-height: 1;
-  transform: rotate(-3deg);
-  transition: transform 0.25s ease;
+  transform: rotate(-4deg);
+  transition: transform 0.2s ease;
+}
+
+/* The seal's mark is knocked back to a single ink value. The filter lives on
+   the child, not the seal: a filter on the element would also desaturate its
+   own red ring, which is painted as a box-shadow. */
+.section-icon > * {
+  filter: grayscale(1) contrast(1.3) brightness(2.1);
 }
 
 .section-icon:hover {
-  transform: rotate(3deg) scale(1.05);
+  transform: rotate(4deg) scale(1.06);
 }
 
-/* Loose colour washes behind sections. Kept soft and sparse — they suggest
-   painted paper rather than a photographic glow. */
+/* Loose washes behind sections, now flung ink and red rather than painted
+   paper. */
 .parallax-wash {
   position: absolute;
   z-index: -1;
-  width: min(40vw, 460px);
+  width: min(42vw, 480px);
   aspect-ratio: 1;
-  border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
-  opacity: 0.35;
+  opacity: 0.12;
   pointer-events: none;
-  background: var(--mango-light);
+  background: var(--ink);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M46 34 c34 -40 96 -26 106 20 c10 44 -18 62 -8 92 c10 30 -22 52 -58 44 c-38 -8 -46 -34 -74 -46 C-12 130 12 74 46 34 z' fill='%23000'/%3E%3Ccircle cx='172' cy='44' r='12' fill='%23000'/%3E%3Ccircle cx='24' cy='168' r='9' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M46 34 c34 -40 96 -26 106 20 c10 44 -18 62 -8 92 c10 30 -22 52 -58 44 c-38 -8 -46 -34 -74 -46 C-12 130 12 74 46 34 z' fill='%23000'/%3E%3Ccircle cx='172' cy='44' r='12' fill='%23000'/%3E%3Ccircle cx='24' cy='168' r='9' fill='%23000'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
 }
 
 .parallax-wash-left {
-  left: -12%;
-  top: 10%;
-  background: var(--lagoon-light);
+  left: -14%;
+  top: 8%;
+  background: var(--ink);
+  transform: rotate(-18deg);
 }
 
 .parallax-wash-right {
-  right: -12%;
-  bottom: 8%;
-  background: var(--mango-light);
+  right: -14%;
+  bottom: 6%;
+  background: var(--blood);
+  opacity: 0.16;
+  transform: rotate(142deg);
 }
 
-/* ── Buttons ────────────────────────────────────────────────────────────── */
+/* ── Buttons ──────────────────────────────────────────────────────────────
+   The primary button is a red slab with the black plate slipped behind it.
+   Pressing it drives the slab into its own shadow. A white slash wipes across
+   on hover, like a squeegee pull. */
 
-/* Buttons that don't set their own radius stay pills, as they were before the
-   redesign — a Tailwind radius utility still overrides this. */
 button {
-  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
-  font-weight: 700;
-  border-radius: 9999px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
 }
 
-/* The press interaction: the button slides into its own shadow. */
 .tropical-button,
 .tropical-button-outline,
 .planner-cta,
 .planner-cta-ghost {
-  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
 .tropical-button {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
-  background: var(--mango);
-  color: var(--ink);
+  @apply relative inline-flex items-center justify-center gap-2 overflow-hidden px-8 py-3 text-sm uppercase;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  background: var(--blood);
+  color: var(--bone);
   border: var(--stroke) solid var(--ink);
   box-shadow: var(--shadow-ink);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+}
+
+/* The squeegee pull. */
+.tropical-button::before,
+.tropical-button-outline::before,
+.planner-cta::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -140%;
+  width: 55%;
+  height: 140%;
+  background: rgba(245, 241, 232, 0.32);
+  transform: skewX(-22deg);
+  transition: left 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.tropical-button:hover::before,
+.tropical-button-outline:hover::before,
+.planner-cta:hover::before {
+  left: 160%;
 }
 
 .tropical-button:hover {
-  background: var(--mango-light);
+  background: var(--blood-light);
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 0 var(--ink);
+  box-shadow: 8px 8px 0 0 var(--ink);
 }
 
 .tropical-button:active {
-  transform: translate(3px, 3px);
-  box-shadow: 1px 1px 0 0 var(--ink);
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 var(--ink);
 }
 
 .tropical-button-outline {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
-  background: #fffdf7;
+  @apply relative inline-flex items-center justify-center gap-2 overflow-hidden px-8 py-3 text-sm uppercase;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  background: var(--bone);
   color: var(--ink);
   border: var(--stroke) solid var(--ink);
   box-shadow: var(--shadow-ink);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .tropical-button-outline:hover {
-  background: var(--lagoon-light);
+  background: var(--ink);
+  color: var(--bone);
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 0 var(--ink);
+  box-shadow: 8px 8px 0 0 var(--blood);
 }
 
 .tropical-button-outline:active {
-  transform: translate(3px, 3px);
-  box-shadow: 1px 1px 0 0 var(--ink);
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 var(--ink);
 }
 
-/* Colour variants for the same shape. */
+/* Colour variants of the same slab. */
 .btn-lagoon {
-  background: var(--lagoon);
-  color: #ffffff;
+  background: var(--ink);
+  color: var(--bone);
 }
 
 .btn-lagoon:hover {
-  background: var(--lagoon-light);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--blood-light);
+  box-shadow: 8px 8px 0 0 var(--blood);
 }
 
 .btn-hibiscus {
-  background: var(--hibiscus);
-  color: #ffffff;
+  background: var(--oxblood);
+  color: var(--bone);
 }
 
 .btn-hibiscus:hover {
-  background: var(--hibiscus-light);
-  color: var(--ink);
+  background: var(--blood);
+  color: var(--bone);
 }
 
 button,
 input,
 textarea,
 select {
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
 }
 
-/* Form fields are drawn with the same pen as everything else. These are
-   element selectors, so any component that sets its own border/background
-   utilities still wins — this is only the default for fields that don't. */
+/* ── Form fields ──────────────────────────────────────────────────────────
+   Fields are boxes stamped on a form: square, hairline-ruled, typewriter
+   values. They fill with a red keyline on focus, so the field you are typing
+   in is marked in the action colour like every other live thing. */
+
 input:not([type='range']),
 textarea,
 select {
-  font-family: 'Nunito', system-ui, sans-serif;
-  font-weight: 700;
+  font-family: 'Barlow', system-ui, sans-serif;
+  font-weight: 600;
   color: var(--ink);
 }
 
@@ -564,8 +855,7 @@ input[type='password'],
 textarea,
 select {
   border: var(--stroke-thin) solid var(--ink);
-  border-radius: 14px;
-  background: #ffffff;
+  background: var(--bone);
 }
 
 input[type='text']:focus,
@@ -579,128 +869,196 @@ input[type='password']:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  background: #f0fdfa;
+  background: #fff;
+  border-color: var(--blood);
+  box-shadow: 3px 3px 0 0 var(--blood);
 }
 
 ::placeholder {
   color: var(--ink-light);
-  font-weight: 600;
+  font-weight: 500;
+  font-style: italic;
 }
 
-/* ── Navigation ─────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--blood);
+  color: var(--bone);
+}
+
+/* ── Navigation ───────────────────────────────────────────────────────────
+   The header is the black bar the whole collage hangs from, ruled off with a
+   red hazard stripe. */
 
 .lobster-header {
-  background: var(--paper);
+  position: relative;
+  background: var(--ink);
   border-bottom: 3px solid var(--ink);
+  color: var(--bone);
+}
+
+.lobster-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 6px;
+  background-image: repeating-linear-gradient(45deg, var(--blood) 0 8px, var(--ink) 8px 16px);
+}
+
+.lobster-header h1 {
+  color: var(--bone);
 }
 
 .nav-link-pill {
-  @apply flex items-center gap-2 rounded-full px-4 py-2 font-bold transition duration-200;
-  color: var(--ink);
+  @apply flex items-center gap-2 px-4 py-2 uppercase transition duration-150;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: rgba(245, 241, 232, 0.82);
   border: var(--stroke-thin) solid transparent;
 }
 
 .nav-link-pill:hover {
-  background: var(--mango-light);
-  border-color: var(--ink);
-  color: var(--ink);
-  transform: translateY(-1px);
+  background: var(--blood);
+  border-color: var(--blood);
+  color: var(--bone);
 }
 
+/* Where you are is struck through in red. */
 .nav-link-pill-active {
-  background: var(--lagoon-light);
-  border-color: var(--ink);
-  box-shadow: var(--shadow-ink-sm);
+  background: transparent;
+  border-color: var(--bone);
+  color: var(--bone);
+  box-shadow: 3px 3px 0 0 var(--blood);
+}
+
+/* The mobile sheet drops down as a bone plate, so its links flip to ink. The
+   same element is the transparent desktop bar above `md`, where the links must
+   stay bone — hence the query. */
+@media (max-width: 767px) {
+  .nav-sheet .nav-link-pill {
+    color: var(--ink);
+  }
+
+  .nav-sheet .nav-link-pill:hover {
+    color: var(--bone);
+  }
+
+  .nav-sheet .nav-link-pill-active {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .nav-sheet .language-toggle {
+    border-color: var(--ink);
+  }
+
+  .nav-sheet .language-toggle-button {
+    color: var(--ink);
+  }
+
+  .nav-sheet .language-toggle-button:not(.active):hover {
+    background: rgba(12, 12, 13, 0.12);
+    color: var(--ink);
+  }
 }
 
 .language-toggle {
-  @apply inline-flex items-center rounded-full p-1;
-  background: #fffdf7;
-  border: var(--stroke-thin) solid var(--ink);
-  box-shadow: var(--shadow-ink-sm);
+  @apply inline-flex items-center p-1;
+  background: transparent;
+  border: var(--stroke-thin) solid rgba(245, 241, 232, 0.55);
 }
 
 .language-toggle-button {
-  @apply inline-flex h-9 min-w-[48px] items-center justify-center rounded-full px-3.5 text-sm font-extrabold transition duration-150;
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
-  color: var(--ink);
+  @apply inline-flex h-8 min-w-[46px] items-center justify-center px-3.5 text-xs uppercase transition duration-150;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(245, 241, 232, 0.8);
 }
 
 .language-toggle-button.active {
-  background: var(--lagoon);
-  color: #ffffff;
+  background: var(--blood);
+  color: var(--bone);
 }
 
 .language-toggle-button:not(.active):hover {
-  background: var(--mango-light);
+  background: rgba(245, 241, 232, 0.16);
+  color: var(--bone);
 }
 
-/* ── Stickers & badges ──────────────────────────────────────────────────── */
+/* ── Stamps & badges ──────────────────────────────────────────────────────
+   Badges are rubber stamps: no fill, a doubled red keyline, typewriter caps,
+   knocked slightly off square, with the ink worn through in places. */
 
 .artsy-brick-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.8rem;
-  border-radius: 9999px;
-  background: var(--mango);
-  color: var(--ink);
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  padding: 0.28rem 0.75rem;
+  background: transparent;
+  color: var(--blood);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  border: var(--stroke-thin) solid var(--ink);
-  box-shadow: var(--shadow-ink-sm);
-  transform: rotate(-3deg);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(245, 241, 232, 0.94);
+  border: var(--stroke-thin) solid var(--blood);
+  box-shadow: inset 0 0 0 2px rgba(245, 241, 232, 0.94), inset 0 0 0 3.5px var(--blood);
+  transform: rotate(-4deg);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Worn ink: the stamp never quite prints solid. The holes are cut out of a
+     single even-odd path, because an alpha mask cannot punch a hole with a
+     second opaque shape drawn on top. */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='30'%3E%3Cpath fill-rule='evenodd' fill='%23000' d='M0 0H96V30H0Z M11 3h4v2h-4z M38 24h7v2h-7z M62 6h3v3h-3z M75 19h5v2h-5z M24 13h2v4h-2z M52 2h5v2h-5z M88 11h3v3h-3z'/%3E%3C/svg%3E");
+  -webkit-mask-size: 96px 30px;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='30'%3E%3Cpath fill-rule='evenodd' fill='%23000' d='M0 0H96V30H0Z M11 3h4v2h-4z M38 24h7v2h-7z M62 6h3v3h-3z M75 19h5v2h-5z M24 13h2v4h-2z M52 2h5v2h-5z M88 11h3v3h-3z'/%3E%3C/svg%3E");
+  mask-size: 96px 30px;
 }
 
 .artsy-brick-badge:hover {
-  transform: rotate(0deg) scale(1.06);
+  transform: rotate(0deg) scale(1.05);
 }
 
 .artsy-brick-badge-inverted {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.8rem;
-  border-radius: 9999px;
-  background: var(--lagoon-light);
-  color: var(--ink);
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  padding: 0.28rem 0.75rem;
+  background: var(--ink);
+  color: var(--bone);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   border: var(--stroke-thin) solid var(--ink);
-  box-shadow: var(--shadow-ink-sm);
   transform: rotate(2deg);
 }
 
 .artsy-title-card {
   display: inline-block;
-  padding: 0.7rem 1.5rem;
-  background: var(--lagoon);
-  color: #ffffff;
-  border-radius: 20px;
+  padding: 0.6rem 1.4rem;
+  background: var(--ink);
+  color: var(--bone);
   border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
+  box-shadow: var(--shadow-misprint);
   transform: rotate(-1.5deg);
 }
 
 .artsy-title-card-light {
   display: inline-block;
-  padding: 0.7rem 1.5rem;
-  background: var(--paper);
+  padding: 0.6rem 1.4rem;
+  background: var(--bone);
   color: var(--ink);
-  border-radius: 20px;
   border: var(--stroke) solid var(--ink);
   box-shadow: var(--shadow-ink);
   transform: rotate(1.5deg);
 }
 
-/* A postage-stamp edge, used on the hero portrait and highlight tiles. */
+/* Perforated edge, kept for the hero portrait and highlight tiles. */
 .stamp-edge {
   --stamp-notch: 9px;
   background: var(--ink);
@@ -713,43 +1071,173 @@ select:focus {
   mask-repeat: repeat;
 }
 
-/* ── Pathway cards ──────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   The trash-polka kit
+   Small parts the markup reaches for directly. Each is a piece of the
+   collage that also carries meaning.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Emoji are marks, not colour.
+   Copy on this site is ink or bone, so desaturating the element that carries
+   an emoji label costs the text nothing and keeps content the site does not
+   control — story emoji, form labels, admin panels — inside the two-colour
+   rule. Never put this on something whose text is red. */
+.emoji-mono {
+  filter: grayscale(1) contrast(1.25);
+}
+
+/* Solid red slab, for a label that has to be obeyed. */
+.tp-slab {
+  display: inline-block;
+  padding: 0.24rem 0.7rem;
+  background: var(--blood);
+  color: var(--bone);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.tp-slab-ink {
+  background: var(--ink);
+  color: var(--bone);
+}
+
+/* A censored word. Used where the old design would have used a highlight. */
+.tp-redact {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 0 0.35em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Typewriter catalogue number. */
+.tp-filenum {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-light);
+  text-transform: uppercase;
+}
+
+/* Barcode. Purely typographic — no image, no font. Used as a rule and as the
+   catalogue mark on a tour plate. */
+.tp-barcode {
+  height: 26px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px,
+    transparent 2px 4px,
+    var(--ink) 4px 5px,
+    transparent 5px 9px,
+    var(--ink) 9px 12px,
+    transparent 12px 13px,
+    var(--ink) 13px 14px,
+    transparent 14px 18px
+  );
+}
+
+/* Heavy rule with a red tick at the head — the divider between blocks. */
+.tp-rule {
+  position: relative;
+  height: 4px;
+  background: var(--ink);
+}
+
+.tp-rule::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -5px;
+  width: 62px;
+  height: 14px;
+  background: var(--blood);
+}
+
+/* Big stencil ordinal, the way a step is numbered on a workshop wall. */
+.tp-index {
+  font-family: 'Anton', Impact, sans-serif;
+  font-size: 3.4rem;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--ink);
+  letter-spacing: -0.03em;
+}
+
+.tp-index-red {
+  -webkit-text-stroke-color: var(--blood);
+}
+
+/* Strip of masking tape, rotated, for pinning a plate to the page. */
+.tp-tape {
+  position: absolute;
+  width: 108px;
+  height: 26px;
+  background: rgba(12, 12, 13, 0.82);
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4px, #000 calc(100% - 4px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 4px, #000 calc(100% - 4px), transparent 100%);
+}
+
+/* Corner notch: the plate has had its corner cut off. No shadow survives a
+   clip-path, so this is for accent slabs only. */
+.tp-cut {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+/* Halftone screen laid over any surface. */
+.tp-screen {
+  position: relative;
+}
+
+.tp-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image: radial-gradient(circle at 50% 50%, rgba(12, 12, 13, 0.7) 1.2px, transparent 1.6px);
+  background-size: 6px 6px;
+}
+
+/* ── Pathway plates ─────────────────────────────────────────────────────── */
 
 .pathway-card {
   position: relative;
   overflow: hidden;
-  border-radius: 30px;
   border: var(--stroke) solid var(--ink);
-  background: #fffdf7;
+  background: var(--bone);
   box-shadow: var(--shadow-ink-lg);
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
 
 .pathway-card:hover {
   transform: translate(-4px, -4px);
-  box-shadow: 12px 12px 0 0 var(--ink);
+  box-shadow: 13px 13px 0 0 var(--ink), -5px -5px 0 0 var(--blood);
 }
 
 .pathway-card-dark {
-  background: #1b3a4b;
-  color: #fff6e5;
+  background: var(--ink);
+  color: var(--bone);
 }
 
-.pathway-card-dark h3,
-.pathway-card-dark h2 {
-  color: #fff6e5;
+.pathway-card-dark h2,
+.pathway-card-dark h3 {
+  color: var(--bone);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   Plan My Day — the night-market panel
-   The planner is the one deliberately dark surface: a flat midnight-teal
-   poster with mango and lagoon accents, so the guided flow reads as its own
-   place without breaking the drawn language.
+   Plan My Day — the interrogation room
+   The planner stays the one deliberately dark surface, but it is now the
+   black plate: ink panels, bone type, red for the answer you picked and for
+   how far through you are.
    ══════════════════════════════════════════════════════════════════════════ */
 
 .planner {
-  --planner-teal: var(--lagoon-light);
-  --planner-amber: var(--mango-light);
+  --planner-teal: var(--bone);
+  --planner-amber: var(--blood-light);
   position: relative;
   isolation: isolate;
 }
@@ -757,148 +1245,174 @@ select:focus {
 .planner-glow {
   position: absolute;
   z-index: -1;
-  border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
-  opacity: 0.4;
+  opacity: 0.14;
   pointer-events: none;
+  background: var(--blood);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40 40 c40 -34 92 -18 104 26 c12 44 -14 60 -6 90 c8 30 -30 50 -66 40 C36 186 26 156 0 138 z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40 40 c40 -34 92 -18 104 26 c12 44 -14 60 -6 90 c8 30 -30 50 -66 40 C36 186 26 156 0 138 z' fill='%23000'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
 }
 
 .planner-panel {
-  border-radius: 30px;
   border: var(--stroke) solid var(--ink);
-  background: #17313f;
-  color: #fff6e5;
-  box-shadow: var(--shadow-ink-lg);
+  background: var(--ink);
+  color: var(--bone);
+  box-shadow: var(--shadow-misprint);
 }
 
 .planner-panel-soft {
-  border-radius: 22px;
-  border: var(--stroke-thin) solid rgba(255, 246, 229, 0.35);
-  background: #1f3d4d;
+  border: var(--stroke-thin) solid rgba(245, 241, 232, 0.28);
+  background: #17171a;
 }
 
+/* An answer is a bone card. Choosing it prints the red plate over it. */
 .planner-option {
   position: relative;
   display: flex;
   width: 100%;
   align-items: flex-start;
   gap: 1rem;
-  border-radius: 20px;
   border: var(--stroke-thin) solid var(--ink);
-  background: #f7fbfb;
-  padding: 1.1rem 1.2rem;
+  background: var(--bone);
+  padding: 1.05rem 1.15rem;
   text-align: left;
   color: var(--ink);
   box-shadow: 4px 4px 0 0 var(--ink);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .planner-option:hover {
   transform: translate(-2px, -2px);
-  background: var(--lagoon-light);
-  box-shadow: 6px 6px 0 0 var(--ink);
+  background: #fff;
+  box-shadow: 6px 6px 0 0 var(--blood);
 }
 
 .planner-option[data-selected='true'] {
-  background: var(--mango-light);
+  background: var(--blood);
   box-shadow: 6px 6px 0 0 var(--ink);
 }
 
-/* The option markup carries light-on-dark text utilities; the tiles are cream
-   now, so pin their contents back to ink. */
+/* The option markup carries light-on-dark utilities; the tiles are bone, so
+   pin their contents to ink — then flip to bone once chosen. */
 .planner-option,
 .planner-option * {
   color: var(--ink) !important;
+}
+
+.planner-option[data-selected='true'],
+.planner-option[data-selected='true'] * {
+  color: var(--bone) !important;
 }
 
 .planner-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 9999px;
   border: var(--stroke-thin) solid var(--ink);
-  background: #fffdf7;
-  padding: 0.5rem 1rem;
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 800;
+  background: var(--bone);
+  padding: 0.42rem 0.9rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink);
   box-shadow: 3px 3px 0 0 var(--ink);
-  transition: transform 0.18s ease, background 0.2s ease;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.planner-chip:not([data-selected='true']) {
+  filter: grayscale(1) contrast(1.2);
 }
 
 .planner-chip:hover {
-  background: var(--lagoon-light);
+  background: var(--ink);
+  color: var(--bone);
   transform: translate(-1px, -1px);
 }
 
 .planner-chip[data-selected='true'] {
-  background: var(--mango);
-  color: var(--ink);
+  background: var(--blood);
+  border-color: var(--blood);
+  color: var(--bone);
 }
 
+/* Progress is a red bar filling a black box, hazard-ruled so it reads as
+   machinery rather than as decoration. */
 .planner-rail {
-  height: 12px;
+  height: 14px;
   width: 100%;
   overflow: hidden;
-  border-radius: 9999px;
   border: var(--stroke-thin) solid var(--ink);
-  background: #fffdf7;
+  background: transparent;
 }
 
 .planner-rail-fill {
   height: 100%;
-  background: repeating-linear-gradient(
+  background-color: var(--blood);
+  background-image: repeating-linear-gradient(
     45deg,
-    var(--mango) 0 10px,
-    var(--mango-light) 10px 20px
+    rgba(12, 12, 13, 0.55) 0 6px,
+    transparent 6px 12px
   );
-  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .planner-cta {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
-  background: var(--mango);
-  color: var(--ink);
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  @apply relative inline-flex items-center justify-center gap-2 overflow-hidden px-8 py-3 text-sm uppercase;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  background: var(--blood);
+  color: var(--bone);
+  border: var(--stroke) solid var(--bone);
+  box-shadow: 5px 5px 0 0 var(--bone);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .planner-cta:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 0 var(--ink);
+  box-shadow: 8px 8px 0 0 var(--bone);
 }
 
 .planner-cta:active {
-  transform: translate(3px, 3px);
-  box-shadow: 1px 1px 0 0 var(--ink);
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 var(--bone);
 }
 
 .planner-cta-ghost {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-wide;
-  border: var(--stroke) solid #fff6e5;
+  @apply inline-flex items-center justify-center gap-2 px-7 py-3 text-sm uppercase;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  border: var(--stroke) solid var(--bone);
   background: transparent;
-  color: #fff6e5;
-  transition: background 0.2s ease, color 0.2s ease;
+  color: var(--bone);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .planner-cta-ghost:hover {
-  background: #fff6e5;
+  background: var(--bone);
   color: var(--ink);
 }
 
 .planner-key {
   display: inline-grid;
-  height: 1.6rem;
-  min-width: 1.6rem;
+  height: 1.65rem;
+  min-width: 1.65rem;
   place-items: center;
-  border-radius: 0.5rem;
   border: var(--stroke-thin) solid var(--ink);
-  background: var(--paper);
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 800;
+  background: var(--bone);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 0.7rem;
   color: var(--ink);
+}
+
+/* Emoji inside the planner are pictures, not colour: they get the same
+   near-monochrome treatment as the photography. */
+.planner-panel-soft .text-3xl,
+.planner-option .text-2xl,
+.planner-option .text-3xl {
+  filter: grayscale(1) contrast(1.25) brightness(1.6);
 }
 
 .planner-marquee {
@@ -913,54 +1427,55 @@ select:focus {
   to { transform: translate3d(-50%, 0, 0); }
 }
 
-/* ── Drawn motion ───────────────────────────────────────────────────────── */
+/* ── Motion ───────────────────────────────────────────────────────────────
+   The old design breathed. This one is pinned down: plates sit at fixed,
+   slightly wrong angles, and only twitch — a stencil slipping under the
+   hand. Amplitudes stay tiny so the heavy outlines never blur. */
 
-/* Ten gentle tilt/bob variants. Cards nudge like paper cut-outs pinned to a
-   board — small amplitudes, no skew, so outlines stay crisp. */
-@keyframes tilt1 { 0%, 100% { transform: translateY(0) rotate(-0.8deg); } 50% { transform: translateY(-7px) rotate(0.7deg); } }
-@keyframes tilt2 { 0%, 100% { transform: translateY(0) rotate(0.9deg); } 50% { transform: translateY(-6px) rotate(-0.8deg); } }
-@keyframes tilt3 { 0%, 100% { transform: translateY(0) rotate(-1.1deg); } 50% { transform: translateY(-8px) rotate(0.5deg); } }
-@keyframes tilt4 { 0%, 100% { transform: translateY(0) rotate(0.6deg); } 50% { transform: translateY(-5px) rotate(-1deg); } }
-@keyframes tilt5 { 0%, 100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-9px) rotate(0.9deg); } }
+@keyframes skew1 { 0%, 90%, 100% { transform: rotate(-0.9deg); } 93% { transform: rotate(-0.3deg) translateX(1px); } 96% { transform: rotate(-1.2deg) translateX(-1px); } }
+@keyframes skew2 { 0%, 88%, 100% { transform: rotate(1deg); } 91% { transform: rotate(0.4deg) translateY(-1px); } 95% { transform: rotate(1.3deg) translateY(1px); } }
+@keyframes skew3 { 0%, 92%, 100% { transform: rotate(-1.4deg); } 94% { transform: rotate(-0.8deg) translate(1px, 1px); } 97% { transform: rotate(-1.7deg); } }
+@keyframes skew4 { 0%, 86%, 100% { transform: rotate(0.7deg); } 89% { transform: rotate(1.2deg) translateX(-1px); } 94% { transform: rotate(0.2deg); } }
+@keyframes skew5 { 0%, 91%, 100% { transform: rotate(-0.4deg); } 94% { transform: rotate(0.3deg) translateY(-1px); } 97% { transform: rotate(-0.9deg); } }
 
-.animate-wave-sway-1 { animation: tilt1 7s ease-in-out infinite; }
-.animate-wave-sway-2 { animation: tilt2 8.5s ease-in-out infinite; animation-delay: -1.5s; }
-.animate-wave-sway-3 { animation: tilt3 7.5s ease-in-out infinite; animation-delay: -3.5s; }
-.animate-wave-sway-4 { animation: tilt4 9s ease-in-out infinite; animation-delay: -1s; }
-.animate-wave-sway-5 { animation: tilt5 6.5s ease-in-out infinite; animation-delay: -4s; }
-.animate-wave-sway-6 { animation: tilt1 8s ease-in-out infinite; animation-delay: -2.5s; }
-.animate-wave-sway-7 { animation: tilt2 9.5s ease-in-out infinite; animation-delay: -5s; }
-.animate-wave-sway-8 { animation: tilt3 6s ease-in-out infinite; animation-delay: -0.5s; }
-.animate-wave-sway-9 { animation: tilt4 8.8s ease-in-out infinite; animation-delay: -6s; }
-.animate-wave-sway-10 { animation: tilt5 7.2s ease-in-out infinite; animation-delay: -3.8s; }
+.animate-wave-sway-1 { animation: skew1 11s steps(1, end) infinite; }
+.animate-wave-sway-2 { animation: skew2 13s steps(1, end) infinite; animation-delay: -2s; }
+.animate-wave-sway-3 { animation: skew3 12s steps(1, end) infinite; animation-delay: -5s; }
+.animate-wave-sway-4 { animation: skew4 14s steps(1, end) infinite; animation-delay: -1s; }
+.animate-wave-sway-5 { animation: skew5 10s steps(1, end) infinite; animation-delay: -7s; }
+.animate-wave-sway-6 { animation: skew1 12.5s steps(1, end) infinite; animation-delay: -3s; }
+.animate-wave-sway-7 { animation: skew2 15s steps(1, end) infinite; animation-delay: -8s; }
+.animate-wave-sway-8 { animation: skew3 10.5s steps(1, end) infinite; animation-delay: -4s; }
+.animate-wave-sway-9 { animation: skew4 13.5s steps(1, end) infinite; animation-delay: -6s; }
+.animate-wave-sway-10 { animation: skew5 11.5s steps(1, end) infinite; animation-delay: -9s; }
 
-/* A hovered card should settle: stop the drift so the lift reads cleanly. */
+/* A hovered plate squares up — the twitch stops so the lift reads cleanly. */
 [class*='animate-wave-sway-']:hover {
   animation-play-state: paused;
 }
 
+/* The booking button pulses its red plate, not a glow. */
 @keyframes fabPulse {
-  0%, 100% { box-shadow: 4px 4px 0 0 var(--ink); }
-  50% { box-shadow: 4px 4px 0 0 var(--ink), 0 0 0 10px rgba(47, 168, 79, 0.18); }
+  0%, 100% { box-shadow: 5px 5px 0 0 var(--ink); }
+  50% { box-shadow: 5px 5px 0 0 var(--ink), 0 0 0 8px rgba(193, 18, 31, 0.28); }
 }
 
 .animate-fab-glow-wave {
-  animation: fabPulse 3s ease-in-out infinite;
+  animation: fabPulse 3s steps(12, end) infinite;
 }
 
-/* Palm fronds and clouds in the backdrop breathe rather than sway hard. */
+/* Fronds became linework, so they no longer sway — they hang. Kept as a very
+   slow drift so the backdrop is not completely dead. */
 @keyframes frondSway {
-  0%, 100% { transform: rotate(-2.5deg); }
-  50% { transform: rotate(2.5deg); }
+  0%, 100% { transform: rotate(-1.2deg); }
+  50% { transform: rotate(1.2deg); }
 }
 
 .animate-frond {
-  animation: frondSway 9s ease-in-out infinite;
+  animation: frondSway 16s ease-in-out infinite;
   transform-origin: bottom center;
 }
 
-/* Clouds cross the viewport, so the distance is measured in viewport widths
-   rather than in multiples of the cloud's own box. */
 @keyframes cloudDrift {
   from { transform: translateX(-25vw); }
   to { transform: translateX(125vw); }
@@ -971,20 +1486,29 @@ select:focus {
 .prose {
   --tw-prose-body: var(--ink-soft);
   --tw-prose-headings: var(--ink);
-  --tw-prose-links: var(--lagoon-dark);
+  --tw-prose-links: var(--blood);
   --tw-prose-bold: var(--ink);
   --tw-prose-quotes: var(--ink);
+  --tw-prose-quote-borders: var(--blood);
+  --tw-prose-counters: var(--blood);
+  --tw-prose-bullets: var(--blood);
+  --tw-prose-hr: var(--ink);
 }
+
+.prose blockquote {
+  border-left-width: 5px;
+  font-family: 'Oswald', sans-serif;
+  font-style: normal;
+}
+
+/* ── Small screens ──────────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
   :root {
-    --stroke: 2px;
+    --stroke: 2.5px;
     --shadow-ink: 4px 4px 0 0 var(--ink);
-    --shadow-ink-lg: 5px 5px 0 0 var(--ink);
-  }
-
-  .hero-glass {
-    border-radius: 24px;
+    --shadow-ink-lg: 6px 6px 0 0 var(--ink);
+    --shadow-misprint: 4px 4px 0 0 var(--ink), -2px -2px 0 0 var(--blood);
   }
 
   .section-shell {
@@ -992,9 +1516,13 @@ select:focus {
   }
 
   .section-icon {
-    width: 64px;
-    height: 64px;
-    font-size: 1.9rem;
+    width: 62px;
+    height: 62px;
+    font-size: 1.6rem;
+  }
+
+  .tp-index {
+    font-size: 2.4rem;
   }
 }
 

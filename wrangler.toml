@@ -1,19 +1,22 @@
 # ==============================================================================
-# Cloudflare Worker configuration (static assets + API routes)
+# Cloudflare Worker configuration — LD VIP
 # ==============================================================================
 #
-# The Cloudflare project deploys with `npx wrangler deploy`, the Workers
-# command. It needs `main` (a script entry point) and `[assets]` (a directory to
-# upload); a Pages config with `pages_build_output_dir` provides neither, which
-# is what produced:
+# This is the `ld_vip` branch, and it deploys to its own Worker: `ld-vip`, not
+# `nahiatours`. The name lives here rather than in a second config file on
+# purpose — the branch is never merged, so the branch *is* the deployment, and
+# there is no way for a deploy from here to land on the nahiatours Worker by
+# accident.
 #
-#   ✘ [ERROR] Missing entry-point to Worker script or to assets directory
+# The two deployments share nothing: separate Worker, separate workers.dev
+# hostname, and a separate KV namespace (scripts/provision-kv.mjs derives the
+# namespace title from the name below, so `ld-vip` gets `ld-vip-data`).
 #
-# `main` and `pages_build_output_dir` are mutually exclusive, so this file is
-# now Workers-shaped. worker/index.ts dispatches to the same functions/*
-# handlers the Pages deployment used, so no endpoint logic is duplicated.
+# The project deploys with `npx wrangler deploy`, the Workers command. It needs
+# `main` (a script entry point) and `[assets]` (a directory to upload); a Pages
+# config with `pages_build_output_dir` provides neither.
 
-name = "nahiatours"
+name = "ld-vip"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 
@@ -34,27 +37,27 @@ run_worker_first = true
 # KV
 # ==============================================================================
 #
-# Uncomment once the namespace exists and paste its id. Create it with either:
-#
-#   npx wrangler kv namespace create nahiatours-data
-#   ./scripts/deploy-cloudflare.sh      (creates, binds and deploys in one go)
+# scripts/provision-kv.mjs runs first inside `npm run build` and writes the
+# binding into this file, so nothing has to be pasted in by hand and nothing
+# has to be committed. It names the namespace after the Worker (`ld-vip-data`),
+# which is what keeps this deployment's data out of nahiatours'.
 #
 # The handlers read DATA_KV_F first and fall back to DATA_KV
 # (functions/api/data.ts), so binding either name is enough.
 #
-# Until then the site still works: reads fall back to the JSON bundled at
-# /data/*.json. Only admin writes and /api/init-data need KV.
+# Until the namespace exists the site still works: reads fall back to the JSON
+# bundled at /data/*.json. Only admin writes and /api/init-data need KV.
 #
 # Note this is a Worker, so wrangler.toml is the source of truth for bindings —
 # a binding added in the dashboard is overwritten by the next deploy.
-#
-# [[kv_namespaces]]
-# binding = "DATA_KV_F"
-# id = "<namespace id>"
 
 # ==============================================================================
 # Environment variables
 # ==============================================================================
+#
+# CANONICAL_HOST is deliberately unset. shared/canonical.ts only redirects when
+# it is set, so this deployment serves under its own hostname instead of 301ing
+# visitors to the nahiatours domain.
 #
 # ADMIN_PASSWORD is read only on the server (shared/adminAuth.ts) and never
 # reaches the browser — but it is committed here in plaintext, so treat it as

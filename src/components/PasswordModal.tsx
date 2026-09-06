@@ -58,8 +58,9 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onAuthenticate }) => {
 
 	return (
 		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-ink/60 p-4">
-			<div className="w-full max-w-md rounded-[26px] border-[3px] border-ink bg-paper p-6 shadow-ink-lg">
-				<h2 className="mb-4 font-display text-xl font-extrabold text-ink">Admin login</h2>
+			<div className="w-full max-w-md border-[3px] border-ink bg-paper p-6 shadow-misprint">
+				<span className="tp-filenum">Restricted · No. 001</span>
+				<h2 className="mb-4 mt-1 font-display text-2xl text-ink">Admin login</h2>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<input
 						type="password"
@@ -68,16 +69,16 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onAuthenticate }) => {
 						placeholder="Enter admin password"
 						autoFocus
 						disabled={isChecking}
-						className="w-full rounded-xl border-2 border-ink px-4 py-3 disabled:opacity-60"
+						className="w-full border-2 border-ink px-4 py-3 font-mono disabled:opacity-60"
 					/>
-					{error && <div className="text-sm font-bold text-hibiscus-dark">{error}</div>}
+					{error && <div className="border-l-4 border-mango bg-mango/10 px-3 py-2 text-sm font-semibold text-mango-dark">{error}</div>}
 					<div className="flex justify-end">
 						<button type="submit" disabled={isChecking || !password} className="tropical-button disabled:opacity-60">
 							{isChecking ? 'Checking…' : 'Enter'}
 						</button>
 					</div>
 				</form>
-				<p className="mt-3 text-xs font-semibold text-ink-light">Enter admin password to access dashboard.</p>
+				<p className="tp-filenum mt-4">Enter admin password to access dashboard.</p>
 			</div>
 		</div>
 	);

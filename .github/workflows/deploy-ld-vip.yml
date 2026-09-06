@@ -1,0 +1,88 @@
+# Deploys the LD VIP redesign to its own Cloudflare Worker.
+#
+# This workflow only ever runs on the `ld_vip` branch, and wrangler.toml on that
+# branch names the Worker `ld-vip`. Both of those have to be wrong at the same
+# time for this to touch the `nahiatours` deployment.
+#
+# It needs one repository secret: CLOUDFLARE_API_TOKEN, with
+#   • Workers Scripts: Edit    (to deploy)
+#   • Workers KV Storage: Edit (so scripts/provision-kv.mjs can create and bind
+#     the `ld-vip-data` namespace — without it the deploy still succeeds and the
+#     site reads from the JSON bundled at /data/*.json)
+# Add it under Settings → Secrets and variables → Actions. If the token can see
+# more than one Cloudflare account, add CLOUDFLARE_ACCOUNT_ID too.
+
+name: Deploy LD VIP
+
+on:
+  push:
+    branches: [ld_vip]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push supersedes an in-flight one.
+concurrency:
+  group: deploy-ld-vip
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Job-level env, not per-step: the `secrets` context is not available in a
+    # step's `if`, but `env` is — which is what lets the preflight below check
+    # for the token. wrangler and provision-kv.mjs both read these names
+    # directly, so nothing else has to pass them along.
+    env:
+      # CF_API_TOKEN is accepted as an alias so an existing secret under that
+      # name works without being duplicated.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      SITE_URL: ${{ vars.SITE_URL }}
+
+    steps:
+      # Say what is actually missing, rather than letting a successful build
+      # end in wrangler's generic "set a CLOUDFLARE_API_TOKEN" error.
+      - name: Check the deploy credential is present
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: |
+          echo "::error::CLOUDFLARE_API_TOKEN is not set for this repository."
+          echo "Add it under Settings → Secrets and variables → Actions."
+          echo "It needs Workers Scripts: Edit, and Workers KV Storage: Edit so"
+          echo "scripts/provision-kv.mjs can create and bind the ld-vip-data namespace."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # .npmrc pins legacy-peer-deps, so a plain `npm ci` is enough.
+      - run: npm ci
+
+      # provision-kv → populate-local-data → sitemap → SEO → vite build.
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+          # The action defaults to wrangler 3, which does not understand
+          # `run_worker_first` under [assets] and drops it with a warning — the
+          # Worker would then never see requests for paths that match a static
+          # file, so the API routes and the canonical check would stop running.
+          # v4 is also what `npm run deploy` gets from npx.
+          wranglerVersion: '4'
+          # `npm run build` already ran above, and it is what writes the KV
+          # binding into wrangler.toml — so deploy only, never rebuild here.
+          command: deploy
+
+      - name: Report where it landed
+        run: |
+          echo "### LD VIP deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Worker \`ld-vip\`, from branch \`ld_vip\` at \`${GITHUB_SHA::7}\`." >> "$GITHUB_STEP_SUMMARY"
+          echo "It is reachable at \`https://ld-vip.<your-subdomain>.workers.dev\`." >> "$GITHUB_STEP_SUMMARY"
