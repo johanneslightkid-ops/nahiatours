@@ -105,4 +105,4 @@ jobs:
           echo "### LD VIP deployed" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Worker \`ld-vip\`, from branch \`ld_vip\` at \`${GITHUB_SHA::7}\`." >> "$GITHUB_STEP_SUMMARY"
-          echo "It is reachable at \`https://ld-vip.<your-subdomain>.workers.dev\`." >> "$GITHUB_STEP_SUMMARY"
+          echo "Live at https://ld-vip.johannes-neugschwentner.workers.dev" >> "$GITHUB_STEP_SUMMARY"

@@ -13,11 +13,11 @@ import { dirname, join } from 'node:path';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-// This branch deploys as the `ld-vip` Worker, so the fallback URL follows it.
-// Set SITE_URL in the deployment's variables once a real domain exists; the
-// workers.dev hostname includes the account subdomain, which the build cannot
-// know, so this is only ever a fallback that keeps absolute URLs coherent.
-const DEFAULT_SITE_URL = 'https://ld-vip.workers.dev';
+// This branch deploys as the `ld-vip` Worker on the johannes-neugschwentner
+// account, so absolute URLs — the canonical tag, OpenGraph, the sitemap and the
+// structured data — default to that host. SITE_URL still overrides it, which is
+// what a custom domain would set.
+const DEFAULT_SITE_URL = 'https://ld-vip.johannes-neugschwentner.workers.dev';
 const DEFAULT_BRAND_NAME = 'Tours';
 
 /** Accepts "example.com", "https://example.com" or a trailing slash. */

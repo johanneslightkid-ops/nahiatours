@@ -25,4 +25,4 @@ Allow: *.webp
 Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://ld-vip.workers.dev/sitemap.xml
+Sitemap: https://ld-vip.johannes-neugschwentner.workers.dev/sitemap.xml

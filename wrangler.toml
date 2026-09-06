@@ -20,6 +20,12 @@ name = "ld-vip"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 
+# Serve this Worker at https://ld-vip.<account-subdomain>.workers.dev.
+# It is the default for a Worker with assets, but it is the whole point of this
+# deployment — the redesign has to be reachable at a URL of its own — so it is
+# stated rather than inherited.
+workers_dev = true
+
 # Static build output. `single-page-application` serves index.html for paths
 # with no matching file, which is what React Router needs for /tours, /plan and
 # the rest. API routes never reach this: worker/index.ts matches them first.

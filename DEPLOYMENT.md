@@ -13,7 +13,7 @@ never land on the production Worker by accident, whichever path below runs it.
 | --- | --- | --- |
 | Worker name (`wrangler.toml`) | `nahiatours` | `ld-vip` |
 | KV namespace | `nahiatours-data` | `ld-vip-data` |
-| Deploy trigger | Workers Builds, production branch | Workers Builds, branch build on push |
+| workers.dev hostname | `nahiatours.…` | `ld-vip.…` |
 | Canonical redirect | as configured | none — `CANONICAL_HOST` is unset |
 
 `scripts/provision-kv.mjs` reads the Worker name out of `wrangler.toml` and
@@ -35,52 +35,52 @@ be pasted in by hand and nothing has to be committed.
 
 Locally, `npm run deploy` does both steps in one go.
 
-## How it actually ships today
-
-The repository is **already connected to Cloudflare Workers Builds**, and that
-connection builds this branch on every push and publishes it at its own branch
-URL:
+## Where it is meant to live
 
 ```
-https://ld-vip-nahiatours.<subdomain>.workers.dev
+https://ld-vip.johannes-neugschwentner.workers.dev
 ```
 
-`main` still builds and publishes the production site; a non-production branch
-gets its own build and its own URL and does not become production. So this
-branch is live, separate, and merged into nothing — which is the whole point of
-it.
+That is a Worker of its own, named `ld-vip`, standing beside `nahiatours` in
+the dashboard with its own `ld-vip-data` KV namespace. `workers_dev = true` in
+`wrangler.toml` is what serves it at that hostname, and
+`scripts/site-config.mjs` defaults every absolute URL — canonical tag,
+OpenGraph, sitemap, structured data — to it.
 
-## Deploying it as a Worker of its own (optional)
+Standing it up needs a Cloudflare credential, which the repository does not
+have yet. Pick either route below; both produce the same Worker at the same
+URL.
 
-If it should be a distinct Worker — `ld-vip`, with its own name in the
-dashboard and its own `ld-vip-data` KV namespace — rather than a branch build of
-the connected project, there are two ways.
-
-### Option A — the GitHub Actions workflow (already written)
+### Route A — the GitHub Actions workflow (written, waiting on one secret)
 
 `.github/workflows/deploy-ld-vip.yml` builds and deploys on every push to
-`ld_vip`. **It skips itself, in green, unless a token is configured**, because
-this path is optional and a red check on the pull request would be a false
-alarm.
+`ld_vip`, and can also be run by hand from the Actions tab. It **skips itself
+in green** while unconfigured, so it never shows a false failure.
 
-To switch it on, add one repository secret under Settings → Secrets and
-variables → Actions:
+Add one repository secret — Settings → Secrets and variables → Actions → New
+repository secret:
 
-**`CLOUDFLARE_API_TOKEN`**, with
+| | |
+| --- | --- |
+| Name | `CLOUDFLARE_API_TOKEN` |
+| Permissions | **Account → Workers Scripts → Edit**<br>**Account → Workers KV Storage → Edit** |
 
-- **Workers Scripts: Edit** — to deploy at all.
-- **Workers KV Storage: Edit** — so the namespace `ld-vip-data` gets created
-  and bound. Without it the deploy still succeeds; the site just reads from the
-  JSON bundled at `/data/*.json`, and only admin writes and `/api/init-data`
-  need KV.
+Create the token at *My Profile → API Tokens → Create Token → Create Custom
+Token*. Workers Scripts: Edit is what deploys; Workers KV Storage: Edit lets
+`scripts/provision-kv.mjs` create and bind `ld-vip-data`. Without the KV
+permission the deploy still succeeds — reads fall back to the JSON bundled at
+`/data/*.json`, and only admin writes and `/api/init-data` need KV.
 
-Add **`CLOUDFLARE_ACCOUNT_ID`** as well if the token can see more than one
-Cloudflare account. `CF_API_TOKEN` / `CF_ACCOUNT_ID` are accepted as aliases.
+Add `CLOUDFLARE_ACCOUNT_ID` too if the token can see more than one account.
+`CF_API_TOKEN` / `CF_ACCOUNT_ID` work as aliases.
 
-### Option B — a second Workers Builds project
+The next push to `ld_vip` — or *Actions → Deploy LD VIP → Run workflow* —
+publishes it.
 
-In the Cloudflare dashboard: **Workers & Pages → Create → Import a repository**,
-pick `johanneslightkid-ops/nahiatours`, and set:
+### Route B — a second Workers Builds project
+
+In the Cloudflare dashboard: **Workers & Pages → Create → Import a
+repository**, pick `johanneslightkid-ops/nahiatours`, and set:
 
 - **Branch to deploy**: `ld_vip`
 - **Build command**: `npm run build`
@@ -89,11 +89,24 @@ pick `johanneslightkid-ops/nahiatours`, and set:
 Create it as a **new** project. Pointing the existing `nahiatours` project at
 this branch would replace the live site rather than standing a second one up.
 
+### What exists in the meantime
+
+The repository is already connected to Workers Builds for the `nahiatours`
+project, so pushes to `ld_vip` also produce a *branch build* of that project at
+
+```
+https://ld-vip-nahiatours.johannes-neugschwentner.workers.dev
+```
+
+That URL is a branch build, not a Worker of its own: it is fine for looking at
+the redesign, but the standalone `ld-vip` Worker above is the deployment this
+branch is written for.
+
 ## Optional variables
 
 | Variable | Effect |
 | --- | --- |
-| `SITE_URL` | Absolute URLs in the sitemap, canonical tag and OpenGraph block. Set it to the real `ld-vip.<subdomain>.workers.dev` once you know the subdomain; otherwise the build falls back to `https://ld-vip.workers.dev`. |
+| `SITE_URL` | Overrides the host used for absolute URLs. The build already defaults to `https://ld-vip.johannes-neugschwentner.workers.dev`, so this is only needed once a custom domain exists. |
 | `CANONICAL_HOST` | Left **unset** on purpose. `shared/canonical.ts` only 301s when it is set, so this deployment serves under its own hostname instead of redirecting visitors to the nahiatours domain. |
 | `KV_NAMESPACE_ID` | Pin an existing namespace instead of letting the script manage one. |
 | `KV_NAMESPACE_TITLE`, `KV_BINDING` | Override the derived namespace title / binding name. |
