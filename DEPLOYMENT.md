@@ -1,16 +1,29 @@
-# Deployment
+# Deployment — LD VIP
 
-The site ships as a **Cloudflare Worker with static assets** — project
-`nahiatours`, deployed from this repository on every push to the connected
-branch.
+This branch (`ld_vip`) is a **separate deployment**, not a change to the
+existing one. It ships as its own **Cloudflare Worker with static assets**,
+named `ld-vip`, and it is never merged into `main`.
+
+Nothing is shared with `nahiatours`:
+
+| | `main` → nahiatours | `ld_vip` → LD VIP |
+| --- | --- | --- |
+| Worker name (`wrangler.toml`) | `nahiatours` | `ld-vip` |
+| Hostname | `nahiatours.<subdomain>.workers.dev` | `ld-vip.<subdomain>.workers.dev` |
+| KV namespace | `nahiatours-data` | `ld-vip-data` |
+| Deploy trigger | its own connected branch | push to `ld_vip` |
+
+`scripts/provision-kv.mjs` reads the Worker name out of `wrangler.toml` and
+names the namespace after it, so the split is automatic — neither deployment
+has to be told about the other.
 
 ## How a deploy runs
 
-Cloudflare runs two commands, in this order:
+Two commands, in this order:
 
 | Step | Command | What happens |
 | --- | --- | --- |
-| Build | `npm run build` | provisions KV → generates the sitemap → pulls remote data → `vite build` into `dist/` |
+| Build | `npm run build` | provisions KV → pulls remote data → generates the sitemap → writes the SEO block → `vite build` into `dist/` |
 | Deploy | `npx wrangler deploy` | uploads `worker/index.ts` and everything in `dist/` |
 
 `npm run build` runs `scripts/provision-kv.mjs` first, so by the time wrangler
@@ -19,25 +32,51 @@ be pasted in by hand and nothing has to be committed.
 
 Locally, `npm run deploy` does both steps in one go.
 
-## The one thing to set up
+## Setting the deployment up
 
-Add **`CLOUDFLARE_API_TOKEN`** to the project's build environment variables
-(Cloudflare dashboard → the `nahiatours` project → Settings → Variables and
-Secrets → add as a **secret**). It needs the **Workers KV Storage: Edit**
-permission.
+Pick **one** of these. Both produce the same `ld-vip` Worker.
 
-With it, every deploy makes the namespace `nahiatours-data` exist and binds it
-as `DATA_KV_F`, creating it on first run and reusing it afterwards.
+### Option A — GitHub Actions (already wired)
 
-Without it the deploy still succeeds — `provision-kv` warns and steps aside,
-and the site serves reads from the JSON bundled at `/data/*.json`. Only admin
-writes and `/api/init-data` actually need KV.
+`.github/workflows/deploy-ld-vip.yml` builds and deploys on every push to
+`ld_vip`. It needs one repository secret:
 
-If you would rather pin a namespace than let the script manage one, set
-`KV_NAMESPACE_ID` instead and no API call is made.
+**`CLOUDFLARE_API_TOKEN`** — Settings → Secrets and variables → Actions → New
+repository secret. The token needs:
 
-Other variables the script understands: `CLOUDFLARE_ACCOUNT_ID` (needed only if
-the token can see more than one account), `KV_NAMESPACE_TITLE`, `KV_BINDING`.
+- **Workers Scripts: Edit** — to deploy at all.
+- **Workers KV Storage: Edit** — so the namespace `ld-vip-data` gets created
+  and bound. Without it the deploy still succeeds; the site just reads from the
+  JSON bundled at `/data/*.json`, and only admin writes and `/api/init-data`
+  need KV.
+
+Add **`CLOUDFLARE_ACCOUNT_ID`** as well if the token can see more than one
+Cloudflare account.
+
+### Option B — Cloudflare Workers Builds
+
+In the Cloudflare dashboard: **Workers & Pages → Create → Import a repository**,
+pick `johanneslightkid-ops/nahiatours`, and set:
+
+- **Branch to deploy**: `ld_vip`
+- **Build command**: `npm run build`
+- **Deploy command**: `npx wrangler deploy`
+
+Then add `CLOUDFLARE_API_TOKEN` (Workers KV Storage: Edit) to that project's
+build variables, as a secret, for the same KV reason as above.
+
+Create it as a **new** project. Pointing the existing `nahiatours` project at
+this branch would replace the live site rather than standing a second one up.
+
+## Optional variables
+
+| Variable | Effect |
+| --- | --- |
+| `SITE_URL` | Absolute URLs in the sitemap, canonical tag and OpenGraph block. Set it to the real `ld-vip.<subdomain>.workers.dev` once you know the subdomain; otherwise the build falls back to `https://ld-vip.workers.dev`. |
+| `CANONICAL_HOST` | Left **unset** on purpose. `shared/canonical.ts` only 301s when it is set, so this deployment serves under its own hostname instead of redirecting visitors to the nahiatours domain. |
+| `KV_NAMESPACE_ID` | Pin an existing namespace instead of letting the script manage one. |
+| `KV_NAMESPACE_TITLE`, `KV_BINDING` | Override the derived namespace title / binding name. |
+| `INIT_DATA_SECRET` | Required before `/api/init-data` will respond at all. |
 
 ## Seeding KV
 
@@ -49,15 +88,14 @@ curl -X POST https://<your-deployment>/api/init-data \
   -H "x-init-secret: $INIT_DATA_SECRET"
 ```
 
-`INIT_DATA_SECRET` must be set in the project's variables for that endpoint to
-respond at all.
-
 ## Preview hostnames
 
-`shared/canonical.ts` 301s any non-canonical hostname to `ferreras.tours`,
-**except** preview hosts (`*.workers.dev`, `*.pages.dev`, localhost), which are
-served in place and marked `noindex`. Without that exception a preview
-deployment would redirect away from itself and you could never look at it.
+`shared/canonical.ts` treats `*.workers.dev`, `*.pages.dev` and localhost as
+preview hosts: they are served in place and marked `noindex`, never redirected.
+Since `CANONICAL_HOST` is unset here, nothing is redirected anyway — but the
+`noindex` still applies, which keeps this redesign out of search results while
+it lives on a workers.dev hostname. Set `SITE_URL` and a custom domain when it
+should be indexed.
 
 ## Still to do
 

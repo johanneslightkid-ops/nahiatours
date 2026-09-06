@@ -20,15 +20,19 @@ export const SoundToggle: React.FC = () => {
       onClick={toggle}
       title={enabled ? 'Mute Sound Effects (Audio FX ON)' : 'Enable Sound Effects (Audio FX OFF)'}
       aria-label={enabled ? 'Mute Sound Effects' : 'Enable Sound Effects'}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 shadow-sm"
+      className="inline-flex h-9 w-9 items-center justify-center border-2 transition-colors duration-200"
       style={{
-        background: enabled ? 'rgba(13, 148, 136, 0.18)' : 'rgba(255, 255, 255, 0.4)',
-        border: `1px solid ${enabled ? '#0D9488' : 'rgba(6, 29, 43, 0.15)'}`,
-        color: enabled ? '#0D9488' : '#64748B',
-        boxShadow: enabled ? '0 0 12px rgba(13, 148, 136, 0.3)' : 'none',
+        // On when it is red, off when it is an empty outline — the same rule
+        // the rest of the interface follows.
+        background: enabled ? '#C1121F' : 'transparent',
+        borderColor: enabled ? '#C1121F' : 'rgba(245, 241, 232, 0.55)',
+        color: enabled ? '#F5F1E8' : 'rgba(245, 241, 232, 0.8)',
       }}
     >
-      <span className="text-base leading-none select-none transition-transform hover:scale-110">
+      <span
+        className="select-none text-base leading-none transition-transform hover:scale-110"
+        style={{ filter: 'grayscale(1) contrast(1.4) brightness(1.8)' }}
+      >
         {enabled ? '🎵' : '🔇'}
       </span>
     </button>

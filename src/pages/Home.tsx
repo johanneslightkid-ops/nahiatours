@@ -101,12 +101,12 @@ const Home: React.FC = () => {
           <section className="home-section shore-section py-24">
             <div className="section-shell grid gap-10 md:grid-cols-2 md:items-center">
               <div className="animate-pulse space-y-4">
-                <div className="h-4 w-32 rounded-full bg-ink/10" />
-                <div className="h-10 w-3/4 rounded-2xl bg-ink/10" />
-                <div className="h-24 w-full rounded-3xl border-2 border-ink/15 bg-paper-warm" />
-                <div className="h-4 w-2/3 rounded-full bg-ink/10" />
+                <div className="h-4 w-32 bg-ink/10" />
+                <div className="h-10 w-3/4 bg-ink/10" />
+                <div className="h-24 w-full border-2 border-ink/15 bg-paper-warm" />
+                <div className="h-4 w-2/3 bg-ink/10" />
               </div>
-              <div className="h-64 w-full animate-pulse rounded-[28px_16px_30px_18px] border-2 border-ink/15 bg-paper-warm md:h-80" />
+              <div className="h-64 w-full animate-pulse border-2 border-ink/15 bg-paper-warm md:h-80" />
             </div>
           </section>
         ) : (
@@ -126,12 +126,12 @@ const Home: React.FC = () => {
                     {/* Header */}
                     <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
                       <div className="section-icon mx-auto mb-5">
-                        {section.emoji}
+                        <span>{section.emoji}</span>
                       </div>
-                      <h2 className="scribble-title-bg mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
+                      <h2 className="scribble-title-bg mb-4 font-display text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
                         {section.title}
                       </h2>
-                      <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold leading-8 text-ink-soft sm:text-xl">
+                      <p className="mx-auto mt-4 max-w-2xl text-lg font-medium leading-8 text-ink-soft sm:text-xl">
                         {section.description}
                       </p>
                     </div>
@@ -174,11 +174,12 @@ const Home: React.FC = () => {
       {!storyData ? null : storyData.callToActions && storyData.callToActions.length > 0 ? (
         <section className="home-section sunset-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <span className="tp-slab mb-6 inline-block">Next move</span>
+            <h2 className="mb-6 font-display text-4xl leading-[0.95] text-white sm:text-5xl md:text-6xl">
               {storyData.storyTitle || 'Ready for Your Perfect Day in Paradise?'}
             </h2>
             {storyData.storyTagline && (
-              <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
+              <p className="mx-auto mb-9 max-w-2xl text-lg font-medium leading-8 text-white sm:text-xl">
                 {storyData.storyTagline}
               </p>
             )}
@@ -206,10 +207,11 @@ const Home: React.FC = () => {
       ) : (
         <section className="home-section sunset-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <span className="tp-slab mb-6 inline-block">Next move</span>
+            <h2 className="mb-6 font-display text-4xl leading-[0.95] text-white sm:text-5xl md:text-6xl">
               Ready for Your Perfect Day in Paradise?
             </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
+            <p className="mx-auto mb-9 max-w-2xl text-lg font-medium leading-8 text-white sm:text-xl">
               Your adventure is just one click away. Contact us on WhatsApp or choose your adventure below.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
@@ -251,10 +253,11 @@ const Home: React.FC = () => {
       <section className="home-section reef-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
-            <h2 className="mb-4 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <span className="tp-filenum mb-4 block text-white/60">Sec. 03 — Why us</span>
+            <h2 className="mb-4 font-display text-4xl leading-[0.95] text-white sm:text-5xl md:text-6xl">
               <FormattedMessage id="features.title" />
             </h2>
-            <p className="text-lg font-bold leading-8 text-white sm:text-xl">
+            <p className="text-lg font-medium leading-8 text-white sm:text-xl">
               Thoughtful service from arrival to return with {brandSettings.brandName}
             </p>
           </div>
@@ -262,33 +265,45 @@ const Home: React.FC = () => {
           <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
             {/* Safety First */}
             <div className="home-feature-card group p-8 animate-wave-sway-1">
-              <div className="text-5xl mb-4">🛡️</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-4xl" style={{ filter: 'grayscale(1) contrast(1.3)' }}>🛡️</span>
+                <span className="tp-index">01</span>
+              </div>
+              <span className="mb-3 block h-[3px] w-12 bg-mango" />
+              <h3 className="mb-3 font-display text-2xl text-ink">
                 <FormattedMessage id="features.safety.title" />
               </h3>
-              <p className="font-semibold text-ink-soft">
+              <p className="font-medium text-ink-soft">
                 <FormattedMessage id="features.safety.description" />
               </p>
             </div>
 
             {/* Curated Experiences */}
             <div className="home-feature-card group p-8 animate-wave-sway-2">
-              <div className="text-5xl mb-4">🌿</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-4xl" style={{ filter: 'grayscale(1) contrast(1.3)' }}>🌿</span>
+                <span className="tp-index">02</span>
+              </div>
+              <span className="mb-3 block h-[3px] w-12 bg-mango" />
+              <h3 className="mb-3 font-display text-2xl text-ink">
                 <FormattedMessage id="features.experiences.title" />
               </h3>
-              <p className="font-semibold text-ink-soft">
+              <p className="font-medium text-ink-soft">
                 <FormattedMessage id="features.experiences.description" />
               </p>
             </div>
 
             {/* Transportation */}
             <div className="home-feature-card group p-8 animate-wave-sway-3">
-              <div className="text-5xl mb-4">🚗</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-4xl" style={{ filter: 'grayscale(1) contrast(1.3)' }}>🚗</span>
+                <span className="tp-index">03</span>
+              </div>
+              <span className="mb-3 block h-[3px] w-12 bg-mango" />
+              <h3 className="mb-3 font-display text-2xl text-ink">
                 <FormattedMessage id="features.transportation.title" />
               </h3>
-              <p className="font-semibold text-ink-soft">
+              <p className="font-medium text-ink-soft">
                 <FormattedMessage id="features.transportation.description" />
               </p>
             </div>

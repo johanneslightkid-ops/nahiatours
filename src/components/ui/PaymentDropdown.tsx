@@ -156,7 +156,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
         <div
           ref={dropdownRef}
           style={{ top: `${dropdownCoords.top}px`, left: `${dropdownCoords.left}px` }}
-          className="fixed z-[99999] w-72 rounded-2xl border-[2.5px] border-ink bg-[#17313F] p-2 text-paper shadow-ink animate-in fade-in slide-in-from-top-2"
+          className="fixed z-[99999] w-72 rounded-2xl border-[2.5px] border-ink bg-ink p-2 text-paper shadow-ink animate-in fade-in slide-in-from-top-2"
         >
           <div className="px-3 py-2 mb-1 border-b-2 border-paper/20 text-[0.65rem] font-extrabold uppercase tracking-[0.18em] text-mango-light">
             Choose Payment Method
@@ -210,7 +210,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
       {/* Stripe Modal via Portal to document.body */}
       {stripeModalOpen && createPortal(
         <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 p-4">
-          <div className="w-full max-w-md rounded-[28px] border-[3px] border-ink bg-[#17313F] p-7 text-paper shadow-ink-lg animate-in zoom-in-95">
+          <div className="w-full max-w-md rounded-[28px] border-[3px] border-ink bg-ink p-7 text-paper shadow-ink-lg animate-in zoom-in-95">
             <button
               onClick={() => {
                 playClickFx();
