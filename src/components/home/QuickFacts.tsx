@@ -18,25 +18,25 @@ const QuickFacts: React.FC = () => {
       value: catalogue.length > 0 ? String(catalogue.length) : '—',
       label: isEs ? 'excursiones seleccionadas' : 'curated excursions',
       art: <Sailboat className="h-10 w-10" />,
-      tone: 'bg-mango-light',
+      tone: 'plate',
     },
     {
       value: '4.99',
       label: isEs ? 'valoración media' : 'average guest rating',
       art: <Starfish className="h-10 w-10" />,
-      tone: 'bg-lagoon-light',
+      tone: 'invert',
     },
     {
       value: '24/7',
       label: isEs ? 'respuesta por WhatsApp' : 'WhatsApp response',
       art: <Cocktail className="h-10 w-10" />,
-      tone: 'bg-hibiscus-light',
+      tone: 'plate',
     },
     {
       value: isEs ? 'Incluido' : 'Included',
       label: isEs ? 'recogida en el hotel' : 'hotel pick-up & drop-off',
       art: <Hibiscus className="h-10 w-10" />,
-      tone: 'bg-jungle-light',
+      tone: 'plate',
     },
   ];
 
@@ -46,15 +46,28 @@ const QuickFacts: React.FC = () => {
         {facts.map((fact, index) => (
           <div
             key={fact.label}
-            className={`flex flex-col items-center rounded-[22px] border-[2.5px] border-ink ${fact.tone} px-3 py-5 text-center shadow-ink-sm transition-transform duration-300 hover:-translate-y-1.5 ${
+            className={`flex flex-col items-center border-[3px] border-ink px-3 py-6 text-center shadow-ink-sm transition-transform duration-200 hover:-translate-x-1 hover:-translate-y-1 ${
+              fact.tone === 'invert' ? 'bg-ink text-paper' : 'bg-paper'
+            } ${
               index % 2 === 0 ? '-rotate-1 hover:rotate-1' : 'rotate-1 hover:-rotate-1'
             }`}
           >
             <span className="mb-2">{fact.art}</span>
-            <div className="font-display text-2xl font-extrabold leading-none text-ink sm:text-3xl">
+            {/* A red rule between the drawing and the number: the same tick
+                that marks every other block on the site. */}
+            <span className="mb-3 block h-[3px] w-8 bg-mango" />
+            <div
+              className={`font-display text-3xl leading-none sm:text-4xl ${
+                fact.tone === 'invert' ? 'text-paper' : 'text-ink'
+              }`}
+            >
               {fact.value}
             </div>
-            <div className="mt-1.5 text-[0.66rem] font-extrabold uppercase tracking-[0.12em] text-ink-soft">
+            <div
+              className={`mt-2 font-condensed text-[0.68rem] uppercase tracking-[0.16em] ${
+                fact.tone === 'invert' ? 'text-paper/70' : 'text-ink-soft'
+              }`}
+            >
               {fact.label}
             </div>
           </div>

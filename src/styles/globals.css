@@ -362,6 +362,7 @@ a:hover {
   width: max(120vw, 1100px);
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
+  z-index: -1;
   background: repeating-conic-gradient(
     from 0deg at 50% 50%,
     rgba(193, 18, 31, 0.55) 0deg 3.2deg,
@@ -376,6 +377,7 @@ a:hover {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: -1;
   pointer-events: none;
   opacity: 0.9;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='400' viewBox='0 0 560 400'%3E%3Cg fill='%23C1121F'%3E%3Ccircle cx='62' cy='58' r='13'/%3E%3Ccircle cx='96' cy='96' r='5'/%3E%3Ccircle cx='38' cy='104' r='3.5'/%3E%3Ccircle cx='120' cy='42' r='3'/%3E%3Cpath d='M470 300 c14 -18 34 -10 30 8 c-4 18 -26 24 -34 12 z'/%3E%3Ccircle cx='508' cy='342' r='6'/%3E%3Ccircle cx='452' cy='344' r='3'/%3E%3Ccircle cx='296' cy='30' r='4'/%3E%3Ccircle cx='268' cy='372' r='5'/%3E%3C/g%3E%3C/svg%3E");
@@ -398,6 +400,7 @@ a:hover {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: -1;
   pointer-events: none;
   opacity: 0.55;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='300' viewBox='0 0 420 300'%3E%3Cg fill='%230C0C0D'%3E%3Cpath d='M40 40 c26 -30 68 -14 58 18 c-8 26 -50 34 -66 16 c-10 -12 -6 -24 8 -34 z'/%3E%3Ccircle cx='128' cy='24' r='7'/%3E%3Ccircle cx='16' cy='96' r='5'/%3E%3Ccircle cx='150' cy='72' r='3.5'/%3E%3Cpath d='M330 236 c22 -22 56 -8 46 18 c-8 22 -44 26 -54 10 c-6 -10 -2 -20 8 -28 z'/%3E%3Ccircle cx='396' cy='210' r='6'/%3E%3Ccircle cx='300' cy='282' r='4'/%3E%3Ccircle cx='224' cy='150' r='3'/%3E%3C/g%3E%3C/svg%3E");
@@ -583,10 +586,13 @@ a:hover {
 }
 
 /* The markup carries light-on-dark text utilities from the band above; the
-   plates are bone, so pin their copy back to ink. */
+   plates are bone, so pin their copy back to ink — and drop the band's
+   heading shadow, which would otherwise ghost in red behind black type. */
 .home-feature-card h3,
-.home-feature-card p {
+.home-feature-card p,
+.home-feature-card :is(h1, h2, h4, h5, h6) {
   color: var(--ink);
+  text-shadow: none;
 }
 
 .story-copy-card {
