@@ -38,6 +38,17 @@ export interface IllustrationProps {
   style?: React.CSSProperties;
 }
 
+/**
+ * Which ground a drawing is printed on.
+ *
+ * `ink` (the default) is the flash sheet: black line, bone fill, for a bone
+ * page. `bone` is the same drawing printed on black — white line, no fill —
+ * which is what the header bar needs. It is a printing decision, not a new
+ * colour: the two-colour rule is untouched, and neither mode uses the red,
+ * because these marks are decoration and red is reserved for actions.
+ */
+export type Ground = 'ink' | 'bone';
+
 const svgProps = {
   xmlns: 'http://www.w3.org/2000/svg',
   fill: 'none',
@@ -99,13 +110,18 @@ export const Cloud: React.FC<IllustrationProps> = ({ className = '', style }) =>
 /* ── Palm frond ───────────────────────────────────────────────────────────
    Bone leaflets on a black spine, each one hatched. The workhorse mark for
    section corners. */
-export const PalmFrond: React.FC<IllustrationProps & { color?: 'ink' | 'blood' | 'bone' }> = ({
-  className = '',
-  style,
-  color = 'ink',
-}) => {
-  const fill =
-    color === 'blood' ? PALETTE.blood : color === 'bone' ? PALETTE.bone : PALETTE.paper;
+export const PalmFrond: React.FC<
+  IllustrationProps & { color?: 'ink' | 'blood' | 'bone'; ground?: Ground }
+> = ({ className = '', style, color = 'ink', ground = 'ink' }) => {
+  const onDark = ground === 'bone';
+  const line = onDark ? PALETTE.bone : PALETTE.ink;
+  const fill = onDark
+    ? 'none'
+    : color === 'blood'
+    ? PALETTE.blood
+    : color === 'bone'
+    ? PALETTE.bone
+    : PALETTE.paper;
 
   const leaflets = Array.from({ length: 8 }).map((_, i) => {
     const y = 14 + i * 11;
@@ -115,25 +131,25 @@ export const PalmFrond: React.FC<IllustrationProps & { color?: 'ink' | 'blood' |
         <path
           d={`M50 ${y} C ${50 - spread * 0.5} ${y - 8} ${50 - spread} ${y - 2} ${50 - spread - 9} ${y + 12} C ${50 - spread * 0.7} ${y + 10} ${50 - spread * 0.25} ${y + 6} 50 ${y}`}
           fill={fill}
-          stroke={PALETTE.ink}
+          stroke={line}
           strokeWidth={2.6}
         />
         <path
           d={`M50 ${y} C ${50 + spread * 0.5} ${y - 8} ${50 + spread} ${y - 2} ${50 + spread + 9} ${y + 12} C ${50 + spread * 0.7} ${y + 10} ${50 + spread * 0.25} ${y + 6} 50 ${y}`}
           fill={fill}
-          stroke={PALETTE.ink}
+          stroke={line}
           strokeWidth={2.6}
         />
         {/* Vein hatching down each leaflet. */}
         <path
           d={`M50 ${y + 1} L ${50 - spread * 0.8} ${y + 7}`}
-          stroke={PALETTE.ink}
+          stroke={line}
           strokeWidth={1.2}
           opacity={0.7}
         />
         <path
           d={`M50 ${y + 1} L ${50 + spread * 0.8} ${y + 7}`}
-          stroke={PALETTE.ink}
+          stroke={line}
           strokeWidth={1.2}
           opacity={0.7}
         />
@@ -144,7 +160,7 @@ export const PalmFrond: React.FC<IllustrationProps & { color?: 'ink' | 'blood' |
   return (
     <svg viewBox="0 0 100 118" className={className} style={style} {...svgProps}>
       {leaflets}
-      <path d="M50 6 C47 42 49 78 50 112" stroke={PALETTE.ink} strokeWidth={4.5} />
+      <path d="M50 6 C47 42 49 78 50 112" stroke={line} strokeWidth={4.5} />
     </svg>
   );
 };
@@ -152,36 +168,53 @@ export const PalmFrond: React.FC<IllustrationProps & { color?: 'ink' | 'blood' |
 /* ── Palm tree ────────────────────────────────────────────────────────────
    Old-school flash: solid black trunk with ring hatching, eight blades, one
    red coconut. */
-export const PalmTree: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 140 180" className={className} style={style} {...svgProps}>
-    <path
-      d="M62 176 C58 138 56 100 44 62 L66 56 C74 96 76 138 78 176 Z"
-      fill={PALETTE.paper}
-      stroke={PALETTE.ink}
-      strokeWidth={4}
-    />
-    {/* Trunk rings — the shorthand that makes a shape read as bark. */}
-    {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+export const PalmTree: React.FC<IllustrationProps & { ground?: Ground }> = ({
+  className = '',
+  style,
+  ground = 'ink',
+}) => {
+  const onDark = ground === 'bone';
+  const line = onDark ? PALETTE.bone : PALETTE.ink;
+  return (
+    <svg viewBox="0 0 140 180" className={className} style={style} {...svgProps}>
       <path
-        key={i}
-        d={`M${57 - i * 1.6} ${72 + i * 14} Q ${67 - i * 1.2} ${78 + i * 14} ${77 - i * 0.4} ${71 + i * 14}`}
-        stroke={PALETTE.ink}
-        strokeWidth={2.2}
+        d="M62 176 C58 138 56 100 44 62 L66 56 C74 96 76 138 78 176 Z"
+        fill={onDark ? 'none' : PALETTE.paper}
+        stroke={line}
+        strokeWidth={4}
       />
-    ))}
-    {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-      <path
-        key={i}
-        d="M56 58 C34 40 16 42 2 58 C20 54 36 60 56 58 Z"
-        fill={i % 2 === 0 ? PALETTE.paper : PALETTE.paperWarm}
-        stroke={PALETTE.ink}
-        strokeWidth={3.2}
-        transform={`rotate(${-92 + i * 26} 56 58)`}
+      {/* Trunk rings — the shorthand that makes a shape read as bark. */}
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+        <path
+          key={i}
+          d={`M${57 - i * 1.6} ${72 + i * 14} Q ${67 - i * 1.2} ${78 + i * 14} ${77 - i * 0.4} ${71 + i * 14}`}
+          stroke={line}
+          strokeWidth={2.2}
+        />
+      ))}
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+        <path
+          key={i}
+          d="M56 58 C34 40 16 42 2 58 C20 54 36 60 56 58 Z"
+          fill={onDark ? 'none' : i % 2 === 0 ? PALETTE.paper : PALETTE.paperWarm}
+          stroke={line}
+          strokeWidth={3.2}
+          transform={`rotate(${-92 + i * 26} 56 58)`}
+        />
+      ))}
+      {/* On black the coconut is a bone disc, not a red one: these marks are
+          decoration, and the red belongs to things a visitor can act on. */}
+      <circle
+        cx="56"
+        cy="58"
+        r="8"
+        fill={onDark ? PALETTE.bone : PALETTE.blood}
+        stroke={line}
+        strokeWidth={3}
       />
-    ))}
-    <circle cx="56" cy="58" r="8" fill={PALETTE.blood} stroke={PALETTE.ink} strokeWidth={3} />
-  </svg>
-);
+    </svg>
+  );
+};
 
 /* ── Toucan ───────────────────────────────────────────────────────────────
    Traditional-tattoo bird: solid black body, bone breast, and a red beak that
@@ -249,41 +282,60 @@ export const Hibiscus: React.FC<IllustrationProps> = ({ className = '', style })
 
 /* ── Pineapple ────────────────────────────────────────────────────────────
    Cross-hatched body, black crown. */
-export const Pineapple: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 100 140" className={className} style={style} {...svgProps}>
-    {[-40, -20, 0, 20, 40].map((r) => (
-      <path
-        key={r}
-        d="M50 44 C44 28 46 12 50 2 C56 12 58 28 52 44 Z"
-        fill={PALETTE.ink}
-        stroke={PALETTE.ink}
-        strokeWidth={3}
-        transform={`rotate(${r} 50 46)`}
+export const Pineapple: React.FC<IllustrationProps & { ground?: Ground }> = ({
+  className = '',
+  style,
+  ground = 'ink',
+}) => {
+  const onDark = ground === 'bone';
+  const line = onDark ? PALETTE.bone : PALETTE.ink;
+  const body =
+    'M50 42 C74 42 86 62 86 88 C86 116 72 134 50 134 C28 134 14 116 14 88 C14 62 26 42 50 42 Z';
+  return (
+    <svg viewBox="0 0 100 140" className={className} style={style} {...svgProps}>
+      {[-40, -20, 0, 20, 40].map((r) => (
+        <path
+          key={r}
+          d="M50 44 C44 28 46 12 50 2 C56 12 58 28 52 44 Z"
+          fill={onDark ? 'none' : PALETTE.ink}
+          stroke={line}
+          strokeWidth={3}
+          transform={`rotate(${r} 50 46)`}
+        />
+      ))}
+      <path d={body} fill={onDark ? 'none' : PALETTE.paper} stroke={line} strokeWidth={3.6} />
+      {/* The diamond skin, drawn as two crossing rulings. It has to be clipped
+          to the body, or the rulings run off past the fruit — on a bone ground
+          the opaque body fill hid that, and on black there is nothing to hide
+          behind. */}
+      <clipPath id={onDark ? 'pineapple-skin-bone' : 'pineapple-skin-ink'}>
+        <path d={body} />
+      </clipPath>
+      <g
+        stroke={line}
+        strokeWidth={1.7}
+        opacity={onDark ? 0.75 : 0.85}
+        clipPath={`url(#${onDark ? 'pineapple-skin-bone' : 'pineapple-skin-ink'})`}
+      >
+        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+          <path key={`a${i}`} d={`M${12 + i * 14} 44 L${-24 + i * 14} 136`} />
+        ))}
+        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+          <path key={`b${i}`} d={`M${12 + i * 14} 136 L${-24 + i * 14} 44`} />
+        ))}
+      </g>
+      <path d={body} stroke={line} strokeWidth={3.6} />
+      <circle
+        cx="50"
+        cy="88"
+        r="8"
+        fill={onDark ? PALETTE.bone : PALETTE.blood}
+        stroke={line}
+        strokeWidth={2.6}
       />
-    ))}
-    <path
-      d="M50 42 C74 42 86 62 86 88 C86 116 72 134 50 134 C28 134 14 116 14 88 C14 62 26 42 50 42 Z"
-      fill={PALETTE.paper}
-      stroke={PALETTE.ink}
-      strokeWidth={3.6}
-    />
-    {/* The diamond skin, drawn as two crossing rulings. */}
-    <g stroke={PALETTE.ink} strokeWidth={1.7} opacity={0.85}>
-      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-        <path key={`a${i}`} d={`M${12 + i * 14} 44 L${-24 + i * 14} 136`} />
-      ))}
-      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-        <path key={`b${i}`} d={`M${12 + i * 14} 136 L${-24 + i * 14} 44`} />
-      ))}
-    </g>
-    <path
-      d="M50 42 C74 42 86 62 86 88 C86 116 72 134 50 134 C28 134 14 116 14 88 C14 62 26 42 50 42 Z"
-      stroke={PALETTE.ink}
-      strokeWidth={3.6}
-    />
-    <circle cx="50" cy="88" r="8" fill={PALETTE.blood} stroke={PALETTE.ink} strokeWidth={2.6} />
-  </svg>
-);
+    </svg>
+  );
+};
 
 /* ── Sailboat ─────────────────────────────────────────────────────────────
    Traditional clipper: black hull, bone sails, red pennant. */
@@ -318,22 +370,35 @@ export const Sailboat: React.FC<IllustrationProps> = ({ className = '', style })
 /* ── Nautical star ────────────────────────────────────────────────────────
    The starfish is now the sailor's star: eight points, each split light and
    dark, which is exactly how the old flash drew it. */
-export const Starfish: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 120 120" className={className} style={style} {...svgProps}>
-    {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-      <g key={i} transform={`rotate(${i * 45} 60 60)`}>
-        <path d="M60 60 L52 12 L60 4 Z" fill={PALETTE.ink} stroke={PALETTE.ink} strokeWidth={2} />
-        <path
-          d="M60 60 L68 12 L60 4 Z"
-          fill={i % 2 === 0 ? PALETTE.blood : PALETTE.paper}
-          stroke={PALETTE.ink}
-          strokeWidth={2}
-        />
-      </g>
-    ))}
-    <circle cx="60" cy="60" r="7" fill={PALETTE.bone} stroke={PALETTE.ink} strokeWidth={2.6} />
-  </svg>
-);
+export const Starfish: React.FC<IllustrationProps & { ground?: Ground }> = ({
+  className = '',
+  style,
+  ground = 'ink',
+}) => {
+  const onDark = ground === 'bone';
+  const line = onDark ? PALETTE.bone : PALETTE.ink;
+  return (
+    <svg viewBox="0 0 120 120" className={className} style={style} {...svgProps}>
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+        <g key={i} transform={`rotate(${i * 45} 60 60)`}>
+          <path
+            d="M60 60 L52 12 L60 4 Z"
+            fill={onDark ? PALETTE.bone : PALETTE.ink}
+            stroke={line}
+            strokeWidth={2}
+          />
+          <path
+            d="M60 60 L68 12 L60 4 Z"
+            fill={onDark ? 'none' : i % 2 === 0 ? PALETTE.blood : PALETTE.paper}
+            stroke={line}
+            strokeWidth={2}
+          />
+        </g>
+      ))}
+      <circle cx="60" cy="60" r="7" fill={onDark ? 'none' : PALETTE.bone} stroke={line} strokeWidth={2.6} />
+    </svg>
+  );
+};
 
 /* ── Cocktail ─────────────────────────────────────────────────────────────
    Coupe glass with a red measure and a hatched shadow. */

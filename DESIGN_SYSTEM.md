@@ -145,6 +145,13 @@ layout is assembled from: `Splatter`, `SunBurst` (the radiant), `Banner`,
 `Barcode` (derived from its label, so the same tour always prints the same
 code), `TornStrip` and `Anchor`.
 
+Drawings that appear on a dark plate take `ground="bone"`: same drawing,
+printed as white line with no fill, the way flash is drawn on black. It is a
+printing decision, not a new colour — and the `bone` mode drops the red spot
+too, because these marks are decoration and the red belongs to actions. The
+header bar is built from it: palms, a piña and a nautical star standing along
+the bottom strip, fronds arching in from the corners.
+
 `IllustratedBackdrop.tsx` paints the fixed sheet behind every page: bone stock,
 a radiant turning once every 90 seconds, a halftoned black wash rising off the
 floor, a torn diagonal slash, thrown ink in the corners, and one palm frond

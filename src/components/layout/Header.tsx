@@ -7,7 +7,7 @@ import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaSignOutAlt } from 're
 import LanguageSwitcher from '../LanguageSwitcher';
 import SoundToggle from '../SoundToggle';
 import { useBrand } from '../../contexts/BrandContext';
-import { Crosshair } from '../ui/Illustrations';
+import { Crosshair, PalmTree, PalmFrond, Pineapple, Starfish } from '../ui/Illustrations';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 
 import { getAdminPassword, clearAdminPassword } from '../../services/authStore';
@@ -49,7 +49,71 @@ const Header: React.FC = () => {
 
   return (
     <header className="lobster-header sticky top-0 z-50 overflow-visible">
-      <div className="section-shell flex items-center justify-between py-3.5 pl-[10.5rem] sm:pl-[11.25rem] lg:pl-8">
+      {/* White flash across the black bar.
+          The tropics survive the redesign here as line only — no fill, no red —
+          so the bar keeps its weight and the nav keeps its contrast.
+
+          Placement is the whole trick. The bar is 218px tall and the links sit
+          in a band around y=95–145, so everything here lives either in the
+          corners above that band or in the empty strip along the bottom, where
+          the marks read as a printed border rather than as a watermark behind
+          the words. Nothing is allowed to sit under a link. */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        {/* Fronds arching in from the two top corners, clear of all text. */}
+        <PalmFrond
+          ground="bone"
+          className="absolute -left-10 -top-16 h-44 w-44 opacity-30"
+          style={{ transform: 'rotate(-40deg)' }}
+        />
+        <PalmFrond
+          ground="bone"
+          className="absolute -right-12 -top-20 hidden h-44 w-44 opacity-[0.26] lg:block"
+          style={{ transform: 'rotate(38deg) scaleX(-1)' }}
+        />
+
+        {/* The bottom strip: a row of marks standing on the rule, in the gap
+            the nav leaves. It starts past the brand block and stops short of
+            the language toggle. */}
+        <PalmTree
+          ground="bone"
+          className="absolute bottom-0 left-[30%] hidden h-16 w-14 opacity-40 md:block"
+        />
+        <Pineapple
+          ground="bone"
+          className="absolute bottom-0 left-[40%] hidden h-[4.25rem] w-12 opacity-[0.42] lg:block"
+          style={{ transform: 'rotate(-6deg)' }}
+        />
+        <PalmTree
+          ground="bone"
+          className="absolute bottom-0 left-[51%] hidden h-[3.5rem] w-12 opacity-[0.32] lg:block"
+          style={{ transform: 'scaleX(-1)' }}
+        />
+        <Starfish
+          ground="bone"
+          className="absolute bottom-4 left-[60%] hidden h-6 w-6 opacity-50 xl:block"
+          style={{ transform: 'rotate(-12deg)' }}
+        />
+        <Pineapple
+          ground="bone"
+          className="absolute bottom-0 right-[11%] hidden h-[4rem] w-11 opacity-[0.38] xl:block"
+          style={{ transform: 'rotate(7deg)' }}
+        />
+
+        {/* Phones only: the logo fills the left of the bar there, so the row
+            above has nowhere to stand. One palm and one piña to the right of
+            it keep the tropics present at every width. */}
+        <PalmTree
+          ground="bone"
+          className="absolute bottom-0 right-[26%] h-[4rem] w-12 opacity-40 md:hidden"
+        />
+        <Pineapple
+          ground="bone"
+          className="absolute bottom-0 right-[9%] h-[3.5rem] w-10 opacity-[0.36] md:hidden"
+          style={{ transform: 'rotate(8deg)' }}
+        />
+      </div>
+
+      <div className="section-shell relative z-10 flex items-center justify-between py-3.5 pl-[10.5rem] sm:pl-[11.25rem] lg:pl-8">
         <Link
           to="/#top"
           className="group flex items-center gap-3"
