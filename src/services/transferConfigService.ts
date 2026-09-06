@@ -2,6 +2,7 @@ import { TransferConfig } from '../types/transport';
 import { DEFAULT_TRANSFER_CONFIG } from '../data/transferDefaults';
 import { DEFAULT_MUNICIPIO_MULTIPLIERS } from '../data/municipioPriceMultipliers';
 import { apiGet, apiPut } from './apiClient';
+import { getAdminPassword } from './authStore';
 
 export async function getTransferConfig(): Promise<TransferConfig> {
   try {
@@ -105,7 +106,7 @@ export async function uploadVehicleImage(file: File): Promise<string> {
   formData.append('file', file);
   formData.append('folder', 'transport_vehicles');
 
-  const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD ?? 'toursadmin';
+  const adminPassword = getAdminPassword() ?? '';
 
   try {
     const response = await fetch('/api/upload', {

@@ -7,6 +7,7 @@ import { saveBlogArticle, BlogArticle } from '../../services/blogService';
 import { getSocialApiSettings } from '../../services/socialApiSettingsService';
 import { useI18n } from '../../contexts/I18nContext';
 import { apiPost } from '../../services/apiClient';
+import { getAdminPassword } from '../../services/authStore';
 
 const AIBlogGenAdmin: React.FC = () => {
   const { locale } = useI18n();
@@ -155,7 +156,7 @@ const AIBlogGenAdmin: React.FC = () => {
       formData.append('file', file);
       formData.append('folder', 'social-media');
       
-      const adminPassword = localStorage.getItem('tours_admin_password') || 'toursadmin';
+      const adminPassword = getAdminPassword() ?? '';
       const res = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'X-Admin-Password': adminPassword },

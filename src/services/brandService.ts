@@ -1,4 +1,5 @@
 import { apiGet, apiPut } from './apiClient';
+import { getAdminPassword } from './authStore';
 
 export interface BrandSettings {
   brandName: string;
@@ -63,7 +64,7 @@ export const uploadBrandIcon = async (file: File): Promise<string> => {
   formData.append('file', file);
   formData.append('folder', 'brand-icons');
 
-  const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD ?? 'toursadmin';
+  const adminPassword = getAdminPassword() ?? '';
 
   try {
     const response = await fetch('/api/upload', {

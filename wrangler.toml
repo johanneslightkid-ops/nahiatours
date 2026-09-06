@@ -56,15 +56,17 @@ run_worker_first = true
 # Environment variables
 # ==============================================================================
 #
-# TODO: CLOUDINARY_API_SECRET and ADMIN_PASSWORD are secrets and do not belong
-# in a committed file. Move them to `npx wrangler secret put <NAME>` and delete
-# them here. The VITE_-prefixed copies are additionally compiled into the client
-# bundle, where any visitor can read them, so those need rotating rather than
-# just relocating.
+# ADMIN_PASSWORD is read only on the server (shared/adminAuth.ts) and never
+# reaches the browser. It is still committed in plaintext, so it belongs in
+# `npx wrangler secret put ADMIN_PASSWORD` — and since this value has been in a
+# public repo, it wants replacing at the same time.
+#
+# TODO: the same goes for CLOUDINARY_API_SECRET. Its VITE_ copy is compiled
+# into the client bundle where any visitor can read it, so that one needs
+# rotating, not just relocating.
 
 [vars]
 ADMIN_PASSWORD = "toursadmin"
-VITE_ADMIN_PASSWORD = "toursadmin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
 CLOUDINARY_API_KEY = "896279918126553"
 CLOUDINARY_API_SECRET = "stWvhkCOQi_2Q_Ko0d1it8LXWr8"

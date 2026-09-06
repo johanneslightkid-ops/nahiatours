@@ -1,3 +1,5 @@
+import { verifyAdminRequest } from '../../shared/adminAuth';
+
 const RESOURCE_WITH_LOCALE = new Set([
   'blog',
   'i18n',
@@ -233,20 +235,10 @@ export async function onRequest(context: { request: Request; env: Record<string,
     }
 
     if (request.method === 'PUT') {
-      // Authenticate admin writes.
-      // wrangler.toml [vars] is only applied when deploying via `wrangler pages deploy` CLI,
-      // NOT when using GitHub auto-deploy. In GitHub auto-deploy, environment variables
-      // must be set in the Cloudflare Pages dashboard to be available at runtime.
-      //
-      // The frontend uses `VITE_ADMIN_PASSWORD` at build time. Some deployments set
-      // `VITE_ADMIN_PASSWORD` only in the Pages dashboard (so it's available to both
-      // the build and Functions runtime). Accept either `ADMIN_PASSWORD` or
-      // `VITE_ADMIN_PASSWORD` here to avoid a mismatch between build-time and
-      // runtime configuration. Fall back to the historical default if neither is set.
-      const adminPassword = env.ADMIN_PASSWORD || env.VITE_ADMIN_PASSWORD || 'c@n@rio2690';
-      const providedPassword = request.headers.get('X-Admin-Password') || '';
-      if (providedPassword !== adminPassword) {
-        return createErrorResponse('Unauthorized: invalid admin password.', 401);
+      // Authenticate admin writes against the deployment's configured password.
+      const auth = verifyAdminRequest(env, request);
+      if (!auth.ok) {
+        return createErrorResponse(auth.error, auth.status);
       }
 
       const body = await request.json().catch(() => null);

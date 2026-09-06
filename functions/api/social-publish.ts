@@ -1,3 +1,5 @@
+import { verifyAdminRequest } from '../../shared/adminAuth';
+
 export async function onRequest(context: { request: Request; env: Record<string, any> }) {
   const { request, env } = context;
 
@@ -6,10 +8,12 @@ export async function onRequest(context: { request: Request; env: Record<string,
   }
 
   // Authenticate request
-  const adminPassword = env.ADMIN_PASSWORD || env.VITE_ADMIN_PASSWORD || 'c@n@rio2690';
-  const providedPassword = request.headers.get('X-Admin-Password') || '';
-  if (providedPassword !== adminPassword) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  const auth = verifyAdminRequest(env, request);
+  if (!auth.ok) {
+    return new Response(JSON.stringify({ error: auth.error }), {
+      status: auth.status,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   try {

@@ -2,6 +2,7 @@ import { tours as staticTours } from '../data/tours';
 import { transportServices as staticTransportServices } from '../data/transportServices';
 import type { TransferRoute } from '../types/transport';
 import { apiGet, apiPut } from './apiClient';
+import { getAdminPassword } from './authStore';
 
 type Locale = 'en' | 'es';
 export type ServiceCategory = 'tours' | 'transport';
@@ -244,7 +245,7 @@ export const uploadImage = async (file: File): Promise<string> => {
   formData.append('file', file);
   formData.append('folder', 'tours');
 
-  const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD ?? 'toursadmin';
+  const adminPassword = getAdminPassword() ?? '';
 
   try {
     const response = await fetch('/api/upload', {

@@ -1,5 +1,6 @@
 import { apiGet, apiPut } from './apiClient';
 import { JourneyLocale } from './introStoryService';
+import { getAdminPassword } from './authStore';
 
 export type StoryElementType = 'title' | 'paragraph' | 'picture' | 'video' | 'cta';
 export type VideoOrientation = 'vertical' | 'horizontal';
@@ -100,7 +101,7 @@ export const uploadImage = async (file: File, onProgress?: (percent: number) => 
   formData.append('file', file);
   formData.append('folder', 'story');
 
-  const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD ?? 'toursadmin';
+  const adminPassword = getAdminPassword() ?? '';
 
   try {
     const xhr = new XMLHttpRequest();
