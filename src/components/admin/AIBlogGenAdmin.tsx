@@ -8,8 +8,10 @@ import { getSocialApiSettings } from '../../services/socialApiSettingsService';
 import { useI18n } from '../../contexts/I18nContext';
 import { apiPost } from '../../services/apiClient';
 import { getAdminPassword } from '../../services/authStore';
+import { useBrand } from '../../contexts/BrandContext';
 
 const AIBlogGenAdmin: React.FC = () => {
+  const { brandSettings } = useBrand();
   const { locale } = useI18n();
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(false);
@@ -148,7 +150,9 @@ const AIBlogGenAdmin: React.FC = () => {
       for (let i = 0; i < numPosts; i++) {
         const params: Omit<BlogGenerationParams, 'language'> = {
           povOrigin, povAge, povGroup, povGender, povExclusivity,
-          selectedTours, voiceTranscript, mediaBase64
+          selectedTours, voiceTranscript, mediaBase64,
+          // The model writes for the configured company, not a made-up one.
+          brandName: brandSettings.brandName,
         };
 
         const [enPost, esPost] = await Promise.all([
