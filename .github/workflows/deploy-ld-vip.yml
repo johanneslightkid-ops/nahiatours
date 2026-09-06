@@ -1,10 +1,21 @@
 # Deploys the LD VIP redesign to its own Cloudflare Worker.
 #
+# This is the *second* deploy path, and the optional one. The repository is
+# already connected to Cloudflare Workers Builds, which builds this branch on
+# every push and publishes it at its own branch URL — that is what actually
+# ships today. This workflow exists for the case where the branch should live
+# as a Worker of its own (`ld-vip`) rather than as a branch build of the
+# connected project.
+#
+# So it SKIPS itself when there is no CLOUDFLARE_API_TOKEN, rather than
+# failing: an absent optional path is not a broken build, and a red check on
+# the pull request would be a false alarm.
+#
 # This workflow only ever runs on the `ld_vip` branch, and wrangler.toml on that
 # branch names the Worker `ld-vip`. Both of those have to be wrong at the same
 # time for this to touch the `nahiatours` deployment.
 #
-# It needs one repository secret: CLOUDFLARE_API_TOKEN, with
+# To turn it on, add one repository secret: CLOUDFLARE_API_TOKEN, with
 #   • Workers Scripts: Edit    (to deploy)
 #   • Workers KV Storage: Edit (so scripts/provision-kv.mjs can create and bind
 #     the `ld-vip-data` namespace — without it the deploy still succeeds and the
@@ -40,32 +51,40 @@ jobs:
       SITE_URL: ${{ vars.SITE_URL }}
 
     steps:
-      # Say what is actually missing, rather than letting a successful build
-      # end in wrangler's generic "set a CLOUDFLARE_API_TOKEN" error.
-      - name: Check the deploy credential is present
+      # No token means this path is simply not in use — say so and stop, in
+      # green. Cloudflare Workers Builds is deploying the branch either way.
+      - name: Skip unless the standalone-Worker path is configured
         if: env.CLOUDFLARE_API_TOKEN == ''
         run: |
-          echo "::error::CLOUDFLARE_API_TOKEN is not set for this repository."
-          echo "Add it under Settings → Secrets and variables → Actions."
-          echo "It needs Workers Scripts: Edit, and Workers KV Storage: Edit so"
-          echo "scripts/provision-kv.mjs can create and bind the ld-vip-data namespace."
-          exit 1
+          echo "::notice::Skipping: no CLOUDFLARE_API_TOKEN, so this branch is not"
+          echo "::notice::being deployed as a standalone ld-vip Worker from Actions."
+          echo "Cloudflare Workers Builds still builds and publishes this branch."
+          echo ""
+          echo "To deploy it as its own Worker instead, add CLOUDFLARE_API_TOKEN under"
+          echo "Settings → Secrets and variables → Actions, with Workers Scripts: Edit"
+          echo "and Workers KV Storage: Edit (the second lets scripts/provision-kv.mjs"
+          echo "create and bind the ld-vip-data namespace)."
 
       - uses: actions/checkout@v4
+        if: env.CLOUDFLARE_API_TOKEN != ''
 
       - uses: actions/setup-node@v4
+        if: env.CLOUDFLARE_API_TOKEN != ''
         with:
           node-version: '20'
           cache: npm
 
       # .npmrc pins legacy-peer-deps, so a plain `npm ci` is enough.
-      - run: npm ci
+      - if: env.CLOUDFLARE_API_TOKEN != ''
+        run: npm ci
 
       # provision-kv → populate-local-data → sitemap → SEO → vite build.
       - name: Build
+        if: env.CLOUDFLARE_API_TOKEN != ''
         run: npm run build
 
       - name: Deploy to Cloudflare
+        if: env.CLOUDFLARE_API_TOKEN != ''
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
@@ -81,6 +100,7 @@ jobs:
           command: deploy
 
       - name: Report where it landed
+        if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
           echo "### LD VIP deployed" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
