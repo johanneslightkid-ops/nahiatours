@@ -44,11 +44,11 @@ const PlanMyDay: React.FC = () => {
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div
           className="planner-glow left-[-10%] top-24 h-[28rem] w-[28rem]"
-          style={{ background: '#0C0C0D' }}
+          style={{ background: '#7FE3DA' }}
         />
         <div
           className="planner-glow bottom-10 right-[-8%] h-[24rem] w-[24rem]"
-          style={{ background: '#C1121F' }}
+          style={{ background: '#FFC861' }}
         />
       </div>
 

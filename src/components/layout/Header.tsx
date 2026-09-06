@@ -7,7 +7,6 @@ import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaSignOutAlt } from 're
 import LanguageSwitcher from '../LanguageSwitcher';
 import SoundToggle from '../SoundToggle';
 import { useBrand } from '../../contexts/BrandContext';
-import { Crosshair } from '../ui/Illustrations';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 
 import { getAdminPassword, clearAdminPassword } from '../../services/authStore';
@@ -56,31 +55,20 @@ const Header: React.FC = () => {
           onClick={() => playClickFx()}
           onMouseEnter={() => playHoverFx()}
         >
-          <div
-            className="menu-logo-icon fixed left-4 top-2 flex relative h-[9.1875rem] w-[9.1875rem] items-center justify-center overflow-hidden border-[3px] border-ink bg-paper shadow-[6px_6px_0_0_#0C0C0D,-4px_-4px_0_0_#C1121F] transition-transform duration-300 group-hover:rotate-2 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]"
-            style={{ transform: 'rotate(-2deg)' }}
-          >
+          <div className="menu-logo-icon fixed left-4 top-2 flex h-[9.1875rem] w-[9.1875rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
             {brandSettings.brandicon ? (
-              <img src={brandSettings.brandicon} alt="Logo" className="photo-pop h-full w-full object-cover" />
+              <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
             ) : (
               <img src="/competitor-logo.svg" alt="Logo" className="h-[7.875rem] w-[7.875rem]" />
             )}
-            {/* Registration crosshair, printed over the corner of the plate. */}
-            <Crosshair className="pointer-events-none absolute right-1.5 top-1.5 h-5 w-5" />
           </div>
-
-          {/* The brand set as a stencil: filing number above, name below. */}
-          <div className="relative hidden sm:ml-[10.75rem] sm:block lg:ml-[11.5rem]">
-            <span className="tp-filenum block text-paper/55">Est. Punta Cana · No. 001</span>
-            <h1 className="font-display text-2xl leading-none text-paper transition group-hover:text-mango-light">
-              {brandSettings.brandName}
-            </h1>
-            <span className="mt-1 block h-[3px] w-14 bg-mango transition-all duration-300 group-hover:w-full" />
-          </div>
+          <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[10.75rem] sm:block lg:ml-[11.5rem]">
+            {brandSettings.brandName}
+          </h1>
         </Link>
 
         <button
-          className="grid h-11 w-11 place-items-center border-[2.5px] border-paper bg-mango text-paper shadow-[3px_3px_0_0_#F5F1E8] transition hover:bg-paper hover:text-ink md:hidden"
+          className="grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-mango-light text-ink shadow-ink-sm transition hover:bg-mango md:hidden"
           onClick={() => {
             playClickFx();
             setIsMenuOpen(!isMenuOpen);
@@ -91,7 +79,7 @@ const Header: React.FC = () => {
         </button>
 
         <nav
-          className={`${isMenuOpen ? 'flex' : 'hidden'} nav-sheet absolute left-3 right-3 top-[calc(100%+18px)] z-50 flex-col gap-2 border-[3px] border-ink bg-paper px-5 py-5 shadow-[8px_8px_0_0_#0C0C0D,-4px_-4px_0_0_#C1121F] md:static md:flex md:flex-row md:items-center md:gap-1 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
+          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+12px)] flex-col gap-3 rounded-[24px] border-[3px] border-ink bg-paper px-5 py-5 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-2 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
         >
           {isAdminRoute ? (
             <>
@@ -119,8 +107,8 @@ const Header: React.FC = () => {
               <Link to="/admin?section=aiBlogGen" onClick={handleNavClick} className={adminNavClass('aiBlogGen')} title="AI Blog Gen">
                 <FaMagic className="h-5 w-5" />
               </Link>
-              <div className="mx-1 hidden h-6 w-0.5 bg-paper/30 md:block"></div>
-              <button onClick={handleLogout} className="nav-link-pill p-3 !text-mango-light hover:!bg-mango hover:!text-paper" title="Log Out & Return">
+              <div className="mx-1 hidden h-6 w-0.5 bg-ink/30 md:block"></div>
+              <button onClick={handleLogout} className="nav-link-pill p-3 !rounded-full !text-hibiscus-dark hover:!bg-hibiscus-light" title="Log Out & Return">
                 <FaSignOutAlt className="h-5 w-5" />
               </button>
             </>
@@ -137,10 +125,8 @@ const Header: React.FC = () => {
                 onClick={handleNavClick}
                 onMouseEnter={() => playHoverFx()}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 border-[2px] border-mango px-4 py-2 font-condensed text-sm uppercase tracking-[0.12em] text-paper transition duration-150 ${
-                    isActive
-                      ? 'bg-mango shadow-[3px_3px_0_0_#F5F1E8]'
-                      : 'bg-mango hover:bg-mango-light hover:shadow-[3px_3px_0_0_#F5F1E8]'
+                  `flex items-center gap-2 rounded-full border-[2.5px] border-ink px-4 py-2 font-extrabold text-ink shadow-ink-sm transition duration-200 hover:-translate-y-0.5 ${
+                    isActive ? 'bg-mango' : 'bg-mango-light hover:bg-mango'
                   }`
                 }
               >

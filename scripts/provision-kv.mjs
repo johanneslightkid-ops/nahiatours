@@ -5,9 +5,6 @@
  * fresh Cloudflare project wires itself up instead of waiting on someone to
  * paste an id into wrangler.toml.
  *
- * The namespace is named after the Worker in wrangler.toml, so each deployment
- * of this repository gets its own store.
- *
  * It runs inside `npm run build`, which Cloudflare runs before `wrangler
  * deploy`, so by the time wrangler reads wrangler.toml the binding is there.
  *
@@ -32,23 +29,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_PATH = join(ROOT, 'wrangler.toml');
 const API = 'https://api.cloudflare.com/client/v4';
 
-/**
- * The namespace is named after the Worker, not after any one project. Two
- * branches that deploy two Workers (`nahiatours` and `ld-vip`) therefore get
- * two namespaces without either of them having to configure anything — which
- * is the whole point: a deploy from one must never write the other's data.
- */
-const resolveWorkerName = () => {
-  try {
-    const match = readFileSync(CONFIG_PATH, 'utf8').match(/^\s*name\s*=\s*"([^"]+)"/m);
-    if (match) return match[1];
-  } catch {
-    // Fall through to the default below.
-  }
-  return 'nahiatours';
-};
-
-const NAMESPACE_TITLE = process.env.KV_NAMESPACE_TITLE || `${resolveWorkerName()}-data`;
+const NAMESPACE_TITLE = process.env.KV_NAMESPACE_TITLE || 'nahiatours-data';
 const BINDING = process.env.KV_BINDING || 'DATA_KV_F';
 
 // The generated block is delimited so re-runs replace it rather than stacking

@@ -5,7 +5,6 @@ import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { useBrand } from '../contexts/BrandContext';
 import { PricingOption } from '../services/toursService';
 import PaymentDropdown from './ui/PaymentDropdown';
-import { Barcode, Crosshair } from './ui/Illustrations';
 import MarkdownRenderer from './ui/MarkdownRenderer';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
 
@@ -96,14 +95,19 @@ const TourCard: React.FC<TourCardProps> = ({
     }
   };
 
+  const radiusClass = index % 3 === 0
+    ? 'rounded-[30px_18px_28px_22px]'
+    : index % 3 === 1
+    ? 'rounded-[20px_30px_20px_28px]'
+    : 'rounded-[26px_22px_30px_18px]';
+
   return (
     <article
       onMouseEnter={() => playHoverFx()}
-      className={`artsy-glass-card group mb-8 flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${swayClass}`}
+      className={`group mb-8 inline-block flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
     >
-      {/* The clipping. Near-monochrome under a halftone screen until the card
-          is hovered, when both lift and the photograph comes back to colour. */}
-      <div className="relative aspect-[16/10] overflow-hidden border-b-[3px] border-ink">
+      {/* Media Frame */}
+      <div className="relative aspect-[16/10] overflow-hidden border-b-[2.5px] border-ink">
         <Link to={detailsPath} onClick={() => playClickFx()} className="block h-full w-full" aria-label={title}>
           <img
             src={image}
@@ -111,18 +115,9 @@ const TourCard: React.FC<TourCardProps> = ({
             className="photo-pop h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         </Link>
-        <span
-          className="pointer-events-none absolute inset-0 opacity-40 transition-opacity duration-500 group-hover:opacity-0"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 50% 50%, rgba(12,12,13,0.8) 1.2px, transparent 1.6px)',
-            backgroundSize: '5px 5px',
-          }}
-        />
         <div className="artsy-brick-badge absolute left-4 top-4">
           <span>★ Excursion</span>
         </div>
-        <Crosshair className="pointer-events-none absolute bottom-2 right-2 h-6 w-6 opacity-80" />
       </div>
 
       {/* Content */}
@@ -130,26 +125,25 @@ const TourCard: React.FC<TourCardProps> = ({
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <span className="tp-filenum">
-                {brandName} Collection · No. {String(index + 1).padStart(2, '0')}
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-lagoon-dark">
+                {brandName} Collection
               </span>
-              <h3 className="mt-1.5 font-display text-2xl leading-none text-ink">
+              <h3 className="mt-1 font-display text-2xl font-extrabold text-ink">
                 {title}
               </h3>
-              <span className="mt-2 block h-[3px] w-10 bg-mango transition-all duration-300 group-hover:w-24" />
             </div>
             {showDetailsLink && (
               <Link
                 to={detailsPath}
                 onClick={() => playClickFx()}
-                className="shrink-0 border-b-2 border-mango pb-0.5 font-condensed text-xs uppercase tracking-[0.14em] text-ink transition hover:bg-mango hover:text-paper"
+                className="shrink-0 text-xs font-extrabold uppercase tracking-wider text-lagoon-dark underline decoration-mango decoration-2 underline-offset-4 transition hover:text-mango-dark"
               >
                 <FormattedMessage id="details.view" defaultMessage="View Details" />
               </Link>
             )}
           </div>
 
-          <div className="text-sm font-medium leading-relaxed text-ink-soft">
+          <div className="text-sm font-semibold leading-relaxed text-ink-soft">
             <MarkdownRenderer content={description} />
           </div>
 
@@ -158,7 +152,7 @@ const TourCard: React.FC<TourCardProps> = ({
               {resolvedPricingOptions.map((option) => (
                 <span
                   key={`${title}-${option.tier}`}
-                  className="inline-flex items-center border-2 border-ink bg-paper-warm px-3.5 py-1 font-condensed text-xs uppercase tracking-[0.1em] text-ink"
+                  className="inline-flex items-center rounded-full border-2 border-ink bg-lagoon-light px-3.5 py-1 text-xs font-extrabold text-ink"
                 >
                   {option.tier}: <strong className="ml-1 text-ink">{option.price}</strong>
                 </span>
@@ -168,15 +162,11 @@ const TourCard: React.FC<TourCardProps> = ({
         </div>
 
         {enabled && (
-          <div className="mt-6 space-y-4 border-t-[3px] border-ink pt-6">
-            <div className="-mt-3 flex items-center justify-between">
-              <span className="tp-slab-ink tp-slab">Book it</span>
-              <Barcode value={excursionName || title} className="h-4 w-24 opacity-40" />
-            </div>
+          <div className="mt-6 space-y-4 border-t-2 border-dashed border-ink/25 pt-6">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {resolvedPricingOptions.map((option) => (
-                <label key={option.tier} className="space-y-1.5 border-2 border-ink bg-paper p-3 text-left">
-                  <span className="block font-condensed text-xs uppercase tracking-[0.14em] text-ink-soft">
+                <label key={option.tier} className="space-y-1.5 rounded-2xl border-2 border-ink bg-paper p-3 text-left">
+                  <span className="block text-xs font-extrabold uppercase tracking-wider text-ink-soft">
                     {option.tier}
                   </span>
                   <input
@@ -184,31 +174,29 @@ const TourCard: React.FC<TourCardProps> = ({
                     min="0"
                     value={quantities[option.tier] ?? 0}
                     onChange={(event) => handleQuantityChange(option.tier, event.target.value)}
-                    className="w-full border-2 border-ink bg-white px-3 py-1.5 font-mono text-sm text-ink outline-none"
+                    className="w-full rounded-xl border-2 border-ink bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none transition focus:bg-lagoon-light"
                   />
                 </label>
               ))}
             </div>
 
             <label className="block space-y-1.5 text-left">
-              <span className="font-condensed text-xs uppercase tracking-[0.14em] text-ink-soft">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-ink-soft">
                 <FormattedMessage id="tours.dateLabel" defaultMessage="Preferred Date" />
               </span>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(event) => setSelectedDate(event.target.value)}
-                className="w-full border-2 border-ink bg-white px-4 py-2.5 font-mono text-sm text-ink outline-none"
+                className="w-full rounded-xl border-2 border-ink bg-white px-4 py-2.5 text-sm font-bold text-ink outline-none transition focus:bg-lagoon-light"
               />
             </label>
 
-            {/* The live total is red because it is the number the visitor is
-                about to act on. */}
-            <div className="flex items-center justify-between border-[3px] border-ink bg-mango px-5 py-3 shadow-ink-sm">
-              <span className="font-condensed text-xs uppercase tracking-[0.16em] text-paper">
+            <div className="flex items-center justify-between rounded-2xl border-[2.5px] border-ink bg-mango px-5 py-3 shadow-ink-sm">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-ink">
                 <FormattedMessage id="payment.total" defaultMessage="Total Estimate" />
               </span>
-              <span className="font-display text-2xl leading-none text-paper">
+              <span className="font-display text-xl font-extrabold text-ink">
                 {totalAmount > 0 ? `$${totalAmount} USD` : price}
               </span>
             </div>

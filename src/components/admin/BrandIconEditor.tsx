@@ -109,7 +109,7 @@ const BrandIconEditor: React.FC<BrandIconEditorProps> = ({ file, onCancel, onApp
     const x = (OUTPUT_SIZE - drawnWidth) / 2 + offset.x * ratio;
     const y = (OUTPUT_SIZE - drawnHeight) / 2 + offset.y * ratio;
 
-    context.fillStyle = '#F5F1E8';
+    context.fillStyle = '#FFFDF7';
     context.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
     context.drawImage(image, x, y, drawnWidth, drawnHeight);
 

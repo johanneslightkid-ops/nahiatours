@@ -52,7 +52,7 @@ const RouteMap: React.FC<Props> = ({ origin, destination, geometry, className = 
 
       if (geometry && geometry.length > 0) {
         L.polyline(geometry, {
-          color: '#C1121F',
+          color: '#0d9488',
           weight: 4,
           opacity: 0.8,
           lineCap: 'round',

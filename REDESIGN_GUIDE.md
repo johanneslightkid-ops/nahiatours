@@ -1,11 +1,9 @@
 # Welcome Page Redesign - Complete Implementation Guide
 
-> **Note:** this guide describes the story-driven *structure* of the welcome
-> page, which still stands. Its visual direction has been superseded twice —
-> first by a flat illustrated tropical poster, and now, on this branch, by the
-> trash-polka / tattoo-flash system documented in
-> [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). Read any colour, gradient, blur or
-> radius named below as history; the structure is the part that is still true.
+> **Note:** this guide describes the story-driven structure of the welcome
+> page, which still stands. Its visual direction (glassmorphism, dark "luxury"
+> palette, Playfair serif) has been superseded by the flat illustrated look
+> documented in [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 
 ## 🎨 Overview
 

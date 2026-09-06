@@ -9,7 +9,7 @@ interface SeaWaveDividerProps {
 
 export const SeaWaveDivider: React.FC<SeaWaveDividerProps> = ({
   variant = 'crest',
-  colorClass = 'text-ink/15',
+  colorClass = 'text-[#061d2b]/15',
   className = '',
   flip = false,
 }) => {

@@ -218,7 +218,7 @@ export const QuestionStep: React.FC = () => {
     >
       <header className="mb-7">
         <div className="mb-3 flex flex-wrap items-center gap-3">
-          <span className="border-2 border-paper/60 px-3 py-1 font-condensed text-[0.68rem] uppercase tracking-[0.18em] text-paper">
+          <span className="rounded-full border-2 border-lagoon-light/50 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
             {copy.ui.stepOf(stepIndex + 1, steps.length)}
           </span>
           {currentStep.optional && (
@@ -374,7 +374,7 @@ export const QuestionStep: React.FC = () => {
               type="date"
               value={profile.startDate ?? ''}
               onChange={(event) => patchProfile({ startDate: event.target.value })}
-              className="w-full border-2 border-paper/30 bg-paper/10 px-4 py-2.5 text-sm font-semibold text-paper outline-none transition focus:border-mango"
+              className="w-full rounded-xl border-2 border-paper/30 bg-paper/10 px-4 py-2.5 text-sm font-semibold text-paper outline-none transition focus:border-lagoon-light"
             />
           </label>
           <label className="planner-panel-soft block space-y-2 px-5 py-4">
@@ -386,7 +386,7 @@ export const QuestionStep: React.FC = () => {
               value={profile.pickupZone ?? ''}
               placeholder={copy.questions.logistics.zonePlaceholder}
               onChange={(event) => patchProfile({ pickupZone: event.target.value })}
-              className="w-full border-2 border-paper/30 bg-paper/10 px-4 py-2.5 text-sm font-semibold text-paper placeholder:text-paper/60 outline-none transition focus:border-mango"
+              className="w-full rounded-xl border-2 border-paper/30 bg-paper/10 px-4 py-2.5 text-sm font-semibold text-paper placeholder:text-paper/60 outline-none transition focus:border-lagoon-light"
             />
           </label>
         </div>

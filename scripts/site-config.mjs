@@ -13,11 +13,7 @@ import { dirname, join } from 'node:path';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-// This branch deploys as the `ld-vip` Worker, so the fallback URL follows it.
-// Set SITE_URL in the deployment's variables once a real domain exists; the
-// workers.dev hostname includes the account subdomain, which the build cannot
-// know, so this is only ever a fallback that keeps absolute URLs coherent.
-const DEFAULT_SITE_URL = 'https://ld-vip.workers.dev';
+const DEFAULT_SITE_URL = 'https://nahiatours.workers.dev';
 const DEFAULT_BRAND_NAME = 'Tours';
 
 /** Accepts "example.com", "https://example.com" or a trailing slash. */

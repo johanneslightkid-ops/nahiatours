@@ -30,7 +30,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
     }}
     aria-pressed={selected}
   >
-    <span className="emoji-mono grid h-12 w-12 shrink-0 place-items-center border-2 border-ink/25 bg-ink/[0.06] text-2xl">
+    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-2 border-paper/25 bg-paper/10 text-2xl">
       {emoji}
     </span>
 
@@ -45,7 +45,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 
     <span className="ml-1 shrink-0 self-center">
       {selected ? (
-        <span className="grid h-7 w-7 place-items-center border-2 border-paper bg-paper text-ink">
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-lagoon-light text-ink">
           <HiCheck className="h-4 w-4" />
         </span>
       ) : (
@@ -84,7 +84,7 @@ export const ChipToggle: React.FC<ChipToggleProps> = ({
     }}
     aria-pressed={selected}
   >
-    {emoji && <span className="emoji-mono text-base leading-none">{emoji}</span>}
+    {emoji && <span className="text-base leading-none">{emoji}</span>}
     <span>{label}</span>
   </button>
 );
@@ -120,7 +120,7 @@ export const CountStepper: React.FC<CountStepperProps> = ({
           onClick={() => set(value - 1)}
           disabled={value <= min}
           aria-label={`− ${label}`}
-          className="grid h-10 w-10 place-items-center border-2 border-paper/40 bg-transparent text-paper transition hover:border-mango hover:bg-mango disabled:opacity-30"
+          className="grid h-10 w-10 place-items-center rounded-full border-2 border-paper/25 bg-paper/10 text-paper transition hover:border-lagoon-light hover:bg-lagoon-light/20 disabled:opacity-30"
         >
           <HiMinus className="h-4 w-4" />
         </button>
@@ -133,7 +133,7 @@ export const CountStepper: React.FC<CountStepperProps> = ({
           onClick={() => set(value + 1)}
           disabled={value >= max}
           aria-label={`+ ${label}`}
-          className="grid h-10 w-10 place-items-center border-2 border-paper/40 bg-transparent text-paper transition hover:border-mango hover:bg-mango disabled:opacity-30"
+          className="grid h-10 w-10 place-items-center rounded-full border-2 border-paper/25 bg-paper/10 text-paper transition hover:border-lagoon-light hover:bg-lagoon-light/20 disabled:opacity-30"
         >
           <HiPlus className="h-4 w-4" />
         </button>

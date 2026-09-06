@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FoamLine, Crosshair, Barcode } from './ui/Illustrations';
+import { FoamLine } from './ui/Illustrations';
 
 interface StorySectionProps {
   id: string;
@@ -132,14 +132,10 @@ const StorySection: React.FC<StorySectionProps> = ({
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Header with emoji and title */}
         <div className={`mb-10 text-center sm:mb-12 ${isAlternate ? 'md:text-right' : 'md:text-left'}`}>
-          {emoji && (
-            <div className={`section-icon mb-5 ${isAlternate ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}>
-              <span>{emoji}</span>
-            </div>
-          )}
-          {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
+          {emoji && <div className={`section-icon mb-5 ${isAlternate ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}>{emoji}</div>}
+          {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
           {timeframe && (
-            <p className="artsy-brick-badge">
+            <p className="inline-block rounded-full border-2 border-ink bg-mango-light px-4 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-ink-sm">
               {timeframe}
             </p>
           )}
@@ -151,21 +147,17 @@ const StorySection: React.FC<StorySectionProps> = ({
           <div className={(imageUrl || vimeoUrl) && isAlternate ? 'md:order-2' : 'md:order-1'}>
             {/* Description */}
             {description && (
-              <div className="story-copy-card mb-6 animate-wave-sway-2">
-                <p className="whitespace-pre-wrap text-base font-medium leading-8 text-ink sm:text-lg">
+              <div className="story-copy-card mb-6 rounded-[30px_16px_30px_18px] animate-wave-sway-2">
+                <p className="whitespace-pre-wrap text-base font-semibold leading-8 text-ink sm:text-lg">
                   {description}
                 </p>
-                <div className="mt-5 flex items-center gap-3 border-t-2 border-ink/15 pt-4">
-                  <Barcode value={id} className="h-4 w-20 opacity-45" />
-                  <span className="tp-filenum">Ch. {id.replace(/_/g, ' ')}</span>
-                </div>
               </div>
             )}
 
             {/* Narrative */}
             {narrative && (
               <div className="prose prose-lg max-w-none">
-                <p className="text-base font-medium italic leading-8 text-ink-soft md:text-lg">
+                <p className="text-base font-semibold italic leading-8 text-ink-soft md:text-lg">
                   {narrative}
                 </p>
               </div>
@@ -177,12 +169,9 @@ const StorySection: React.FC<StorySectionProps> = ({
                 {mood.split(', ').filter(Boolean).map((m, idx) => (
                   <span
                     key={idx}
-                    className={`border-2 px-4 py-1.5 font-condensed text-xs uppercase tracking-[0.14em] shadow-ink-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 ${
-                      idx % 4 === 3
-                        ? 'border-mango bg-mango text-paper'
-                        : 'border-ink bg-paper text-ink'
+                    className={`rounded-full border-[2.5px] border-ink px-4 py-1.5 text-sm font-extrabold text-ink shadow-ink-sm transition-transform hover:-translate-y-1 hover:rotate-2 ${
+                      ['bg-mango-light', 'bg-lagoon-light', 'bg-hibiscus-light', 'bg-jungle-light'][idx % 4]
                     }`}
-                    style={{ transform: `rotate(${(idx % 3) - 1}deg)` }}
                   >
                     {m}
                   </span>
@@ -206,12 +195,12 @@ const StorySection: React.FC<StorySectionProps> = ({
                       </blockquote>
                     </div>
                   ) : (
-                    <div className="tp-filenum flex aspect-video w-full items-center justify-center border-[3px] border-ink bg-paper-warm">Loading TikTok…</div>
+                    <div className="relative w-full aspect-video rounded-[28px_14px_30px_16px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft">Loading TikTok...</div>
                   )
                 ) : (
                   <iframe
                     src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
-                    className="relative aspect-video w-full border-[3px] border-ink shadow-ink-lg"
+                    className="relative w-full aspect-video rounded-[28px_14px_30px_16px] shadow-2xl"
                     frameBorder="0"
                     allowFullScreen
                   />
@@ -223,13 +212,12 @@ const StorySection: React.FC<StorySectionProps> = ({
           {/* Media Column (Image or Video if no image) */}
           {(imageUrl || (!imageUrl && vimeoUrl)) && (
             <div className={`${isAlternate ? 'md:order-1' : 'md:order-2'} ${id === 'decision' ? 'md:mt-12' : ''}`}>
-              <div className={`story-media-frame group relative mb-10 md:mb-0 ${id === 'afternoon_post' ? 'mt-12 md:mt-0' : ''} animate-wave-sway-1`}>
-                <Crosshair className="pointer-events-none absolute -right-3 top-3 z-20 h-7 w-7" />
+              <div className={`story-media-frame group mb-10 md:mb-0 ${id === 'afternoon_post' ? 'mt-12 md:mt-0' : ''} animate-wave-sway-1`}>
                 {imageUrl ? (
                   <img
                     src={imageUrl}
                     alt={title || 'Story image'}
-                    className="photo-pop relative mt-6 h-[22rem] w-full border-[3px] border-ink object-cover shadow-ink-lg transition-transform duration-700 group-hover:scale-[1.02] sm:h-96 md:h-[520px]"
+                    className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] object-cover shadow-[0_25px_60px_rgba(4,19,29,0.3)] transition-transform duration-700 group-hover:scale-105 sm:h-96 md:h-[520px]"
                   />
                 ) : isTikTok ? (
                   hasLoaded ? (
@@ -244,12 +232,12 @@ const StorySection: React.FC<StorySectionProps> = ({
                       </blockquote>
                     </div>
                   ) : (
-                     <div className="tp-filenum relative mt-6 flex h-[22rem] w-full items-center justify-center border-[3px] border-ink bg-paper-warm sm:h-96 md:h-[520px]">Loading TikTok…</div>
+                     <div className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft sm:h-96 md:h-[520px]">Loading TikTok...</div>
                   )
                 ) : (
                   <iframe
                     src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
-                    className="relative mt-6 h-[22rem] w-full border-[3px] border-ink shadow-ink-lg transition-transform duration-500 sm:h-96 md:h-[520px]"
+                    className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] shadow-[0_25px_60px_rgba(4,19,29,0.3)] transition-transform duration-500 sm:h-96 md:h-[520px]"
                     frameBorder="0"
                     allowFullScreen
                   />
@@ -261,8 +249,8 @@ const StorySection: React.FC<StorySectionProps> = ({
       </div>
 
       {/* Closing flourish */}
-      <div className="pointer-events-none absolute bottom-0 left-0 flex w-full justify-center pb-10 opacity-60">
-        <FoamLine className="h-4 w-40" />
+      <div className="pointer-events-none absolute bottom-0 left-0 flex w-full justify-center pb-10 opacity-30">
+        <FoamLine className="h-6 w-32" />
       </div>
     </section>
   );

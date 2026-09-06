@@ -1,161 +1,88 @@
-# Design system — LD VIP, trash polka
+# Design system — the illustrated tropical poster
 
-The site is **tattooed, not illustrated**. It reads like a trash-polka sleeve
-or a flash sheet: bone stock, black ink, exactly one red, and a collage of
-engraved linework, brush strokes, splatters, stencil slabs and torn paper.
+The site is **drawn, not photographed**. It reads like a screen-printed travel
+poster: flat colour, ink outlines, chunky rounded shapes and a friendly display
+face, aimed at holiday travellers rather than at a luxury catalogue.
 
-Everything lives in three files — `src/styles/globals.css` (tokens and
-component classes), `tailwind.config.cjs` (palette, type, radius, shadows) and
-`src/components/ui/Illustrations.tsx` (the drawings and the collage furniture).
+Everything below lives in two files — `src/styles/globals.css` (tokens and
+component classes) and `tailwind.config.cjs` (palette, fonts, shadows) — plus
+the drawing set in `src/components/ui/Illustrations.tsx`.
 
-## The four rules
+## The three rules
 
-1. **Red means act.** Bone, black and grey build the page. The one red is spent
-   only on what a visitor can *do* — book, plan, call, submit, the chosen
-   planner option, the live total, the focus ring. Scanning the page for red is
-   the same as scanning it for the next move. If something new is not
-   actionable, it is not red.
-2. **Nothing is rounded.** The Tailwind radius scale collapses to zero, so
-   every `rounded-*` and `rounded-full` already in the markup produces a cut
-   slab. `[class*='rounded-[']` in globals.css squares the arbitrary radii the
-   config cannot reach. Opt back in with `.is-round` only where a circle is the
-   *meaning* — a seal, a bullet.
-3. **Out of register.** Depth is a misprint: a hard, un-blurred offset of the
-   black plate (`shadow-ink`, `shadow-ink-lg`), sometimes with the red plate
-   slipped the other way (`shadow-misprint`). Never a haze. Tailwind's own
-   `shadow-sm … shadow-2xl` are overridden to hard offsets too, so a stray
-   utility cannot soften a plate.
-4. **Photos are engravings until you touch them.** Photography is pushed to
-   `grayscale(0.88) contrast(1.28)` under a halftone screen, and blooms back to
-   full colour on hover or focus. The picture you are reaching for is the one
-   that is alive.
+1. **Flat colour.** No frosted glass, no `backdrop-blur`, no photo-real
+   gradients. Every surface is opaque poster paint. Gradients are allowed only
+   as a broad two- or three-stop wash across a whole section band.
+2. **One ink outline.** Cards, buttons, badges, form fields and framed photos
+   are drawn with the same pen: `2.5px solid var(--ink)` (`2px` on mobile).
+3. **Hard shadow.** Depth is an un-blurred offset block of ink
+   (`shadow-ink-sm` / `shadow-ink` / `shadow-ink-lg`), never a soft haze.
 
-Keep those four and anything new will sit inside the collage.
+Keep those three and anything new will sit inside the illustration.
 
 ## Palette
 
-The token *names* are inherited from the previous design on purpose: several
-hundred colour utilities are scattered through the markup, and remapping the
-tokens lands every one of them inside this system instead of leaving pastels
-behind. So `mango` is the red, `lagoon` and `sky` are greys, `jungle` is an
-ink-green.
-
 | Token | Hex | Used for |
 | --- | --- | --- |
-| `ink` | `#0C0C0D` | the black plate: outlines, type, hard shadows |
-| `ink-soft` / `ink-light` | `#3B3B3F` / `#6F6F76` | secondary and tertiary copy |
-| `paper` / `paper-warm` / `paper-deep` | `#EFE9DD` / `#E5DDCD` / `#D5CAB4` | bone stock, in three weights |
-| `--bone` | `#F5F1E8` | the lightest stock; plates and cards |
-| `mango` | `#C1121F` | **the red.** Primary action, live totals, selection |
-| `mango-light` / `mango-dark` | `#E63946` / `#8B0A15` | the red on black / on bone |
-| `hibiscus` | `#A4161A` | oxblood: alerts and the second-tier accent |
-| `lagoon` | `#4A4A4E` | graphite: links, quiet fills, secondary chrome |
-| `sky` | `#8A8A90` | smoke: tertiary surfaces |
-| `jungle` | `#3E4A38` | ink-green: "success" without opening a second hue |
-| `grape` | `#3A3542` | bruise; the one place a third value is allowed |
+| `ink` | `#1E2A3A` | outlines, body text, hard shadows |
+| `ink-soft` / `ink-light` | `#42566B` / `#7C8FA3` | secondary and tertiary copy |
+| `paper` / `paper-warm` | `#FFF6E5` / `#FFEFD6` | page and card grounds |
+| `mango` | `#FFA62B` | primary action, price tags, highlights |
+| `hibiscus` | `#FF5D73` | accents, alerts, one of the card tints |
+| `lagoon` | `#21C0B7` | secondary action, links, water |
+| `sky` | `#4CC3F0` | sky, cool sections |
+| `jungle` | `#2FA84F` | WhatsApp, foliage, success |
+| `sunset` | `#FF7A45` | the warm CTA band |
+
+Each has `-light` and (mostly) `-dark` variants. Text on a saturated band is
+white; text on paper is `ink`.
 
 ## Type
 
-Five faces, each with one job:
+- **Display — Baloo 2** (700/800): headings, buttons, prices, numbers.
+- **Body — Nunito** (600/700): everything else. The body weight is 600, because
+  400 looks thin against heavy outlines.
+- **Accent — Caveat**: the hand-lettered kickers (`.hand-note`). Small doses.
 
-- **Anton** (`font-display`, all `h1`–`h3`) — the shout. Poster caps, headlines,
-  prices, stencil ordinals. One weight only, so headings are pinned to 400 and
-  `font-synthesis-weight: none` stops a faux-bold smearing it.
-- **Oswald** (`font-condensed`, `h4`–`h6`, buttons, nav, badges) — the voice of
-  the interface. Condensed uppercase with wide tracking.
-- **Barlow** (`font-sans`, body) — long-form, at weight 500.
-- **Special Elite** (`font-mono` / `font-stamp`, `.tp-filenum`) — the typewriter:
-  filing numbers, catalogue marks, rubber stamps.
-- **Permanent Marker** (`font-accent`, `.hand-note`) — annotations scrawled over
-  the layout. Small doses.
-
-Heading *colour* is set on `h1`–`h6` element selectors only, never on
-`.font-display`. A class there would tie with `text-paper` and — being later in
-the file — win, painting every heading on a black panel black.
+`font-serif` is aliased to the display face, so any leftover use of it in the
+markup still lands inside the system.
 
 ## Component classes
 
-| Class | What it prints |
+| Class | What it draws |
 | --- | --- |
-| `.sticker-card` / `.artsy-glass-card` / `.glass-card` | the standard plate: bone stock, 3px keyline, hard offset, a red registration crosshair in the corner; slips further out of register on hover |
-| `.tropical-button` | the red action slab, with a squeegee wipe on hover; presses into its own shadow |
-| `.tropical-button-outline` | the same slab in bone; inverts to black on hover. `.btn-lagoon` / `.btn-hibiscus` recolour it |
-| `.artsy-brick-badge` | rubber stamp: doubled red keyline, typewriter caps, rotated, ink worn through by a mask |
-| `.section-icon` | black seal ringed in red; its mark is knocked back to one ink value by a filter on the child |
-| `.marker-highlight` | red brush stroke behind a headline; ragged-edged by a mask, cloned per line |
-| `.scribble-title-bg` | dry-brush swipe dragged under a title |
-| `.hand-note` | Permanent Marker kicker, rotated |
-| `.wavy-band` / `-top` / `-bottom` | tears the band's top and bottom edges (see below) |
-| `.shore- / cove- / lagoon- / bay- / dawn- / sunset- / reef-section` | the printing plates |
-| `.planner-*` | the planner's black surfaces |
-| `.photo-pop` | the engraving treatment, and the colour bloom on hover |
+| `.sticker-card` / `.artsy-glass-card` / `.glass-card` | the standard card: cream fill, ink outline, hard shadow, lifts on hover |
+| `.tropical-button` / `.tropical-button-outline` | the pill button; presses into its own shadow on `:active`. `.btn-lagoon` / `.btn-hibiscus` recolour it |
+| `.artsy-brick-badge` | small rotated sticker badge |
+| `.section-icon` | round emoji sticker at the head of a section |
+| `.marker-highlight` | marker stroke behind a headline; wraps per line |
+| `.scribble-title-bg` | crayon rule under a title |
+| `.hand-note` | Caveat kicker, rotated slightly |
+| `.wavy-band` / `-top` / `-bottom` | masks a section with a rolling wave edge, so the backdrop shows through the troughs |
+| `.shore- / cove- / lagoon- / bay- / dawn- / sunset- / reef-section` | the painted section bands |
+| `.planner-*` | the planner's deliberately dark "night" surfaces |
+| `.photo-pop` | the small saturation/contrast lift applied to photography |
 
-### The trash-polka kit
+## Photography
 
-Small parts the markup reaches for directly. Each is a piece of the collage
-that also carries meaning:
-
-| Class | Meaning |
-| --- | --- |
-| `.tp-slab` / `.tp-slab-ink` | a label that has to be obeyed |
-| `.tp-filenum` | typewriter catalogue number |
-| `.tp-barcode` | a rule that is also an identifier (purely typographic — no image) |
-| `.tp-rule` | heavy divider with a red tick at the head |
-| `.tp-index` | outlined stencil ordinal, the way a step is numbered on a wall |
-| `.tp-tape` | a strip of masking tape pinning a plate to the page |
-| `.tp-redact` | a censored word |
-| `.tp-cut` | a notched corner (no shadow survives a clip-path, so accents only) |
-| `.tp-screen` | halftone screen over any surface |
-
-## Section bands
-
-Each band declares **only two things** — `--band` (the paint) and
-`--band-texture` (the screen over it). The tear rules read those, which is what
-lets one rule rip any band without knowing its colour.
-
-| Band | Plate |
-| --- | --- |
-| `.shore-section` | bone, plain |
-| `.cove-section` | deep stock, coarse halftone |
-| `.lagoon-section` | bone, engraver's crosshatch |
-| `.bay-section` | warm stock, red ledger ruling |
-| `.dawn-section` | deep stock, red hazard rule along the top |
-| `.sunset-section` | **the black plate** — red ray burst, thrown ink |
-| `.reef-section` | **the red plate** — oxblood into black, ink splatter |
-
-Values step in tone from one band to the next, so a tear between two of them
-actually reads.
-
-### Torn edges
-
-A mask alone would only reveal the bone collage behind — bone on bone. So each
-band paints an **ink margin** along its own top and bottom, a strip exactly as
-tall as the tear, and the mask rips through *that*. What is left is a ragged
-black fibre edge printed by the band itself, with the backdrop showing through
-the deepest bites. `--tear-ink` flips it to red on the dark plates, where a
-black margin would show nothing.
+Photos stay — they are the product — but they are treated as objects pasted
+into a drawing: ink border, hard shadow, rounded corners and `.photo-pop`. The
+hero shows the one video as a postcard rather than as a full-bleed background.
 
 ## Illustrations
 
-`Illustrations.tsx` exports the flash — engraved palms, a traditional toucan
-with a red beak, a nautical star, a clipper, a hatched pineapple, a rose-
-hibiscus, a woodcut fish, sailor's swallows — plus the collage furniture the
-layout is assembled from: `Splatter`, `SunBurst` (the radiant), `Banner`,
-`Arrow` (which points, literally), `Crosshair` (registration mark),
-`Barcode` (derived from its label, so the same tour always prints the same
-code), `TornStrip` and `Anchor`.
+`src/components/ui/Illustrations.tsx` exports flat SVG drawings (sun, cloud,
+palm frond, palm tree, toucan, hibiscus, pineapple, sailboat, starfish,
+cocktail, fish, birds, wave band, foam line). They take a `className` for
+sizing and are `aria-hidden`, since they are always decorative.
 
-`IllustratedBackdrop.tsx` paints the fixed sheet behind every page: bone stock,
-a radiant turning once every 90 seconds, a halftoned black wash rising off the
-floor, a torn diagonal slash, thrown ink in the corners, and one palm frond
-still hanging in. Everything sits at very low opacity — it must read through
-the tears without competing with a single line of copy.
+`IllustratedBackdrop.tsx` paints the fixed scene behind every page — sky, sun,
+drifting clouds, a sea of three crests, and fronds at the edges. It replaced a
+WebGL ocean shader, so there is no GL context anywhere in the app.
 
 ## Motion
 
-The old design breathed; this one is pinned down. `.animate-wave-sway-1…10`
-hold plates at fixed, slightly wrong angles and only **twitch** — a stencil
-slipping under the hand — on stepped timing, and pause on hover so the lift
-reads cleanly. `animate-bob`, `animate-frond`, `animate-spin-slow` and
-`cloudDrift` move the scenery slowly. `animate-ink-bleed` is the reveal for
-stamped elements. Everything is disabled under `prefers-reduced-motion`.
+`.animate-wave-sway-1…10` give cards a gentle pinned-paper tilt; they pause on
+hover. `animate-bob`, `animate-sway`, `animate-frond`, `animate-spin-slow` and
+`cloudDrift` animate the scenery. Everything is disabled under
+`prefers-reduced-motion: reduce`.
