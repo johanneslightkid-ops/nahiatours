@@ -67,7 +67,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    const redirect = canonicalRedirect(url);
+    const redirect = canonicalRedirect(url, env);
     if (redirect) {
       return redirect;
     }

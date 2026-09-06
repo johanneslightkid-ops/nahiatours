@@ -37,6 +37,7 @@ const TourCard: React.FC<TourCardProps> = ({
 }) => {
   const intl = useIntl();
   const { brandSettings } = useBrand();
+  const brandName = brandSettings.brandName;
   const swayClass = `animate-wave-sway-${(index % 10) + 1}`;
   const resolvedPricingOptions = pricingOptions.length > 0
     ? pricingOptions
@@ -77,12 +78,12 @@ const TourCard: React.FC<TourCardProps> = ({
   const handleBookNow = () => {
     playClickFx();
     let message = '';
-    message += `Hello, I want to book ${excursionName} with Francisco Ferreras Tours\n`;
+    message += `Hello, I want to book ${excursionName} with ${brandName}\n`;
     message += `Participants: ${selectedQuantitySummary || 'N/A'}\n`;
     message += `Preferred date: ${formattedSelectedDate || 'Not specified'}\n`;
     message += `Price: ${totalAmount > 0 ? totalAmount : price} USD`;
     message += `\n`;
-    message += `Hola, deseo reservar el ${excursionName} con Francisco Ferreras Tours\n`;
+    message += `Hola, deseo reservar el ${excursionName} con ${brandName}\n`;
     message += `Participantes: ${selectedQuantitySummary || 'N/A'}\n`;
     message += `Fecha preferida: ${formattedSelectedDate || 'No especificada'}\n`;
     message += `Precio: ${totalAmount > 0 ? totalAmount : price} USD`;
@@ -125,7 +126,7 @@ const TourCard: React.FC<TourCardProps> = ({
           <div className="flex items-start justify-between gap-3">
             <div>
               <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-lagoon-dark">
-                Francisco Ferreras Collection
+                {brandName} Collection
               </span>
               <h3 className="mt-1 font-display text-2xl font-extrabold text-ink">
                 {title}

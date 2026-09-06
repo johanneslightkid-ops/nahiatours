@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { getBrandSettings, saveBrandSettings, BrandSettings, uploadBrandIcon } from '../services/brandService';
+import BrandIconEditor from '../components/admin/BrandIconEditor';
 import { getTours, saveTours, Tour } from '../services/toursService';
 import { useI18n } from '../contexts/I18nContext';
 import ServiceAdminPanel from '../components/admin/ServiceAdminPanel';
@@ -23,6 +24,8 @@ const Admin: React.FC = () => {
   });
   const [editingBrand, setEditingBrand] = useState(false);
   const [uploadingIcon, setUploadingIcon] = useState(false);
+  /** File picked but not yet framed — drives the crop editor. */
+  const [pendingIconFile, setPendingIconFile] = useState<File | null>(null);
   const [tours, setTours] = useState<Tour[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeSection = searchParams.get('section') || 'brand';
@@ -42,6 +45,7 @@ const Admin: React.FC = () => {
       if (iconUrl) {
         setBrandSettings({ ...brandSettings, brandicon: iconUrl });
       }
+      setPendingIconFile(null);
     } catch (error) {
       console.error('Brand icon upload failed:', error);
     } finally {
@@ -125,8 +129,11 @@ const Admin: React.FC = () => {
                     onChange={(event) => {
                       const file = event.target.files?.[0];
                       if (file) {
-                        handleBrandIconUpload(file);
+                        // Frame it first; the editor hands back the crop.
+                        setPendingIconFile(file);
                       }
+                      // Reset, so picking the same file twice still fires.
+                      event.target.value = '';
                     }}
                   />
                 </div>
@@ -262,6 +269,15 @@ const Admin: React.FC = () => {
           </div>
         )}
       </div>
+      {pendingIconFile && (
+        <BrandIconEditor
+          file={pendingIconFile}
+          busy={uploadingIcon}
+          onCancel={() => setPendingIconFile(null)}
+          onApply={handleBrandIconUpload}
+        />
+      )}
+
     </div>
   );
 };

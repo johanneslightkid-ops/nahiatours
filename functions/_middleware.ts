@@ -1,4 +1,4 @@
-import { canonicalRedirect } from '../shared/canonical';
+import { canonicalRedirect, CanonicalEnv } from '../shared/canonical';
 
 /**
  * Canonical-host redirect for the Pages deployment.
@@ -7,10 +7,14 @@ import { canonicalRedirect } from '../shared/canonical';
  * (worker/index.ts) applies exactly the same rule. Preview hosts are no longer
  * redirected away — see that module for why.
  */
-export async function onRequest(context: { request: Request; next: () => Promise<Response> }) {
-  const { request, next } = context;
+export async function onRequest(context: {
+  request: Request;
+  env: CanonicalEnv;
+  next: () => Promise<Response>;
+}) {
+  const { request, env, next } = context;
 
-  const redirect = canonicalRedirect(new URL(request.url));
+  const redirect = canonicalRedirect(new URL(request.url), env);
   if (redirect) {
     return redirect;
   }

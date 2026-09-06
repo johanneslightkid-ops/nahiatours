@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
 import { useI18n } from './I18nContext';
+import { useBrand } from './BrandContext';
 import { BlogArticle, getBlogArticles } from '../services/blogService';
+import { applyBrandTokensDeep } from '../utils/brandText';
 
 type Locale = 'en' | 'es';
 
@@ -26,6 +28,9 @@ interface BlogProviderProps {
 
 export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
   const { locale } = useI18n();
+  // Articles carry {{brand}} rather than a hardcoded company name.
+  const { brandSettings } = useBrand();
+  const brandName = brandSettings.brandName;
   const [blogArticles, setBlogArticles] = useState<Record<Locale, BlogArticle[]>>({ en: [], es: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -51,8 +56,13 @@ export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
     loadBlogContent();
   }, [locale]);
 
+  const brandedArticles = useMemo(
+    () => applyBrandTokensDeep(blogArticles, brandName),
+    [blogArticles, brandName]
+  );
+
   return (
-    <BlogContext.Provider value={{ blogArticles, loading, error }}>
+    <BlogContext.Provider value={{ blogArticles: brandedArticles, loading, error }}>
       {children}
     </BlogContext.Provider>
   );

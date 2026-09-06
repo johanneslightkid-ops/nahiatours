@@ -48,21 +48,21 @@ const Header: React.FC = () => {
 
   return (
     <header className="lobster-header sticky top-0 z-50 overflow-visible">
-      <div className="section-shell flex items-center justify-between py-3.5 pl-[7.25rem] sm:pl-[7.75rem] lg:pl-8">
+      <div className="section-shell flex items-center justify-between py-3.5 pl-[10.5rem] sm:pl-[11.25rem] lg:pl-8">
         <Link
           to="/#top"
           className="group flex items-center gap-3"
           onClick={() => playClickFx()}
           onMouseEnter={() => playHoverFx()}
         >
-          <div className="menu-logo-icon fixed left-4 top-2 flex h-[6.125rem] w-[6.125rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
+          <div className="menu-logo-icon fixed left-4 top-2 flex h-[9.1875rem] w-[9.1875rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
             {brandSettings.brandicon ? (
               <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
             ) : (
-              <img src="/competitor-logo.svg" alt="Logo" className="h-[5.25rem] w-[5.25rem]" />
+              <img src="/competitor-logo.svg" alt="Logo" className="h-[7.875rem] w-[7.875rem]" />
             )}
           </div>
-          <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[7.5rem] sm:block lg:ml-[8rem]">
+          <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[10.75rem] sm:block lg:ml-[11.5rem]">
             {brandSettings.brandName}
           </h1>
         </Link>

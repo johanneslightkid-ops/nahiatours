@@ -33,6 +33,13 @@ const AIBlogGenAdmin: React.FC = () => {
   // Voice Recording State
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
+  /**
+   * Text the recogniser has committed. Interim results are *cumulative* — each
+   * onresult repeats the whole in-progress phrase — so they must never be
+   * accumulated into state, only shown after the finalised text. Keeping the
+   * final text in a ref means an interim update cannot double it.
+   */
+  const finalTranscriptRef = useRef('');
 
   // Output State
   const [generatedPosts, setGeneratedPosts] = useState<Array<{en: {title: string, content: string}, es: {title: string, content: string}, saved: boolean}>>([]);
@@ -40,6 +47,15 @@ const AIBlogGenAdmin: React.FC = () => {
   useEffect(() => {
     loadInitialData();
     initSpeechRecognition();
+    return () => {
+      // Leaving the panel mid-recording should release the microphone.
+      try {
+        recognitionRef.current?.stop();
+      } catch {
+        /* already stopped */
+      }
+      recognitionRef.current = null;
+    };
   }, []);
 
   const loadInitialData = async () => {
@@ -60,27 +76,44 @@ const AIBlogGenAdmin: React.FC = () => {
       
       recognitionRef.current.onresult = (event: any) => {
         let interimTranscript = '';
-        let finalTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const chunk = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
+            // Each result finalises exactly once, so this appends once.
+            finalTranscriptRef.current += chunk;
           } else {
-            interimTranscript += event.results[i][0].transcript;
+            interimTranscript += chunk;
           }
         }
-        setVoiceTranscript((prev) => prev + finalTranscript + interimTranscript);
+        // Rebuilt from the committed text every time, never appended to.
+        setVoiceTranscript(finalTranscriptRef.current + interimTranscript);
       };
+
+      // The recogniser stops itself after a silence, which used to leave the
+      // button claiming it was still recording.
+      recognitionRef.current.onend = () => setIsRecording(false);
+      recognitionRef.current.onerror = () => setIsRecording(false);
     }
   };
 
   const toggleRecording = () => {
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
+
     if (isRecording) {
-      recognitionRef.current?.stop();
+      recognition.stop();
       setIsRecording(false);
-    } else {
-      setVoiceTranscript('');
-      recognitionRef.current?.start();
+      return;
+    }
+
+    finalTranscriptRef.current = '';
+    setVoiceTranscript('');
+    try {
+      recognition.start();
       setIsRecording(true);
+    } catch {
+      // start() throws if the recogniser is already running; the onend
+      // handler will settle the state.
     }
   };
 

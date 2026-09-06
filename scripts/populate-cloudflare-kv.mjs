@@ -11,7 +11,7 @@
  * the production URL.
  */
 
-const API_BASE = process.env.VITE_API_BASE_URL || 'https://ferreras.tours';
+const API_BASE = process.env.VITE_API_BASE_URL || process.env.SITE_URL || 'http://localhost:8788';
 const API_PATH = '/api/data';
 
 const RESOURCES_WITH_LOCALE = [

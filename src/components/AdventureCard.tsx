@@ -36,7 +36,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
 
   const handleWhatsAppClick = () => {
     playClickFx();
-    const message = `Hola! Me gustaría más información sobre: ${adventure.title} con Francisco Ferreras Tours`;
+    const message = `Hola! Me gustaría más información sobre: ${adventure.title} con ${brandSettings.brandName}`;
     window.open(generateWhatsAppMessage(whatsappPhone, message), '_blank');
   };
 

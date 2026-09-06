@@ -31,7 +31,7 @@ const buildDynamicPayPalUrl = (baseUrl: string, priceStr?: string): string => {
 };
 
 export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
-  excursionTitle = 'Francisco Ferreras Excursion',
+  excursionTitle = 'Excursion',
   selectedPrice,
   selectedTier,
   className = '',

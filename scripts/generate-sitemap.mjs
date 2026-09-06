@@ -1,21 +1,13 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { ROOT, resolveSiteUrl } from './site-config.mjs';
 
-const projectRoot = path.resolve(new URL('..', import.meta.url).pathname);
+const projectRoot = ROOT;
 const sitemapPath = path.join(projectRoot, 'public', 'sitemap.xml');
 
-const normalizeDomain = (value) => {
-  if (!value) return 'https://ferreras.tours';
-  const trimmed = value.trim().replace(/\/$/, '');
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    return trimmed;
-  }
-  return `https://${trimmed}`;
-};
-
-const siteUrl = normalizeDomain(
-  process.env.SITE_URL || process.env.CLOUDFLARE_PAGES_URL || process.env.CLOUDFLARE_DOMAIN || 'ferreras.tours'
-);
+// Resolved centrally (scripts/site-config.mjs) so the sitemap, robots.txt and
+// the SEO meta tags always agree on where the site lives.
+const siteUrl = resolveSiteUrl();
 
 const slugify = (value) =>
   value

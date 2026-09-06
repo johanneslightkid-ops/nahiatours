@@ -1,7 +1,7 @@
 [
   {
     "id": "welcome",
-    "hostTitle": "¡Hola! Soy Francisco Ferreras 👋",
+    "hostTitle": "¡Hola! Bienvenido a {{brand}} 👋",
     "subtitle": "Bienvenido a Bávaro y Punta Cana",
     "narrative": "Ya sea que estés planeando tu viaje desde casa o descansando en las playas de Bávaro, déjame guiarte hacia la aventura dominicana perfecta adaptada a con quién viajas y qué deseas experimentar.",
     "mediaImage": "https://cdn.pixabay.com/photo/2016/11/19/14/00/beach-1836467_1280.jpg",

@@ -254,7 +254,9 @@ const Home: React.FC = () => {
             <h2 className="mb-4 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
               <FormattedMessage id="features.title" />
             </h2>
-            <p className="text-lg font-bold leading-8 text-white sm:text-xl">Thoughtful service from arrival to return with Francisco Ferreras</p>
+            <p className="text-lg font-bold leading-8 text-white sm:text-xl">
+              Thoughtful service from arrival to return with {brandSettings.brandName}
+            </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3 lg:gap-8">

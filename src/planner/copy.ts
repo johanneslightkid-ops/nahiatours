@@ -289,7 +289,7 @@ const en = {
     all_rounder: { emoji: '🌴', title: 'The All-Rounders', blurb: 'A bit of everything the coast does best, balanced across the day.' },
   },
   whatsapp: {
-    intro: 'Hi Francisco! I built a day plan on ferreras.tours 🌴',
+    intro: (brand: string) => `Hi! I built a day plan on ${brand} 🌴`,
     profile: 'My group',
     plan: 'The plan',
     total: 'Estimated total',
@@ -586,7 +586,7 @@ const es: CopyShape = {
     all_rounder: { emoji: '🌴', title: 'Los Todoterreno', blurb: 'Un poco de todo lo mejor de la costa, bien repartido.' },
   },
   whatsapp: {
-    intro: '¡Hola Francisco! Armé un plan de día en ferreras.tours 🌴',
+    intro: (brand: string) => `¡Hola! Armé un plan de día en ${brand} 🌴`,
     profile: 'Mi grupo',
     plan: 'El plan',
     total: 'Total estimado',

@@ -42,8 +42,11 @@ export const PlanResult: React.FC = () => {
 
   const whatsappUrl = useMemo(() => {
     if (!plan) return '';
-    return generateWhatsAppMessage(brandSettings.phoneNumber, buildPlanMessage(plan, profile, copy));
-  }, [plan, profile, copy, brandSettings.phoneNumber]);
+    return generateWhatsAppMessage(
+      brandSettings.phoneNumber,
+      buildPlanMessage(plan, profile, copy, brandSettings.brandName)
+    );
+  }, [plan, profile, copy, brandSettings.phoneNumber, brandSettings.brandName]);
 
   if (loading || !plan) {
     return (

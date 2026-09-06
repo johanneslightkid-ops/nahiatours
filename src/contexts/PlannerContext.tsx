@@ -52,7 +52,9 @@ interface PlannerContextValue {
   hasProgress: boolean;
 }
 
-const STORAGE_KEY = 'ferreras_planner_v2';
+const STORAGE_KEY = 'tours_planner_v2';
+/** Previous key, read once so an in-progress plan survives the rename. */
+const LEGACY_STORAGE_KEY = 'ferreras_planner_v2';
 
 const PlannerContext = createContext<PlannerContextValue | undefined>(undefined);
 
@@ -66,7 +68,8 @@ interface PersistedState {
 
 const readPersisted = (): Partial<PersistedState> => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw =
+      localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as Partial<PersistedState>) : {};
   } catch {
     return {};

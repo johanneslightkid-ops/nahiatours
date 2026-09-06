@@ -681,10 +681,12 @@ const buildTransportPlan = (
 export const buildPlanMessage = (
   plan: DayPlan,
   profile: TravelProfile,
-  copy: PlannerCopy
+  copy: PlannerCopy,
+  /** Configured company name, so the message never hardcodes a brand. */
+  brandName: string
 ): string => {
   const lines: string[] = [];
-  lines.push(copy.whatsapp.intro);
+  lines.push(copy.whatsapp.intro(brandName));
   lines.push('');
   lines.push(`*${copy.whatsapp.profile}:* ${plan.persona.title}`);
   lines.push(

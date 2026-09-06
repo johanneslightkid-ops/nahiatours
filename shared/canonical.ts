@@ -1,17 +1,25 @@
 /**
  * Canonical-host policy, shared by both deployment shapes.
  *
- * The site used to bounce every non-canonical hostname to ferreras.tours with
- * a 301. That is right for a stray custom domain, but it also meant a preview
- * deployment redirected away from itself the moment you opened it — you could
- * never look at what you had just deployed.
+ * The host is configuration, not a constant: set CANONICAL_HOST on the Worker
+ * to the domain the site should be indexed under, and every other hostname
+ * 301s to it. Leave it unset — the default — and no redirect happens at all,
+ * which is what an independent deployment wants.
  *
- * So preview hosts are served normally and marked noindex instead, which keeps
- * the SEO intent (one indexable copy of the site) without making previews
- * useless.
+ * Preview hosts are never redirected. They are served in place and marked
+ * noindex, so a preview deployment can actually be looked at while still
+ * leaving one indexable copy of the site.
  */
 
-export const CANONICAL_HOST = 'ferreras.tours';
+export interface CanonicalEnv {
+  /** Domain to canonicalise to, e.g. "example.com". Unset means no redirect. */
+  CANONICAL_HOST?: string;
+  [key: string]: unknown;
+}
+
+/** Strips scheme, path and trailing slash, so either form works in config. */
+const normalizeHost = (value: string): string =>
+  value.trim().replace(/^https?:\/\//i, '').replace(/\/.*$/, '').replace(/\/$/, '');
 
 const PREVIEW_HOST_SUFFIXES = ['.workers.dev', '.pages.dev'];
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0', '::1']);
@@ -24,11 +32,12 @@ export const isPreviewHost = (hostname: string): boolean =>
  * A 301 to the canonical host, or null when the request should be served where
  * it is (the canonical host itself, or any preview host).
  */
-export const canonicalRedirect = (url: URL): Response | null => {
-  if (url.hostname === CANONICAL_HOST || isPreviewHost(url.hostname)) {
+export const canonicalRedirect = (url: URL, env: CanonicalEnv = {}): Response | null => {
+  const configured = typeof env.CANONICAL_HOST === 'string' ? normalizeHost(env.CANONICAL_HOST) : '';
+  if (!configured || url.hostname === configured || isPreviewHost(url.hostname)) {
     return null;
   }
-  return Response.redirect(`https://${CANONICAL_HOST}${url.pathname}${url.search}`, 301);
+  return Response.redirect(`https://${configured}${url.pathname}${url.search}`, 301);
 };
 
 /** Keep preview deployments out of search results. */

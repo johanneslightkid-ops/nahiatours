@@ -1,5 +1,5 @@
 /**
- * Francisco Ferreras Tours — Web Audio API Synthesizer & Caribbean Sound FX Engine
+ * Web Audio API synthesizer and Caribbean sound FX engine.
  * ==================================================================================
  * Provides zero-latency Web Audio API synthesis for UI interactions,
  * Caribbean ocean micro-sound FX, and interactive sound effects.
@@ -21,15 +21,19 @@ function getContext(): AudioContext | null {
   return ctx;
 }
 
+const AUDIO_FX_STORAGE_KEY = 'tours_audio_fx';
+/** Previous key, read once so an existing preference is not lost. */
+const LEGACY_AUDIO_FX_STORAGE_KEY = 'ferreras_audio_fx';
+
 export function isAudioEnabled(): boolean {
   if (typeof window === 'undefined') return false;
-  const stored = localStorage.getItem('ferreras_audio_fx');
+  const stored = (localStorage.getItem(AUDIO_FX_STORAGE_KEY) ?? localStorage.getItem(LEGACY_AUDIO_FX_STORAGE_KEY));
   return stored !== 'false';
 }
 
 export function setAudioEnabled(enabled: boolean): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem('ferreras_audio_fx', enabled ? 'true' : 'false');
+  localStorage.setItem(AUDIO_FX_STORAGE_KEY, enabled ? 'true' : 'false');
 }
 
 /** UI Micro Sound: Button click pop */

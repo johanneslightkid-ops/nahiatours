@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ferreras.tours/</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/plan</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/plan</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/plan?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/plan?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/plan?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/plan?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/tours</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/tours</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/tours?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/tours?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/tours?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/tours?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/transport</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/transport</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/transport?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/transport?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/transport?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/transport?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/blog</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/blog</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/blog?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/blog?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/blog?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/blog?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/contact</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/contact</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/contact?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/contact?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/contact?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/contact?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/details/tours/1-remote-island-trip-saona</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/details/tours/1-remote-island-trip-saona</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/details/tours/1-remote-island-trip-saona?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/details/tours/1-remote-island-trip-saona?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/details/tours/1-remote-island-trip-saona?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/details/tours/1-remote-island-trip-saona?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/details/tours/2-buggies-adventure</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/details/tours/2-buggies-adventure</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/details/tours/2-buggies-adventure?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/details/tours/2-buggies-adventure?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/details/tours/2-buggies-adventure?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/details/tours/2-buggies-adventure?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/details/tours/3-party-boat-experience</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/details/tours/3-party-boat-experience</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/details/tours/3-party-boat-experience?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/details/tours/3-party-boat-experience?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/details/tours/3-party-boat-experience?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/details/tours/3-party-boat-experience?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/details/transport/1-private-transfer-punta-cana-zone</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/details/transport/1-private-transfer-punta-cana-zone</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/details/transport/1-private-transfer-punta-cana-zone?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/details/transport/1-private-transfer-punta-cana-zone?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/details/transport/1-private-transfer-punta-cana-zone?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/details/transport/1-private-transfer-punta-cana-zone?lang=es"/>
   </url>
   <url>
-    <loc>https://ferreras.tours/details/transport/2-luxury-transfer</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://nahiatours.workers.dev/details/transport/2-luxury-transfer</loc>
+    <lastmod>2026-09-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ferreras.tours/details/transport/2-luxury-transfer?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://ferreras.tours/details/transport/2-luxury-transfer?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nahiatours.workers.dev/details/transport/2-luxury-transfer?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nahiatours.workers.dev/details/transport/2-luxury-transfer?lang=es"/>
   </url>
 </urlset>
