@@ -288,7 +288,7 @@ const Transport: React.FC = () => {
           <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
             <div className="flex-1 space-y-5 md:space-y-6">
               <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
-                <h2 className="mb-4 text-lg font-semibold text-ink-soft">
+                <h2 className="emoji-mono mb-4 font-condensed text-base uppercase tracking-[0.16em] text-ink">
                   📍 <FormattedMessage id="transport.pickupDropoff" defaultMessage="Pickup & Drop-off" />
                 </h2>
                 <div className="space-y-4">
@@ -382,8 +382,8 @@ const Transport: React.FC = () => {
                     onClick={() => setTripType('round-trip')}
                     className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
                       tripType === 'round-trip'
-                        ? 'bg-lagoon text-white'
-                        : 'bg-paper text-ink hover:bg-mango-light'
+                        ? 'bg-mango text-paper'
+                        : 'bg-paper text-ink hover:bg-ink hover:text-paper'
                     }`}
                   >
                     🔄 <FormattedMessage id="transport.roundTrip" defaultMessage="Round Trip" />
@@ -392,8 +392,8 @@ const Transport: React.FC = () => {
                     onClick={() => setTripType('one-way')}
                     className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
                       tripType === 'one-way'
-                        ? 'bg-lagoon text-white'
-                        : 'bg-paper text-ink hover:bg-mango-light'
+                        ? 'bg-mango text-paper'
+                        : 'bg-paper text-ink hover:bg-ink hover:text-paper'
                     }`}
                   >
                     ➡️ <FormattedMessage id="transport.oneWay" defaultMessage="One Way" />
@@ -402,7 +402,7 @@ const Transport: React.FC = () => {
               </div>
 
               <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
-                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
+                <h3 className="emoji-mono mb-4 font-condensed text-base uppercase tracking-[0.16em] text-ink">
                   📅 <FormattedMessage id="transport.dateTime" defaultMessage="Date & Time" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -438,7 +438,7 @@ const Transport: React.FC = () => {
               </div>
 
               <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
-                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
+                <h3 className="emoji-mono mb-4 font-condensed text-base uppercase tracking-[0.16em] text-ink">
                   🚗 <FormattedMessage id="transport.vehicleAndPassengers" defaultMessage="Vehicle & Passengers" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -497,7 +497,7 @@ const Transport: React.FC = () => {
               </div>
 
               <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
-                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
+                <h3 className="emoji-mono mb-4 font-condensed text-base uppercase tracking-[0.16em] text-ink">
                   ⚙️ <FormattedMessage id="transport.extras" defaultMessage="Extras" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -537,7 +537,7 @@ const Transport: React.FC = () => {
               </div>
 
               <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
-                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
+                <h3 className="emoji-mono mb-4 font-condensed text-base uppercase tracking-[0.16em] text-ink">
                   📋 <FormattedMessage id="transport.locationInfo" defaultMessage="Location Details" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -586,7 +586,7 @@ const Transport: React.FC = () => {
             <div className="w-full lg:w-80 xl:w-96">
               <div className="sticky top-24 space-y-5 md:space-y-6">
                 <div className="rounded-2xl border-[2.5px] border-ink bg-white p-5 shadow-ink-sm md:p-6">
-                  <h2 className="mb-4 text-lg font-semibold text-ink-soft">
+                  <h2 className="emoji-mono mb-4 font-condensed text-base uppercase tracking-[0.16em] text-ink">
                     💰 <FormattedMessage id="transport.priceSummary" defaultMessage="Price Summary" />
                   </h2>
 

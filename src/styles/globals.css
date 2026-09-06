@@ -1073,6 +1073,15 @@ select:focus {
    collage that also carries meaning.
    ══════════════════════════════════════════════════════════════════════════ */
 
+/* Emoji are marks, not colour.
+   Copy on this site is ink or bone, so desaturating the element that carries
+   an emoji label costs the text nothing and keeps content the site does not
+   control — story emoji, form labels, admin panels — inside the two-colour
+   rule. Never put this on something whose text is red. */
+.emoji-mono {
+  filter: grayscale(1) contrast(1.25);
+}
+
 /* Solid red slab, for a label that has to be obeyed. */
 .tp-slab {
   display: inline-block;
@@ -1309,6 +1318,10 @@ select:focus {
   transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
+.planner-chip:not([data-selected='true']) {
+  filter: grayscale(1) contrast(1.2);
+}
+
 .planner-chip:hover {
   background: var(--ink);
   color: var(--bone);
@@ -1327,7 +1340,7 @@ select:focus {
   height: 14px;
   width: 100%;
   overflow: hidden;
-  border: var(--stroke-thin) solid var(--bone);
+  border: var(--stroke-thin) solid var(--ink);
   background: transparent;
 }
 
