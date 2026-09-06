@@ -462,13 +462,17 @@ a:hover {
   background-repeat: no-repeat, no-repeat, repeat;
 }
 
-/* A band ripped only along one edge keeps its other margin clean. */
+/* A band ripped along one edge only has to park the other margin somewhere
+   off the element. It has to be parked with a *length*: a percentage offset is
+   resolved against (container − image), and these stripes are 100% wide, so
+   any percentage — including -200% — collapses to 0 and prints the stripe at
+   the top edge instead of hiding it. */
 .wavy-band-top {
-  background-position: top center, -200% 0, 0 0;
+  background-position: top center, 0 -9999px, 0 0;
 }
 
 .wavy-band-bottom {
-  background-position: -200% 0, bottom center, 0 0;
+  background-position: 0 -9999px, bottom center, 0 0;
 }
 
 .wavy-band {
