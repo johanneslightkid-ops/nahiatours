@@ -2,17 +2,17 @@ import React from 'react';
 import { SunBurst, Cloud, PalmFrond, Birds } from './Illustrations';
 
 /**
- * The drawn scene behind the whole site.
+ * The place the whole site stands in.
  *
- * This replaces the WebGL ocean shader that used to sit here. That shader
- * simulated real water — exactly the photographic register this redesign moves
- * away from — and cost a GL context on every page. What is left is a flat
- * painted sky: a gradient, a sun, drifting paper clouds, a sea drawn as three
- * stacked crests, and palm fronds leaning in from the edges. All of it is CSS
- * and inline SVG, so it costs nothing to run and scales to any viewport.
+ * This is the over-under, held still behind every page: sky and haze at the
+ * top, a horizon, then shallow water running down to the foot of the
+ * viewport with light moving across it. Content bands are opaque, so the
+ * scene reads through the hero, through the gaps the waterlines leave
+ * between sections, and down the page margins.
  *
- * Content sections above are opaque, so the scene reads through the hero, the
- * wave-shaped gaps between bands, and the page margins.
+ * Everything is CSS and inline SVG — no images, no canvas, no GL context.
+ * The one moving part is the caustic layer, which is two repeating gradients
+ * sliding against each other, so it costs a composite and nothing else.
  */
 const IllustratedBackdrop: React.FC = () => (
   <div
@@ -20,84 +20,91 @@ const IllustratedBackdrop: React.FC = () => (
     style={{ zIndex: -1 }}
     aria-hidden="true"
   >
-    {/* Sky */}
+    {/* Sky: zenith blue, dropping to haze, then to the glare that sits on
+        every horizon over water. */}
     <div
       className="absolute inset-0"
       style={{
         background:
-          'linear-gradient(180deg, #A5E4FF 0%, #C9EFFF 28%, #EAF8FF 52%, #FFF6E5 74%, #FFF6E5 100%)',
+          'linear-gradient(180deg, #7FD3F7 0%, #A5DFF9 22%, #D6F1FF 44%, #F2FBFF 56%, #FFFBF5 64%, #FFFBF5 100%)',
       }}
     />
 
-    {/* Sun, high on the right. The rays turn once every 40s. */}
-    <SunBurst spin className="absolute -right-16 -top-16 h-72 w-72 sm:h-96 sm:w-96" />
-
-    {/* Clouds. Each drifts the full width on its own clock, so they never
-        line up into a repeating pattern. */}
-    <Cloud
-      className="absolute h-16 w-28 opacity-95 sm:h-20 sm:w-36"
-      style={{ top: '12%', animation: 'cloudDrift 90s linear infinite' }}
-    />
-    <Cloud
-      className="absolute h-10 w-20 opacity-80 sm:h-14 sm:w-24"
-      style={{ top: '26%', animation: 'cloudDrift 140s linear infinite', animationDelay: '-40s' }}
-    />
-    <Cloud
-      className="absolute h-12 w-24 opacity-70 sm:h-16 sm:w-28"
-      style={{ top: '5%', animation: 'cloudDrift 190s linear infinite', animationDelay: '-120s' }}
+    {/* The sun, high and to the right, turning once every 90 seconds. */}
+    <SunBurst
+      spin
+      className="absolute -right-[16vw] -top-[22vw] h-[62vw] w-[62vw] opacity-70 sm:-right-[8vw] sm:-top-[16vw] sm:h-[46vw] sm:w-[46vw]"
     />
 
-    <Birds
-      className="absolute left-[18%] top-[18%] h-8 w-24 opacity-40"
-      style={{ animation: 'cloudDrift 240s linear infinite' }}
-    />
-
-    {/* Sea: three drawn crests stacked at the foot of the viewport. */}
-    <svg
-      className="absolute inset-x-0 bottom-0 h-[38vh] w-full"
-      viewBox="0 0 1200 380"
-      preserveAspectRatio="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M0 92 C150 56 300 124 450 96 C600 68 750 126 900 100 C1020 79 1110 88 1200 78 L1200 380 L0 380 Z"
-        fill="#A5E4FF"
-      />
-      <path
-        d="M0 150 C150 116 300 182 450 154 C600 126 750 184 900 158 C1020 137 1110 146 1200 136 L1200 380 L0 380 Z"
-        fill="#7FE3DA"
-      />
-      <path
-        d="M0 212 C150 180 300 244 450 216 C600 188 750 246 900 220 C1020 199 1110 208 1200 198 L1200 380 L0 380 Z"
-        fill="#21C0B7"
-      />
-      {/* Foam ticks: the shorthand for moving water in a flat drawing. */}
-      <g stroke="#FFFDF7" strokeWidth={5} strokeLinecap="round" opacity={0.75}>
-        <path d="M120 250 L190 250" />
-        <path d="M330 286 L392 286" />
-        <path d="M620 262 L690 262" />
-        <path d="M880 300 L946 300" />
-        <path d="M1040 258 L1096 258" />
-      </g>
-    </svg>
-
-    {/* Fronds leaning in from the bottom corners. The static lean lives on the
-        wrapper so the sway animation on the frond itself is free to own
-        `transform` outright. */}
+    {/* Trade-wind cloud, crossing on its own clock. */}
     <div
-      className="absolute -left-28 bottom-[-16%] h-72 w-72 sm:h-96 sm:w-96"
-      style={{ transform: 'rotate(28deg)' }}
+      className="absolute"
+      style={{ top: '9%', animation: 'cloudDrift 150s linear infinite' }}
     >
-      <PalmFrond color="jungleLight" className="animate-frond h-full w-full opacity-70" />
+      <Cloud className="h-16 w-28 opacity-80 sm:h-20 sm:w-36" />
     </div>
     <div
-      className="absolute -right-32 bottom-[-18%] h-72 w-72 sm:h-[26rem] sm:w-[26rem]"
-      style={{ transform: 'rotate(-34deg) scaleX(-1)' }}
+      className="absolute"
+      style={{ top: '22%', animation: 'cloudDrift 220s linear infinite', animationDelay: '-80s' }}
+    >
+      <Cloud className="h-11 w-20 opacity-60 sm:h-14 sm:w-24" />
+    </div>
+
+    <Birds
+      className="absolute left-[18%] top-[16%] h-8 w-28 opacity-45"
+      style={{ animation: 'cloudDrift 300s linear infinite' }}
+    />
+
+    {/* The sea. Three bands of depth — shallow over sand, then the drop-off,
+        then deep water — with a hard bright line where it meets the sky. */}
+    <div className="absolute inset-x-0 bottom-0 h-[32vh]">
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(180deg, #BFEFEA 0%, #6FD9DC 26%, #21B4C4 58%, #0A7C93 100%)',
+        }}
+      />
+
+      {/* Light on the surface. This is the signature — Hockney's white
+          squiggle, built from two gradients drifting at different rates. */}
+      <span className="caustics" />
+
+      {/* Glare sitting on the water directly under the sun. */}
+      <div
+        className="absolute -top-6 right-[6%] h-40 w-[52vw] opacity-70"
+        style={{
+          background:
+            'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.35) 32%, transparent 68%)',
+        }}
+      />
+
+      {/* Foam along the horizon: unpainted white, the brightest thing here. */}
+      <div
+        className="absolute inset-x-0 top-0 h-1.5"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)',
+        }}
+      />
+    </div>
+
+    {/* Palms leaning in from the corners. The lean lives on the wrapper so
+        the wind animation on the frond itself owns `transform` outright. */}
+    <div
+      className="absolute -left-24 bottom-[-12%] h-80 w-80 sm:h-[26rem] sm:w-[26rem]"
+      style={{ transform: 'rotate(24deg)' }}
+    >
+      <PalmFrond color="dark" className="animate-frond h-full w-full opacity-25" />
+    </div>
+    <div
+      className="absolute -right-28 bottom-[-16%] hidden h-80 w-80 lg:block"
+      style={{ transform: 'rotate(-30deg) scaleX(-1)' }}
     >
       <PalmFrond
-        color="jungle"
-        className="animate-frond h-full w-full opacity-70"
-        style={{ animationDelay: '-3s' }}
+        color="palm"
+        className="animate-frond h-full w-full opacity-20"
+        style={{ animationDelay: '-4s' }}
       />
     </div>
   </div>

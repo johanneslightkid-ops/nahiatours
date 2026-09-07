@@ -193,7 +193,7 @@ const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
             setTimeout(() => setShowSuggestions(false), 200);
           }}
           placeholder={placeholder}
-          className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
+          className="w-full rounded-2xl ring-1 ring-ink/10 bg-white px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
         />
         {inputValue && (
           <button
@@ -215,7 +215,7 @@ const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
       )}
 
       {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-2xl border-2 border-ink bg-white shadow-ink-sm">
+        <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-2xl ring-1 ring-ink/10 bg-white shadow-md">
           {suggestions.map((s) => (
             <li
               key={s.placeId}

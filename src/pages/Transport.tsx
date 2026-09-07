@@ -287,7 +287,7 @@ const Transport: React.FC = () => {
         ) : (
           <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
             <div className="flex-1 space-y-5 md:space-y-6">
-              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+              <div className="rounded-2xl ring-1 ring-ink/10 bg-white p-4 shadow-md md:p-6">
                 <h2 className="mb-4 text-lg font-semibold text-ink-soft">
                   📍 <FormattedMessage id="transport.pickupDropoff" defaultMessage="Pickup & Drop-off" />
                 </h2>
@@ -373,14 +373,14 @@ const Transport: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+              <div className="rounded-2xl ring-1 ring-ink/10 bg-white p-4 shadow-md md:p-6">
                 <label className="mb-3 block text-sm font-semibold text-ink-soft">
                   <FormattedMessage id="transport.tripType" defaultMessage="Trip Type" />
                 </label>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setTripType('round-trip')}
-                    className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
+                    className={`flex-1 rounded-2xl ring-1 ring-ink/10 px-4 py-4 text-center text-base font-extrabold shadow-md transition ${
                       tripType === 'round-trip'
                         ? 'bg-lagoon text-white'
                         : 'bg-paper text-ink hover:bg-mango-light'
@@ -390,7 +390,7 @@ const Transport: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setTripType('one-way')}
-                    className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
+                    className={`flex-1 rounded-2xl ring-1 ring-ink/10 px-4 py-4 text-center text-base font-extrabold shadow-md transition ${
                       tripType === 'one-way'
                         ? 'bg-lagoon text-white'
                         : 'bg-paper text-ink hover:bg-mango-light'
@@ -401,7 +401,7 @@ const Transport: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+              <div className="rounded-2xl ring-1 ring-ink/10 bg-white p-4 shadow-md md:p-6">
                 <h3 className="mb-4 text-lg font-semibold text-ink-soft">
                   📅 <FormattedMessage id="transport.dateTime" defaultMessage="Date & Time" />
                 </h3>
@@ -437,7 +437,7 @@ const Transport: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+              <div className="rounded-2xl ring-1 ring-ink/10 bg-white p-4 shadow-md md:p-6">
                 <h3 className="mb-4 text-lg font-semibold text-ink-soft">
                   🚗 <FormattedMessage id="transport.vehicleAndPassengers" defaultMessage="Vehicle & Passengers" />
                 </h3>
@@ -449,7 +449,7 @@ const Transport: React.FC = () => {
                     <select
                       value={form.vehicleKey}
                       onChange={(e) => setForm((prev) => ({ ...prev, vehicleKey: e.target.value }))}
-                      className="w-full appearance-none rounded-2xl border-2 border-ink bg-white px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
+                      className="w-full appearance-none rounded-2xl ring-1 ring-ink/10 bg-white px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     >
                       {config.vehicleTypes.map((vt) => (
                         <option key={vt.key} value={vt.key}>
@@ -496,17 +496,17 @@ const Transport: React.FC = () => {
                 )}
               </div>
 
-              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+              <div className="rounded-2xl ring-1 ring-ink/10 bg-white p-4 shadow-md md:p-6">
                 <h3 className="mb-4 text-lg font-semibold text-ink-soft">
                   ⚙️ <FormattedMessage id="transport.extras" defaultMessage="Extras" />
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="flex items-center gap-3 rounded-xl border border-ink/20 p-4 transition has-[:checked]:border-ink has-[:checked]:bg-lagoon-light active:scale-[0.98]">
+                  <label className="flex items-center gap-3 rounded-xl border border-ink/20 p-4 transition has-[:checked]:border-lagoon has-[:checked]:bg-lagoon-light/60 active:scale-[0.98]">
                     <input
                       type="checkbox"
                       checked={form.nightTransfer}
                       onChange={(e) => setForm((prev) => ({ ...prev, nightTransfer: e.target.checked }))}
-                      className="h-5 w-5 rounded border-2 border-ink text-lagoon-dark"
+                      className="h-5 w-5 rounded ring-1 ring-ink/10 text-lagoon-dark"
                     />
                     <span className="text-sm text-ink-soft">
                       🌙 <FormattedMessage id="transport.nightTransfer" defaultMessage="Night Transfer" />
@@ -536,7 +536,7 @@ const Transport: React.FC = () => {
                 )}
               </div>
 
-              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+              <div className="rounded-2xl ring-1 ring-ink/10 bg-white p-4 shadow-md md:p-6">
                 <h3 className="mb-4 text-lg font-semibold text-ink-soft">
                   📋 <FormattedMessage id="transport.locationInfo" defaultMessage="Location Details" />
                 </h3>
@@ -585,7 +585,7 @@ const Transport: React.FC = () => {
 
             <div className="w-full lg:w-80 xl:w-96">
               <div className="sticky top-24 space-y-5 md:space-y-6">
-                <div className="rounded-2xl border-[2.5px] border-ink bg-white p-5 shadow-ink-sm md:p-6">
+                <div className="rounded-2xl ring-1 ring-ink/10 bg-white p-5 shadow-md md:p-6">
                   <h2 className="mb-4 text-lg font-semibold text-ink-soft">
                     💰 <FormattedMessage id="transport.priceSummary" defaultMessage="Price Summary" />
                   </h2>
@@ -695,7 +695,7 @@ const Transport: React.FC = () => {
                   <button
                     onClick={handleBookNow}
                     disabled={!priceResult || !!priceError}
-                    className={`w-full rounded-2xl px-6 py-4 text-center text-base font-bold text-white shadow-ink-sm transition active:scale-[0.97] ${
+                    className={`w-full rounded-2xl px-6 py-4 text-center text-base font-bold text-white shadow-md transition active:scale-[0.97] ${
                       priceResult && !priceError
                         ? 'bg-lagoon hover:bg-lagoon-light hover:text-ink'
                         : 'cursor-not-allowed bg-ink/20'
@@ -707,7 +707,7 @@ const Transport: React.FC = () => {
                   {priceResult && !priceError && brandSettings.paypalMeLink && (
                     <button
                       onClick={handlePayWithPayPal}
-                      className="w-full rounded-2xl bg-[#0070ba] px-6 py-4 text-center text-base font-bold text-white shadow-ink-sm transition hover:bg-[#003087] active:scale-[0.97]"
+                      className="w-full rounded-2xl bg-[#0070ba] px-6 py-4 text-center text-base font-bold text-white shadow-md transition hover:bg-[#003087] active:scale-[0.97]"
                     >
                       💳 <FormattedMessage id="payment.paypal" defaultMessage="Pay with PayPal" />
                     </button>
@@ -715,7 +715,7 @@ const Transport: React.FC = () => {
 
                   <button
                     onClick={handleChatOnWhatsApp}
-                    className="w-full rounded-2xl border-2 border-ink bg-white px-6 py-4 text-center text-base font-semibold text-lagoon-dark transition hover:bg-lagoon-light active:scale-[0.97]"
+                    className="w-full rounded-2xl ring-1 ring-ink/10 bg-white px-6 py-4 text-center text-base font-semibold text-lagoon-dark transition hover:bg-lagoon-light active:scale-[0.97]"
                   >
                     💬 <FormattedMessage id="transport.chatOnWhatsApp" defaultMessage="Chat / Question" />
                   </button>

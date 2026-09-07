@@ -95,19 +95,18 @@ const TourCard: React.FC<TourCardProps> = ({
     }
   };
 
-  const radiusClass = index % 3 === 0
-    ? 'rounded-[30px_18px_28px_22px]'
-    : index % 3 === 1
-    ? 'rounded-[20px_30px_20px_28px]'
-    : 'rounded-[26px_22px_30px_18px]';
+  // Principle 5: the closer a surface gets to taking money, the calmer it
+  // is. A booking card is the calmest thing on the site — white, soft-edged,
+  // hairline-ruled, with the one warm colour spent on the button.
+  const radiusClass = 'rounded-3xl';
 
   return (
     <article
       onMouseEnter={() => playHoverFx()}
-      className={`group mb-8 inline-block flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
+      className={`group mb-8 inline-block flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} booking-card ${swayClass}`}
     >
       {/* Media Frame */}
-      <div className="relative aspect-[16/10] overflow-hidden border-b-[2.5px] border-ink">
+      <div className="relative aspect-[16/10] overflow-hidden">
         <Link to={detailsPath} onClick={() => playClickFx()} className="block h-full w-full" aria-label={title}>
           <img
             src={image}
@@ -115,9 +114,11 @@ const TourCard: React.FC<TourCardProps> = ({
             className="photo-pop h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         </Link>
-        <div className="artsy-brick-badge absolute left-4 top-4">
-          <span>★ Excursion</span>
-        </div>
+        {/* A soft scrim so the badge reads over any photograph. */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/25 via-transparent to-transparent" />
+        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/92 px-3 py-1.5 text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-lagoon-dark shadow-sm backdrop-blur">
+          <span className="text-sunset">★</span> Excursion
+        </span>
       </div>
 
       {/* Content */}
@@ -136,7 +137,7 @@ const TourCard: React.FC<TourCardProps> = ({
               <Link
                 to={detailsPath}
                 onClick={() => playClickFx()}
-                className="shrink-0 text-xs font-extrabold uppercase tracking-wider text-lagoon-dark underline decoration-mango decoration-2 underline-offset-4 transition hover:text-mango-dark"
+                className="shrink-0 text-xs font-extrabold uppercase tracking-wider text-lagoon-dark underline decoration-lagoon/50 decoration-2 underline-offset-4 transition hover:text-mango-dark hover:decoration-mango"
               >
                 <FormattedMessage id="details.view" defaultMessage="View Details" />
               </Link>
@@ -152,7 +153,7 @@ const TourCard: React.FC<TourCardProps> = ({
               {resolvedPricingOptions.map((option) => (
                 <span
                   key={`${title}-${option.tier}`}
-                  className="inline-flex items-center rounded-full border-2 border-ink bg-lagoon-light px-3.5 py-1 text-xs font-extrabold text-ink"
+                  className="inline-flex items-center rounded-full bg-lagoon-light/60 px-3.5 py-1.5 text-xs font-bold text-lagoon-dark"
                 >
                   {option.tier}: <strong className="ml-1 text-ink">{option.price}</strong>
                 </span>
@@ -162,10 +163,10 @@ const TourCard: React.FC<TourCardProps> = ({
         </div>
 
         {enabled && (
-          <div className="mt-6 space-y-4 border-t-2 border-dashed border-ink/25 pt-6">
+          <div className="mt-6 space-y-4 border-t border-ink/10 pt-6">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {resolvedPricingOptions.map((option) => (
-                <label key={option.tier} className="space-y-1.5 rounded-2xl border-2 border-ink bg-paper p-3 text-left">
+                <label key={option.tier} className="space-y-1.5 rounded-2xl bg-paper-warm/70 p-3 text-left ring-1 ring-ink/10">
                   <span className="block text-xs font-extrabold uppercase tracking-wider text-ink-soft">
                     {option.tier}
                   </span>
@@ -174,7 +175,7 @@ const TourCard: React.FC<TourCardProps> = ({
                     min="0"
                     value={quantities[option.tier] ?? 0}
                     onChange={(event) => handleQuantityChange(option.tier, event.target.value)}
-                    className="w-full rounded-xl border-2 border-ink bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none transition focus:bg-lagoon-light"
+                    className="w-full rounded-xl bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none ring-1 ring-ink/10 transition focus:ring-2 focus:ring-lagoon"
                   />
                 </label>
               ))}
@@ -188,12 +189,12 @@ const TourCard: React.FC<TourCardProps> = ({
                 type="date"
                 value={selectedDate}
                 onChange={(event) => setSelectedDate(event.target.value)}
-                className="w-full rounded-xl border-2 border-ink bg-white px-4 py-2.5 text-sm font-bold text-ink outline-none transition focus:bg-lagoon-light"
+                className="w-full rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-ink outline-none ring-1 ring-ink/10 transition focus:ring-2 focus:ring-lagoon"
               />
             </label>
 
-            <div className="flex items-center justify-between rounded-2xl border-[2.5px] border-ink bg-mango px-5 py-3 shadow-ink-sm">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-ink">
+            <div className="flex items-center justify-between rounded-2xl bg-gradient-to-r from-lagoon-light/55 to-sky-light/70 px-5 py-3.5 ring-1 ring-lagoon/25">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-lagoon-dark">
                 <FormattedMessage id="payment.total" defaultMessage="Total Estimate" />
               </span>
               <span className="font-display text-xl font-extrabold text-ink">

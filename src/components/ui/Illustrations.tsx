@@ -1,30 +1,52 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 /**
- * Flat-vector illustration set.
+ * Caribbean daylight scenery.
  *
- * Every drawing here follows the same rules as the rest of the design system:
- * flat fills from the poster palette, one ink outline weight, no gradients and
- * no photographic detail. They are decorative, so each is `aria-hidden` and
- * inherits sizing from the caller's className.
+ * These were flat poster shapes. They are now lit: every form is modelled
+ * with gradients — a light side, a shadow side, and a bounce where the sea
+ * throws light back up underneath. The result reads as photography reduced to
+ * its essentials rather than as illustration, which is the register the rest
+ * of the design works in.
+ *
+ * Two rules carry over from the research and apply to every drawing here:
+ *
+ *   • White is the light. Highlights are pure white, never a pale tint —
+ *     sun on a wave crest, glare on a leaf, foam.
+ *   • Warm light, cool shadow. Sunlit faces run towards gold, shadowed ones
+ *     towards the sea. That single relationship is what makes flat vector
+ *     shapes read as though they are actually outdoors.
+ *
+ * Gradients need document-unique ids, so each component takes one from
+ * `useId()`. Sharing a static id across instances renders correctly today but
+ * is invalid markup and breaks the moment two instances want to differ.
+ *
+ * Everything is decorative: each drawing is `aria-hidden` and takes its size
+ * from the caller's className.
  */
 
-export const INK = '#1E2A3A';
+export const INK = '#0E2E3B';
 
 const PALETTE = {
-  mango: '#FFA62B',
-  mangoLight: '#FFC861',
-  hibiscus: '#FF5D73',
-  hibiscusLight: '#FF9AA8',
-  lagoon: '#21C0B7',
-  lagoonLight: '#7FE3DA',
-  sky: '#4CC3F0',
-  skyLight: '#A5E4FF',
-  jungle: '#2FA84F',
-  jungleLight: '#7BD389',
-  sunset: '#FF7A45',
-  paper: '#FFF6E5',
-  cream: '#FFFDF7',
+  ink: INK,
+  inkSoft: '#3D5A66',
+  lagoonLight: '#9CEDE6',
+  lagoon: '#14B8C4',
+  lagoonDark: '#0A7C93',
+  abyss: '#08415C',
+  skyLight: '#D6F1FF',
+  sky: '#5EC5F5',
+  skyDark: '#2A7FB8',
+  sand: '#FFF3E4',
+  sandDeep: '#FBE6CB',
+  coral: '#FF6B45',
+  coralLight: '#FF9B76',
+  gold: '#FFB703',
+  goldLight: '#FFD68C',
+  palm: '#2FA36B',
+  palmLight: '#93DCA9',
+  palmDark: '#186B48',
+  white: '#FFFFFF',
 };
 
 export interface IllustrationProps {
@@ -35,275 +57,419 @@ export interface IllustrationProps {
 const svgProps = {
   xmlns: 'http://www.w3.org/2000/svg',
   fill: 'none',
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
   'aria-hidden': true,
   focusable: false as const,
 };
 
-/* ── Sun ─────────────────────────────────────────────────────────────────
-   Twelve tapered rays around a flat disc. The rays sit in their own group so
-   a caller can spin them slowly without moving the disc. */
+/* ── The sun ──────────────────────────────────────────────────────────────
+   A disc of pure white at the core, blooming out through gold. The rays are
+   soft wedges rather than spikes, because real glare has no edge. */
 export const SunBurst: React.FC<IllustrationProps & { spin?: boolean }> = ({
   className = '',
   style,
   spin = false,
-}) => (
-  <svg viewBox="0 0 120 120" className={className} style={style} {...svgProps}>
-    <g
-      className={spin ? 'animate-spin-slow' : undefined}
-      style={{ transformOrigin: '60px 60px' }}
-    >
-      {Array.from({ length: 12 }).map((_, i) => (
-        <path
-          key={i}
-          d="M60 6 L66 26 L54 26 Z"
-          fill={PALETTE.mangoLight}
-          stroke={INK}
-          strokeWidth={3}
-          transform={`rotate(${i * 30} 60 60)`}
-        />
-      ))}
-    </g>
-    <circle cx="60" cy="60" r="30" fill={PALETTE.mango} stroke={INK} strokeWidth={3.5} />
-    <path
-      d="M46 52 C50 44 58 44 62 50"
-      stroke={PALETTE.cream}
-      strokeWidth={3}
-      opacity={0.7}
-    />
-  </svg>
-);
-
-/* ── Cloud ───────────────────────────────────────────────────────────── */
-export const Cloud: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 120 70" className={className} style={style} {...svgProps}>
-    <path
-      d="M24 62 C10 62 4 48 14 40 C8 26 24 14 36 22 C42 6 66 4 72 20 C88 12 104 26 98 40 C112 44 110 62 94 62 Z"
-      fill={PALETTE.cream}
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-  </svg>
-);
-
-/* ── Palm frond ──────────────────────────────────────────────────────────
-   A stem with leaflets stepped down both sides — the workhorse decoration
-   for section corners. */
-export const PalmFrond: React.FC<IllustrationProps & { color?: keyof typeof PALETTE }> = ({
-  className = '',
-  style,
-  color = 'jungle',
 }) => {
-  const leaflets = Array.from({ length: 7 }).map((_, i) => {
-    const y = 16 + i * 11;
-    const spread = 34 - i * 2.5;
-    return (
-      <g key={i}>
-        <path
-          d={`M50 ${y} C ${50 - spread * 0.6} ${y - 7} ${50 - spread} ${y + 1} ${50 - spread - 8} ${y + 13} C ${50 - spread * 0.7} ${y + 11} ${50 - spread * 0.25} ${y + 7} 50 ${y}`}
-          fill={PALETTE[color]}
-          stroke={INK}
-          strokeWidth={2.5}
-        />
-        <path
-          d={`M50 ${y} C ${50 + spread * 0.6} ${y - 7} ${50 + spread} ${y + 1} ${50 + spread + 8} ${y + 13} C ${50 + spread * 0.7} ${y + 11} ${50 + spread * 0.25} ${y + 7} 50 ${y}`}
-          fill={PALETTE[color]}
-          stroke={INK}
-          strokeWidth={2.5}
-        />
-      </g>
-    );
-  });
-
+  const id = useId();
   return (
-    <svg viewBox="0 0 100 110" className={className} style={style} {...svgProps}>
-      {leaflets}
-      <path d="M50 8 C48 40 49 74 50 104" stroke={INK} strokeWidth={4} />
+    <svg viewBox="0 0 240 240" className={className} style={style} {...svgProps}>
+      <defs>
+        <radialGradient id={`${id}-core`}>
+          <stop offset="0%" stopColor={PALETTE.white} />
+          <stop offset="45%" stopColor="#FFF0C9" />
+          <stop offset="100%" stopColor={PALETTE.gold} />
+        </radialGradient>
+        <radialGradient id={`${id}-bloom`}>
+          <stop offset="0%" stopColor={PALETTE.white} stopOpacity="0.9" />
+          <stop offset="38%" stopColor={PALETTE.goldLight} stopOpacity="0.42" />
+          <stop offset="70%" stopColor={PALETTE.gold} stopOpacity="0.12" />
+          <stop offset="100%" stopColor={PALETTE.gold} stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* Bloom first — the haze the disc sits inside. */}
+      <circle cx="120" cy="120" r="118" fill={`url(#${id}-bloom)`} />
+
+      {/* Soft rays, turning slowly if asked. */}
+      <g
+        className={spin ? 'animate-spin-slow' : undefined}
+        style={{ transformOrigin: '120px 120px' }}
+        opacity="0.5"
+      >
+        {Array.from({ length: 16 }).map((_, i) => (
+          <path
+            key={i}
+            d="M120 120 L112 8 L128 8 Z"
+            fill={`url(#${id}-bloom)`}
+            transform={`rotate(${i * 22.5} 120 120)`}
+          />
+        ))}
+      </g>
+
+      <circle cx="120" cy="120" r="46" fill={`url(#${id}-core)`} />
+      <circle cx="120" cy="120" r="46" fill={PALETTE.white} opacity="0.35" />
     </svg>
   );
 };
 
-/* ── Palm tree ───────────────────────────────────────────────────────── */
-export const PalmTree: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 120 160" className={className} style={style} {...svgProps}>
-    <path
-      d="M58 156 C56 120 54 90 44 58 L62 54 C68 88 68 122 70 156 Z"
-      fill="#A9713F"
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-    {[0, 1, 2, 3, 4].map((i) => (
+/* ── Cloud ────────────────────────────────────────────────────────────────
+   Trade-wind cumulus: bright top where the sun hits, cool underside where
+   the sea bounces light back into it. */
+export const Cloud: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 200 110" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-body`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={PALETTE.white} />
+          <stop offset="58%" stopColor="#FAFDFF" />
+          <stop offset="100%" stopColor="#D5E8F2" />
+        </linearGradient>
+      </defs>
       <path
-        key={i}
-        d="M54 54 C34 40 18 42 6 54 C22 52 36 56 54 54 Z"
-        fill={i % 2 === 0 ? PALETTE.jungle : PALETTE.jungleLight}
-        stroke={INK}
-        strokeWidth={3}
-        transform={`rotate(${-72 + i * 36} 54 54)`}
+        d="M42 96 C18 96 6 74 22 60 C10 38 34 16 54 28 C64 4 106 0 118 24 C142 10 172 28 164 52 C190 56 192 92 162 96 Z"
+        fill={`url(#${id}-body)`}
       />
-    ))}
-    <circle cx="54" cy="54" r="7" fill={PALETTE.mango} stroke={INK} strokeWidth={3} />
-  </svg>
-);
-
-/* ── Toucan ──────────────────────────────────────────────────────────── */
-export const Toucan: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 130 110" className={className} style={style} {...svgProps}>
-    <path
-      d="M96 96 C74 104 48 96 42 74 C36 52 50 32 70 30 C92 28 104 46 102 66 C101 78 100 88 96 96 Z"
-      fill="#2B3B4E"
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-    <path
-      d="M62 44 C50 52 48 70 58 82 C66 92 80 92 88 86 C74 80 66 62 62 44 Z"
-      fill={PALETTE.paper}
-      stroke={INK}
-      strokeWidth={3}
-    />
-    <path
-      d="M56 40 C36 34 14 40 8 52 C18 62 40 64 58 56 Z"
-      fill={PALETTE.mango}
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-    <path d="M22 44 C30 46 44 48 56 48" stroke={INK} strokeWidth={2.5} />
-    <path
-      d="M100 62 C114 60 124 70 120 82 C112 78 104 72 100 62 Z"
-      fill={PALETTE.hibiscus}
-      stroke={INK}
-      strokeWidth={3}
-    />
-    <circle cx="72" cy="44" r="6" fill={PALETTE.cream} stroke={INK} strokeWidth={2.5} />
-    <circle cx="72" cy="44" r="2.4" fill={INK} />
-  </svg>
-);
-
-/* ── Hibiscus ────────────────────────────────────────────────────────── */
-export const Hibiscus: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 100 100" className={className} style={style} {...svgProps}>
-    {[0, 1, 2, 3, 4].map((i) => (
-      <ellipse
-        key={i}
-        cx="50"
-        cy="27"
-        rx="17"
-        ry="22"
-        fill={i % 2 === 0 ? PALETTE.hibiscus : PALETTE.hibiscusLight}
-        stroke={INK}
-        strokeWidth={3}
-        transform={`rotate(${i * 72} 50 50)`}
+      {/* The lit crown, in unpainted white. */}
+      <path
+        d="M60 30 C70 12 100 8 112 26 C96 20 74 22 60 30 Z"
+        fill={PALETTE.white}
+        opacity="0.95"
       />
-    ))}
-    <circle cx="50" cy="50" r="10" fill={PALETTE.mangoLight} stroke={INK} strokeWidth={3} />
-    <path d="M50 50 L64 34" stroke={INK} strokeWidth={3} />
-    <circle cx="66" cy="32" r="4" fill={PALETTE.mango} stroke={INK} strokeWidth={2.5} />
-  </svg>
-);
+    </svg>
+  );
+};
 
-/* ── Pineapple ───────────────────────────────────────────────────────── */
-export const Pineapple: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 90 130" className={className} style={style} {...svgProps}>
-    <path
-      d="M45 36 C22 36 14 58 16 82 C18 106 30 122 45 122 C60 122 72 106 74 82 C76 58 68 36 45 36 Z"
-      fill={PALETTE.mango}
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-    {[0, 1, 2, 3].map((i) => (
-      <path key={`a${i}`} d={`M18 ${52 + i * 18} L72 ${68 + i * 18}`} stroke={INK} strokeWidth={2} opacity={0.65} />
-    ))}
-    {[0, 1, 2, 3].map((i) => (
-      <path key={`b${i}`} d={`M18 ${68 + i * 18} L72 ${50 + i * 18}`} stroke={INK} strokeWidth={2} opacity={0.65} />
-    ))}
-    <path
-      d="M45 38 C40 22 32 12 22 6 C34 8 40 14 45 22 C50 14 56 8 68 6 C58 12 50 22 45 38 Z"
-      fill={PALETTE.jungle}
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-  </svg>
-);
+/* ── Palm frond ───────────────────────────────────────────────────────────
+   Each leaflet is its own gradient, so the frond turns from sunlit tip to
+   shaded base the way a real one does. */
+export const PalmFrond: React.FC<IllustrationProps & { color?: 'palm' | 'light' | 'dark' }> = ({
+  className = '',
+  style,
+  color = 'palm',
+}) => {
+  const id = useId();
+  const top =
+    color === 'light' ? PALETTE.palmLight : color === 'dark' ? PALETTE.palm : PALETTE.palmLight;
+  const bottom =
+    color === 'light' ? PALETTE.palm : color === 'dark' ? PALETTE.palmDark : PALETTE.palmDark;
 
-/* ── Sailboat ────────────────────────────────────────────────────────── */
-export const Sailboat: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 120 120" className={className} style={style} {...svgProps}>
-    <path d="M60 12 L60 84" stroke={INK} strokeWidth={4} />
-    <path d="M56 20 L20 78 L56 78 Z" fill={PALETTE.cream} stroke={INK} strokeWidth={3.5} />
-    <path d="M66 34 L98 78 L66 78 Z" fill={PALETTE.hibiscus} stroke={INK} strokeWidth={3.5} />
-    <path
-      d="M12 84 L108 84 L92 104 C86 110 34 110 28 104 Z"
-      fill={PALETTE.mango}
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-  </svg>
-);
+  return (
+    <svg viewBox="0 0 110 130" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-leaf`} x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor={top} />
+          <stop offset="100%" stopColor={bottom} />
+        </linearGradient>
+      </defs>
+      {Array.from({ length: 9 }).map((_, i) => {
+        const y = 12 + i * 12;
+        const spread = 40 - i * 2.6;
+        return (
+          <g key={i}>
+            <path
+              d={`M55 ${y} C ${55 - spread * 0.5} ${y - 9} ${55 - spread} ${y - 2} ${55 - spread - 10} ${y + 14} C ${55 - spread * 0.7} ${y + 11} ${55 - spread * 0.25} ${y + 7} 55 ${y}`}
+              fill={`url(#${id}-leaf)`}
+            />
+            <path
+              d={`M55 ${y} C ${55 + spread * 0.5} ${y - 9} ${55 + spread} ${y - 2} ${55 + spread + 10} ${y + 14} C ${55 + spread * 0.7} ${y + 11} ${55 + spread * 0.25} ${y + 7} 55 ${y}`}
+              fill={`url(#${id}-leaf)`}
+            />
+          </g>
+        );
+      })}
+      <path d="M55 6 C52 44 54 84 55 124" stroke={PALETTE.palmDark} strokeWidth={3.5} strokeLinecap="round" />
+    </svg>
+  );
+};
 
-/* ── Starfish ────────────────────────────────────────────────────────── */
-export const Starfish: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 100 100" className={className} style={style} {...svgProps}>
-    <path
-      d="M50 8 C55 8 58 12 60 20 L66 38 L86 40 C94 41 98 46 96 52 C95 57 90 59 84 62 L70 72 L74 90 C76 98 72 102 66 100 C61 99 57 95 50 90 C43 95 39 99 34 100 C28 102 24 98 26 90 L30 72 L16 62 C10 59 5 57 4 52 C2 46 6 41 14 40 L34 38 L40 20 C42 12 45 8 50 8 Z"
-      fill={PALETTE.mangoLight}
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-    <circle cx="50" cy="52" r="3.5" fill={INK} opacity={0.5} />
-    <circle cx="38" cy="42" r="2.6" fill={INK} opacity={0.35} />
-    <circle cx="62" cy="42" r="2.6" fill={INK} opacity={0.35} />
-  </svg>
-);
+/* ── Palm tree ────────────────────────────────────────────────────────────
+   Lit from the left: the trunk carries a bright edge and a shaded one, and
+   the fronds run from sunlit at the crown to deep green underneath. */
+export const PalmTree: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 160 200" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-trunk`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#C89A6B" />
+          <stop offset="35%" stopColor="#A97C4E" />
+          <stop offset="100%" stopColor="#6E4A2C" />
+        </linearGradient>
+        <linearGradient id={`${id}-lit`} x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor={PALETTE.palmLight} />
+          <stop offset="100%" stopColor={PALETTE.palm} />
+        </linearGradient>
+        <linearGradient id={`${id}-shade`} x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor={PALETTE.palm} />
+          <stop offset="100%" stopColor={PALETTE.palmDark} />
+        </linearGradient>
+      </defs>
 
-/* ── Cocktail ────────────────────────────────────────────────────────── */
-export const Cocktail: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 100 120" className={className} style={style} {...svgProps}>
-    <path d="M18 26 L82 26 L54 62 L46 62 Z" fill={PALETTE.lagoonLight} stroke={INK} strokeWidth={3.5} />
-    <path d="M24 34 L76 34" stroke={INK} strokeWidth={2.5} opacity={0.5} />
-    <path d="M50 62 L50 98" stroke={INK} strokeWidth={4} />
-    <path d="M28 104 L72 104" stroke={INK} strokeWidth={4.5} />
-    <path d="M66 12 L54 44" stroke={PALETTE.hibiscus} strokeWidth={5} />
-    <circle cx="70" cy="26" r="11" fill={PALETTE.mango} stroke={INK} strokeWidth={3} />
-    <path d="M70 15 L70 37" stroke={INK} strokeWidth={2} opacity={0.6} />
-  </svg>
-);
+      <path
+        d="M70 196 C64 152 62 108 48 66 L74 58 C86 104 88 150 90 196 Z"
+        fill={`url(#${id}-trunk)`}
+      />
+      {/* Bright edge where the sun rakes across the trunk. */}
+      <path d="M68 190 C63 150 60 110 50 70 L56 68 C66 108 70 150 74 190 Z" fill={PALETTE.white} opacity="0.16" />
 
-/* ── Fish ────────────────────────────────────────────────────────────── */
-export const Fish: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 120 70" className={className} style={style} {...svgProps}>
-    <path
-      d="M30 35 C42 12 78 10 96 22 C108 30 108 40 96 48 C78 60 42 58 30 35 Z"
-      fill={PALETTE.sky}
-      stroke={INK}
-      strokeWidth={3.5}
-    />
-    <path d="M30 35 L8 16 L14 35 L8 54 Z" fill={PALETTE.skyLight} stroke={INK} strokeWidth={3.5} />
-    <path d="M62 14 L70 30" stroke={INK} strokeWidth={3} />
-    <path d="M62 56 L70 40" stroke={INK} strokeWidth={3} />
-    <circle cx="88" cy="30" r="4.5" fill={PALETTE.cream} stroke={INK} strokeWidth={2.5} />
-  </svg>
-);
+      {/* Back fronds in shade, front fronds in light — that ordering is what
+          gives the crown depth. */}
+      {[-96, -58, 96, 58].map((r, i) => (
+        <path
+          key={`b${i}`}
+          d="M62 62 C36 40 16 44 0 62 C20 58 40 66 62 62 Z"
+          fill={`url(#${id}-shade)`}
+          transform={`rotate(${r} 62 62)`}
+        />
+      ))}
+      {[-20, 20, 0, -140, 140].map((r, i) => (
+        <path
+          key={`f${i}`}
+          d="M62 62 C36 38 16 42 2 60 C22 56 40 66 62 62 Z"
+          fill={`url(#${id}-lit)`}
+          transform={`rotate(${r} 62 62)`}
+        />
+      ))}
+      <circle cx="62" cy="62" r="7" fill="#8B5E3C" />
+      <circle cx="60" cy="60" r="3" fill={PALETTE.white} opacity="0.4" />
+    </svg>
+  );
+};
 
-/* ── Bird pair ───────────────────────────────────────────────────────────
-   Two ink strokes — the shorthand for "sky" in a flat illustration. */
+/* ── Toucan ───────────────────────────────────────────────────────────────
+   Kept colourful and friendly — this is the one drawing children look for. */
+export const Toucan: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 150 120" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-body`} x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stopColor="#2B4250" />
+          <stop offset="100%" stopColor="#0E2E3B" />
+        </linearGradient>
+        <linearGradient id={`${id}-beak`} x1="0" y1="0" x2="1" y2="0.6">
+          <stop offset="0%" stopColor={PALETTE.gold} />
+          <stop offset="55%" stopColor={PALETTE.coralLight} />
+          <stop offset="100%" stopColor={PALETTE.coral} />
+        </linearGradient>
+      </defs>
+      <path
+        d="M108 104 C84 114 54 104 47 79 C40 54 56 32 79 30 C104 28 118 48 116 71 C115 85 113 95 108 104 Z"
+        fill={`url(#${id}-body)`}
+      />
+      <path
+        d="M70 46 C56 55 54 76 65 90 C74 101 90 101 99 94 C83 87 74 67 70 46 Z"
+        fill="#FFFDF7"
+      />
+      <path d="M63 42 C40 34 14 41 6 55 C18 67 44 69 65 60 Z" fill={`url(#${id}-beak)`} />
+      <path d="M20 47 C30 49 46 51 62 51" stroke={PALETTE.coral} strokeWidth={2} opacity="0.5" strokeLinecap="round" />
+      <circle cx="82" cy="45" r="7" fill={PALETTE.white} />
+      <circle cx="83" cy="45" r="3.2" fill={PALETTE.ink} />
+      <circle cx="85" cy="43" r="1.2" fill={PALETTE.white} />
+    </svg>
+  );
+};
+
+/* ── Hibiscus ─────────────────────────────────────────────────────────────
+   Petals lit from the centre out, the way a flower actually catches sun. */
+export const Hibiscus: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 120 120" className={className} style={style} {...svgProps}>
+      <defs>
+        <radialGradient id={`${id}-petal`} cx="0.5" cy="0.85">
+          <stop offset="0%" stopColor="#FFE0B8" />
+          <stop offset="45%" stopColor="#FFA9B9" />
+          <stop offset="100%" stopColor="#FF5F7E" />
+        </radialGradient>
+      </defs>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <path
+          key={i}
+          d="M60 58 C46 50 34 30 44 16 C54 4 74 8 76 26 C77 40 70 52 60 58 Z"
+          fill={`url(#${id}-petal)`}
+          transform={`rotate(${i * 72} 60 60)`}
+        />
+      ))}
+      <circle cx="60" cy="60" r="11" fill={PALETTE.gold} />
+      <circle cx="58" cy="57" r="4" fill={PALETTE.white} opacity="0.65" />
+    </svg>
+  );
+};
+
+/* ── Pineapple ────────────────────────────────────────────────────────── */
+export const Pineapple: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 100 145" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-body`} x1="0.15" y1="0" x2="0.9" y2="1">
+          <stop offset="0%" stopColor="#FFD98A" />
+          <stop offset="45%" stopColor={PALETTE.gold} />
+          <stop offset="100%" stopColor="#C97F0A" />
+        </linearGradient>
+        <linearGradient id={`${id}-crown`} x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor={PALETTE.palmLight} />
+          <stop offset="100%" stopColor={PALETTE.palmDark} />
+        </linearGradient>
+      </defs>
+      {[-40, -20, 0, 20, 40].map((r) => (
+        <path
+          key={r}
+          d="M50 46 C44 30 46 14 50 2 C56 14 58 30 52 46 Z"
+          fill={`url(#${id}-crown)`}
+          transform={`rotate(${r} 50 48)`}
+        />
+      ))}
+      <path
+        d="M50 44 C74 44 86 64 86 90 C86 118 72 136 50 136 C28 136 14 118 14 90 C14 64 26 44 50 44 Z"
+        fill={`url(#${id}-body)`}
+      />
+      {/* Diamond skin, kept faint so it reads as texture not as a grid. */}
+      <g stroke="#A9670A" strokeWidth={1.3} opacity="0.35">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <path key={`a${i}`} d={`M${16 + i * 15} 46 L${-14 + i * 15} 134`} />
+        ))}
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <path key={`b${i}`} d={`M${16 + i * 15} 134 L${-14 + i * 15} 46`} />
+        ))}
+      </g>
+      <ellipse cx="34" cy="72" rx="10" ry="16" fill={PALETTE.white} opacity="0.25" />
+    </svg>
+  );
+};
+
+/* ── Sailboat ─────────────────────────────────────────────────────────────
+   White sails against sea: the sail facing the sun is unpainted, the one
+   turned away picks up shadow. */
+export const Sailboat: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 130 140" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-sail`} x1="0" y1="0" x2="1" y2="0.5">
+          <stop offset="0%" stopColor={PALETTE.white} />
+          <stop offset="100%" stopColor="#DDEEF5" />
+        </linearGradient>
+        <linearGradient id={`${id}-hull`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={PALETTE.lagoonDark} />
+          <stop offset="100%" stopColor={PALETTE.abyss} />
+        </linearGradient>
+      </defs>
+      <path d="M64 12 L64 98" stroke="#B98B5E" strokeWidth={3.5} strokeLinecap="round" />
+      <path d="M60 22 C38 42 30 62 28 90 L60 90 Z" fill={PALETTE.white} />
+      <path d="M68 34 C86 48 94 68 96 90 L68 90 Z" fill={`url(#${id}-sail)`} />
+      <path d="M12 96 L118 96 L100 122 L30 122 Z" fill={`url(#${id}-hull)`} />
+      <path d="M20 102 L110 102" stroke={PALETTE.white} strokeWidth={2} opacity="0.35" strokeLinecap="round" />
+      <path d="M64 12 L88 18 L64 26 Z" fill={PALETTE.coral} />
+    </svg>
+  );
+};
+
+/* ── Starfish ─────────────────────────────────────────────────────────── */
+export const Starfish: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 120 120" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-star`} x1="0.3" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stopColor="#FFCF9A" />
+          <stop offset="55%" stopColor={PALETTE.coralLight} />
+          <stop offset="100%" stopColor="#E0663C" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M60 8 C64 8 66 12 72 34 C74 42 78 44 96 44 C114 44 116 50 102 62 C90 72 88 76 94 96 C100 114 94 118 78 106 C64 96 58 96 44 106 C28 118 22 114 28 96 C34 76 32 72 20 62 C6 50 8 44 26 44 C44 44 48 42 50 34 C56 12 58 8 60 8 Z"
+        fill={`url(#${id}-star)`}
+      />
+      <g fill={PALETTE.white} opacity="0.4">
+        <circle cx="60" cy="46" r="3" />
+        <circle cx="48" cy="66" r="2.4" />
+        <circle cx="72" cy="66" r="2.4" />
+        <circle cx="60" cy="82" r="2" />
+      </g>
+    </svg>
+  );
+};
+
+/* ── Cocktail ─────────────────────────────────────────────────────────── */
+export const Cocktail: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 110 140" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-drink`} x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor={PALETTE.goldLight} />
+          <stop offset="55%" stopColor={PALETTE.coralLight} />
+          <stop offset="100%" stopColor={PALETTE.coral} />
+        </linearGradient>
+        <linearGradient id={`${id}-glass`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={PALETTE.white} stopOpacity="0.8" />
+          <stop offset="50%" stopColor={PALETTE.skyLight} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={PALETTE.white} stopOpacity="0.6" />
+        </linearGradient>
+      </defs>
+      <path d="M16 22 L94 22 L55 76 Z" fill={`url(#${id}-glass)`} />
+      <path d="M26 32 L84 32 L55 72 Z" fill={`url(#${id}-drink)`} />
+      <path d="M55 76 L55 116 M32 118 L78 118" stroke="#CBDDE6" strokeWidth={5} strokeLinecap="round" />
+      <path d="M76 22 C88 6 100 2 106 6" stroke={PALETTE.palm} strokeWidth={3.5} strokeLinecap="round" />
+      <circle cx="104" cy="8" r="8" fill={PALETTE.coral} />
+      <circle cx="101" cy="5" r="3" fill={PALETTE.white} opacity="0.5" />
+    </svg>
+  );
+};
+
+/* ── Fish ─────────────────────────────────────────────────────────────── */
+export const Fish: React.FC<IllustrationProps> = ({ className = '', style }) => {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 150 90" className={className} style={style} {...svgProps}>
+      <defs>
+        <linearGradient id={`${id}-fish`} x1="0.1" y1="0" x2="0.9" y2="1">
+          <stop offset="0%" stopColor={PALETTE.goldLight} />
+          <stop offset="45%" stopColor={PALETTE.coralLight} />
+          <stop offset="100%" stopColor={PALETTE.lagoon} />
+        </linearGradient>
+      </defs>
+      <path
+        d="M18 46 C34 18 76 12 104 30 C118 39 126 46 126 46 C126 46 118 53 104 62 C76 80 34 74 18 46 Z"
+        fill={`url(#${id}-fish)`}
+      />
+      <path d="M126 46 L148 24 L143 46 L148 68 Z" fill={PALETTE.coral} opacity="0.85" />
+      <path d="M62 14 C74 4 90 6 98 16" stroke={PALETTE.coral} strokeWidth={4} opacity="0.7" strokeLinecap="round" />
+      <circle cx="36" cy="42" r="6" fill={PALETTE.white} />
+      <circle cx="37" cy="42" r="2.8" fill={PALETTE.ink} />
+    </svg>
+  );
+};
+
+/* ── Distant birds ────────────────────────────────────────────────────── */
 export const Birds: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 120 50" className={className} style={style} {...svgProps}>
-    <path d="M8 26 C18 12 26 12 34 24 C42 12 50 12 60 26" stroke={INK} strokeWidth={3.5} />
-    <path d="M64 40 C72 30 78 30 84 38 C90 30 96 30 104 40" stroke={INK} strokeWidth={3} opacity={0.75} />
+  <svg viewBox="0 0 160 60" className={className} style={style} {...svgProps}>
+    <g stroke={PALETTE.inkSoft} strokeWidth={2.4} strokeLinecap="round" fill="none" opacity="0.55">
+      <path d="M8 26 C16 16 24 16 32 26" />
+      <path d="M32 26 C40 16 48 16 56 26" />
+      <path d="M66 42 C72 34 78 34 84 42" />
+      <path d="M84 42 C90 34 96 34 102 42" />
+      <path d="M112 18 C117 12 122 12 127 18" />
+      <path d="M127 18 C132 12 137 12 142 18" />
+    </g>
   </svg>
 );
 
-/* ── Wave band ───────────────────────────────────────────────────────────
-   Three stacked crests used to close a section or head a footer. Stretches to
-   any width via preserveAspectRatio. */
-export const WaveBand: React.FC<IllustrationProps & { tone?: 'lagoon' | 'sky' }> = ({
+/* ── The waterline ────────────────────────────────────────────────────────
+   The over-under, as a component. Sky above, lit water below, and along the
+   seam a band of foam left pure white. Used wherever a section has to hand
+   over to the next one. */
+export const WaveBand: React.FC<IllustrationProps & { tone?: 'lagoon' | 'sky' | 'deep' }> = ({
   className = '',
   style,
   tone = 'lagoon',
 }) => {
-  const back = tone === 'lagoon' ? PALETTE.lagoonLight : PALETTE.skyLight;
-  const front = tone === 'lagoon' ? PALETTE.lagoon : PALETTE.sky;
+  const id = useId();
+  const top = tone === 'deep' ? PALETTE.lagoon : tone === 'sky' ? PALETTE.skyLight : PALETTE.lagoonLight;
+  const bottom = tone === 'deep' ? PALETTE.abyss : tone === 'sky' ? PALETTE.lagoonLight : PALETTE.lagoon;
+
   return (
     <svg
       viewBox="0 0 1200 120"
@@ -312,46 +478,80 @@ export const WaveBand: React.FC<IllustrationProps & { tone?: 'lagoon' | 'sky' }>
       style={style}
       {...svgProps}
     >
+      <defs>
+        <linearGradient id={`${id}-water`} x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor={top} />
+          <stop offset="100%" stopColor={bottom} />
+        </linearGradient>
+      </defs>
+      {/* The swell. */}
       <path
-        d="M0 46 C120 12 240 78 360 52 C480 26 600 78 720 56 C840 34 960 74 1080 52 C1140 41 1170 44 1200 40 L1200 120 L0 120 Z"
-        fill={back}
+        d="M0,52 C150,10 300,94 450,56 C600,18 750,98 900,60 C1020,30 1120,74 1200,48 L1200,120 L0,120 Z"
+        fill={`url(#${id}-water)`}
+      />
+      {/* Foam riding the crest — unpainted white, per Homer. */}
+      <path
+        d="M0,52 C150,10 300,94 450,56 C600,18 750,98 900,60 C1020,30 1120,74 1200,48"
+        stroke={PALETTE.white}
+        strokeWidth={7}
+        fill="none"
+        opacity="0.92"
+        strokeLinecap="round"
       />
       <path
-        d="M0 74 C120 44 240 100 360 78 C480 56 600 100 720 82 C840 64 960 96 1080 78 C1140 69 1170 72 1200 68 L1200 120 L0 120 Z"
-        fill={front}
-        stroke={INK}
+        d="M0,64 C150,22 300,106 450,68 C600,30 750,110 900,72 C1020,42 1120,86 1200,60"
+        stroke={PALETTE.white}
         strokeWidth={3}
+        fill="none"
+        opacity="0.5"
+        strokeLinecap="round"
       />
     </svg>
   );
 };
 
-/* ── Sea foam line ───────────────────────────────────────────────────────
-   A single drawn crest with dashes above it, for use as a divider. */
+/* ── Foam line ────────────────────────────────────────────────────────────
+   The last reach of a wave up wet sand. */
 export const FoamLine: React.FC<IllustrationProps> = ({ className = '', style }) => (
-  <svg viewBox="0 0 400 40" preserveAspectRatio="none" className={className} style={style} {...svgProps}>
+  <svg viewBox="0 0 300 20" preserveAspectRatio="none" className={className} style={style} {...svgProps}>
     <path
-      d="M0 26 C50 8 90 40 140 24 C190 8 230 38 280 24 C330 10 360 30 400 20"
-      stroke={INK}
-      strokeWidth={4}
+      d="M2 12 C40 4 62 16 104 9 C148 2 178 15 222 8 C254 3 278 12 298 6"
+      stroke={PALETTE.lagoon}
+      strokeWidth={3}
+      fill="none"
+      opacity="0.55"
+      strokeLinecap="round"
     />
-    <path d="M40 12 L58 12 M150 8 L172 8 M280 10 L300 10" stroke={INK} strokeWidth={3.5} opacity={0.45} />
+    <path
+      d="M2 16 C40 9 62 19 104 13 C148 7 178 18 222 12 C254 8 278 15 298 10"
+      stroke="#FFFFFF"
+      strokeWidth={2.5}
+      fill="none"
+      opacity="0.9"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
-export default {
-  SunBurst,
-  Cloud,
-  PalmFrond,
-  PalmTree,
-  Toucan,
-  Hibiscus,
-  Pineapple,
-  Sailboat,
-  Starfish,
-  Cocktail,
-  Fish,
-  Birds,
-  WaveBand,
-  FoamLine,
-};
+/* ══════════════════════════════════════════════════════════════════════════
+   Light
+   Two pieces of pure atmosphere, used to bed content into the scene.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/** Hockney's caustics as a drop-in layer: thin white light on rippled water. */
+export const Caustics: React.FC<IllustrationProps & { soft?: boolean }> = ({
+  className = '',
+  style,
+  soft = false,
+}) => (
+  <span
+    aria-hidden="true"
+    className={`caustics ${soft ? 'caustics-soft' : ''} ${className}`}
+    style={style}
+  />
+);
+
+/** Sun glare — a bloom of pure white, for corners the light comes from. */
+export const SunGlare: React.FC<IllustrationProps> = ({ className = '', style }) => (
+  <span aria-hidden="true" className={`sun-glare ${className}`} style={style} />
+);

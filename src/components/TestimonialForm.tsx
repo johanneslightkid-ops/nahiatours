@@ -25,7 +25,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onSubmit, isLoading =
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 rounded-[26px] border-[2.5px] border-ink bg-paper shadow-ink">
+    <div className="w-full max-w-2xl mx-auto p-6 rounded-3xl ring-1 ring-ink/10 bg-paper shadow-lg">
       <h3 className="text-2xl font-bold text-ink mb-4 text-center">
         <FormattedMessage id="testimonials.addTestimonial" />
       </h3>
@@ -97,7 +97,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onSubmit, isLoading =
         <button
           type="submit"
           disabled={isLoading || !review.trim() || !name.trim() || !email.trim()}
-          className="w-full py-3 px-4 rounded-full border-[2.5px] border-ink bg-mango font-extrabold uppercase tracking-wide text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-mango-light disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full py-3 px-4 rounded-full ring-1 ring-ink/10 bg-gradient-to-br from-mango-light via-mango to-mango-dark font-extrabold uppercase tracking-wide text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-coral disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? 'Sharing...' : <FormattedMessage id="testimonials.submitReview" />}
         </button>

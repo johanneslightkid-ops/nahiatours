@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FoamLine } from './ui/Illustrations';
+import { FoamLine, Caustics } from './ui/Illustrations';
 
 interface StorySectionProps {
   id: string;
@@ -117,11 +117,45 @@ const StorySection: React.FC<StorySectionProps> = ({
     }
   };
 
+  const media = imageUrl ? (
+    <img
+      src={imageUrl}
+      alt={title || 'Story image'}
+      className="photo-pop h-full w-full object-cover"
+    />
+  ) : isTikTok ? (
+    hasLoaded ? (
+      <div className="flex h-full w-full items-center justify-center overflow-hidden">
+        <blockquote
+          className="tiktok-embed"
+          cite={vimeoUrl}
+          data-video-id={tiktokVideoId}
+          style={{ maxWidth: '605px', minWidth: '325px', margin: '0 auto' }}
+        >
+          <section></section>
+        </blockquote>
+      </div>
+    ) : (
+      <div className="flex h-full w-full items-center justify-center bg-paper-warm font-bold text-ink-light">
+        Loading…
+      </div>
+    )
+  ) : vimeoUrl ? (
+    <iframe
+      src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
+      className="h-full w-full"
+      frameBorder="0"
+      allowFullScreen
+    />
+  ) : null;
+
+  const hasMedia = Boolean(imageUrl || vimeoUrl);
+
   return (
     <section
       ref={sectionRef}
       id={id}
-      className={`home-section wavy-band relative overflow-hidden px-4 py-28 sm:py-32 md:px-8 lg:py-36 ${
+      className={`home-section wavy-band relative overflow-hidden py-20 sm:py-24 lg:py-28 ${
         themeName ? themeName : isAlternate ? 'cove-section' : 'shore-section'
       }`}
     >
@@ -129,127 +163,126 @@ const StorySection: React.FC<StorySectionProps> = ({
         className={`parallax-wash ${isAlternate ? 'parallax-wash-left' : 'parallax-wash-right'}`}
       />
 
-      <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Header with emoji and title */}
-        <div className={`mb-10 text-center sm:mb-12 ${isAlternate ? 'md:text-right' : 'md:text-left'}`}>
-          {emoji && <div className={`section-icon mb-5 ${isAlternate ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}>{emoji}</div>}
-          {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
-          {timeframe && (
-            <p className="inline-block rounded-full border-2 border-ink bg-mango-light px-4 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-ink-sm">
-              {timeframe}
-            </p>
-          )}
-        </div>
-
-        {/* Main content grid */}
-        <div className={`grid items-center gap-12 ${imageUrl || vimeoUrl ? 'md:grid-cols-2 lg:gap-20' : 'md:grid-cols-1'}`}>
-          {/* Text content */}
-          <div className={(imageUrl || vimeoUrl) && isAlternate ? 'md:order-2' : 'md:order-1'}>
-            {/* Description */}
-            {description && (
-              <div className="story-copy-card mb-6 rounded-[30px_16px_30px_18px] animate-wave-sway-2">
-                <p className="whitespace-pre-wrap text-base font-semibold leading-8 text-ink sm:text-lg">
-                  {description}
-                </p>
+      <div className="section-shell relative z-10">
+        {/* The story is told in two columns: the picture and, beside it, the
+            whole of the copy — heading included. Floating the heading across
+            the full width left it stranded a long way from the words it
+            belonged to. */}
+        <div
+          className={`grid items-center gap-10 lg:gap-16 ${
+            hasMedia ? 'lg:grid-cols-12' : 'lg:grid-cols-1'
+          }`}
+        >
+          {/* Picture */}
+          {hasMedia && (
+            <div
+              className={`group relative lg:col-span-6 ${isAlternate ? 'lg:order-2' : 'lg:order-1'}`}
+            >
+              <div className="photo-frame animate-wave-sway-1 relative aspect-[4/3] sm:aspect-[3/2] lg:aspect-[4/3]">
+                {media}
+                <Caustics soft className="z-10" />
               </div>
+
+              {/* The timeframe rides the corner of the picture, the way a
+                  caption is written on the border of a print. */}
+              {timeframe && (
+                <span className="absolute -bottom-4 left-5 z-20 inline-flex items-center rounded-full bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-lagoon-dark shadow-lg">
+                  {timeframe}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Words */}
+          <div
+            className={`${hasMedia ? 'lg:col-span-6' : ''} ${
+              isAlternate ? 'lg:order-1' : 'lg:order-2'
+            }`}
+          >
+            {emoji && <div className="section-icon mb-6">{emoji}</div>}
+
+            {title && (
+              <h2 className="scribble-title-bg mb-6 font-display text-3xl leading-[1.08] text-ink sm:text-4xl lg:text-5xl">
+                {title}
+              </h2>
             )}
 
-            {/* Narrative */}
+            {description && (
+              <p className="mb-6 whitespace-pre-wrap text-lg leading-[1.75] text-ink-soft">
+                {description}
+              </p>
+            )}
+
             {narrative && (
-              <div className="prose prose-lg max-w-none">
-                <p className="text-base font-semibold italic leading-8 text-ink-soft md:text-lg">
+              <div className="story-copy-card mb-7">
+                <p className="text-base italic leading-[1.8] text-ink-soft sm:text-lg">
                   {narrative}
                 </p>
               </div>
             )}
 
-            {/* Mood badge */}
             {mood && (
-              <div className="mt-8 flex flex-wrap gap-2.5">
-                {mood.split(', ').filter(Boolean).map((m, idx) => (
-                  <span
-                    key={idx}
-                    className={`rounded-full border-[2.5px] border-ink px-4 py-1.5 text-sm font-extrabold text-ink shadow-ink-sm transition-transform hover:-translate-y-1 hover:rotate-2 ${
-                      ['bg-mango-light', 'bg-lagoon-light', 'bg-hibiscus-light', 'bg-jungle-light'][idx % 4]
-                    }`}
-                  >
-                    {m}
-                  </span>
-                ))}
+              <div className="flex flex-wrap gap-2.5">
+                {mood
+                  .split(', ')
+                  .filter(Boolean)
+                  .map((m, idx) => (
+                    <span
+                      key={idx}
+                      className={`inline-flex items-center rounded-full px-4 py-1.5 text-sm font-bold shadow-sm transition-transform duration-300 hover:-translate-y-0.5 ${
+                        [
+                          'bg-lagoon-light/70 text-lagoon-dark',
+                          'bg-sunset-light/60 text-[#8a5a00]',
+                          'bg-jungle-light/60 text-jungle-dark',
+                          'bg-mango-light/45 text-mango-dark',
+                        ][idx % 4]
+                      }`}
+                    >
+                      {m}
+                    </span>
+                  ))}
               </div>
             )}
 
-            {/* Video (if we also have an image, video goes here below the text) */}
+            {/* A second piece of media (video alongside a photo) sits under
+                the copy rather than competing with the hero picture. */}
             {vimeoUrl && imageUrl && (
-              <div className="mt-8 story-media-frame flex justify-center w-full animate-wave-sway-3">
+              <div className="animate-wave-sway-3 mt-8">
                 {isTikTok ? (
                   hasLoaded ? (
-                    <div className="relative z-10 w-full overflow-hidden rounded-[28px_14px_30px_16px]">
+                    <div className="photo-frame w-full">
                       <blockquote
                         className="tiktok-embed"
                         cite={vimeoUrl}
                         data-video-id={tiktokVideoId}
-                        style={{ maxWidth: "605px", minWidth: "325px", margin: "0 auto" }}
+                        style={{ maxWidth: '605px', minWidth: '325px', margin: '0 auto' }}
                       >
                         <section></section>
                       </blockquote>
                     </div>
                   ) : (
-                    <div className="relative w-full aspect-video rounded-[28px_14px_30px_16px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft">Loading TikTok...</div>
+                    <div className="photo-frame flex aspect-video w-full items-center justify-center bg-paper-warm font-bold text-ink-light">
+                      Loading…
+                    </div>
                   )
                 ) : (
-                  <iframe
-                    src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
-                    className="relative w-full aspect-video rounded-[28px_14px_30px_16px] shadow-2xl"
-                    frameBorder="0"
-                    allowFullScreen
-                  />
+                  <div className="photo-frame aspect-video w-full">
+                    <iframe
+                      src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
+                      className="h-full w-full"
+                      frameBorder="0"
+                      allowFullScreen
+                    />
+                  </div>
                 )}
               </div>
             )}
           </div>
-
-          {/* Media Column (Image or Video if no image) */}
-          {(imageUrl || (!imageUrl && vimeoUrl)) && (
-            <div className={`${isAlternate ? 'md:order-1' : 'md:order-2'} ${id === 'decision' ? 'md:mt-12' : ''}`}>
-              <div className={`story-media-frame group mb-10 md:mb-0 ${id === 'afternoon_post' ? 'mt-12 md:mt-0' : ''} animate-wave-sway-1`}>
-                {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt={title || 'Story image'}
-                    className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] object-cover shadow-[0_25px_60px_rgba(4,19,29,0.3)] transition-transform duration-700 group-hover:scale-105 sm:h-96 md:h-[520px]"
-                  />
-                ) : isTikTok ? (
-                  hasLoaded ? (
-                    <div className="relative mt-6 z-10 flex justify-center w-full overflow-hidden rounded-[32px_14px_36px_20px]">
-                      <blockquote
-                        className="tiktok-embed"
-                        cite={vimeoUrl}
-                        data-video-id={tiktokVideoId}
-                        style={{ maxWidth: "605px", minWidth: "325px", margin: "0 auto" }}
-                      >
-                        <section></section>
-                      </blockquote>
-                    </div>
-                  ) : (
-                     <div className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft sm:h-96 md:h-[520px]">Loading TikTok...</div>
-                  )
-                ) : (
-                  <iframe
-                    src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
-                    className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] shadow-[0_25px_60px_rgba(4,19,29,0.3)] transition-transform duration-500 sm:h-96 md:h-[520px]"
-                    frameBorder="0"
-                    allowFullScreen
-                  />
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Closing flourish */}
-      <div className="pointer-events-none absolute bottom-0 left-0 flex w-full justify-center pb-10 opacity-30">
+      {/* A line of foam closing the section off. */}
+      <div className="pointer-events-none absolute bottom-0 left-0 flex w-full justify-center pb-8 opacity-40">
         <FoamLine className="h-6 w-32" />
       </div>
     </section>

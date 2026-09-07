@@ -110,7 +110,7 @@ const PathwaysSection: React.FC = () => {
           >
             <div className="flex items-center justify-between gap-3">
               <span className="text-4xl">🧭</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-mango-light px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-ink">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-sunset-light ring-1 ring-white/25">
                 <HiSparkles className="h-3 w-3" /> {copy.plannerBadge}
               </span>
             </div>

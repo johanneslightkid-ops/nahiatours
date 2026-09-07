@@ -1,61 +1,100 @@
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Caveat:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ILLUSTRATED TROPICAL DESIGN SYSTEM
+   BEAUTIFUL TOURS — CARIBBEAN DAYLIGHT
    ──────────────────────────────────────────────────────────────────────────
-   The site is drawn, not photographed. Three rules hold the look together:
+   The site was a flat screen-printed poster. It is now the light itself:
+   clear shallow water over white sand, palm shade, and golden hour. The
+   stylisation comes from painting and photography rather than illustration.
 
-     1. Flat colour. No frosted glass, no backdrop blur, no photo-real
-        gradients — every surface is opaque poster paint.
-     2. Ink outline. Cards, buttons, badges and icons are drawn with the same
-        dark outline, the way a sticker sheet is.
-     3. Hard shadow. Depth comes from an un-blurred offset block of colour,
-        never from a soft haze.
+   Five principles, each borrowed from a tradition and each doing a job:
 
-   Keep those three and anything new will sit inside the illustration.
+     1. WHITE IS THE LIGHT. Homer painted the Bahamas by leaving the paper
+        bare where the sun struck. Highlights here are pure white, never a
+        pale tint. Sun glare, sea foam and sand glare are all #FFF, and the
+        foam along every waterline is literally unpainted band.
+     2. LIGHT ON WATER IS A WHITE LINE. Hockney drew pool caustics as thin
+        wavy white strokes over flat turquoise. `.caustics` is that, built
+        from two repeating gradients sliding against each other — no
+        simulation, no filter, nothing per-frame for the CPU to do.
+     3. THE OVER-UNDER. Dive photographers split the frame at the waterline.
+        Sections divide the same way: the band above ends in foam, the band
+        below is lit water.
+     4. SEA IS THE WORLD, SUN IS THE ACTION. Blue reads as trust, but a
+        travel brand that leads with blue looks like every airline. The blues
+        build the place; the warm coral is spent only on what a visitor can
+        DO — book, plan, call, submit, the chosen option, the live total.
+     5. EDITORIAL IS SATURATED, TRANSACTIONAL IS CALM. Hero and story
+        surfaces lean into photographic colour. Booking forms, prices and the
+        planner go quiet and white. The closer to paying, the calmer it gets.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --ink: #1e2a3a;
-  --ink-soft: #42566b;
-  --ink-light: #7c8fa3;
+  /* ── Depth: the colour of water, read downward ────────────────────────── */
+  --ink: #0e2e3b;
+  --ink-soft: #3d5a66;
+  --ink-light: #7b95a1;
 
-  --paper: #fff6e5;
-  --paper-warm: #ffefd6;
-  --paper-deep: #f7e3c2;
+  /* ── Sand ─────────────────────────────────────────────────────────────── */
+  --paper: #fffbf5;
+  --paper-warm: #fff3e4;
+  --paper-deep: #fbe6cb;
+  --white: #ffffff;
 
-  --mango: #ffa62b;
-  --mango-light: #ffc861;
-  --mango-dark: #f07e13;
+  /* ── The sea ──────────────────────────────────────────────────────────── */
+  --lagoon-light: #9cede6;
+  --lagoon: #14b8c4;
+  --lagoon-dark: #0a7c93;
+  --abyss: #08415c;
 
-  --hibiscus: #ff5d73;
-  --hibiscus-light: #ff9aa8;
+  /* ── The sky ──────────────────────────────────────────────────────────── */
+  --sky-light: #d6f1ff;
+  --sky: #5ec5f5;
+  --sky-dark: #2a7fb8;
 
-  --lagoon: #21c0b7;
-  --lagoon-light: #7fe3da;
-  --lagoon-dark: #128c8a;
+  /* ── The sun, and the action it stands for ────────────────────────────── */
+  --coral-light: #ff9b76;
+  --coral: #ff6b45;
+  --coral-dark: #dc4a22;
+  --gold-light: #ffd68c;
+  --gold: #ffb703;
+  --gold-dark: #e08700;
 
-  --sky: #4cc3f0;
-  --sky-light: #a5e4ff;
-  --sky-dark: #1c86be;
+  /* ── Growing things ───────────────────────────────────────────────────── */
+  --palm-light: #93dca9;
+  --palm: #2fa36b;
+  --palm-dark: #186b48;
 
-  --jungle: #2fa84f;
-  --jungle-light: #7bd389;
-  --jungle-dark: #1b7a3c;
+  /* Legacy token names, remapped so every stray utility in the markup lands
+     inside this palette. */
+  --mango: var(--coral);
+  --mango-light: var(--coral-light);
+  --mango-dark: var(--coral-dark);
+  --hibiscus: #ff5f7e;
+  --hibiscus-light: #ffa9b9;
+  --jungle: var(--palm);
+  --jungle-light: var(--palm-light);
+  --jungle-dark: var(--palm-dark);
+  --sunset: var(--gold);
+  --grape: #7c5fd3;
 
-  --sunset: #ff7a45;
-  --grape: #9163de;
+  /* Light is soft here, and it bounces off water. Every shadow is two stops:
+     a tight contact shadow and a wide ambient one, tinted towards the sea. */
+  --shadow-sm: 0 1px 2px rgba(14, 46, 59, 0.06), 0 2px 6px rgba(14, 46, 59, 0.05);
+  --shadow-md: 0 3px 6px rgba(14, 46, 59, 0.07), 0 10px 22px rgba(14, 46, 59, 0.08);
+  --shadow-lg: 0 6px 12px rgba(14, 46, 59, 0.07), 0 18px 38px rgba(14, 46, 59, 0.1);
+  --shadow-xl: 0 10px 20px rgba(14, 46, 59, 0.08), 0 30px 60px rgba(14, 46, 59, 0.12);
+  --shadow-lift: 0 14px 26px -10px rgba(14, 46, 59, 0.2), 0 34px 60px -24px rgba(14, 46, 59, 0.26);
 
-  /* Every outline on the site is drawn with this one pen. */
-  --stroke: 2.5px;
-  --stroke-thin: 2px;
-  --shadow-ink: 5px 5px 0 0 var(--ink);
-  --shadow-ink-sm: 3px 3px 0 0 var(--ink);
-  --shadow-ink-lg: 8px 8px 0 0 var(--ink);
+  --radius: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 30px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -66,9 +105,8 @@ html {
   background: var(--paper);
 }
 
-/* Fronds, badges and tilted stickers all reach slightly past the layout. None
-   of them are content, so clip the overflow instead of letting it produce a
-   horizontal scrollbar. `clip` (not `hidden`) keeps the viewport as the scroll
+/* Palms, glare and floating cards reach past the layout; none of them are
+   content. `clip` rather than `hidden` keeps the viewport as the scroll
    container, so the sticky header still sticks. */
 html,
 body {
@@ -77,94 +115,177 @@ body {
 
 body {
   min-height: 100vh;
-  font-family: 'Nunito', system-ui, sans-serif;
-  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1.0625rem;
+  line-height: 1.65;
   color: var(--ink);
-  /* The paper colour lives on <html> so the drawn backdrop and the paper
-     grain — both negative z-index — can paint above it. A background here
-     would cover them. */
+  -webkit-font-smoothing: antialiased;
+  /* The sand lives on <html> so the sea backdrop, at negative z-index, can
+     paint above it. */
   background-color: transparent;
 }
 
-/* Hand-drawn paper speckle. Two sparse dot layers at low opacity read as
-   printed grain without costing an image request. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  opacity: 0.5;
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(30, 42, 58, 0.14) 1px, transparent 1.4px),
-    radial-gradient(circle at 50% 50%, rgba(240, 126, 19, 0.12) 1px, transparent 1.4px);
-  background-size: 22px 22px, 37px 37px;
-  background-position: 0 0, 11px 14px;
-}
-
+/* ── Type ─────────────────────────────────────────────────────────────────
+   Fraunces is a soft, sunny serif with real warmth — family-facing where a
+   geometric sans would read corporate. Plus Jakarta Sans carries everything
+   transactional, because prices and forms want clarity, not character. */
 h1,
 h2,
 h3,
 h4,
 h5,
-h6,
-.font-lobster {
-  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1.12;
+h6 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-variation-settings: 'SOFT' 40, 'WONK' 1;
+  letter-spacing: -0.018em;
+  line-height: 1.08;
   color: var(--ink);
+}
+
+h1 {
+  letter-spacing: -0.028em;
 }
 
 a {
   color: var(--lagoon-dark);
-  font-weight: 700;
+  font-weight: 600;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--mango-dark);
+  color: var(--coral-dark);
+}
+
+/* The keyboard route through the site is marked in the action colour, like
+   every other actionable thing. */
+:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--lagoon-light);
+  color: var(--ink);
 }
 
 .section-shell {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   Caustics — the signature
+   Crossed straight gradients make a lattice, and a lattice reads as a fence
+   rather than as light. Real caustics are an irregular web: fractal noise,
+   hard-thresholded, so bright veins pool and branch.
+
+   That is exactly what feTurbulence plus a steep feColorMatrix on the alpha
+   gives, so the texture is generated once as a static data URI and then only
+   its background-position moves. Nothing is filtered per frame — the cost is
+   a composite, which is what makes this affordable on a phone.
+
+   Two copies at different scales drift in opposite directions; their beat
+   against each other is what stops the loop from being visible.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --caustic-web: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.013 0.019' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.4 0 0 0 -1.15'/%3E%3C/filter%3E%3Crect width='700' height='700' filter='url(%23c)'/%3E%3C/svg%3E");
+}
+
+.caustics {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  background-image: var(--caustic-web), var(--caustic-web);
+  background-size: 700px 700px, 460px 460px;
+  background-position: 0 0, 120px 80px;
+  /* Light through moving water has no hard edge. */
+  filter: blur(1.5px);
+  animation: causticDrift 26s ease-in-out infinite alternate;
+}
+
+/* Over a photograph the web has to be fainter, or it reads as scratches on
+   the print rather than as light in the water. */
+.caustics-soft {
+  opacity: 0.45;
+  mix-blend-mode: overlay;
+  filter: blur(2.5px);
+}
+
+@keyframes causticDrift {
+  0% {
+    background-position: 0 0, 120px 80px;
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    background-position: 180px -120px, -140px 220px;
+    opacity: 0.62;
+  }
+}
+
+/* Sun glare. Pure white at the centre — principle one, as a light source. */
+.sun-glare {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 214, 140, 0.5) 32%,
+    rgba(255, 183, 3, 0.16) 52%,
+    transparent 72%
+  );
+  animation: shimmer 7s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.06); }
+}
+
 /* ── Type accents ───────────────────────────────────────────────────────── */
 
-/* Hand-lettered kicker above a headline. */
 .hand-note {
   font-family: 'Caveat', cursive;
-  font-weight: 700;
-  font-size: 1.55rem;
+  font-weight: 600;
+  font-size: 1.6rem;
   line-height: 1;
-  color: var(--mango-dark);
+  color: var(--lagoon-dark);
   transform: rotate(-2deg);
   display: inline-block;
 }
 
-/* Marker-pen highlight behind a headline. Painted as a gradient on the inline
-   text box with `box-decoration-break: clone`, so a headline that wraps gets
-   the stroke under each line instead of one smear across the whole block. */
+/* A wash of light behind a headline — the sun catching the words, not a
+   marker stroke. Cloned per line so a wrapping headline keeps it. */
 .marker-highlight {
   display: inline;
-  padding: 0 0.08em;
+  padding: 0 0.14em;
+  /* Sun falling across the words. A hard-edged band reads as a highlighter
+     pen; light does not have an edge, so every stop here is soft and the
+     whole thing fades out before it reaches the cap height. */
   background-image: linear-gradient(
     to bottom,
-    transparent 58%,
-    var(--mango-light) 58%,
-    var(--mango-light) 92%,
-    transparent 92%
+    transparent 48%,
+    rgba(255, 214, 140, 0.28) 62%,
+    rgba(255, 183, 3, 0.42) 82%,
+    rgba(255, 214, 140, 0.1) 96%,
+    transparent 100%
   );
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
 
-/* Used by story headings: a crayon underline sweeping under the title. */
+/* A soft swell underlining a title, drawn like a shallow wave. */
 .scribble-title-bg {
   position: relative;
   display: inline-block;
-  padding-bottom: 0.2em;
+  padding-bottom: 0.22em;
 }
 
 .scribble-title-bg::after {
@@ -172,99 +293,199 @@ a:hover {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -0.12em;
-  height: 0.5rem;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2,8 C40,2 60,10 100,5 C140,0 165,9 198,4' stroke='%23FFA62B' stroke-width='6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
-}
-
-/* ── Section bands ──────────────────────────────────────────────────────── */
-
-.home-section {
-  isolation: isolate;
-}
-
-/* Flat poster bands. Opaque on purpose — the illustrated backdrop shows
-   through the wave-shaped gaps between them, not through the paint. */
-.shore-section {
-  background: var(--paper) !important;
-}
-
-.cove-section {
-  background: var(--paper-warm) !important;
-}
-
-.lagoon-section {
-  background: linear-gradient(180deg, #e6f7ff 0%, #d3f0ff 100%) !important;
-}
-
-.bay-section {
-  background: linear-gradient(180deg, #e4fbf4 0%, #d0f6ea 100%) !important;
-}
-
-.dawn-section {
-  background: linear-gradient(180deg, #fff6e5 0%, #ffe6c9 100%) !important;
-}
-
-.sunset-section {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #ffc861 0%, #ff9a5b 48%, #ff5d73 100%) !important;
-}
-
-.reef-section {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #7fe3da 0%, #21c0b7 45%, #128c8a 100%) !important;
-}
-
-/* A drawn sun sitting behind the warm band, and drifting water rings behind
-   the reef band. Both are pure gradients, so they cost nothing to paint. */
-.sunset-section::before {
-  content: '';
-  position: absolute;
-  top: -14%;
-  left: 50%;
-  width: min(58vw, 620px);
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  border-radius: 9999px;
-  background: radial-gradient(circle, rgba(255, 245, 214, 0.95) 0%, rgba(255, 233, 175, 0.55) 42%, transparent 62%);
-  pointer-events: none;
-}
-
-/* Drawn foam ticks scattered over the water, rather than concentric rings —
-   the rings read as a printing artefact at full width. */
-.reef-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160' viewBox='0 0 240 160'%3E%3Cg stroke='%23ffffff' stroke-width='4' stroke-linecap='round' fill='none' opacity='0.55'%3E%3Cpath d='M20 34 h34'/%3E%3Cpath d='M150 22 h26'/%3E%3Cpath d='M92 86 h30'/%3E%3Cpath d='M196 104 h28'/%3E%3Cpath d='M42 132 h24'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 240px 160px;
-}
-
-/* Section copy on the two saturated bands is white, so the drawn outline is
-   white there too. */
-.sunset-section h2,
-.sunset-section h3,
-.reef-section h2,
-.reef-section h3 {
-  color: #ffffff;
-  text-shadow: 3px 3px 0 rgba(30, 42, 58, 0.28);
+  bottom: 0;
+  height: 0.42rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2,7 C34,1 60,9 100,5 C140,1 168,9 198,3' stroke='%2314B8C4' stroke-width='4' stroke-linecap='round' fill='none' opacity='0.85'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   Wavy section edges
-   The bands are masked with a rolling wave at top and bottom: one composited
-   layer, no extra DOM, and the illustrated backdrop stays visible through the
-   troughs.
+   Section bands
+   Each band declares only what it is made of — `--band` and, where it has
+   one, `--band-texture`. The waterline rules below read those, so one rule
+   can cut any band without knowing its colour.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.home-section {
+  isolation: isolate;
+  position: relative;
+  background-color: var(--band, transparent);
+  background-image: var(--band-texture, none);
+  background-size: var(--band-texture-size, auto);
+}
+
+/* Dry sand in full sun. */
+.shore-section {
+  --band: var(--paper);
+}
+
+/* Warm sand, a little further up the beach. */
+.cove-section {
+  --band: var(--paper-warm);
+}
+
+/* THE LAGOON. Shallow water over white sand — the brand's own colour, and
+   the one band that carries live caustics. */
+.lagoon-section {
+  --band: #d9f6f4;
+  --band-texture: linear-gradient(180deg, #eafbf9 0%, #c3efec 55%, #9fe4e0 100%);
+  --band-texture-size: 100% 100%;
+}
+
+/* Deeper water, further out. */
+.bay-section {
+  --band: #bfeaf0;
+  --band-texture: linear-gradient(180deg, #d8f4f7 0%, #a9e0e9 60%, #7fcbdc 100%);
+  --band-texture-size: 100% 100%;
+}
+
+/* First light on the water. */
+.dawn-section {
+  --band: var(--paper-warm);
+  --band-texture: linear-gradient(180deg, #fff8ec 0%, #ffeed7 55%, #ffe0bd 100%);
+  --band-texture-size: 100% 100%;
+}
+
+/* GOLDEN HOUR. The warm band, and the one that holds the big call to act. */
+.sunset-section {
+  position: relative;
+  overflow: hidden;
+  --band: var(--coral);
+  --band-texture: linear-gradient(170deg, #ffd68c 0%, #ff9b76 46%, #ff6b45 100%);
+  --band-texture-size: 100% 100%;
+  color: #fff;
+}
+
+/* The sun sitting low in that band, throwing glare up the page. */
+.sunset-section::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  bottom: -26%;
+  left: 50%;
+  width: min(90vw, 900px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 236, 190, 0.6) 26%,
+    rgba(255, 183, 3, 0.25) 44%,
+    transparent 66%
+  );
+  pointer-events: none;
+}
+
+/* THE REEF. Deep water — the darkest surface on the site, and the only one
+   where the type goes white. */
+.reef-section {
+  position: relative;
+  overflow: hidden;
+  --band: var(--abyss);
+  --band-texture: linear-gradient(180deg, #14b8c4 0%, #0a7c93 40%, #08415c 100%);
+  --band-texture-size: 100% 100%;
+  color: #fff;
+}
+
+/* Shafts of light falling through deep water. */
+.reef-section::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -10% 0 0 0;
+  pointer-events: none;
+  opacity: 0.4;
+  background: repeating-linear-gradient(
+    97deg,
+    transparent 0 42px,
+    rgba(255, 255, 255, 0.16) 42px 58px,
+    transparent 58px 120px
+  );
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
+}
+
+.sunset-section h1,
+.sunset-section h2,
+.sunset-section h3,
+.reef-section h1,
+.reef-section h2,
+.reef-section h3 {
+  color: #fff;
+  text-shadow: 0 2px 18px rgba(14, 46, 59, 0.28);
+}
+
+.sunset-section p,
+.reef-section p {
+  color: rgba(255, 255, 255, 0.93);
+}
+
+/* On a band that is itself warm, the coral button disappears — coral on
+   coral. The rule stands but inverts: the action is still the one thing that
+   is not the colour of the surface, so here it goes to unpainted white with
+   the warmth in the type. (Homer again: on a saturated ground the light is
+   what the brush leaves alone.) */
+.sunset-section .tropical-button,
+.reef-section .tropical-button,
+.sunset-section .planner-cta,
+.reef-section .planner-cta {
+  background: #fff;
+  color: var(--coral-dark);
+  box-shadow: 0 10px 26px -8px rgba(14, 46, 59, 0.35);
+}
+
+.sunset-section .tropical-button::before,
+.reef-section .tropical-button::before {
+  display: none;
+}
+
+.sunset-section .tropical-button:hover,
+.reef-section .tropical-button:hover,
+.sunset-section .planner-cta:hover,
+.reef-section .planner-cta:hover {
+  background: var(--paper);
+  color: var(--coral-dark);
+  box-shadow: 0 16px 34px -10px rgba(14, 46, 59, 0.42);
+}
+
+.sunset-section .tropical-button-outline,
+.reef-section .tropical-button-outline {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #fff;
+}
+
+.sunset-section .tropical-button-outline:hover,
+.reef-section .tropical-button-outline:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: #fff;
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   The waterline
+   Bands meet the way a dive photographer's frame does: the edge is a swell,
+   and along that swell the band goes white — foam. The foam is not drawn on
+   top, it is a white stripe in the band's own background that the wave mask
+   cuts into. Homer's rule, structurally: the light is unpainted band.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --wave-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,72 C120,120 220,24 340,58 C460,92 540,10 660,44 C780,78 880,116 1000,74 C1090,42 1140,58 1200,44 L1200,120 L0,120 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,76 C1140,62 1090,78 1000,46 C880,4 780,42 660,76 C540,110 460,28 340,62 C220,96 120,0 0,48 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-height: 3.25rem;
+  --wave-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,58 C150,14 300,98 450,60 C600,22 750,102 900,64 C1020,34 1120,78 1200,52 L1200,120 L0,120 Z' fill='%23000'/%3E%3C/svg%3E");
+  --wave-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,68 C1120,42 1020,86 900,56 C750,18 600,98 450,60 C300,22 150,106 0,62 Z' fill='%23000'/%3E%3C/svg%3E");
+  --wave-height: 4rem;
+  --foam: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.82) 42%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  --foam-up: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.82) 42%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
 .wavy-band,
@@ -272,6 +493,25 @@ a:hover {
 .wavy-band-bottom {
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+  /* Foam stripes painted over the band's own texture. The unused stripe is
+     parked with a LENGTH — a percentage offset resolves against
+     (container − image), and these are 100% wide, so any percentage would
+     collapse to 0 and print the stripe at the top edge instead of hiding it. */
+  background-image: var(--foam), var(--foam-up), var(--band-texture, none);
+  background-size:
+    100% calc(var(--wave-height) * 1.6),
+    100% calc(var(--wave-height) * 1.6),
+    var(--band-texture-size, auto);
+  background-position: top center, bottom center, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat;
+}
+
+.wavy-band-top {
+  background-position: top center, 0 -9999px, 0 0;
+}
+
+.wavy-band-bottom {
+  background-position: 0 -9999px, bottom center, 0 0;
 }
 
 .wavy-band {
@@ -303,253 +543,316 @@ a:hover {
 
 @media (max-width: 640px) {
   :root {
-    --wave-height: 2rem;
+    --wave-height: 2.5rem;
   }
 }
 
-/* ── Drawn surfaces ─────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   Surfaces
+   Cards are things resting in sunlight: white, generously rounded, lifted on
+   soft layered shadow. They rise towards the light on hover.
+   ══════════════════════════════════════════════════════════════════════════ */
 
-/* The single card recipe the whole site draws from. */
 .sticker-card,
 .artsy-glass-card,
 .glass-card {
   position: relative;
-  background: #fffdf7;
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  background: #fff;
+  border: 1px solid rgba(14, 46, 59, 0.07);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
 }
 
 .sticker-card:hover,
 .artsy-glass-card:hover,
 .glass-card:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 0 var(--ink);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lift);
 }
 
-/* Feature cards live on the saturated bands, so they are painted in poster
-   colours and cycle hue by position. */
+/* Frosted glass, for panels that sit directly on a photograph. This is the
+   one place blur earns its keep: the picture stays readable through it. */
+.hero-glass {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  backdrop-filter: blur(18px) saturate(1.25);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-xl);
+}
+
 .home-feature-card {
   position: relative;
-  border-radius: 26px;
-  border: var(--stroke) solid var(--ink);
-  background: var(--paper);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.94);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   color: var(--ink);
-  box-shadow: var(--shadow-ink);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
 }
 
 .home-feature-card:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 9px 9px 0 0 var(--ink);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lift);
 }
 
-.home-feature-card:nth-child(3n + 1) {
-  background: #fff2d9;
-}
-
-.home-feature-card:nth-child(3n + 2) {
-  background: #e2fbf5;
-}
-
-.home-feature-card:nth-child(3n + 3) {
-  background: #ffe8ea;
-}
-
-/* Feature-card copy is dark now that the cards are cream, so neutralise the
-   light text utilities the markup still carries. */
+/* These sit on the deep band, whose copy is white; the cards are not, so
+   their contents go back to ink. */
 .home-feature-card h3,
-.home-feature-card p {
+.home-feature-card p,
+.home-feature-card :is(h1, h2, h4, h5, h6) {
   color: var(--ink);
+  text-shadow: none;
+}
+
+/* The booking surface. Principle 5 in one rule: as a visitor gets closer to
+   paying, the page gets quieter. This is white, hairline-ruled and softly
+   lifted — no colour of its own, so the coral button is the only warm thing
+   in the card and reads as the single thing to do. */
+.booking-card {
+  background: #fff;
+  border: 1px solid rgba(14, 46, 59, 0.07);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
+}
+
+.booking-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-xl);
 }
 
 .story-copy-card {
-  border-radius: 24px;
-  border: var(--stroke) solid var(--ink);
-  background: #fffdf7;
-  padding: 1.75rem;
-  box-shadow: var(--shadow-ink);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  border: 1px solid rgba(14, 46, 59, 0.07);
+  padding: 1.9rem;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
 }
 
 .story-copy-card:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 0 var(--ink);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
-/* Photographs are framed as if pasted into a scrapbook: ink border, hard
-   shadow, and a small colour lift so they sit with the drawn palette. */
+/* ── Photography ──────────────────────────────────────────────────────────
+   The pictures are the product, so they are graded, not stylised away: a
+   golden-hour lift — warmth, a little contrast, a little saturation — and
+   they bloom towards the light when you reach for them. */
+
+.photo-pop {
+  filter: saturate(1.12) contrast(1.06) brightness(1.02);
+  transition: filter 0.6s ease, transform 0.8s var(--ease-out);
+}
+
+.group:hover .photo-pop,
+.group:focus-within .photo-pop,
+a:hover .photo-pop,
+.photo-pop:hover {
+  filter: saturate(1.2) contrast(1.08) brightness(1.06);
+}
+
 .story-media-frame {
   position: relative;
 }
 
 .story-media-frame img,
 .story-media-frame iframe {
-  border-radius: 24px;
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink-lg);
-  filter: saturate(1.18) contrast(1.05);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  filter: saturate(1.12) contrast(1.05);
 }
 
 .photo-sticker {
-  border: var(--stroke) solid var(--ink);
-  filter: saturate(1.2) contrast(1.06);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  filter: saturate(1.12) contrast(1.05);
 }
 
-/* Photography sits inside a drawn page, so it is pushed a little towards the
-   poster palette: more saturation, a touch more contrast, slightly warmer. */
-.photo-pop {
-  filter: saturate(1.22) contrast(1.07) brightness(1.02);
-}
-
-.hero-glass {
+/* A photograph sitting in water picks up light from it. Used on framed
+   media to bed it into the page rather than pasting it on top. */
+.photo-frame {
   position: relative;
   overflow: hidden;
-  border-radius: 32px;
-  background: var(--paper);
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
 }
 
-/* Round sticker holding a section's emoji. */
+.photo-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    transparent 26%,
+    transparent 62%,
+    rgba(14, 46, 59, 0.22) 100%
+  );
+}
+
+/* A sun-lit disc at the head of a section. */
 .section-icon {
   display: inline-grid;
   width: 78px;
   height: 78px;
   place-items: center;
   border-radius: 9999px;
-  background: var(--mango-light);
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
+  background: linear-gradient(160deg, #fff 0%, var(--gold-light) 62%, var(--gold) 100%);
+  box-shadow: 0 10px 26px -8px rgba(255, 183, 3, 0.6), 0 0 0 8px rgba(255, 255, 255, 0.55);
   font-size: 2.3rem;
   line-height: 1;
-  transform: rotate(-3deg);
-  transition: transform 0.25s ease;
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
 }
 
 .section-icon:hover {
-  transform: rotate(3deg) scale(1.05);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 16px 34px -8px rgba(255, 183, 3, 0.7), 0 0 0 10px rgba(255, 255, 255, 0.7);
 }
 
-/* Loose colour washes behind sections. Kept soft and sparse — they suggest
-   painted paper rather than a photographic glow. */
+/* Broad, soft colour washes — light pooling behind a section, not paint. */
 .parallax-wash {
   position: absolute;
   z-index: -1;
-  width: min(40vw, 460px);
+  width: min(46vw, 540px);
   aspect-ratio: 1;
-  border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
-  opacity: 0.35;
+  border-radius: 9999px;
+  opacity: 0.5;
   pointer-events: none;
-  background: var(--mango-light);
+  filter: blur(60px);
+  background: radial-gradient(circle, var(--lagoon-light) 0%, transparent 70%);
 }
 
 .parallax-wash-left {
-  left: -12%;
-  top: 10%;
-  background: var(--lagoon-light);
+  left: -14%;
+  top: 6%;
+  background: radial-gradient(circle, var(--lagoon-light) 0%, transparent 70%);
 }
 
 .parallax-wash-right {
-  right: -12%;
-  bottom: 8%;
-  background: var(--mango-light);
+  right: -14%;
+  bottom: 4%;
+  background: radial-gradient(circle, var(--gold-light) 0%, transparent 70%);
 }
 
-/* ── Buttons ────────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   Actions
+   Everything a visitor can do is warm. Nothing that is merely information
+   is. That is the whole colour system in one sentence.
+   ══════════════════════════════════════════════════════════════════════════ */
 
-/* Buttons that don't set their own radius stay pills, as they were before the
-   redesign — a Tailwind radius utility still overrides this. */
 button {
-  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-weight: 700;
   border-radius: 9999px;
 }
 
-/* The press interaction: the button slides into its own shadow. */
-.tropical-button,
-.tropical-button-outline,
-.planner-cta,
-.planner-cta-ghost {
-  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+.tropical-button {
+  @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-8 py-3.5 text-sm font-bold;
+  letter-spacing: 0.01em;
+  background: linear-gradient(140deg, var(--coral-light) 0%, var(--coral) 55%, var(--coral-dark) 100%);
+  color: #fff;
+  box-shadow: 0 10px 26px -8px rgba(255, 107, 69, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), filter 0.3s ease;
 }
 
-.tropical-button {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
-  background: var(--mango);
-  color: var(--ink);
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+/* Sun catching the edge as it rises. */
+.tropical-button::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 60%;
+  height: 220%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: rotate(18deg);
+  transition: left 0.7s var(--ease-out);
+  pointer-events: none;
+}
+
+.tropical-button:hover::before {
+  left: 130%;
 }
 
 .tropical-button:hover {
-  background: var(--mango-light);
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 0 var(--ink);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px -10px rgba(255, 107, 69, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  filter: brightness(1.04);
 }
 
 .tropical-button:active {
-  transform: translate(3px, 3px);
-  box-shadow: 1px 1px 0 0 var(--ink);
+  transform: translateY(0);
+  box-shadow: 0 6px 14px -6px rgba(255, 107, 69, 0.6);
 }
 
+/* The quieter route: an outlined pill that fills with sea on hover. */
 .tropical-button-outline {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
-  background: #fffdf7;
+  @apply relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold;
+  background: rgba(255, 255, 255, 0.9);
   color: var(--ink);
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  border: 1.5px solid rgba(14, 46, 59, 0.14);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 .tropical-button-outline:hover {
-  background: var(--lagoon-light);
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 0 var(--ink);
+  transform: translateY(-3px);
+  background: #fff;
+  border-color: var(--lagoon);
+  color: var(--lagoon-dark);
+  box-shadow: 0 14px 30px -10px rgba(20, 184, 196, 0.45);
 }
 
 .tropical-button-outline:active {
-  transform: translate(3px, 3px);
-  box-shadow: 1px 1px 0 0 var(--ink);
+  transform: translateY(0);
 }
 
-/* Colour variants for the same shape. */
 .btn-lagoon {
-  background: var(--lagoon);
-  color: #ffffff;
+  background: linear-gradient(140deg, var(--lagoon-light) 0%, var(--lagoon) 55%, var(--lagoon-dark) 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 26px -8px rgba(20, 184, 196, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-lagoon:hover {
-  background: var(--lagoon-light);
-  color: var(--ink);
+  background: linear-gradient(140deg, var(--lagoon-light) 0%, var(--lagoon) 45%, var(--lagoon-dark) 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 18px 36px -10px rgba(20, 184, 196, 0.7);
 }
 
 .btn-hibiscus {
-  background: var(--hibiscus);
-  color: #ffffff;
+  background: linear-gradient(140deg, var(--hibiscus-light) 0%, var(--hibiscus) 100%);
+  color: #fff;
+  border-color: transparent;
 }
 
 .btn-hibiscus:hover {
-  background: var(--hibiscus-light);
-  color: var(--ink);
+  color: #fff;
+  border-color: transparent;
 }
 
 button,
 input,
 textarea,
 select {
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
-/* Form fields are drawn with the same pen as everything else. These are
-   element selectors, so any component that sets its own border/background
-   utilities still wins — this is only the default for fields that don't. */
+/* ── Forms: the calm end of the site ──────────────────────────────────────
+   Principle five. This is where money changes hands, so the surface goes
+   quiet: white, generous, unfussy, with the sea marking focus. */
+
 input:not([type='range']),
 textarea,
 select {
-  font-family: 'Nunito', system-ui, sans-serif;
-  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 500;
   color: var(--ink);
 }
 
@@ -563,9 +866,10 @@ input[type='search'],
 input[type='password'],
 textarea,
 select {
-  border: var(--stroke-thin) solid var(--ink);
+  border: 1.5px solid rgba(14, 46, 59, 0.14);
   border-radius: 14px;
-  background: #ffffff;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 input[type='text']:focus,
@@ -579,138 +883,124 @@ input[type='password']:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  background: #f0fdfa;
+  border-color: var(--lagoon);
+  box-shadow: 0 0 0 4px rgba(20, 184, 196, 0.16);
 }
 
 ::placeholder {
   color: var(--ink-light);
-  font-weight: 600;
+  font-weight: 400;
 }
 
-/* ── Navigation ─────────────────────────────────────────────────────────── */
+/* ── Navigation ───────────────────────────────────────────────────────────
+   The header is sea air: near-white, blurred, barely there, so the
+   photography behind it is what you notice first. */
 
 .lobster-header {
-  background: var(--paper);
-  border-bottom: 3px solid var(--ink);
+  background: rgba(255, 251, 245, 0.82);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid rgba(14, 46, 59, 0.07);
+  box-shadow: 0 2px 20px rgba(14, 46, 59, 0.05);
 }
 
 .nav-link-pill {
-  @apply flex items-center gap-2 rounded-full px-4 py-2 font-bold transition duration-200;
-  color: var(--ink);
-  border: var(--stroke-thin) solid transparent;
+  @apply flex items-center gap-2 rounded-full px-4 py-2 font-semibold transition duration-300;
+  color: var(--ink-soft);
 }
 
 .nav-link-pill:hover {
-  background: var(--mango-light);
-  border-color: var(--ink);
-  color: var(--ink);
+  background: rgba(20, 184, 196, 0.1);
+  color: var(--lagoon-dark);
   transform: translateY(-1px);
 }
 
 .nav-link-pill-active {
-  background: var(--lagoon-light);
-  border-color: var(--ink);
-  box-shadow: var(--shadow-ink-sm);
+  background: rgba(20, 184, 196, 0.14);
+  color: var(--lagoon-dark);
 }
 
 .language-toggle {
   @apply inline-flex items-center rounded-full p-1;
-  background: #fffdf7;
-  border: var(--stroke-thin) solid var(--ink);
-  box-shadow: var(--shadow-ink-sm);
+  background: rgba(14, 46, 59, 0.05);
 }
 
 .language-toggle-button {
-  @apply inline-flex h-9 min-w-[48px] items-center justify-center rounded-full px-3.5 text-sm font-extrabold transition duration-150;
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
-  color: var(--ink);
+  @apply inline-flex h-9 min-w-[46px] items-center justify-center rounded-full px-3.5 text-sm font-bold transition duration-300;
+  color: var(--ink-soft);
 }
 
 .language-toggle-button.active {
-  background: var(--lagoon);
-  color: #ffffff;
+  background: #fff;
+  color: var(--lagoon-dark);
+  box-shadow: var(--shadow-sm);
 }
 
 .language-toggle-button:not(.active):hover {
-  background: var(--mango-light);
+  color: var(--ink);
 }
 
-/* ── Stickers & badges ──────────────────────────────────────────────────── */
+/* ── Badges & labels ────────────────────────────────────────────────────── */
 
 .artsy-brick-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.8rem;
+  padding: 0.34rem 0.85rem;
   border-radius: 9999px;
-  background: var(--mango);
-  color: var(--ink);
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--lagoon-dark);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: var(--stroke-thin) solid var(--ink);
-  box-shadow: var(--shadow-ink-sm);
-  transform: rotate(-3deg);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.artsy-brick-badge:hover {
-  transform: rotate(0deg) scale(1.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .artsy-brick-badge-inverted {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.8rem;
+  padding: 0.34rem 0.85rem;
   border-radius: 9999px;
-  background: var(--lagoon-light);
-  color: var(--ink);
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  background: linear-gradient(135deg, var(--lagoon) 0%, var(--lagoon-dark) 100%);
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: var(--stroke-thin) solid var(--ink);
-  box-shadow: var(--shadow-ink-sm);
-  transform: rotate(2deg);
+  box-shadow: 0 8px 20px -6px rgba(20, 184, 196, 0.5);
 }
 
 .artsy-title-card {
   display: inline-block;
   padding: 0.7rem 1.5rem;
-  background: var(--lagoon);
-  color: #ffffff;
-  border-radius: 20px;
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
-  transform: rotate(-1.5deg);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--lagoon) 0%, var(--lagoon-dark) 100%);
+  color: #fff;
+  box-shadow: 0 12px 28px -10px rgba(20, 184, 196, 0.55);
 }
 
 .artsy-title-card-light {
   display: inline-block;
   padding: 0.7rem 1.5rem;
-  background: var(--paper);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.92);
   color: var(--ink);
-  border-radius: 20px;
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
-  transform: rotate(1.5deg);
+  box-shadow: var(--shadow-md);
 }
 
-/* A postage-stamp edge, used on the hero portrait and highlight tiles. */
+/* Kept for the hero portrait; a soft scalloped edge rather than a stamp. */
 .stamp-edge {
-  --stamp-notch: 9px;
-  background: var(--ink);
-  padding: var(--stroke);
-  -webkit-mask-image: radial-gradient(circle at center, #000 68%, transparent 70%);
-  -webkit-mask-size: var(--stamp-notch) var(--stamp-notch);
-  -webkit-mask-repeat: repeat;
-  mask-image: radial-gradient(circle at center, #000 68%, transparent 70%);
-  mask-size: var(--stamp-notch) var(--stamp-notch);
-  mask-repeat: repeat;
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.6);
+  padding: 6px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 /* ── Pathway cards ──────────────────────────────────────────────────────── */
@@ -718,38 +1008,38 @@ select:focus {
 .pathway-card {
   position: relative;
   overflow: hidden;
-  border-radius: 30px;
-  border: var(--stroke) solid var(--ink);
-  background: #fffdf7;
-  box-shadow: var(--shadow-ink-lg);
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+  border-radius: var(--radius-xl);
+  background: #fff;
+  border: 1px solid rgba(14, 46, 59, 0.07);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
 }
 
 .pathway-card:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 12px 12px 0 0 var(--ink);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lift);
 }
 
 .pathway-card-dark {
-  background: #1b3a4b;
-  color: #fff6e5;
+  background: linear-gradient(160deg, #0f6a80 0%, #08415c 100%);
+  color: #fff;
+  border-color: transparent;
 }
 
-.pathway-card-dark h3,
-.pathway-card-dark h2 {
-  color: #fff6e5;
+.pathway-card-dark :is(h1, h2, h3, h4, h5, h6) {
+  color: #fff;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   Plan My Day — the night-market panel
-   The planner is the one deliberately dark surface: a flat midnight-teal
-   poster with mango and lagoon accents, so the guided flow reads as its own
-   place without breaking the drawn language.
+   Plan My Day — the calm room
+   Principle five, most literally. The planner is where a family commits to a
+   day and a price, so it is the quietest surface on the site: deep clear
+   water, white cards, and warmth only on the option actually chosen.
    ══════════════════════════════════════════════════════════════════════════ */
 
 .planner {
   --planner-teal: var(--lagoon-light);
-  --planner-amber: var(--mango-light);
+  --planner-amber: var(--gold-light);
   position: relative;
   isolation: isolate;
 }
@@ -757,54 +1047,74 @@ select:focus {
 .planner-glow {
   position: absolute;
   z-index: -1;
-  border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
-  opacity: 0.4;
+  border-radius: 9999px;
+  opacity: 0.5;
+  filter: blur(70px);
   pointer-events: none;
 }
 
 .planner-panel {
-  border-radius: 30px;
-  border: var(--stroke) solid var(--ink);
-  background: #17313f;
-  color: #fff6e5;
-  box-shadow: var(--shadow-ink-lg);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(165deg, #0f6a80 0%, #08415c 62%, #052a3d 100%);
+  color: #fff;
+  box-shadow: var(--shadow-xl);
+}
+
+/* `.planner-panel-soft` is frosted white, which only works *inside* the deep
+   panel. These three sit on the open page, where the same treatment turns
+   muddy against the water — so out here the card is simply white. */
+.planner-card {
+  border-radius: var(--radius-lg);
+  background: #fff;
+  border: 1px solid rgba(14, 46, 59, 0.07);
+  box-shadow: var(--shadow-md);
 }
 
 .planner-panel-soft {
-  border-radius: 22px;
-  border: var(--stroke-thin) solid rgba(255, 246, 229, 0.35);
-  background: #1f3d4d;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
+.planner-panel :is(h1, h2, h3, h4, h5, h6),
+.planner-panel-soft :is(h1, h2, h3, h4, h5, h6) {
+  color: #fff;
+}
+
+/* An answer is a white card. Choosing it warms it — the only warm thing in
+   the room is the thing you picked. */
 .planner-option {
   position: relative;
   display: flex;
   width: 100%;
   align-items: flex-start;
   gap: 1rem;
-  border-radius: 20px;
-  border: var(--stroke-thin) solid var(--ink);
-  background: #f7fbfb;
+  border-radius: var(--radius);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.95);
   padding: 1.1rem 1.2rem;
   text-align: left;
   color: var(--ink);
-  box-shadow: 4px 4px 0 0 var(--ink);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background 0.3s ease;
 }
 
 .planner-option:hover {
-  transform: translate(-2px, -2px);
-  background: var(--lagoon-light);
-  box-shadow: 6px 6px 0 0 var(--ink);
+  transform: translateY(-3px);
+  background: #fff;
+  box-shadow: 0 14px 30px -10px rgba(20, 184, 196, 0.45);
 }
 
 .planner-option[data-selected='true'] {
-  background: var(--mango-light);
-  box-shadow: 6px 6px 0 0 var(--ink);
+  background: linear-gradient(140deg, #fff 0%, #ffe9dd 100%);
+  border-color: var(--coral);
+  box-shadow: 0 14px 30px -10px rgba(255, 107, 69, 0.5);
 }
 
-/* The option markup carries light-on-dark text utilities; the tiles are cream
-   now, so pin their contents back to ink. */
+/* The option markup carries light-on-dark utilities from the panel; the
+   tiles are white, so pin their contents back to ink. */
 .planner-option,
 .planner-option * {
   color: var(--ink) !important;
@@ -815,97 +1125,93 @@ select:focus {
   align-items: center;
   gap: 0.5rem;
   border-radius: 9999px;
-  border: var(--stroke-thin) solid var(--ink);
-  background: #fffdf7;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.94);
   padding: 0.5rem 1rem;
-  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.85rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--ink);
-  box-shadow: 3px 3px 0 0 var(--ink);
-  transition: transform 0.18s ease, background 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s var(--ease-out), background 0.25s ease;
 }
 
 .planner-chip:hover {
-  background: var(--lagoon-light);
-  transform: translate(-1px, -1px);
+  transform: translateY(-2px);
+  background: #fff;
 }
 
 .planner-chip[data-selected='true'] {
-  background: var(--mango);
-  color: var(--ink);
+  background: linear-gradient(140deg, var(--coral-light) 0%, var(--coral) 100%);
+  color: #fff;
+  border-color: transparent;
 }
 
+/* How far through you are, filling with light. */
 .planner-rail {
-  height: 12px;
+  height: 10px;
   width: 100%;
   overflow: hidden;
   border-radius: 9999px;
-  border: var(--stroke-thin) solid var(--ink);
-  background: #fffdf7;
+  background: rgba(14, 46, 59, 0.1);
 }
 
 .planner-rail-fill {
   height: 100%;
-  background: repeating-linear-gradient(
-    45deg,
-    var(--mango) 0 10px,
-    var(--mango-light) 10px 20px
-  );
-  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--lagoon) 0%, var(--gold) 60%, var(--coral) 100%);
+  box-shadow: 0 0 14px rgba(255, 183, 3, 0.5);
+  transition: width 0.55s var(--ease-out);
 }
 
 .planner-cta {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-extrabold uppercase tracking-wide;
-  background: var(--mango);
-  color: var(--ink);
-  border: var(--stroke) solid var(--ink);
-  box-shadow: var(--shadow-ink);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold;
+  background: linear-gradient(140deg, var(--coral-light) 0%, var(--coral) 55%, var(--coral-dark) 100%);
+  color: #fff;
+  box-shadow: 0 12px 28px -8px rgba(255, 107, 69, 0.6);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
 }
 
 .planner-cta:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 0 var(--ink);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 38px -10px rgba(255, 107, 69, 0.7);
 }
 
 .planner-cta:active {
-  transform: translate(3px, 3px);
-  box-shadow: 1px 1px 0 0 var(--ink);
+  transform: translateY(0);
 }
 
 .planner-cta-ghost {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-wide;
-  border: var(--stroke) solid #fff6e5;
-  background: transparent;
-  color: #fff6e5;
-  transition: background 0.2s ease, color 0.2s ease;
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .planner-cta-ghost:hover {
-  background: #fff6e5;
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 .planner-key {
   display: inline-grid;
-  height: 1.6rem;
-  min-width: 1.6rem;
+  height: 1.7rem;
+  min-width: 1.7rem;
   place-items: center;
-  border-radius: 0.5rem;
-  border: var(--stroke-thin) solid var(--ink);
-  background: var(--paper);
-  font-family: 'Baloo 2', sans-serif;
+  border-radius: 8px;
+  background: rgba(14, 46, 59, 0.08);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--ink);
+  font-weight: 700;
+  color: var(--ink-soft);
 }
 
 .planner-marquee {
   display: flex;
   gap: 1rem;
   width: max-content;
-  animation: drift 48s linear infinite;
+  animation: drift 52s linear infinite;
 }
 
 @keyframes drift {
@@ -913,54 +1219,53 @@ select:focus {
   to { transform: translate3d(-50%, 0, 0); }
 }
 
-/* ── Drawn motion ───────────────────────────────────────────────────────── */
+/* ── Motion ───────────────────────────────────────────────────────────────
+   Everything here drifts the way things do in warm water: slow, buoyant,
+   and never quite in step with its neighbour. */
 
-/* Ten gentle tilt/bob variants. Cards nudge like paper cut-outs pinned to a
-   board — small amplitudes, no skew, so outlines stay crisp. */
-@keyframes tilt1 { 0%, 100% { transform: translateY(0) rotate(-0.8deg); } 50% { transform: translateY(-7px) rotate(0.7deg); } }
-@keyframes tilt2 { 0%, 100% { transform: translateY(0) rotate(0.9deg); } 50% { transform: translateY(-6px) rotate(-0.8deg); } }
-@keyframes tilt3 { 0%, 100% { transform: translateY(0) rotate(-1.1deg); } 50% { transform: translateY(-8px) rotate(0.5deg); } }
-@keyframes tilt4 { 0%, 100% { transform: translateY(0) rotate(0.6deg); } 50% { transform: translateY(-5px) rotate(-1deg); } }
-@keyframes tilt5 { 0%, 100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-9px) rotate(0.9deg); } }
+@keyframes swell1 { 0%, 100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-12px) rotate(0.4deg); } }
+@keyframes swell2 { 0%, 100% { transform: translateY(0) rotate(0.6deg); } 50% { transform: translateY(-9px) rotate(-0.5deg); } }
+@keyframes swell3 { 0%, 100% { transform: translateY(0) rotate(-0.7deg); } 50% { transform: translateY(-14px) rotate(0.3deg); } }
+@keyframes swell4 { 0%, 100% { transform: translateY(0) rotate(0.4deg); } 50% { transform: translateY(-8px) rotate(-0.6deg); } }
+@keyframes swell5 { 0%, 100% { transform: translateY(0) rotate(-0.3deg); } 50% { transform: translateY(-16px) rotate(0.5deg); } }
 
-.animate-wave-sway-1 { animation: tilt1 7s ease-in-out infinite; }
-.animate-wave-sway-2 { animation: tilt2 8.5s ease-in-out infinite; animation-delay: -1.5s; }
-.animate-wave-sway-3 { animation: tilt3 7.5s ease-in-out infinite; animation-delay: -3.5s; }
-.animate-wave-sway-4 { animation: tilt4 9s ease-in-out infinite; animation-delay: -1s; }
-.animate-wave-sway-5 { animation: tilt5 6.5s ease-in-out infinite; animation-delay: -4s; }
-.animate-wave-sway-6 { animation: tilt1 8s ease-in-out infinite; animation-delay: -2.5s; }
-.animate-wave-sway-7 { animation: tilt2 9.5s ease-in-out infinite; animation-delay: -5s; }
-.animate-wave-sway-8 { animation: tilt3 6s ease-in-out infinite; animation-delay: -0.5s; }
-.animate-wave-sway-9 { animation: tilt4 8.8s ease-in-out infinite; animation-delay: -6s; }
-.animate-wave-sway-10 { animation: tilt5 7.2s ease-in-out infinite; animation-delay: -3.8s; }
+.animate-wave-sway-1 { animation: swell1 9s ease-in-out infinite; }
+.animate-wave-sway-2 { animation: swell2 11s ease-in-out infinite; animation-delay: -2s; }
+.animate-wave-sway-3 { animation: swell3 10s ease-in-out infinite; animation-delay: -4.5s; }
+.animate-wave-sway-4 { animation: swell4 12s ease-in-out infinite; animation-delay: -1.5s; }
+.animate-wave-sway-5 { animation: swell5 8.5s ease-in-out infinite; animation-delay: -6s; }
+.animate-wave-sway-6 { animation: swell1 10.5s ease-in-out infinite; animation-delay: -3s; }
+.animate-wave-sway-7 { animation: swell2 12.5s ease-in-out infinite; animation-delay: -7s; }
+.animate-wave-sway-8 { animation: swell3 9.5s ease-in-out infinite; animation-delay: -1s; }
+.animate-wave-sway-9 { animation: swell4 11.5s ease-in-out infinite; animation-delay: -5s; }
+.animate-wave-sway-10 { animation: swell5 10.2s ease-in-out infinite; animation-delay: -8s; }
 
-/* A hovered card should settle: stop the drift so the lift reads cleanly. */
+/* A card being reached for stops drifting, so the lift reads cleanly. */
 [class*='animate-wave-sway-']:hover {
   animation-play-state: paused;
 }
 
+/* The booking button breathes like something floating. */
 @keyframes fabPulse {
-  0%, 100% { box-shadow: 4px 4px 0 0 var(--ink); }
-  50% { box-shadow: 4px 4px 0 0 var(--ink), 0 0 0 10px rgba(47, 168, 79, 0.18); }
+  0%, 100% { box-shadow: 0 12px 30px -8px rgba(255, 107, 69, 0.6); }
+  50% { box-shadow: 0 12px 30px -8px rgba(255, 107, 69, 0.7), 0 0 0 12px rgba(255, 107, 69, 0.12); }
 }
 
 .animate-fab-glow-wave {
-  animation: fabPulse 3s ease-in-out infinite;
+  animation: fabPulse 3.4s ease-in-out infinite;
 }
 
-/* Palm fronds and clouds in the backdrop breathe rather than sway hard. */
+/* Palm fronds move in the trade wind — from the stem, not the middle. */
 @keyframes frondSway {
-  0%, 100% { transform: rotate(-2.5deg); }
-  50% { transform: rotate(2.5deg); }
+  0%, 100% { transform: rotate(-2.2deg); }
+  50% { transform: rotate(2.2deg); }
 }
 
 .animate-frond {
-  animation: frondSway 9s ease-in-out infinite;
+  animation: frondSway 11s ease-in-out infinite;
   transform-origin: bottom center;
 }
 
-/* Clouds cross the viewport, so the distance is measured in viewport widths
-   rather than in multiples of the cloud's own box. */
 @keyframes cloudDrift {
   from { transform: translateX(-25vw); }
   to { transform: translateX(125vw); }
@@ -974,17 +1279,16 @@ select:focus {
   --tw-prose-links: var(--lagoon-dark);
   --tw-prose-bold: var(--ink);
   --tw-prose-quotes: var(--ink);
+  --tw-prose-quote-borders: var(--lagoon);
+  --tw-prose-bullets: var(--lagoon);
+  --tw-prose-counters: var(--coral);
 }
 
-@media (max-width: 640px) {
-  :root {
-    --stroke: 2px;
-    --shadow-ink: 4px 4px 0 0 var(--ink);
-    --shadow-ink-lg: 5px 5px 0 0 var(--ink);
-  }
+/* ── Small screens ──────────────────────────────────────────────────────── */
 
-  .hero-glass {
-    border-radius: 24px;
+@media (max-width: 640px) {
+  body {
+    font-size: 1rem;
   }
 
   .section-shell {

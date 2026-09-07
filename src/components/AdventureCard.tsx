@@ -51,26 +51,24 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
     navigate(detailPaths[adventure.id] || '/tours');
   };
 
-  const radiusClass = index % 3 === 0
-    ? 'rounded-[30px_20px_28px_22px]'
-    : index % 3 === 1
-    ? 'rounded-[22px_30px_20px_28px]'
-    : 'rounded-[28px_20px_30px_18px]';
+  // Pebble-round, like everything else here. The old torn corners belonged
+  // to a different design.
+  const radiusClass = 'rounded-3xl';
 
   return (
     <div
       onMouseEnter={() => playHoverFx()}
-      className={`group flex h-full flex-col overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
+      className={`group flex h-full flex-col overflow-hidden ${radiusClass} booking-card ${swayClass}`}
     >
       {/* Image container */}
-      <div className="relative h-60 overflow-hidden border-b-[2.5px] border-ink bg-paper-warm sm:h-64 md:h-80">
+      <div className="relative h-60 overflow-hidden bg-paper-warm sm:h-64 md:h-80">
         <img
           src={adventure.imageUrl}
           alt={adventure.title}
           className="photo-pop h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         {/* Ink wash on hover, so the play button has something to sit against */}
-        <div className="absolute inset-0 bg-ink/45 opacity-0 transition-opacity group-hover:opacity-100" />
+        <div className="absolute inset-0 bg-abyss/50 opacity-0 transition-opacity group-hover:opacity-100" />
 
         {/* Video button overlay */}
         {!showVideo && (
@@ -81,12 +79,12 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
             }}
             className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
           >
-            <FaPlayCircle className="text-6xl text-paper transition-transform hover:scale-110" />
+            <FaPlayCircle className="text-6xl text-white drop-shadow-lg transition-transform hover:scale-110" />
           </button>
         )}
 
         {/* Emoji badge */}
-        <div className="absolute right-4 top-4 rotate-3 rounded-full border-[2.5px] border-ink bg-mango-light p-3 text-3xl leading-none shadow-ink-sm">
+        <div className="absolute right-4 top-4 grid h-16 w-16 place-items-center rounded-full bg-white/92 text-3xl leading-none shadow-lg backdrop-blur">
           {adventure.emoji}
         </div>
       </div>
@@ -108,7 +106,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
               playClickFx();
               setShowVideo(false);
             }}
-            className="absolute right-2 top-2 z-10 rounded-full border-2 border-ink bg-hibiscus px-3 py-1 text-xs font-extrabold text-white"
+            className="absolute right-2 top-2 z-10 rounded-full bg-white/90 px-3 py-1 text-xs font-extrabold text-ink shadow-md backdrop-blur transition hover:bg-white"
           >
             Close Video
           </button>
@@ -140,7 +138,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
             isExpanded ? 'max-h-96' : 'max-h-0'
           }`}
         >
-          <div className="mt-4 border-t-2 border-dashed border-ink/25 pt-4">
+          <div className="mt-4 border-t border-ink/10 pt-4">
             <div className="mb-4">
               <h4 className="mb-2 font-display font-extrabold text-ink">
                 <FormattedMessage id="story.highlights" />
@@ -166,7 +164,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
               {adventure.mood.split(', ').map((mood, idx) => (
                 <span
                   key={idx}
-                  className="rounded-full border-2 border-ink bg-lagoon-light px-3 py-1 text-xs font-extrabold text-ink"
+                  className="rounded-full bg-lagoon-light/60 px-3 py-1.5 text-xs font-bold text-lagoon-dark"
                 >
                   {mood}
                 </span>
@@ -182,20 +180,20 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
               playClickFx();
               setIsExpanded(!isExpanded);
             }}
-            className="flex-1 rounded-full border-[2.5px] border-ink bg-paper px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-lagoon-light"
+            className="flex-1 rounded-full bg-paper-warm px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink-soft ring-1 ring-ink/10 transition hover:-translate-y-0.5 hover:bg-lagoon-light/60 hover:text-lagoon-dark"
           >
             {isExpanded ? 'Show Less' : 'Details'}
           </button>
           <button
             onClick={handleWhatsAppClick}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-mango px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-mango-light"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-br from-mango-light via-mango to-mango-dark px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-coral transition hover:-translate-y-0.5 hover:shadow-lg"
           >
             <FaMapPin className="text-base" />
             Book Now
           </button>
           <button
             onClick={handleShowDetails}
-            className="flex flex-1 items-center justify-center rounded-full border-[2.5px] border-ink bg-paper px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-hibiscus-light"
+            className="flex flex-1 items-center justify-center rounded-full bg-paper-warm px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink-soft ring-1 ring-ink/10 transition hover:-translate-y-0.5 hover:bg-lagoon-light/60 hover:text-lagoon-dark"
           >
             All Details
           </button>

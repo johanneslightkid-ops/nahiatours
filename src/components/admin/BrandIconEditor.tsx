@@ -127,7 +127,7 @@ const BrandIconEditor: React.FC<BrandIconEditorProps> = ({ file, onCancel, onApp
 
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/60 p-4">
-      <div className="w-full max-w-md rounded-[26px] border-[3px] border-ink bg-paper p-6 shadow-ink-lg">
+      <div className="w-full max-w-md rounded-3xl ring-1 ring-ink/10 bg-paper p-6 shadow-xl">
         <h3 className="mb-1 font-display text-xl font-extrabold text-ink">Frame the icon</h3>
         <p className="mb-4 text-xs font-semibold text-ink-light">
           Drag to reposition, use the slider to zoom. The circle is exactly what the site will show.
@@ -135,7 +135,7 @@ const BrandIconEditor: React.FC<BrandIconEditorProps> = ({ file, onCancel, onApp
 
         <div className="flex flex-col items-center gap-4">
           <div
-            className="relative touch-none overflow-hidden rounded-full border-[3px] border-ink bg-white shadow-ink-sm"
+            className="relative touch-none overflow-hidden rounded-full ring-1 ring-ink/10 bg-white shadow-md"
             style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE, cursor: image ? 'grab' : 'default' }}
             onMouseDown={(e) => startDrag(e.clientX, e.clientY)}
             onMouseMove={(e) => moveDrag(e.clientX, e.clientY)}

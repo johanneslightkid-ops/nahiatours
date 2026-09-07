@@ -48,27 +48,37 @@ const Header: React.FC = () => {
 
   return (
     <header className="lobster-header sticky top-0 z-50 overflow-visible">
-      <div className="section-shell flex items-center justify-between py-3.5 pl-[10.5rem] sm:pl-[11.25rem] lg:pl-8">
+      <div className="section-shell flex items-center justify-between gap-4 py-3">
         <Link
           to="/#top"
           className="group flex items-center gap-3"
           onClick={() => playClickFx()}
           onMouseEnter={() => playHoverFx()}
         >
-          <div className="menu-logo-icon fixed left-4 top-2 flex h-[9.1875rem] w-[9.1875rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
+          {/* The mark used to be a 147px disc pinned to the viewport, which
+              floated over the page once you scrolled. On a translucent bar it
+              belongs in the bar: small, round, softly lit. */}
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-md ring-1 ring-ink/5 transition duration-500 group-hover:shadow-lg sm:h-14 sm:w-14">
             {brandSettings.brandicon ? (
               <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
             ) : (
-              <img src="/competitor-logo.svg" alt="Logo" className="h-[7.875rem] w-[7.875rem]" />
+              <img src="/competitor-logo.svg" alt="Logo" className="h-9 w-9 sm:h-11 sm:w-11" />
             )}
-          </div>
-          <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[10.75rem] sm:block lg:ml-[11.5rem]">
-            {brandSettings.brandName}
-          </h1>
+          </span>
+          <span className="block">
+            <span className="block font-display text-lg leading-none text-ink transition group-hover:text-lagoon-dark sm:text-xl">
+              {brandSettings.brandName}
+            </span>
+            {/* The place is part of the promise, so it stays on the phone too
+                — a family searching from a hotel room wants to see "Bávaro". */}
+            <span className="mt-1 block text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-ink-light sm:text-[0.68rem] sm:tracking-[0.16em]">
+              Punta Cana · Bávaro
+            </span>
+          </span>
         </Link>
 
         <button
-          className="grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-mango-light text-ink shadow-ink-sm transition hover:bg-mango md:hidden"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-ink shadow-md ring-1 ring-ink/5 transition hover:text-lagoon-dark md:hidden"
           onClick={() => {
             playClickFx();
             setIsMenuOpen(!isMenuOpen);
@@ -79,7 +89,7 @@ const Header: React.FC = () => {
         </button>
 
         <nav
-          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+12px)] flex-col gap-3 rounded-[24px] border-[3px] border-ink bg-paper px-5 py-5 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-2 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
+          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+10px)] z-50 flex-col gap-1.5 rounded-3xl bg-white/95 px-4 py-4 shadow-xl ring-1 ring-ink/5 backdrop-blur-xl md:static md:flex md:flex-row md:items-center md:gap-1 md:bg-transparent md:p-0 md:shadow-none md:ring-0 md:backdrop-blur-none`}
         >
           {isAdminRoute ? (
             <>
@@ -125,8 +135,10 @@ const Header: React.FC = () => {
                 onClick={handleNavClick}
                 onMouseEnter={() => playHoverFx()}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 rounded-full border-[2.5px] border-ink px-4 py-2 font-extrabold text-ink shadow-ink-sm transition duration-200 hover:-translate-y-0.5 ${
-                    isActive ? 'bg-mango' : 'bg-mango-light hover:bg-mango'
+                  `flex items-center gap-2 rounded-full px-4 py-2 font-bold text-white shadow-coral transition duration-300 hover:-translate-y-0.5 ${
+                    isActive
+                      ? 'bg-gradient-to-br from-mango-light to-mango-dark'
+                      : 'bg-gradient-to-br from-mango-light to-mango'
                   }`
                 }
               >
