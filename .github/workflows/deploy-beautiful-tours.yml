@@ -114,7 +114,33 @@ jobs:
           echo "::add-mask::$clean"
           echo "CLOUDFLARE_API_TOKEN=$clean" >> "$GITHUB_ENV"
           echo "CLOUDFLARE_ACCOUNT_ID=$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')" >> "$GITHUB_ENV"
-          echo "Token length after trimming: ${#clean}"
+
+          # Enough to identify a mis-pasted credential without printing one.
+          # Which secret supplied it matters: the env expression falls back to
+          # CF_API_TOKEN, so a stale secret under that name is used silently
+          # whenever CLOUDFLARE_API_TOKEN is missing.
+          if   [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then src="CLOUDFLARE_API_TOKEN"
+          elif [ -n "${{ secrets.CF_API_TOKEN }}" ];         then src="CF_API_TOKEN (fallback — is this stale?)"
+          elif [ -n "${{ inputs.cloudflare_api_token }}" ];  then src="the workflow_dispatch input"
+          else src="nowhere"; fi
+          echo "Supplied by:  $src"
+          echo "Length:       ${#clean} (a Cloudflare API token here should be 53)"
+
+          case "$clean" in
+            cfut_*) echo "Prefix:       starts with cfut_, as expected" ;;
+            *)      echo "Prefix:       does NOT start with cfut_ — wrong value or wrapped" ;;
+          esac
+
+          # Only the offending punctuation is printed, never its context.
+          bad="$(printf '%s' "$clean" | tr -d 'A-Za-z0-9_.-' | fold -w1 | sort -u | tr -d '\n')"
+          if [ -n "$bad" ]; then
+            echo "Stray chars:  [$bad] — an API token contains none of these."
+            echo "              Quotes, angle brackets or backticks here mean the value"
+            echo "              was pasted with wrapping. Re-add the secret as the bare"
+            echo "              token, nothing around it."
+          else
+            echo "Stray chars:  none"
+          fi
 
       - uses: actions/checkout@v4
 
