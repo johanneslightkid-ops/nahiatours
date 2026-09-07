@@ -52,15 +52,22 @@ const cf = async (path, token, init = {}) => {
   });
   const body = await response.json().catch(() => null);
   if (!body || body.success !== true) {
-    const detail = body?.errors?.map((e) => `${e.code} ${e.message}`).join('; ');
+    // Cloudflare hides the useful half of an error inside error_chain.
+    const detail = (body?.errors || [])
+      .map((e) => {
+        const chain = (e.error_chain || []).map((c) => `${c.code} ${c.message}`).join(' → ');
+        return chain ? `${e.code} ${e.message} (${chain})` : `${e.code} ${e.message}`;
+      })
+      .join('; ');
     throw new Error(detail || `HTTP ${response.status} from ${path}`);
   }
   return body.result;
 };
 
 const resolveAccountId = async (token) => {
-  if (process.env.CLOUDFLARE_ACCOUNT_ID) {
-    return process.env.CLOUDFLARE_ACCOUNT_ID;
+  const fromEnv = (process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
+  if (fromEnv) {
+    return fromEnv;
   }
   const accounts = await cf('/accounts?per_page=50', token);
   if (accounts.length !== 1) {
@@ -129,7 +136,9 @@ const main = async () => {
     return;
   }
 
-  const token = process.env.CLOUDFLARE_API_TOKEN;
+  // Trimmed: a secret pasted with a trailing newline builds an Authorization
+  // header Cloudflare rejects with 6003, which this script would then swallow.
+  const token = (process.env.CLOUDFLARE_API_TOKEN || '').trim();
   if (!token) {
     warn('no CLOUDFLARE_API_TOKEN and no KV_NAMESPACE_ID — skipping.');
     warn('The deploy continues; reads fall back to the bundled /data/*.json.');

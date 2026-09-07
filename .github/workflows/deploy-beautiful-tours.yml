@@ -101,6 +101,21 @@ jobs:
           echo "one as the cloudflare_api_token input when dispatching this workflow."
           exit 1
 
+      # Everything downstream reads the token from the environment — my two
+      # scripts and wrangler-action alike — so trim it in one place rather than
+      # in each of them. A secret pasted with a trailing newline builds an
+      # Authorization header Cloudflare rejects with 6003 before it ever looks
+      # at what the token is allowed to do, and wrangler fails the same way.
+      # Re-masking is required: the trimmed string is a different string from
+      # the registered secret, so the automatic redaction does not cover it.
+      - name: Normalize the token
+        run: |
+          clean="$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '[:space:]')"
+          echo "::add-mask::$clean"
+          echo "CLOUDFLARE_API_TOKEN=$clean" >> "$GITHUB_ENV"
+          echo "CLOUDFLARE_ACCOUNT_ID=$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+          echo "Token length after trimming: ${#clean}"
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4

@@ -33,12 +33,26 @@
 
 const API = 'https://api.cloudflare.com/client/v4';
 
-const token = process.env.CLOUDFLARE_API_TOKEN;
+// Trimmed, because this is the single most common way a working token fails:
+// pasted into a secret with a trailing newline, it produces an Authorization
+// header Cloudflare rejects outright (6003 "Invalid request headers", chained
+// to 6111 "Invalid format for Authorization header"). That reads like a bad
+// token but is really a bad header, and costs an hour if you believe it.
+const token = (process.env.CLOUDFLARE_API_TOKEN || '').trim();
 const OVERWRITE = process.env.OVERWRITE !== 'false';
 const DEST_TITLE =
   process.env.DEST_KV_TITLE || process.env.KV_NAMESPACE_TITLE || 'beautiful-tours-data';
 
 const log = (message) => console.log(`[clone-kv] ${message}`);
+
+/** Cloudflare hides the useful half of an error inside error_chain. */
+const describe = (errors) =>
+  (errors || [])
+    .map((e) => {
+      const chain = (e.error_chain || []).map((c) => `${c.code} ${c.message}`).join(' → ');
+      return chain ? `${e.code} ${e.message} (${chain})` : `${e.code} ${e.message}`;
+    })
+    .join('; ');
 
 const cf = async (path, init = {}) => {
   const response = await fetch(`${API}${path}`, {
@@ -51,20 +65,63 @@ const cf = async (path, init = {}) => {
   });
   const body = await response.json().catch(() => null);
   if (!body || body.success !== true) {
-    const detail = body?.errors?.map((e) => `${e.code} ${e.message}`).join('; ');
-    throw new Error(detail || `HTTP ${response.status} from ${path}`);
+    throw new Error(describe(body?.errors) || `HTTP ${response.status} from ${path}`);
   }
   return body.result;
 };
 
+/**
+ * Ask Cloudflare what it thinks of the token before doing anything with it, so
+ * a rejected credential is reported as a rejected credential rather than as
+ * whichever call happened to run first.
+ */
+const verifyToken = async () => {
+  const response = await fetch(`${API}/user/tokens/verify`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const body = await response.json().catch(() => null);
+  if (body?.success === true) {
+    log(`token verified — status "${body.result?.status}"`);
+    return;
+  }
+  const detail = describe(body?.errors) || `HTTP ${response.status}`;
+  const shape =
+    `it is ${token.length} characters` +
+    (/^[A-Za-z0-9_.-]+$/.test(token) ? '' : ', and contains characters outside [A-Za-z0-9_.-]');
+  throw new Error(
+    `Cloudflare rejected the token: ${detail}. For reference ${shape}. ` +
+      'A 6003/6111 here means the Authorization header itself was malformed — ' +
+      'usually a newline or space captured when the secret was pasted, so re-adding ' +
+      'CLOUDFLARE_API_TOKEN with no trailing whitespace is the fix. Note also that ' +
+      'this endpoint only accepts an API token: an OAuth credential from `wrangler ' +
+      'login`, or a Global API Key, will not verify here.'
+  );
+};
+
 const resolveAccountId = async () => {
-  if (process.env.CLOUDFLARE_ACCOUNT_ID) return process.env.CLOUDFLARE_ACCOUNT_ID;
-  const accounts = await cf('/accounts?per_page=50');
-  if (accounts.length !== 1) {
+  const fromEnv = (process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
+  if (fromEnv) {
+    log('using CLOUDFLARE_ACCOUNT_ID from the environment');
+    return fromEnv;
+  }
+  let accounts;
+  try {
+    accounts = await cf('/accounts?per_page=50');
+  } catch (error) {
+    // A token scoped to Workers alone is often not allowed to enumerate
+    // accounts. That is a fine token; it just cannot answer this question.
     throw new Error(
-      `token can see ${accounts.length} accounts — set CLOUDFLARE_ACCOUNT_ID to pick one`
+      `could not list accounts (${error.message}). Add a CLOUDFLARE_ACCOUNT_ID ` +
+        'repository secret — the id is on the right-hand side of any Cloudflare ' +
+        'dashboard page, and in the URL as dash.cloudflare.com/<account id>.'
     );
   }
+  if (accounts.length !== 1) {
+    throw new Error(
+      `token can see ${accounts.length} account(s) — set CLOUDFLARE_ACCOUNT_ID to pick one`
+    );
+  }
+  log(`resolved account "${accounts[0].name}"`);
   return accounts[0].id;
 };
 
@@ -162,6 +219,7 @@ const resolveSource = (namespaces, destinationId) => {
 const main = async () => {
   if (!token) throw new Error('CLOUDFLARE_API_TOKEN is required');
 
+  await verifyToken();
   const accountId = await resolveAccountId();
   const namespaces = await listNamespaces(accountId);
   log(`token sees ${namespaces.length} namespace(s): ${namespaces.map((n) => n.title).join(', ')}`);
