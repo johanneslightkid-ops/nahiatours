@@ -29,7 +29,17 @@
 
 name: Deploy Beautiful Tours
 
+# `push` is the trigger that matters, and not only because every push to this
+# branch should redeploy it. GitHub registers a `workflow_dispatch` workflow
+# only once its file has appeared on the DEFAULT branch — and `main` carries no
+# .github/workflows at all, so a dispatch-only workflow here is invisible to
+# the API and to the Actions UI: the dispatch endpoint answers 404 and nothing
+# ever runs. A push-triggered workflow has no such requirement; it runs from
+# whichever branch it lives on. So this branch deploys itself on push, and the
+# manual dispatch below only becomes usable once this file reaches main.
 on:
+  push:
+    branches: [beautiful-tours]
   workflow_dispatch:
     inputs:
       cloudflare_api_token:
