@@ -26,6 +26,16 @@ compatibility_date = "2024-05-01"
 # stated rather than inherited.
 workers_dev = true
 
+# Pinned so wrangler never has to work out which account this is. Left unset it
+# calls /memberships to discover one, and a token scoped to Workers cannot read
+# that endpoint — the deploy then dies on `Authentication error [code: 10000]`
+# even though the token is perfectly able to do the deploy itself.
+#
+# An account id is an identifier, not a credential: it is in every dashboard
+# URL, and Cloudflare's own documentation puts it in this file. It grants
+# nothing on its own.
+account_id = "d5272033401c64f8cc6ce650a8321cb2"
+
 # Static build output. `single-page-application` serves index.html for paths
 # with no matching file, which is what React Router needs for /tours, /plan and
 # the rest. API routes never reach this: worker/index.ts matches them first.
