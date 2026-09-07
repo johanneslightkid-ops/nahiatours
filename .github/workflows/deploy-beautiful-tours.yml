@@ -1,0 +1,153 @@
+# Deploys the Beautiful Tours redesign to its own Cloudflare Worker, with a
+# copy of the newest existing project's KV data.
+#
+# This branch is a *separate site*, not a change to the production one. Two
+# things keep them apart, and both have to fail at once for this to touch
+# nahiatours:
+#
+#   • wrangler.toml on this branch names the Worker `beautiful-tours`;
+#   • this workflow only runs on the `beautiful-tours` branch.
+#
+# The data is a copy, taken once at deploy time. scripts/clone-kv.mjs reads
+# every key out of the source namespace and writes it into `beautiful-tours-data`,
+# so the new site opens with the real catalogue rather than the seed JSON —
+# and from that moment the two namespaces are independent. Editing a tour here
+# cannot reach the live site, and vice versa.
+#
+# THE TOKEN. It is read from a repository secret, and falls back to a
+# workflow_dispatch input for a one-off run when no secret exists yet. The
+# input is masked in the log on the first line of the job, but note that
+# GitHub records dispatch inputs against the run itself, where the log mask
+# does not reach — so the secret is the right home for anything long-lived,
+# and a token passed as an input should be rotated afterwards.
+#
+# The secret needs:
+#   • Workers Scripts: Edit    — to deploy
+#   • Workers KV Storage: Edit — to create `beautiful-tours-data` and fill it
+# Add it under Settings → Secrets and variables → Actions. If the token can see
+# more than one Cloudflare account, add CLOUDFLARE_ACCOUNT_ID too.
+
+name: Deploy Beautiful Tours
+
+on:
+  workflow_dispatch:
+    inputs:
+      cloudflare_api_token:
+        description: >-
+          One-off Cloudflare API token (Workers Scripts: Edit + Workers KV
+          Storage: Edit). Leave empty to use the CLOUDFLARE_API_TOKEN secret.
+          Rotate any token passed this way once the deploy is done.
+        required: false
+        default: ''
+      source_kv_title:
+        description: >-
+          Title of the KV namespace to copy data from. Leave empty to use the
+          newest namespace that is not beautiful-tours-data.
+        required: false
+        default: ''
+      skip_kv_clone:
+        description: 'Deploy without copying KV data (the site falls back to /data/*.json)'
+        required: false
+        type: boolean
+        default: false
+
+# One deploy at a time; a newer run supersedes an in-flight one.
+concurrency:
+  group: deploy-beautiful-tours
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Job-level env, not per-step: the `secrets` context is not available in a
+    # step's `if`, but `env` is. wrangler, provision-kv.mjs and clone-kv.mjs
+    # all read these names directly, so nothing else has to pass them along.
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN || inputs.cloudflare_api_token }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      KV_NAMESPACE_TITLE: beautiful-tours-data
+      SOURCE_KV_TITLE: ${{ inputs.source_kv_title }}
+      SITE_URL: ${{ vars.SITE_URL }}
+
+    steps:
+      # First thing in the job, before the token can reach any other output:
+      # a token that arrived as an input is not automatically a registered
+      # secret, so ask the runner to redact it from every subsequent log line.
+      - name: Mask the token
+        run: echo "::add-mask::${{ inputs.cloudflare_api_token }}"
+        if: inputs.cloudflare_api_token != ''
+
+      # Unlike the ld-vip workflow, this one FAILS without a token rather than
+      # skipping in green. That workflow was an optional second path alongside
+      # Cloudflare Workers Builds; this branch has no other way to ship, so a
+      # silent green here would be a lie.
+      - name: Require a token
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: |
+          echo "::error::No Cloudflare API token."
+          echo "Add CLOUDFLARE_API_TOKEN under Settings → Secrets and variables →"
+          echo "Actions (Workers Scripts: Edit + Workers KV Storage: Edit), or pass"
+          echo "one as the cloudflare_api_token input when dispatching this workflow."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # .npmrc pins legacy-peer-deps, so a plain `npm ci` is enough.
+      - run: npm ci
+
+      # Create beautiful-tours-data if needed and fill it from the source. This
+      # runs BEFORE the build, because `npm run build` invokes provision-kv.mjs,
+      # which resolves the same namespace title and writes the binding into
+      # wrangler.toml — so by deploy time the binding points at a namespace that
+      # already has the data in it.
+      - name: Clone the KV data
+        id: kv
+        if: inputs.skip_kv_clone != true
+        run: node scripts/clone-kv.mjs
+
+      # provision-kv → populate-local-data → sitemap → SEO → vite build.
+      # provision-kv.mjs finds the namespace clone-kv just filled, by title.
+      - name: Build
+        run: npm run build
+
+      - name: Show the resolved KV binding
+        run: |
+          echo "wrangler.toml KV binding after the build:"
+          sed -n '/managed by scripts\/provision-kv/,/<<< managed/p' wrangler.toml
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          # The action defaults to wrangler 3, which does not understand
+          # `run_worker_first` under [assets] and drops it with a warning — the
+          # Worker would then never see requests for paths that match a static
+          # file, so the API routes would stop running. v4 is also what
+          # `npm run deploy` gets from npx.
+          wranglerVersion: '4'
+          # `npm run build` already ran above, and it is what writes the KV
+          # binding into wrangler.toml — so deploy only, never rebuild here.
+          command: deploy
+
+      - name: Report where it landed
+        run: |
+          {
+            echo "### Beautiful Tours deployed"
+            echo ""
+            echo "Worker \`beautiful-tours\`, from branch \`beautiful-tours\` at \`${GITHUB_SHA::7}\`."
+            echo ""
+            if [ "${{ inputs.skip_kv_clone }}" = "true" ]; then
+              echo "KV: not copied (\`skip_kv_clone\`) — reading the bundled \`/data/*.json\`."
+            else
+              echo "KV: ${{ steps.kv.outputs.keys_copied }} key(s) copied from \`${{ steps.kv.outputs.source_title }}\` into \`beautiful-tours-data\` (\`${{ steps.kv.outputs.namespace_id }}\`)."
+            fi
+            echo ""
+            echo "Live at https://beautiful-tours.johannes-neugschwentner.workers.dev"
+          } >> "$GITHUB_STEP_SUMMARY"

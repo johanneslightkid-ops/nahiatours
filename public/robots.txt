@@ -25,4 +25,4 @@ Allow: *.webp
 Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://nahiatours.workers.dev/sitemap.xml
+Sitemap: https://beautiful-tours.johannes-neugschwentner.workers.dev/sitemap.xml

@@ -13,9 +13,19 @@
 # now Workers-shaped. worker/index.ts dispatches to the same functions/*
 # handlers the Pages deployment used, so no endpoint logic is duplicated.
 
-name = "nahiatours"
+# BEAUTIFUL TOURS deploys as its own Worker, entirely separate from the
+# production site. The name is what keeps them apart: `wrangler deploy` writes
+# to the Worker this names, so leaving it as "nahiatours" would have published
+# this branch straight over the live site. It must stay "beautiful-tours".
+#
+# `workers_dev = true` publishes it at beautiful-tours.<subdomain>.workers.dev.
+# No CANONICAL_HOST is set anywhere in this file, deliberately: that variable
+# is what redirects the production Worker to its own domain, and inheriting it
+# here would bounce every visitor off this deployment.
+name = "beautiful-tours"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
+workers_dev = true
 
 # Static build output. `single-page-application` serves index.html for paths
 # with no matching file, which is what React Router needs for /tours, /plan and
@@ -36,7 +46,7 @@ run_worker_first = true
 #
 # Uncomment once the namespace exists and paste its id. Create it with either:
 #
-#   npx wrangler kv namespace create nahiatours-data
+#   npx wrangler kv namespace create beautiful-tours-data
 #   ./scripts/deploy-cloudflare.sh      (creates, binds and deploys in one go)
 #
 # The handlers read DATA_KV_F first and fall back to DATA_KV
