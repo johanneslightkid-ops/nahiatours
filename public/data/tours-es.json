@@ -3,8 +3,7 @@
     "title": "Isla Saona: El Paraíso Caribeño",
     "description": "Descubra la esencia del Caribe en una emocionante excursión que combina lancha rápida y catamarán. Relájese en la famosa Piscina Natural del Parque Nacional Cotubanamá, donde podrá admirar estrellas de mar gigantes en aguas cristalinas. \n\n¿Qué hace diferente a nuestra Saona VIP? Disfrutará de un ambiente festivo con animación a bordo y un área exclusiva en Playa Abanico.\n\n**Duración:** 10 horas\n\n**Incluye:**\n• Traslado ida y vuelta desde su hotel\n• Paseo en lancha y catamarán con barra libre (ron, refrescos y agua)\n• 3 horas en Isla Saona (Piscina Natural y Playa Abanico)\n• Área VIP exclusiva con tumbonas frente al mar\n• Almuerzo buffet con carnes y pescados a la parrilla\n• Guía profesional certificado por el Ministerio de Turismo",
     "pricing": [
-      { "tier": "Adultos", "price": "$60" },
-      { "tier": "Niños", "price": "$35" }
+      { "tier": "Personas", "price": "$60" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210651/tours/e0xfwsbpvqkwazqsfyxw.webp" },
@@ -25,8 +24,7 @@
     "title": "Saona Exclusive: Banquete de Langosta",
     "description": "Eleve su experiencia al máximo nivel. Este paquete premium incluye todas las bondades de nuestro tour clásico con un toque de lujo gastronómico para los paladares más exigentes.\n\n**Incluye:**\n• Recogida y regreso al hotel\n• Fiesta en catamarán con animación y barra libre\n• Estancia en la Piscina Natural y Playa Abanico\n• Área VIP con tumbonas preferenciales\n• **Extra Premium:** Cerveza Presidente fría y 1 libra (0.45kg) de langosta a la parrilla\n• Buffet completo y guía experto",
     "pricing": [
-      { "tier": "Adultos", "price": "$119" },
-      { "tier": "Niños", "price": "$43" }
+      { "tier": "Personas", "price": "$119" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210929/tours/wdbnry7sqerywcysm85x.webp" },
@@ -47,8 +45,7 @@
     "title": "Catalina Exclusive: El Paraíso del Snorkel",
     "description": "A diferencia de otras islas, Isla Catalina es el destino soñado para los amantes del mundo submarino. Sumérjase en sus arrecifes de coral repletos de vida y color. Disfrute de un día de paz en una de las joyas más hermosas del Caribe.\n\n**Duración:** 12 horas\n\n**Incluye:**\n• Traslado desde/hacia su hotel\n• Visita a tienda de artesanía local\n• Transporte en barco hacia la isla (25-30 min)\n• Bebidas a bordo y almuerzo buffet en la playa\n• Equipo completo de snorkel (máscara, tubo y chaleco)",
     "pricing": [
-      { "tier": "Adultos", "price": "$70" },
-      { "tier": "Niños", "price": "$40" }
+      { "tier": "Personas", "price": "$70" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213231/tours/awhlnbguojfhbh52aulz.webp" },
@@ -63,7 +60,7 @@
     "title": "Party Boat: Fiesta en el Mar",
     "description": "Baile sobre las olas en el catamarán más alegre de Bávaro. Disfrute de la mejor música, haga snorkel en arrecifes tropicales y brinde con un trago en la Piscina Natural. ¡La mejor fiesta bajo el sol dominicano!\n\n**Duración:** 4 horas\n\n**Incluye:**\n• Traslado privado con aire acondicionado\n• Barco con barra libre de marcas premium\n• Música, animación y parada en la Piscina Natural\n• Sesión de snorkel con equipo incluido",
     "pricing": [
-      { "tier": "Adultos", "price": "$50" }
+      { "tier": "Personas", "price": "$50" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213524/tours/uiurdhaiowr8nxctaije.webp" },
@@ -77,8 +74,7 @@
     "title": "Montaña Redonda: Vistas de Ensueño",
     "description": "Un lugar mágico donde la tierra toca el cielo. A 300 metros de altura, disfrute de vistas panorámicas de 360 grados. Colúmprese sobre el paisaje y viva una experiencia gastronómica auténticamente dominicana en la cima.\n\n**Duración:** 4-5 horas\n\n**Incluye:**\n• Traslado desde su hotel\n• Ascenso a la cima en Camión Safari\n• Uso de los famosos columpios y escobas 'voladoras'\n• Almuerzo típico dominicano en la montaña\n• Tiempo libre para fotos y visita a Playa Macao",
     "pricing": [
-      { "tier": "Adultos", "price": "$90" },
-      { "tier": "Niños", "price": "$45" }
+      { "tier": "Personas", "price": "$90" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213741/tours/bdqqfq9bi6qml7zr5hsv.webp" },
@@ -93,7 +89,7 @@
     "title": "Buggies: Aventura Todo Terreno",
     "description": "Sienta la adrenalina conduciendo por senderos rurales. Visitaremos la mística cueva de Macao para un chapuzón en su cenote subterráneo y terminaremos en las impresionantes aguas de Playa Macao. ¡Prepárese para ensuciarse y divertirse!\n\n**Incluye:**\n• Recogida y regreso al hotel\n• Buggy y equipo de seguridad\n• Baño en cenote natural y tiempo en Playa Macao\n• Visita a rancho típico (café, cacao y tabaco)\n• Guía certificado",
     "pricing": [
-      { "tier": "Adultos", "price": "$50" }
+      { "tier": "Personas", "price": "$50" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213927/tours/uo9idcqzjhikdmxzhdpe.webp" },
@@ -110,8 +106,7 @@
     "title": "Santo Domingo: Primada de América",
     "description": "Explore la historia viva en la capital dominicana. Caminaremos por la Zona Colonial, visitaremos el Alcázar de Colón y la Catedral Primada de América. Un recorrido esencial para entender el alma de la República Dominicana.\n\n**Duración:** 10 horas\n\n**Incluye:**\n• Autobús privado con aire acondicionado\n• Entradas a monumentos y al Parque Los Tres Ojos\n• Visita guiada por calles históricas y Museo del Cacao\n• Almuerzo típico dominicano y bebidas\n• Seguro de responsabilidad civil",
     "pricing": [
-      { "tier": "Adultos", "price": "$70" },
-      { "tier": "Niños", "price": "$40" }
+      { "tier": "Personas", "price": "$70" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214830/tours/saoqvsm2gzr6omj8tlcu.webp" },
@@ -125,8 +120,7 @@
     "title": "Safari Cultural: La Vida Local en 4x4",
     "description": "Descubra la verdadera República Dominicana más allá de los hoteles. En nuestros camiones 4x4, visitará escuelas, plantaciones de café y cacao, y disfrutará de un paseo a caballo por senderos tropicales.\n\n**Duración:** 8 horas\n\n**Incluye:**\n• Transporte en camión safari con guía experto\n• Visita a plantaciones con degustación de productos locales\n• Recorrido por Higüey y su famosa Basílica\n• Almuerzo buffet en rancho típico y baño en el río Maimón\n• Paseo a caballo y tiempo en Playa Macao",
     "pricing": [
-      { "tier": "Adultos", "price": "$90" },
-      { "tier": "Niños", "price": "$55" }
+      { "tier": "Personas", "price": "$90" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214989/tours/ac8n9ohhayyjprq7szqn.webp" },
@@ -140,8 +134,7 @@
     "title": "Speed Boat: Sea su Propio Capitán",
     "description": "Tome el control de su propia lancha rápida y surque las aguas de Bávaro. Combine la velocidad con la paz de hacer snorkel en una zona de corales rodeada de peces tropicales. ¡Diversión garantizada para parejas y amigos!\n\n**Incluye:**\n• Traslados cada hora desde su hotel\n• 1 lancha rápida por pareja\n• Equipo de snorkel y guía acompañante\n• Parada en la piscina natural de Bávaro",
     "pricing": [
-      { "tier": "Adultos", "price": "$60" },
-      { "tier": "Niños", "price": "$30" }
+      { "tier": "Personas", "price": "$60" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216232/tours/fadp6ka0fejf3iqffy0k.webp" },
@@ -162,7 +155,7 @@
     "title": "Parasailing: Vuelo Sobre el Caribe",
     "description": "¿Busca adrenalina? Vuele sobre la costa de Punta Cana y disfrute de las mejores vistas de la isla desde el aire. Una experiencia segura y emocionante, solo para valientes.",
     "pricing": [
-      { "tier": "Adultos", "price": "$60" }
+      { "tier": "Personas", "price": "$60" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "imgs/tours/tour_parasail_detail_7.jpg" },
@@ -176,9 +169,7 @@
     "title": "Coco Bongo: El Mejor Show del Mundo",
     "description": "Mucho más que una discoteca, es un espectáculo de clase mundial. Con más de 15 shows por noche, acróbatas y efectos visuales, Coco Bongo es la experiencia nocturna definitiva en Punta Cana.",
     "pricing": [
-      { "tier": "Entrada Regular", "price": "$90" },
-      { "tier": "Gold Member", "price": "$170" },
-      { "tier": "Front Row", "price": "$190" }
+      { "tier": "Personas", "price": "$90" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221689/tours/n8goxbgpt68izjvdiixh.webp" },
@@ -192,7 +183,7 @@
     "title": "Imagine: Fiesta en una Cueva",
     "description": "Baile en el interior de una impresionante cueva natural. Con una acústica única y diferentes salas de música internacional, Imagine es el lugar donde comienza la fiesta segura y divertida en Punta Cana.",
     "pricing": [
-      { "tier": "Adultos", "price": "$85" }
+      { "tier": "Personas", "price": "$85" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221853/tours/phgqpjshey4mwxoevbtg.webp" },
@@ -207,8 +198,7 @@
     "title": "Monkeyland: Encuentro con Monos",
     "description": "Interactúe con encantadores monos ardilla en su hábitat natural. Una experiencia educativa y divertida donde podrá conocer sus hábitos y disfrutar de la naturaleza dominicana.",
     "pricing": [
-      { "tier": "Adultos", "price": "$110" },
-      { "tier": "Niños", "price": "$50" }
+      { "tier": "Personas", "price": "$110" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222121/tours/gojo9pqg3l0kftfafvx4.webp" },
@@ -222,8 +212,7 @@
     "title": "Scape Park: Aventura Natural",
     "description": "Vuele en tirolesas, nade en el místico Hoyo Azul y descubra cuevas culturales. Un parque de aventuras naturales que ofrece la combinación perfecta de emoción y paisajes.",
     "pricing": [
-      { "tier": "Adultos", "price": "$129" },
-      { "tier": "Niños", "price": "$55" }
+      { "tier": "Personas", "price": "$129" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279279/tours/yobk3cxbzzim4k7rna52.webp" },
@@ -239,8 +228,7 @@
     "title": "Zipline: Adrenalina en la Selva",
     "description": "Deslícese por uno de los circuitos de tirolesas más largos del Caribe. 12 líneas y 18 plataformas en el corazón de la montaña Anamuya para un día de pura emoción.",
     "pricing": [
-      { "tier": "Adultos", "price": "$70" },
-      { "tier": "Niños", "price": "$45" }
+      { "tier": "Personas", "price": "$70" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774280946/tours/vkuwif21csjdtyfjuata.webp" },
@@ -254,8 +242,7 @@
     "title": "Dolphin: Nadar con Delfines",
     "description": "Viva el sueño de conocer de cerca a los mamíferos marinos más inteligentes. Disfrute de besos, abrazos y juegos en un encuentro interactivo inolvidable.",
     "pricing": [
-      { "tier": "Adultos", "price": "$110" },
-      { "tier": "Niños", "price": "$90" }
+      { "tier": "Personas", "price": "$110" }
     ],
     "images": []
   }

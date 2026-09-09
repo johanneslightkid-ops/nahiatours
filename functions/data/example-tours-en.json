@@ -3,14 +3,7 @@
     "title": "Saona Island: Paradise Found",
     "description": "Experience the ultimate Caribbean escape with a dynamic catamaran and speedboat adventure to Saona Island. Feel the ocean breeze as you sail toward the famous Natural Pool in the Cotubanamá National Park—one of the world's largest, where giant starfish thrive in crystal-clear waters. \n\nWhat sets the Saona VIP apart? We turn the journey into a celebration with onboard entertainment and a premium experience at Abanico Beach.\n\n**Duration:** 10 hours\n\n**Included:**\n• Round-trip hotel transportation\n• Speedboat and Catamaran cruise with open bar (rum, mixers, and water)\n• 3 hours on Saona Island, including a swim at the Natural Pool and 2 hours of relaxation at Abanico Beach\n• Reserved VIP area at Abanico Beach with dedicated sun loungers\n• Full buffet featuring grilled meats, fresh fish, and local sides\n• Certified professional tour guide",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$60"
-      },
-      {
-        "tier": "Children",
-        "price": "$35"
-      }
+      { "tier": "Persons", "price": "$60" }
     ],
     "images": [
       {
@@ -67,14 +60,7 @@
     "title": "Saona Island Exclusive: The Lobster Feast",
     "description": "Elevate your island experience with our most luxurious Saona package. Enjoy everything from our classic tour plus high-end upgrades designed for foodies and comfort-seekers.\n\n**Included:**\n• Door-to-door hotel transfers\n• Catamaran party with live entertainment and open bar\n• 3-hour island stay with a visit to the Natural Pool and Abanico Beach\n• Exclusive VIP beach area with front-row sun loungers\n• **Premium Add-ons:** Cold Presidente beer and a full pound (0.45kg) of fresh grilled lobster\n• Gourmet buffet with variety of meats, fish, and drinks\n• Expert certified guide",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$119"
-      },
-      {
-        "tier": "Children",
-        "price": "$43"
-      }
+      { "tier": "Persons", "price": "$119" }
     ],
     "images": [
       {
@@ -131,14 +117,7 @@
     "title": "Catalina Exclusive: Snorkel & Reef Adventure",
     "description": "If your dream is to explore vibrant underwater life, Catalina Island is your destination. Unlike other tours, we focus on the spectacular coral reefs surrounding this Caribbean jewel. Dive into turquoise waters to witness a kaleidoscope of tropical fish before relaxing on pristine white sands.\n\n**Duration:** 12 hours\n\n**Included:**\n• Convenient hotel pickup and drop-off\n• Visit to a local artisan souvenir shop\n• Scenic boat transfer to the island (approx. 25 mins)\n• Refreshments served on board\n• Beachfront buffet lunch and drinks\n• Professional snorkeling gear (mask, snorkel, and buoyancy aid)",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$70"
-      },
-      {
-        "tier": "Children",
-        "price": "$40"
-      }
+      { "tier": "Persons", "price": "$70" }
     ],
     "images": [
       {
@@ -171,10 +150,7 @@
     "title": "Bávaro Party Boat: Dance on the Waves",
     "description": "Turn the ocean into your dance floor! Join the most vibrant party in Punta Cana as we cruise along the Bávaro coast. Dance to the latest hits, snorkel among tropical fish, and enjoy a cocktail in the middle of the ocean at the Natural Pool.\n\n**Duration:** 4 hours\n\n**Included:**\n• Round-trip air-conditioned hotel transfer\n• Modern catamaran with premium open bar\n• High-energy music and entertainment\n• Swimming stop at the Natural Pool\n• Guided snorkeling session with equipment included",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$50"
-      }
+      { "tier": "Persons", "price": "$50" }
     ],
     "images": [
       {
@@ -203,14 +179,7 @@
     "title": "Montaña Redonda: Views & Flavors",
     "description": "Discover the Dominican Republic's most Instagrammable peak. Perched 300 meters above the northeast coast, Montaña Redonda offers 360-degree panoramic views that will take your breath away. Swing over the edge of the world and enjoy a traditional meal at the summit.\n\n**Duration:** 4-5 hours\n\n**Included:**\n• Hotel pickup and drop-off\n• Thrilling Safari Truck ascent to the summit\n• Access to the famous 'flying' broomsticks and hammocks\n• Traditional Dominican lunch with a view\n• Free time for photography\n• Visit to a local Macao shop and beach",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$90"
-      },
-      {
-        "tier": "Children",
-        "price": "$45"
-      }
+      { "tier": "Persons", "price": "$90" }
     ],
     "images": [
       {
@@ -243,10 +212,7 @@
     "title": "Evolution Buggies: Off-Road Adventure",
     "description": "Get ready to get muddy! This off-road journey takes you through the heart of the Dominican countryside. Drive your own buggy through rugged trails, explore the hidden Macao Cave cenote, and finish with a refreshing dip at the world-famous Macao Beach.\n\n**Included:**\n• Hotel pickup and drop-off\n• All-terrain buggy and safety gear\n• Swimming in a natural underground cave\n• Visit to a traditional plantation (cacao, coffee, tobacco)\n• Relaxation time at Macao Beach",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$50"
-      }
+      { "tier": "Persons", "price": "$50" }
     ],
     "images": [
       {
@@ -287,14 +253,7 @@
     "title": "Santo Domingo: The First City",
     "description": "Step back in time in the oldest city in the Americas. Walk the cobblestone streets of the Colonial Zone, visit the palace of Christopher Columbus's son, and marvel at the first Cathedral ever built in the New World. A deep dive into the soul and history of the Dominican Republic.\n\n**Duration:** 10 hours\n\n**Included:**\n• Private air-conditioned transportation\n• Entrance fees to all major monuments and 'Los Tres Ojos' cave park\n• Guided tours of Alcázar de Colón and the National Cathedral\n• Visits to the Chocolate Museum and jewelry workshops (Amber & Larimar)\n• Traditional Dominican lunch and drinks\n• Full liability insurance",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$70"
-      },
-      {
-        "tier": "Children",
-        "price": "$40"
-      }
+      { "tier": "Persons", "price": "$70" }
     ],
     "images": [
       {
@@ -323,14 +282,7 @@
     "title": "Cultural Safari: 4x4 Countryside Quest",
     "description": "Go beyond the resort walls and see the real Dominican Republic. Aboard our open-air 4x4 trucks, you'll visit local schools, mountain plantations, and family-run ranches. This is a journey of flavors, culture, and stunning landscapes perfect for all ages.\n\n**Duration:** 8 hours\n\n**Included:**\n• Safari truck transportation\n• Educational tours of coffee, cacao, and tobacco farms with tastings\n• Visit to the Basilica of Higüey and the local market\n• Traditional ranch lunch and a swim in the Maimón River\n• Scenic horseback riding through tropical trails\n• Beach time at Macao Beach\n• Open bar and buffet lunch",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$90"
-      },
-      {
-        "tier": "Children",
-        "price": "$55"
-      }
+      { "tier": "Persons", "price": "$90" }
     ],
     "images": [
       {
@@ -359,14 +311,7 @@
     "title": "Speed Boat & Snorkel Adventure",
     "description": "Be the captain of your own adventure! Pilot your own speedboat across the turquoise waters of Bávaro. This high-speed thrill is paired with a peaceful snorkeling session in a protected coral reef teeming with tropical fish.\n\n**Included:**\n• Hourly hotel transfers for maximum flexibility\n• Private speedboat (1 per couple)\n• Professional snorkeling gear\n• Stop at the Bávaro Natural Pool for a refreshing ocean dip\n• Expert guide in a lead boat",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$60"
-      },
-      {
-        "tier": "Children",
-        "price": "$30"
-      }
+      { "tier": "Persons", "price": "$60" }
     ],
     "images": [
       {
@@ -423,10 +368,7 @@
     "title": "Parasailing: Sky-High Adventure",
     "description": "Ready for the ultimate bird's-eye view? Soar high above the Punta Cana coastline and witness the stunning contrast of the turquoise sea and white sands. Secure, thrilling, and absolutely unforgettable—this is the best way to see the island.\n\n**Duration:** 25 minutes\n\n**Included:**\n• Round-trip hotel transportation\n• Speedboat ride to the flight zone\n• All safety equipment and bilingual instruction\n• High-altitude parasailing flight",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$60"
-      }
+      { "tier": "Persons", "price": "$60" }
     ],
     "images": [
       {
@@ -455,18 +397,7 @@
     "title": "Coco Bongo: The World's Best Party",
     "description": "This isn't just a club—it's a world-class spectacle. With over 15 high-production shows nightly, featuring acrobats, tribute artists, and cinematic effects, Coco Bongo is a sensory explosion. If you want to experience the legendary nightlife of the Caribbean, this is the place.\n\n**Duration:** 5 hours\n\n**Included:**\n• Admission ticket and round-trip hotel transfer\n• Access to all shows and entertainment\n• Drink packages based on selected ticket tier",
     "pricing": [
-      {
-        "tier": "Regular Ticket",
-        "price": "$90"
-      },
-      {
-        "tier": "Gold Member",
-        "price": "$170"
-      },
-      {
-        "tier": "Front Row",
-        "price": "$190"
-      }
+      { "tier": "Persons", "price": "$90" }
     ],
     "images": [
       {
@@ -495,10 +426,7 @@
     "title": "Imagine: Party in a Cave",
     "description": "Descend into the earth for a night you'll never forget. Imagine is a massive natural cavern transformed into a state-of-the-art nightclub. With different rooms playing various genres and acoustics that only a cave can provide, it's the most unique party venue in Punta Cana.\n\n**Duration:** 4 hours\n\n**Included:**\n• Entrance to the cave nightclub\n• Round-trip hotel shuttle\n• Open bar (all night) depending on ticket type\n• Live DJ sets and entertainment",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$85"
-      }
+      { "tier": "Persons", "price": "$85" }
     ],
     "images": [
       {
@@ -531,14 +459,7 @@
     "title": "Monkeyland: Meet the Squirrel Monkeys",
     "description": "Get up close and personal with the most charming residents of the Dominican jungle. Visit Monkeyland, where friendly squirrel monkeys will jump on your shoulders and eat from your hands. A heart-warming experience perfect for nature lovers and families.\n\n**Duration:** 4 hours\n\n**Included:**\n• Hotel pickup and drop-off\n• Guided tour of the monkey sanctuary\n• Educational talk on monkey habits and habitat\n• Tastings of local organic coffee, chocolate, and fruit",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$110"
-      },
-      {
-        "tier": "Children",
-        "price": "$50"
-      }
+      { "tier": "Persons", "price": "$110" }
     ],
     "images": [
       {
@@ -567,14 +488,7 @@
     "title": "Scape Park: Natural Adventure Park",
     "description": "Unleash your inner explorer at Scape Park. From flying over the trees on zip lines to swimming in the hidden turquoise waters of the 'Hoyo Azul' cenote, this park offers a perfect blend of adrenaline and natural beauty.\n\n**Duration:** 4-5 hours\n\n**Included:**\n• Round-trip hotel transportation\n• All-day admission to park attractions\n• Bilingual guides to assist throughout the park",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$129"
-      },
-      {
-        "tier": "Children",
-        "price": "$55"
-      }
+      { "tier": "Persons", "price": "$129" }
     ],
     "images": [
       {
@@ -611,14 +525,7 @@
     "title": "Zip Line: Canopy Thrill Ride",
     "description": "Soar through the lush canopy of the Anamuya Mountain on one of the Caribbean's longest zip line circuits. With 12 lines spanning across 18 platforms, you'll experience a pure adrenaline rush while surrounded by breathtaking tropical nature.\n\n**Duration:** 5 hours\n\n**Included:**\n• Safari truck hotel transfers\n• ACCT-certified safety equipment and instructors\n• Full circuit of 12 zip lines\n• Refreshing fruit and drinks",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$70"
-      },
-      {
-        "tier": "Children",
-        "price": "$45"
-      }
+      { "tier": "Persons", "price": "$70" }
     ],
     "images": [
       {
@@ -647,14 +554,7 @@
     "title": "Dolphin Encounter: Swim with the Stars",
     "description": "Make a dream come true by meeting the ocean's most intelligent creatures. Enjoy an interactive swim where you can experience the joy of a dolphin's hug, kiss, and handshake. This educational and emotional encounter is a highlight for any Punta Cana visitor.\n\n**Duration:** 1 hour\n\n**Included:**\n• Transfer from your resort to the aquatic center\n• Guided interactive session with dolphins\n• Safety briefing and educational talk",
     "pricing": [
-      {
-        "tier": "Adults",
-        "price": "$110"
-      },
-      {
-        "tier": "Children",
-        "price": "$90"
-      }
+      { "tier": "Persons", "price": "$110" }
     ],
     "images": []
   }

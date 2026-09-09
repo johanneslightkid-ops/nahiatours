@@ -89,26 +89,28 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
-const normalizePricingOptions = (
-  raw: RawService,
-  category: ServiceCategory,
-  locale: Locale
-): PricingOption[] => {
+/** The single per-person label, in the reader's language. */
+export const perPersonTier = (locale: Locale) => (locale === 'es' ? 'Personas' : 'Persons');
+
+/**
+ * Every service is priced at one rate per person.
+ *
+ * Services used to carry a list of tiers — typically "Adults" and "Children"
+ * at different rates. That is gone: there is one price and everybody pays it.
+ * Stored data may still hold several tiers (KV, JSONBin and the seed files
+ * predate the change), so they are collapsed here rather than migrated, which
+ * means old and new records both load. The first tier with a usable price
+ * wins, since that was the adult/full rate.
+ */
+const normalizePricingOptions = (raw: RawService, locale: Locale): PricingOption[] => {
   const rawPricing = Array.isArray(raw.pricing) ? raw.pricing : [];
 
-  if (rawPricing.length > 0) {
-    return rawPricing.map((item, index) => ({
-      tier: item.tier?.trim() || `${locale === 'es' ? 'Opción' : 'Option'} ${index + 1}`,
-      price: item.price?.trim() || '',
-      amount: extractAmountFromPrice(item.price?.trim() || ''),
-    }));
-  }
+  const price =
+    rawPricing.map((item) => item.price?.trim()).find((value) => Boolean(value)) ||
+    String(raw.price ?? '').trim();
 
-  const fallbackTier = category === 'transport' ? 'People' : 'Adults';
-  const fallbackPrice = String(raw.price ?? '').trim();
-
-  return fallbackPrice
-    ? [{ tier: fallbackTier, price: fallbackPrice, amount: extractAmountFromPrice(fallbackPrice) }]
+  return price
+    ? [{ tier: perPersonTier(locale), price, amount: extractAmountFromPrice(price) }]
     : [];
 };
 
@@ -123,7 +125,7 @@ const normalizeService = (
         .map((image) => normalizeImagePath(String(image.localPath ?? '').trim()))
         .filter(Boolean)
     : [];
-  const pricingOptions = normalizePricingOptions(rawService, category, locale);
+  const pricingOptions = normalizePricingOptions(rawService, locale);
   const fallbackImage = normalizeImagePath(String(rawService.image ?? '').trim());
   const image = detailImages[0] || fallbackImage || '/imgs/placeholder.jpg';
   const price = pricingOptions[0]?.price || String(rawService.price ?? '').trim();

@@ -16,7 +16,21 @@ interface ServiceAdminPanelProps {
   siblingAdminLabel: string;
 }
 
-const createEmptyPricingOption = (): PricingOption => ({ tier: '', price: '', amount: null });
+/**
+ * Label stored with every price.
+ *
+ * Services used to carry a list of tiers the operator typed themselves
+ * ("Adults", "Children", "VIP"). There is now one rate that everybody pays, so
+ * the tier is no longer an editable field — it is this, and the reader sees it
+ * translated (see perPersonTier in toursService).
+ */
+const PER_PERSON_TIER = 'Persons';
+
+const createEmptyPricingOption = (): PricingOption => ({
+  tier: PER_PERSON_TIER,
+  price: '',
+  amount: null,
+});
 
 const createEmptyRoute = () => ({
   id: String(Date.now()),
@@ -50,8 +64,8 @@ const normalizeImageEntry = (value: string) => {
 const buildPricingOption = (option: PricingOption): PricingOption => {
   const numeric = Number(String(option.price ?? '').replace(/[^\d.]/g, ''));
   return {
-    tier: option.tier.trim(),
-    price: option.price.trim(),
+    tier: PER_PERSON_TIER,
+    price: String(option.price ?? '').trim(),
     amount: Number.isFinite(numeric) && numeric > 0 ? numeric : null,
   };
 };
@@ -85,7 +99,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
     setEditingId(service.id);
     setDraft({
       ...service,
-      pricingOptions: service.pricingOptions.length ? service.pricingOptions : [createEmptyPricingOption()],
+      pricingOptions: [service.pricingOptions[0] ?? createEmptyPricingOption()],
       transferRoutes: (service as any).transferRoutes?.length ? (service as any).transferRoutes : [createEmptyRoute()],
       details: {
         description: service.details.description || service.description,
@@ -94,12 +108,10 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
     });
   };
 
-  const updatePricing = (index: number, field: keyof PricingOption, value: string) => {
+  const updatePrice = (value: string) => {
     setDraft((current) => ({
       ...current,
-      pricingOptions: current.pricingOptions.map((option, optionIndex) =>
-        optionIndex === index ? { ...option, [field]: value } : option
-      ),
+      pricingOptions: [{ ...(current.pricingOptions[0] ?? createEmptyPricingOption()), price: value }],
     }));
   };
 
@@ -124,9 +136,8 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
     }));
   };
   const buildDraft = (): Tour => {
-    const pricingOptions = draft.pricingOptions
-      .map(buildPricingOption)
-      .filter((option) => option.tier && option.price);
+    const pricingOptions = [buildPricingOption(draft.pricingOptions[0] ?? createEmptyPricingOption())]
+      .filter((option) => option.price);
     const routes = (draft.transferRoutes ?? [])
       .map((route: any, index: number) => ({
         id: route.id || `${index}-${route.origin}-${route.destination}`,
@@ -223,46 +234,17 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
         </div>
 
         <div className="mt-6 rounded-3xl border border-slate-200 p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-900">Pricing categories</h3>
-            <button
-              onClick={() => setDraft((current) => ({ ...current, pricingOptions: [...current.pricingOptions, createEmptyPricingOption()] }))}
-              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-            >
-              Add price row
-            </button>
-          </div>
-          <div className="space-y-3">
-            {draft.pricingOptions.map((option, index) => (
-              <div key={`${option.tier}-${index}`} className="grid grid-cols-1 gap-3 md:grid-cols-[1fr,1fr,auto]">
-                <input
-                  type="text"
-                  value={option.tier}
-                  onChange={(event) => updatePricing(index, 'tier', event.target.value)}
-                  placeholder={category === 'transport' ? 'People / From' : 'Adults / Children / VIP'}
-                  className="rounded-2xl border border-slate-200 px-4 py-3"
-                />
-                <input
-                  type="text"
-                  value={option.price}
-                  onChange={(event) => updatePricing(index, 'price', event.target.value)}
-                  placeholder="$55"
-                  className="rounded-2xl border border-slate-200 px-4 py-3"
-                />
-                <button
-                  onClick={() => setDraft((current) => ({
-                    ...current,
-                    pricingOptions: current.pricingOptions.length > 1
-                      ? current.pricingOptions.filter((_, optionIndex) => optionIndex !== index)
-                      : [createEmptyPricingOption()],
-                  }))}
-                  className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
+          <h3 className="mb-1 text-lg font-semibold text-slate-900">Price</h3>
+          <p className="mb-4 text-sm text-slate-600">
+            One rate per person — the same for adults and children.
+          </p>
+          <input
+            type="text"
+            value={draft.pricingOptions[0]?.price ?? ''}
+            onChange={(event) => updatePrice(event.target.value)}
+            placeholder={category === 'transport' ? 'From USD 15' : '$55'}
+            className="w-full rounded-2xl border border-slate-200 px-4 py-3 md:max-w-xs"
+          />
         </div>
 
         {category === 'transport' && (
@@ -414,11 +396,9 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
             <h3 className="text-xl font-semibold text-slate-900">{service.title}</h3>
             <p className="mt-2 text-sm text-slate-600">{service.description.slice(0, 180)}{service.description.length > 180 ? '…' : ''}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {service.pricingOptions.map((option) => (
-                <span key={option.tier} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                  {option.tier}: {option.price}
-                </span>
-              ))}
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                {service.pricingOptions[0]?.price || service.price || 'No price set'} per person
+              </span>
             </div>
             <p className="mt-3 text-xs font-medium text-slate-500">{service.details.images.length} detail images</p>
             <div className="mt-4 flex gap-3">
