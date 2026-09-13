@@ -247,6 +247,8 @@ const StoryAdmin: React.FC = () => {
                 <img
                   src={element.content.imageUrl}
                   alt="Preview"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-40 object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';

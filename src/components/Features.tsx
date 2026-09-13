@@ -4,10 +4,10 @@ import { MdSecurityUpdateGood, MdElectricBolt, MdDirectionsBus } from 'react-ico
 
 const Features = () => {
   return (
-    <section className="py-20">
-      <div className="section-shell">
+    <section className="home-section shore-section wavy-band relative py-24">
+      <div className="section-shell relative z-10">
         <div className="mb-14 text-center">
-          <h2 className="text-5xl font-bold text-ink">
+          <h2 className="scribble-title-bg mx-auto font-display text-4xl leading-tight text-ink sm:text-5xl">
             <FormattedMessage id="features.title" />
           </h2>
         </div>
@@ -17,7 +17,7 @@ const Features = () => {
             title: 'features.safety.title',
             text: 'features.safety.description',
           }, {
-            icon: <MdElectricBolt className="h-10 w-10 text-blue-700" />,
+            icon: <MdElectricBolt className="h-10 w-10 text-sunset-dark" />,
             title: 'features.experiences.title',
             text: 'features.experiences.description',
           }, {
@@ -25,12 +25,14 @@ const Features = () => {
             title: 'features.transportation.title',
             text: 'features.transportation.description',
           }].map((item) => (
-            <article key={item.title} className="glass-card rounded-3xl p-8 text-center">
-              <div className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-full bg-white shadow">{item.icon}</div>
-              <h3 className="mb-3 text-2xl font-bold text-ink">
+            <article key={item.title} className="booking-card rounded-3xl p-8 text-center">
+              <div className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-full bg-gradient-to-b from-white to-lagoon-light/45 shadow-md ring-1 ring-white/80">
+                {item.icon}
+              </div>
+              <h3 className="mb-3 font-display text-2xl text-ink">
                 <FormattedMessage id={item.title} />
               </h3>
-              <p className="text-ink-soft">
+              <p className="leading-relaxed text-ink-soft">
                 <FormattedMessage id={item.text} />
               </p>
             </article>

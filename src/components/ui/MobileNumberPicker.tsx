@@ -40,7 +40,7 @@ const MobileNumberPicker: React.FC<Props> = ({
 
       <div
         onClick={() => setIsOpen(true)}
-        className="relative w-full cursor-pointer rounded-2xl border-2 border-ink bg-white px-4 py-4 text-base transition focus-within:bg-lagoon-light"
+        className="relative w-full cursor-pointer rounded-2xl ring-1 ring-ink/10 bg-white px-4 py-4 text-base transition focus-within:bg-lagoon-light"
       >
         <div className="flex items-center justify-between">
           <span className="text-ink-soft font-semibold text-xl">{current}</span>
@@ -56,7 +56,7 @@ const MobileNumberPicker: React.FC<Props> = ({
             <div className="mb-8 flex items-center justify-center gap-6">
               <button
                 onClick={decrement}
-                className="flex h-24 w-24 items-center justify-center rounded-2xl border-[2.5px] border-ink bg-paper text-4xl font-extrabold text-ink shadow-ink-sm transition hover:bg-mango-light active:translate-y-0.5"
+                className="flex h-24 w-24 items-center justify-center rounded-2xl ring-1 ring-ink/10 bg-paper text-4xl font-extrabold text-ink shadow-md transition hover:bg-mango-light active:translate-y-0.5"
                 aria-label={`${ariaLabel} decrease`}
               >
                 −
@@ -69,7 +69,7 @@ const MobileNumberPicker: React.FC<Props> = ({
 
               <button
                 onClick={increment}
-                className="flex h-24 w-24 items-center justify-center rounded-2xl border-[2.5px] border-ink bg-paper text-4xl font-extrabold text-ink shadow-ink-sm transition hover:bg-mango-light active:translate-y-0.5"
+                className="flex h-24 w-24 items-center justify-center rounded-2xl ring-1 ring-ink/10 bg-paper text-4xl font-extrabold text-ink shadow-md transition hover:bg-mango-light active:translate-y-0.5"
                 aria-label={`${ariaLabel} increase`}
               >
                 +

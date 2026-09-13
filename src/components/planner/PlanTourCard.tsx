@@ -60,7 +60,7 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent md:bg-gradient-to-r md:from-transparent md:to-ink/70" />
           <span
-            className={`absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-ink ${
+            className={`absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full ring-1 ring-ink/10 px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-ink ${
               SLOT_ACCENT[item.slot] ?? SLOT_ACCENT.half
             }`}
           >
@@ -68,7 +68,7 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
           </span>
 
           {item.pinned && (
-            <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border-2 border-ink bg-paper px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-ink">
+            <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full ring-1 ring-ink/10 bg-paper px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-ink">
               ★ {copy.result.addedByYou}
             </span>
           )}

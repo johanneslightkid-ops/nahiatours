@@ -105,12 +105,12 @@ const Blog = () => {
           <div className="grid gap-12 max-w-4xl mx-auto">
             {articles.map((article, idx) => {
               const swayClass = `animate-wave-sway-${(idx % 10) + 1}`;
-              const radiusClass = idx % 2 === 0 ? 'rounded-[36px_16px_32px_20px]' : 'rounded-[20px_36px_24px_32px]';
+              const radiusClass = idx % 2 === 0 ? 'rounded-3xl' : 'rounded-3xl';
               return (
                 <article
                   key={article.id}
                   id={article.slug}
-                  className={`glass-card ${radiusClass} ${swayClass} p-6 md:p-12 transition-all duration-500 hover:scale-[1.015] shadow-ink-sm border border-ink/15`}
+                  className={`glass-card ${radiusClass} ${swayClass} p-6 md:p-12 transition-all duration-500 hover:scale-[1.015] shadow-md border border-ink/15`}
                 >
                   <header className="mb-8 border-b border-ink/20 pb-6">
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-ink font-display tracking-tight leading-tight mb-5">
@@ -118,13 +118,13 @@ const Blog = () => {
                     </h2>
                     <div className="flex flex-wrap items-center gap-4 text-sm font-body">
                       {article.tour && (
-                        <span className="inline-flex items-center gap-1.5 rounded-[16px_6px_14px_8px] border-2 border-ink bg-lagoon-light px-4 py-1.5 font-extrabold text-ink">
+                        <span className="inline-flex items-center gap-1.5 rounded-3xl ring-1 ring-ink/10 bg-lagoon-light px-4 py-1.5 font-extrabold text-ink">
                           <MdTour className="h-4 w-4 text-lagoon-dark" />
                           <FormattedMessage id="blog.relatedTourLabel" defaultMessage="Related tour" />: {article.tour}
                         </span>
                       )}
                       {article.date && (
-                        <span className="inline-flex items-center gap-1.5 rounded-[14px_6px_12px_8px] bg-paper px-4 py-1.5 font-medium text-ink-soft border border-ink/20 shadow-sm">
+                        <span className="inline-flex items-center gap-1.5 rounded-3xl bg-paper px-4 py-1.5 font-medium text-ink-soft border border-ink/20 shadow-sm">
                           <MdEvent className="h-4 w-4 text-lagoon-dark" />
                           <time dateTime={article.date}>
                             {article.date}

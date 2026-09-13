@@ -108,11 +108,11 @@ export const PlannerIntro: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 + index * 0.08 }}
-            className="planner-panel-soft px-6 py-6"
+            className="planner-card px-6 py-6"
           >
             <div className="text-3xl">{bullet.emoji}</div>
-            <h3 className="mt-3 font-display text-lg font-bold text-paper">{bullet.title}</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-paper/85">{bullet.text}</p>
+            <h3 className="mt-3 font-display text-lg font-bold text-ink">{bullet.title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">{bullet.text}</p>
           </motion.div>
         ))}
       </div>

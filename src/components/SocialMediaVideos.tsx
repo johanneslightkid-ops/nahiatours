@@ -103,7 +103,7 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
           {platforms.map((platform) => (
             <div key={platform} className="space-y-6">
               {/* Platform header */}
-              <div className={`inline-flex items-center gap-3 rounded-full border-[2.5px] border-ink px-6 py-3 text-white shadow-ink-sm ${platformColors[platform].gradient}`}>
+              <div className={`inline-flex items-center gap-3 rounded-full ring-1 ring-ink/10 px-6 py-3 text-white shadow-md ${platformColors[platform].gradient}`}>
                 {platformIcons[platform]}
                 <span className="font-bold text-lg capitalize">{platform}</span>
               </div>
@@ -113,10 +113,10 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
                 {videosByPlatform[platform].map((video, idx) => (
                   <div
                     key={video.id}
-                    className="group relative rounded-2xl overflow-hidden shadow-ink-sm hover:shadow-ink-sm transition-all hover:-translate-y-2 border border-ink/20 hover:border-ink flex flex-col h-full bg-white"
+                    className="group relative rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all hover:-translate-y-2 ring-1 ring-ink/10 flex flex-col h-full bg-white"
                   >
                     {/* Video thumbnail/preview */}
-                    <div className={`relative flex h-64 items-center justify-center overflow-hidden border-b-[2.5px] border-ink ${platformColors[platform].gradient}`}>
+                    <div className={`relative flex h-64 items-center justify-center overflow-hidden border-b border-white/20 ${platformColors[platform].gradient}`}>
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all" />
                       <FaPlay className="text-6xl text-paper/85 group-hover:text-white transition-all transform group-hover:scale-125" />
 
@@ -138,7 +138,7 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
                         href={video.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-auto inline-flex w-full items-center justify-center rounded-full border-[2.5px] border-ink bg-mango px-4 py-3 text-center font-extrabold text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-mango-light"
+                        className="mt-auto inline-flex w-full items-center justify-center rounded-full ring-1 ring-ink/10 bg-gradient-to-br from-mango-light via-mango to-mango-dark px-4 py-3 text-center font-extrabold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-mango-light"
                       >
                         Watch on {platform.charAt(0).toUpperCase() + platform.slice(1)}
                       </a>
@@ -177,7 +177,7 @@ const SocialMediaVideos: React.FC<SocialMediaVideosProps> = ({ showIf = true }) 
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center gap-2 rounded-full border-[2.5px] border-ink px-6 py-3 font-extrabold text-white shadow-ink-sm transition hover:-translate-y-0.5 ${platformColors[platform].gradient}`}
+                  className={`inline-flex items-center gap-2 rounded-full ring-1 ring-ink/10 px-6 py-3 font-extrabold text-white shadow-md transition hover:-translate-y-0.5 ${platformColors[platform].gradient}`}
                 >
                   {platformIcons[platform]}
                   <span className="capitalize hidden sm:inline">{platform}</span>

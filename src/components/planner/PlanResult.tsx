@@ -213,7 +213,7 @@ export const PlanResult: React.FC = () => {
         <section key={day.index} className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 px-1">
             <h3 className="flex items-center gap-3 font-display text-2xl font-bold text-paper">
-              <span className="grid h-10 w-10 place-items-center rounded-2xl border-2 border-ink bg-mango font-display text-lg font-extrabold text-ink">
+              <span className="grid h-10 w-10 place-items-center rounded-2xl ring-1 ring-ink/10 bg-mango font-display text-lg font-extrabold text-ink">
                 {day.index}
               </span>
               {copy.result.dayLabel(day.index)}

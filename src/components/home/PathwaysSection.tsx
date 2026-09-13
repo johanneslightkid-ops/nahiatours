@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiArrowRight, HiSparkles } from 'react-icons/hi';
 import { FaWhatsapp } from 'react-icons/fa';
-import { motion } from 'framer-motion';
 import { useI18n } from '../../contexts/I18nContext';
 import { useBrand } from '../../contexts/BrandContext';
 import { usePlanner } from '../../contexts/PlannerContext';
+import Reveal from '../ui/Reveal';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 
@@ -80,51 +80,51 @@ const PathwaysSection: React.FC = () => {
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Manual mode */}
-          <motion.div
-            initial={{ opacity: 0, y: 26 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="pathway-card flex flex-col p-8 sm:p-10"
-          >
-            <span className="text-4xl">🗂️</span>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-ink">{copy.catalogueTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-ink-soft">{copy.catalogueText}</p>
-            <Link
-              to="/tours#top"
-              onClick={() => playClickFx()}
-              onMouseEnter={() => playHoverFx()}
-              className="tropical-button-outline mt-7 self-start"
-            >
-              {copy.catalogueCta} <HiArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </motion.div>
+          <Reveal className="h-full">
+            <div className="pathway-card flex h-full flex-col p-8 sm:p-10">
+              <span className="text-4xl">🗂️</span>
+              <h3 className="mt-4 font-display text-2xl font-extrabold text-ink">
+                {copy.catalogueTitle}
+              </h3>
+              <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-ink-soft">
+                {copy.catalogueText}
+              </p>
+              <Link
+                to="/tours#top"
+                onClick={() => playClickFx()}
+                onMouseEnter={() => playHoverFx()}
+                className="tropical-button-outline mt-7 self-start"
+              >
+                {copy.catalogueCta} <HiArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
+          </Reveal>
 
           {/* Guided mode */}
-          <motion.div
-            initial={{ opacity: 0, y: 26 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="pathway-card pathway-card-dark flex flex-col p-8 sm:p-10"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-4xl">🧭</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-mango-light px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-ink">
-                <HiSparkles className="h-3 w-3" /> {copy.plannerBadge}
-              </span>
+          <Reveal delay={0.1} className="h-full">
+            <div className="pathway-card pathway-card-dark flex h-full flex-col p-8 sm:p-10">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-4xl">🧭</span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-sunset-light ring-1 ring-white/25">
+                  <HiSparkles className="h-3 w-3" /> {copy.plannerBadge}
+                </span>
+              </div>
+              <h3 className="mt-4 font-display text-2xl font-extrabold text-paper">
+                {copy.plannerTitle}
+              </h3>
+              <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-paper/85">
+                {copy.plannerText}
+              </p>
+              <Link
+                to="/plan#top"
+                onClick={() => playClickFx()}
+                onMouseEnter={() => playHoverFx()}
+                className="planner-cta mt-7 self-start"
+              >
+                {copy.plannerCta} <HiArrowRight className="h-4 w-4" />
+              </Link>
             </div>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-paper">{copy.plannerTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-paper/85">{copy.plannerText}</p>
-            <Link
-              to="/plan#top"
-              onClick={() => playClickFx()}
-              onMouseEnter={() => playHoverFx()}
-              className="planner-cta mt-7 self-start"
-            >
-              {copy.plannerCta} <HiArrowRight className="h-4 w-4" />
-            </Link>
-          </motion.div>
+          </Reveal>
         </div>
 
         <div className="mt-10 flex flex-col items-center gap-3">

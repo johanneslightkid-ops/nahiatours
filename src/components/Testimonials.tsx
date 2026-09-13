@@ -39,7 +39,7 @@ const Testimonials = () => {
           {testimonials.map((testimonial, index) => (
             <article key={index} className="glass-card rounded-3xl p-6">
               <div className="mb-5 flex items-center gap-3">
-                <img src={testimonial.avatar} alt={testimonial.name} className="h-12 w-12 rounded-full border-2 border-lagoon" />
+                <img src={testimonial.avatar} alt={testimonial.name} loading="lazy" decoding="async" className="h-12 w-12 rounded-full border-2 border-lagoon" />
                 <div>
                   <h3 className="font-semibold text-ink">{testimonial.name}</h3>
                   <p className="text-sm text-ink-light">{testimonial.location}</p>

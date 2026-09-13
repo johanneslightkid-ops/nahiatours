@@ -103,10 +103,10 @@ const Home: React.FC = () => {
               <div className="animate-pulse space-y-4">
                 <div className="h-4 w-32 rounded-full bg-ink/10" />
                 <div className="h-10 w-3/4 rounded-2xl bg-ink/10" />
-                <div className="h-24 w-full rounded-3xl border-2 border-ink/15 bg-paper-warm" />
+                <div className="h-24 w-full rounded-3xl border border-ink/10 bg-paper-warm" />
                 <div className="h-4 w-2/3 rounded-full bg-ink/10" />
               </div>
-              <div className="h-64 w-full animate-pulse rounded-[28px_16px_30px_18px] border-2 border-ink/15 bg-paper-warm md:h-80" />
+              <div className="h-64 w-full animate-pulse rounded-3xl border border-ink/10 bg-paper-warm md:h-80" />
             </div>
           </section>
         ) : (

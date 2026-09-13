@@ -392,7 +392,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {sortedServices.map((service) => (
           <article key={service.id} className="rounded-3xl bg-white p-5 shadow-lg">
-            <img src={service.image} alt={service.title} className="mb-4 h-44 w-full rounded-2xl object-cover" />
+            <img src={service.image} alt={service.title} loading="lazy" decoding="async" className="mb-4 h-44 w-full rounded-2xl object-cover" />
             <h3 className="text-xl font-semibold text-slate-900">{service.title}</h3>
             <p className="mt-2 text-sm text-slate-600">{service.description.slice(0, 180)}{service.description.length > 180 ? '…' : ''}</p>
             <div className="mt-4 flex flex-wrap gap-2">

@@ -22,7 +22,7 @@ interface BrandProviderProps {
 
 export const BrandProvider: React.FC<BrandProviderProps> = ({ children }) => {
   const [brandSettings, setBrandSettings] = useState<BrandSettings>({
-    brandName: 'Tours',
+    brandName: 'Beautiful Tours',
     phoneNumber: '+1 (809) 555-0123',
     paypalMeLink: 'https://www.paypal.com/paypalme/carlostours',
     verifoneLink: '',
