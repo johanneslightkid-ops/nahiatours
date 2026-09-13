@@ -8,8 +8,7 @@ export const tours: Tour[] = [
     description: 'Discover the stunning beauty of Saona Island with a relaxing day of sun and sand.',
     price: '$100',
     pricingOptions: [
-      { tier: 'Adults', price: '$100', amount: 100 },
-      { tier: 'Children', price: '$75', amount: 75 }
+      { tier: 'Persons', price: '$100', amount: 100 }
     ],
     details: {
       description: 'Spend the day on white-sand beaches with boat transfers, a natural pool stop, and island time under the palms.',
@@ -26,7 +25,7 @@ export const tours: Tour[] = [
     description: 'Get your adrenaline pumping with an exciting 4-wheeler adventure through the jungle.',
     price: '$85',
     pricingOptions: [
-      { tier: 'Adults', price: '$85', amount: 85 }
+      { tier: 'Persons', price: '$85', amount: 85 }
     ],
     details: {
       description: 'Drive muddy backroads, visit a hidden cenote, and cool off after a high-energy buggy route.',
@@ -43,7 +42,7 @@ export const tours: Tour[] = [
     description: 'Join us for a fun-filled day on the water with music, drinks, and great company.',
     price: '$65',
     pricingOptions: [
-      { tier: 'Adults', price: '$65', amount: 65 }
+      { tier: 'Persons', price: '$65', amount: 65 }
     ],
     details: {
       description: 'Cruise along the Caribbean coast with music, snorkeling, and a festive natural pool stop.',

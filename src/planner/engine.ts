@@ -10,7 +10,6 @@
  * returns a DayPlan. No network, no React — which makes it easy to reason about
  * and cheap to recompute on every answer change.
  */
-import type { PricingOption } from '../services/toursService';
 import type { PlannerCopy } from './copy';
 import type { DaySlot, InterestKey, PartyType, TourProfile } from './tourProfiles';
 import type {
@@ -85,9 +84,6 @@ const VEHICLES: Array<{ maxPax: number; en: string; es: string }> = [
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-const isAdultTier = (tier: string) => /adult|adulto/i.test(tier);
-const isChildTier = (tier: string) => /child|kid|ni[ñn]/i.test(tier);
-
 const youngestChildAge = (profile: TravelProfile): number => {
   if (profile.children <= 0) return 99;
   if (profile.kidAges.length === 0) return 5;
@@ -98,74 +94,32 @@ export const budgetCap = (band?: BudgetBand): number | null =>
   band ? BUDGET_CAPS[band] : null;
 
 /**
- * Price one tour for this group using the live pricing tiers.
- * Multi-tier tours (e.g. Coco Bongo regular / gold / front row) pick the tier
- * that matches the guest's budget band instead of always quoting the cheapest.
+ * Price one tour for this group.
+ *
+ * Every service now carries a single per-person rate, so the total is that
+ * rate times the number of travellers. Children are counted like anyone else
+ * — there is no separate child tier to look for, and no budget-band choice
+ * between ticket tiers, because there is only ever one price.
  */
 export const priceTour = (
   entry: CatalogueEntry,
   profile: TravelProfile,
   copy: PlannerCopy
 ): TourPricing => {
-  const options = entry.tour.pricingOptions?.filter((option) => (option.amount ?? 0) > 0) ?? [];
-  const adults = Math.max(0, profile.adults);
-  const children = Math.max(0, profile.children);
-  const heads = Math.max(1, adults + children);
+  const heads = Math.max(1, Math.max(0, profile.adults) + Math.max(0, profile.children));
+  const rate = entry.tour.pricingOptions?.find((option) => (option.amount ?? 0) > 0);
 
-  if (options.length === 0) {
-    return { lines: [], total: 0, perPerson: 0, childrenAtAdultRate: false };
+  if (!rate) {
+    return { lines: [], total: 0, perPerson: 0 };
   }
 
-  const adultOption = options.find((option) => isAdultTier(option.tier));
-  const childOption = options.find((option) => isChildTier(option.tier));
-
-  // Tiered tickets (no adult/child split) — choose by budget appetite.
-  if (!adultOption && !childOption && options.length > 1) {
-    const sorted = [...options].sort((a, b) => (a.amount ?? 0) - (b.amount ?? 0));
-    const pickIndex =
-      profile.budget === 'open'
-        ? sorted.length - 1
-        : profile.budget === 'premium'
-        ? Math.min(1, sorted.length - 1)
-        : 0;
-    const chosen = sorted[pickIndex];
-    const unit = chosen.amount ?? 0;
-    return {
-      lines: [{ label: chosen.tier, qty: heads, unit, total: unit * heads }],
-      total: unit * heads,
-      perPerson: unit,
-      tierNote: chosen.tier,
-      childrenAtAdultRate: false,
-    };
-  }
-
-  const base: PricingOption = adultOption ?? options[0];
-  const baseUnit = base.amount ?? 0;
-  const lines = [];
-  let total = 0;
-  let childrenAtAdultRate = false;
-
-  // Without a child tier everyone pays the adult rate, so it stays one line.
-  const childOnAdultRate = children > 0 && !childOption;
-  const baseQty = adults + (childOnAdultRate ? children : 0);
-
-  if (baseQty > 0) {
-    lines.push({ label: base.tier, qty: baseQty, unit: baseUnit, total: baseUnit * baseQty });
-    total += baseUnit * baseQty;
-    childrenAtAdultRate = childOnAdultRate;
-  }
-
-  if (children > 0 && childOption) {
-    const unit = childOption.amount ?? 0;
-    lines.push({ label: childOption.tier, qty: children, unit, total: unit * children });
-    total += unit * children;
-  }
+  const unit = rate.amount ?? 0;
+  const total = unit * heads;
 
   return {
-    lines,
+    lines: [{ label: rate.tier, qty: heads, unit, total }],
     total,
-    perPerson: Math.round(total / heads),
-    childrenAtAdultRate,
+    perPerson: unit,
   };
 };
 
@@ -709,8 +663,7 @@ export const buildPlanMessage = (
     if (day.items.length === 0) return;
     lines.push(`${copy.result.dayLabel(day.index)}`);
     day.items.forEach((item) => {
-      const tier = item.pricing.tierNote ? ` (${item.pricing.tierNote})` : '';
-      lines.push(`  • ${item.entry.tour.title}${tier} — $${item.pricing.total} USD`);
+      lines.push(`  • ${item.entry.tour.title} — $${item.pricing.total} USD`);
     });
   });
 

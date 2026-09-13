@@ -125,11 +125,6 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
                 {line.qty} × {line.label} · ${line.unit}
               </span>
             ))}
-            {item.pricing.childrenAtAdultRate && (
-              <span className="rounded-full border-2 border-mango-light/45 bg-mango-light/20 px-3 py-1 text-[0.7rem] font-semibold text-mango-light">
-                {copy.result.adultRateForKids}
-              </span>
-            )}
           </div>
 
           {item.cautions.length > 0 && (

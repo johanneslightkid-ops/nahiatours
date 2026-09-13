@@ -79,10 +79,6 @@ export interface TourPricing {
   lines: PriceLine[];
   total: number;
   perPerson: number;
-  /** Chosen ticket tier name when a tour offers several (e.g. Coco Bongo). */
-  tierNote?: string;
-  /** True when children had to be priced at the adult rate. */
-  childrenAtAdultRate: boolean;
 }
 
 export interface ScoreBreakdown {

@@ -8,7 +8,7 @@ export const transportServices: Tour[] = [
     description: 'Private airport shuttle with meet-and-greet service and luggage assistance.',
     price: 'From USD 15',
     pricingOptions: [
-      { tier: 'People', price: 'From USD 15', amount: 15 }
+      { tier: 'Persons', price: 'From USD 15', amount: 15 }
     ],
     details: {
       description: 'Fast and comfortable transfer from the airport or hotel with a dedicated driver and air-conditioned vehicle.',
@@ -25,7 +25,7 @@ export const transportServices: Tour[] = [
     description: 'Premium SUV or van service for executive arrivals and special occasions.',
     price: 'From USD 35',
     pricingOptions: [
-      { tier: 'People', price: 'From USD 35', amount: 35 }
+      { tier: 'Persons', price: 'From USD 35', amount: 35 }
     ],
     details: {
       description: 'Upgrade your arrival with a polished VIP transfer experience and premium comfort.',

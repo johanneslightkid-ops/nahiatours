@@ -3,7 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { useBrand } from '../contexts/BrandContext';
-import { PricingOption } from '../services/toursService';
+import { PricingOption, perPersonTier } from '../services/toursService';
 import PaymentDropdown from './ui/PaymentDropdown';
 import MarkdownRenderer from './ui/MarkdownRenderer';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
@@ -39,30 +39,20 @@ const TourCard: React.FC<TourCardProps> = ({
   const { brandSettings } = useBrand();
   const brandName = brandSettings.brandName;
   const swayClass = `animate-wave-sway-${(index % 10) + 1}`;
-  const resolvedPricingOptions = pricingOptions.length > 0
-    ? pricingOptions
-    : [{ tier: intl.locale === 'es' ? 'Personas' : 'People', price, amount: null }];
+  const locale = intl.locale === 'es' ? 'es' : 'en';
+
+  // Everyone pays the same rate, so a tour has exactly one price and the only
+  // thing to ask for is how many people are coming.
+  const rate: PricingOption = pricingOptions[0] ?? {
+    tier: perPersonTier(locale),
+    price,
+    amount: null,
+  };
+
   const [selectedDate, setSelectedDate] = useState('');
-  const [quantities, setQuantities] = useState<Record<string, number>>(() =>
-    resolvedPricingOptions.reduce<Record<string, number>>((accumulator, option, idx) => {
-      accumulator[option.tier] = idx === 0 ? 1 : 0;
-      return accumulator;
-    }, {})
-  );
+  const [persons, setPersons] = useState(1);
 
-  const totalAmount = useMemo(
-    () =>
-      resolvedPricingOptions.reduce((sum, option) => {
-        const quantity = quantities[option.tier] ?? 0;
-        return sum + (option.amount ?? 0) * quantity;
-      }, 0),
-    [quantities, resolvedPricingOptions]
-  );
-
-  const selectedQuantitySummary = resolvedPricingOptions
-    .filter((option) => (quantities[option.tier] ?? 0) > 0)
-    .map((option) => `${option.tier}: ${quantities[option.tier]}`)
-    .join(', ');
+  const totalAmount = useMemo(() => (rate.amount ?? 0) * persons, [rate.amount, persons]);
 
   const formattedSelectedDate = selectedDate
     ? new Intl.DateTimeFormat(intl.locale === 'es' ? 'es-DO' : 'en-US', {
@@ -70,21 +60,20 @@ const TourCard: React.FC<TourCardProps> = ({
     }).format(new Date(`${selectedDate}T00:00:00`))
     : '';
 
-  const handleQuantityChange = (tier: string, nextValue: string) => {
-    const parsedValue = Math.max(0, Number(nextValue) || 0);
-    setQuantities((current) => ({ ...current, [tier]: parsedValue }));
+  const handlePersonsChange = (nextValue: string) => {
+    setPersons(Math.max(0, Number(nextValue) || 0));
   };
 
   const handleBookNow = () => {
     playClickFx();
     let message = '';
     message += `Hello, I want to book ${excursionName} with ${brandName}\n`;
-    message += `Participants: ${selectedQuantitySummary || 'N/A'}\n`;
+    message += `Participants: ${persons} ${persons === 1 ? 'person' : 'persons'}\n`;
     message += `Preferred date: ${formattedSelectedDate || 'Not specified'}\n`;
     message += `Price: ${totalAmount > 0 ? totalAmount : price} USD`;
     message += `\n`;
     message += `Hola, deseo reservar el ${excursionName} con ${brandName}\n`;
-    message += `Participantes: ${selectedQuantitySummary || 'N/A'}\n`;
+    message += `Participantes: ${persons} ${persons === 1 ? 'persona' : 'personas'}\n`;
     message += `Fecha preferida: ${formattedSelectedDate || 'No especificada'}\n`;
     message += `Precio: ${totalAmount > 0 ? totalAmount : price} USD`;
 
@@ -152,36 +141,29 @@ const TourCard: React.FC<TourCardProps> = ({
 
           {showPrice && (
             <div className="flex flex-wrap gap-2 pt-1">
-              {resolvedPricingOptions.map((option) => (
-                <span
-                  key={`${title}-${option.tier}`}
-                  className="inline-flex items-center rounded-full bg-lagoon-light/60 px-3.5 py-1.5 text-xs font-bold text-lagoon-dark"
-                >
-                  {option.tier}: <strong className="ml-1 text-ink">{option.price}</strong>
-                </span>
-              ))}
+              <span className="inline-flex items-center rounded-full bg-lagoon-light/60 px-3.5 py-1.5 text-xs font-bold text-lagoon-dark">
+                {rate.tier}: <strong className="ml-1 text-ink">{rate.price}</strong>
+              </span>
             </div>
           )}
         </div>
 
         {enabled && (
           <div className="mt-6 space-y-4 border-t border-ink/10 pt-6">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {resolvedPricingOptions.map((option) => (
-                <label key={option.tier} className="space-y-1.5 rounded-2xl bg-paper-warm/70 p-3 text-left ring-1 ring-ink/10">
-                  <span className="block text-xs font-extrabold uppercase tracking-wider text-ink-soft">
-                    {option.tier}
-                  </span>
-                  <input
-                    type="number"
-                    min="0"
-                    value={quantities[option.tier] ?? 0}
-                    onChange={(event) => handleQuantityChange(option.tier, event.target.value)}
-                    className="w-full rounded-xl bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none ring-1 ring-ink/10 transition focus:ring-2 focus:ring-lagoon"
-                  />
-                </label>
-              ))}
-            </div>
+            {/* One rate, so one box: the grid of tier counts this replaced had
+                nothing left to lay out. */}
+            <label className="block space-y-1.5 rounded-2xl bg-paper-warm/70 p-3 text-left ring-1 ring-ink/10">
+              <span className="block text-xs font-extrabold uppercase tracking-wider text-ink-soft">
+                {rate.tier}
+              </span>
+              <input
+                type="number"
+                min="0"
+                value={persons}
+                onChange={(event) => handlePersonsChange(event.target.value)}
+                className="w-full rounded-xl bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none ring-1 ring-ink/10 transition focus:ring-2 focus:ring-lagoon"
+              />
+            </label>
 
             <label className="block space-y-1.5 text-left">
               <span className="text-xs font-extrabold uppercase tracking-wider text-ink-soft">

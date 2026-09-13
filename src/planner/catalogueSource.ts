@@ -6,7 +6,7 @@
  * hiccup) we fall back to the static bundle in /data so the planner never shows
  * an empty day.
  */
-import { getServiceSlug, getTours, Tour } from '../services/toursService';
+import { getServiceSlug, getTours, perPersonTier, Tour } from '../services/toursService';
 import { matchTourProfile } from './tourProfiles';
 import type { CatalogueEntry } from './types';
 
@@ -25,17 +25,20 @@ const amountFrom = (price: string): number | null => {
   return Number.isFinite(numeric) && numeric > 0 ? numeric : null;
 };
 
-const normalizeStatic = (raw: RawTour, index: number): Tour => {
+const normalizeStatic = (raw: RawTour, index: number, locale: Locale): Tour => {
   const images = (raw.images ?? [])
     .map((image) => String(image?.localPath ?? '').trim())
     .filter(Boolean)
     .map((path) => (/^https?:\/\//.test(path) ? path : `/${path.replace(/^\//, '')}`));
 
-  const pricingOptions = (raw.pricing ?? []).map((tier, i) => ({
-    tier: tier.tier?.trim() || `Option ${i + 1}`,
-    price: tier.price?.trim() || '',
-    amount: amountFrom(tier.price ?? ''),
-  }));
+  // One per-person rate, exactly as the live API path produces. Bundled files
+  // may still list several tiers, so the first priced one is taken.
+  const price =
+    (raw.pricing ?? []).map((tier) => tier.price?.trim()).find(Boolean) ||
+    String(raw.price ?? '').trim();
+  const pricingOptions = price
+    ? [{ tier: perPersonTier(locale), price, amount: amountFrom(price) }]
+    : [];
 
   const image = images[0] || '/imgs/placeholder.jpg';
 
@@ -59,7 +62,9 @@ const loadStatic = async (locale: Locale): Promise<Tour[]> => {
     if (!response.ok) return [];
     const payload = await response.json();
     const list = Array.isArray(payload) ? payload : (payload?.record ?? []);
-    return Array.isArray(list) ? list.map(normalizeStatic) : [];
+    return Array.isArray(list)
+      ? list.map((raw, index) => normalizeStatic(raw, index, locale))
+      : [];
   } catch (error) {
     console.warn('[planner] static catalogue fallback failed', error);
     return [];
