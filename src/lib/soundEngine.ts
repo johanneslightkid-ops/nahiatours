@@ -25,15 +25,35 @@ const AUDIO_FX_STORAGE_KEY = 'tours_audio_fx';
 /** Previous key, read once so an existing preference is not lost. */
 const LEGACY_AUDIO_FX_STORAGE_KEY = 'ferreras_audio_fx';
 
+/* The preference is read from storage once and then held. Every hover and
+   every click asks whether sound is on, and `localStorage` is synchronous —
+   it blocks the main thread and, on a cold read, can touch disk. The only
+   thing that changes the answer is the toggle below. */
+let audioEnabled: boolean | null = null;
+
 export function isAudioEnabled(): boolean {
   if (typeof window === 'undefined') return false;
-  const stored = (localStorage.getItem(AUDIO_FX_STORAGE_KEY) ?? localStorage.getItem(LEGACY_AUDIO_FX_STORAGE_KEY));
-  return stored !== 'false';
+  if (audioEnabled === null) {
+    try {
+      const stored =
+        localStorage.getItem(AUDIO_FX_STORAGE_KEY) ??
+        localStorage.getItem(LEGACY_AUDIO_FX_STORAGE_KEY);
+      audioEnabled = stored !== 'false';
+    } catch {
+      audioEnabled = true;
+    }
+  }
+  return audioEnabled;
 }
 
 export function setAudioEnabled(enabled: boolean): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(AUDIO_FX_STORAGE_KEY, enabled ? 'true' : 'false');
+  audioEnabled = enabled;
+  try {
+    localStorage.setItem(AUDIO_FX_STORAGE_KEY, enabled ? 'true' : 'false');
+  } catch {
+    /* Private mode, or storage disabled: the preference just does not stick. */
+  }
 }
 
 /** UI Micro Sound: Button click pop */

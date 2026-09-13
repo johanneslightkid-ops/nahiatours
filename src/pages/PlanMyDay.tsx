@@ -44,11 +44,17 @@ const PlanMyDay: React.FC = () => {
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div
           className="planner-glow left-[-10%] top-24 h-[28rem] w-[28rem]"
-          style={{ background: '#7FE3DA' }}
+          style={{
+            background:
+              'radial-gradient(circle closest-side, rgba(127,227,218,0.95) 0%, rgba(127,227,218,0.55) 42%, rgba(127,227,218,0.18) 66%, rgba(127,227,218,0) 86%)',
+          }}
         />
         <div
           className="planner-glow bottom-10 right-[-8%] h-[24rem] w-[24rem]"
-          style={{ background: '#FFC861' }}
+          style={{
+            background:
+              'radial-gradient(circle closest-side, rgba(255,200,97,0.95) 0%, rgba(255,200,97,0.55) 42%, rgba(255,200,97,0.18) 66%, rgba(255,200,97,0) 86%)',
+          }}
         />
       </div>
 

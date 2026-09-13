@@ -121,6 +121,8 @@ const StorySection: React.FC<StorySectionProps> = ({
     <img
       src={imageUrl}
       alt={title || 'Story image'}
+      loading="lazy"
+      decoding="async"
       className="photo-pop h-full w-full object-cover"
     />
   ) : isTikTok ? (
@@ -141,12 +143,20 @@ const StorySection: React.FC<StorySectionProps> = ({
       </div>
     )
   ) : vimeoUrl ? (
-    <iframe
-      src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
-      className="h-full w-full"
-      frameBorder="0"
-      allowFullScreen
-    />
+    /* The player is a third-party document with its own scripts and its own
+       network budget. It is not built until this section has actually been
+       scrolled to — before that there is only the frame it will sit in. */
+    hasLoaded ? (
+      <iframe
+        src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
+        className="h-full w-full"
+        loading="lazy"
+        frameBorder="0"
+        allowFullScreen
+      />
+    ) : (
+      <div className="h-full w-full bg-paper-warm" />
+    )
   ) : null;
 
   const hasMedia = Boolean(imageUrl || vimeoUrl);
@@ -267,12 +277,17 @@ const StorySection: React.FC<StorySectionProps> = ({
                   )
                 ) : (
                   <div className="photo-frame aspect-video w-full">
-                    <iframe
-                      src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
-                      className="h-full w-full"
-                      frameBorder="0"
-                      allowFullScreen
-                    />
+                    {hasLoaded ? (
+                      <iframe
+                        src={isInView ? getVimeoAutoplayUrl(vimeoUrl) : vimeoUrl}
+                        className="h-full w-full"
+                        loading="lazy"
+                        frameBorder="0"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-paper-warm" />
+                    )}
                   </div>
                 )}
               </div>

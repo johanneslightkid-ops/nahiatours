@@ -60,7 +60,7 @@ const Header: React.FC = () => {
               belongs in the bar: small, round, softly lit. */}
           <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-md ring-1 ring-ink/5 transition duration-500 group-hover:shadow-lg sm:h-14 sm:w-14">
             {brandSettings.brandicon ? (
-              <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
+              <img src={brandSettings.brandicon} alt="Logo" decoding="async" className="h-full w-full object-cover" />
             ) : (
               <img src="/competitor-logo.svg" alt="Logo" className="h-9 w-9 sm:h-11 sm:w-11" />
             )}

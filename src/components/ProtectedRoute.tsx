@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Route, Routes, RouteProps } from 'react-router-dom';
+import { RouteProps } from 'react-router-dom';
 import PasswordModal from '../components/PasswordModal';
-import Admin from '../pages/Admin';
 
 interface ProtectedRouteProps extends RouteProps {
   component: React.ComponentType;

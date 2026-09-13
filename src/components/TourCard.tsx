@@ -111,6 +111,8 @@ const TourCard: React.FC<TourCardProps> = ({
           <img
             src={image}
             alt={title}
+            loading="lazy"
+            decoding="async"
             className="photo-pop h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         </Link>

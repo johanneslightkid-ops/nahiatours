@@ -63,12 +63,14 @@ const svgProps = {
 
 /* ── The sun ──────────────────────────────────────────────────────────────
    A disc of pure white at the core, blooming out through gold. The rays are
-   soft wedges rather than spikes, because real glare has no edge. */
-export const SunBurst: React.FC<IllustrationProps & { spin?: boolean }> = ({
-  className = '',
-  style,
-  spin = false,
-}) => {
+   soft wedges rather than spikes, because real glare has no edge.
+
+   It used to turn, once every ninety seconds, and it cost more than every
+   other effect on the welcome page put together: rotating a group inside an
+   SVG re-renders sixteen gradient-filled wedges every frame, and this one is
+   62vw across, pinned behind the whole site, and never off screen. See
+   `IllustratedBackdrop` for the measurements. It sits still now. */
+export const SunBurst: React.FC<IllustrationProps> = ({ className = '', style }) => {
   const id = useId();
   return (
     <svg viewBox="0 0 240 240" className={className} style={style} {...svgProps}>
@@ -89,12 +91,8 @@ export const SunBurst: React.FC<IllustrationProps & { spin?: boolean }> = ({
       {/* Bloom first — the haze the disc sits inside. */}
       <circle cx="120" cy="120" r="118" fill={`url(#${id}-bloom)`} />
 
-      {/* Soft rays, turning slowly if asked. */}
-      <g
-        className={spin ? 'animate-spin-slow' : undefined}
-        style={{ transformOrigin: '120px 120px' }}
-        opacity="0.5"
-      >
+      {/* Soft rays. */}
+      <g opacity="0.5">
         {Array.from({ length: 16 }).map((_, i) => (
           <path
             key={i}

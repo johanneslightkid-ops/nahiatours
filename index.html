@@ -154,6 +154,33 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
+    <!-- Type.
+
+         This was an @import at the top of globals.css, which is the slowest
+         possible place to put it: the browser has to download the stylesheet,
+         parse it, discover the @import, and only then start on the fonts —
+         and nothing paints until that whole chain finishes. From here it
+         starts the moment the HTML arrives, alongside everything else.
+
+         Each family is asked for as a weight *range*, so Google serves one
+         variable file per family instead of one file per weight: three
+         downloads where there were twelve. The range runs to 800 because the
+         headings ask for extrabold, which until now the browser was faking. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..800&family=Plus+Jakarta+Sans:wght@400..800&family=Caveat:wght@400..700&display=swap"
+    />
+
+    <!-- The hero photograph is what a visitor is waiting for, and in a
+         client-rendered app the browser cannot find it until the bundle has
+         downloaded, parsed and run. Naming it here starts it immediately. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/imgs/tours/tour_saona_island_detail_12.jpg"
+      fetchpriority="high"
+    />
   </head>
   <body>
     <div id="root"></div>

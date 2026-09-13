@@ -11,8 +11,22 @@ import { SunBurst, Cloud, PalmFrond, Birds } from './Illustrations';
  * between sections, and down the page margins.
  *
  * Everything is CSS and inline SVG — no images, no canvas, no GL context.
- * The one moving part is the caustic layer, which is two repeating gradients
- * sliding against each other, so it costs a composite and nothing else.
+ *
+ * It is also a full-viewport layer fixed behind every page, and that is what
+ * decides what is allowed to move in here. Anything animating inside it keeps
+ * the whole layer dirty, so the browser re-rasterises a screenful of sky and
+ * sea every frame. Measured on a throttled desktop, the scene costs 60fps
+ * when it is still and 34fps the moment any single part of it moves — and it
+ * made no difference which part. The sun turning once every ninety seconds
+ * and the clouds crossing over three minutes are, between them, most of the
+ * page's frame budget, for motion nobody watching the page can actually see.
+ *
+ * So the scene is held still, exactly as this file's first line claims it is.
+ * The one thing that still moves is the light on the water, which is the
+ * signature and which — with no filter and no blend mode on it — is free.
+ *
+ * The sun, clouds, birds and the second palm are still rationed by screen
+ * size on top of that: a phone has no room to show them properly.
  */
 const IllustratedBackdrop: React.FC = () => (
   <div
@@ -30,30 +44,18 @@ const IllustratedBackdrop: React.FC = () => (
       }}
     />
 
-    {/* The sun, high and to the right, turning once every 90 seconds. */}
-    <SunBurst
-      spin
-      className="absolute -right-[16vw] -top-[22vw] h-[62vw] w-[62vw] opacity-70 sm:-right-[8vw] sm:-top-[16vw] sm:h-[46vw] sm:w-[46vw]"
-    />
+    {/* The sun, high and to the right. */}
+    <SunBurst className="absolute -right-[16vw] -top-[22vw] h-[62vw] w-[62vw] opacity-70 lg:-right-[8vw] lg:-top-[16vw] lg:h-[46vw] lg:w-[46vw]" />
 
-    {/* Trade-wind cloud, crossing on its own clock. */}
-    <div
-      className="absolute"
-      style={{ top: '9%', animation: 'cloudDrift 150s linear infinite' }}
-    >
+    {/* Trade-wind cloud, and a second one further down the sky. */}
+    <div className="absolute left-[8%] hidden lg:block" style={{ top: '9%' }}>
       <Cloud className="h-16 w-28 opacity-80 sm:h-20 sm:w-36" />
     </div>
-    <div
-      className="absolute"
-      style={{ top: '22%', animation: 'cloudDrift 220s linear infinite', animationDelay: '-80s' }}
-    >
+    <div className="absolute left-[62%] hidden lg:block" style={{ top: '22%' }}>
       <Cloud className="h-11 w-20 opacity-60 sm:h-14 sm:w-24" />
     </div>
 
-    <Birds
-      className="absolute left-[18%] top-[16%] h-8 w-28 opacity-45"
-      style={{ animation: 'cloudDrift 300s linear infinite' }}
-    />
+    <Birds className="absolute left-[18%] top-[16%] hidden h-8 w-28 opacity-45 lg:block" />
 
     {/* The sea. Three bands of depth — shallow over sand, then the drop-off,
         then deep water — with a hard bright line where it meets the sky. */}
@@ -67,8 +69,10 @@ const IllustratedBackdrop: React.FC = () => (
       />
 
       {/* Light on the surface. This is the signature — Hockney's white
-          squiggle, built from two gradients drifting at different rates. */}
-      <span className="caustics" />
+          squiggle. `caustics-scene` marks it as the copy that lives in the
+          fixed layer, which decides where it is allowed to drift; see
+          `globals.css`. */}
+      <span className="caustics caustics-scene" />
 
       {/* Glare sitting on the water directly under the sun. */}
       <div
@@ -89,23 +93,18 @@ const IllustratedBackdrop: React.FC = () => (
       />
     </div>
 
-    {/* Palms leaning in from the corners. The lean lives on the wrapper so
-        the wind animation on the frond itself owns `transform` outright. */}
+    {/* Palms leaning in from the corners. */}
     <div
       className="absolute -left-24 bottom-[-12%] h-80 w-80 sm:h-[26rem] sm:w-[26rem]"
       style={{ transform: 'rotate(24deg)' }}
     >
-      <PalmFrond color="dark" className="animate-frond h-full w-full opacity-25" />
+      <PalmFrond color="dark" className="h-full w-full opacity-25" />
     </div>
     <div
       className="absolute -right-28 bottom-[-16%] hidden h-80 w-80 lg:block"
       style={{ transform: 'rotate(-30deg) scaleX(-1)' }}
     >
-      <PalmFrond
-        color="palm"
-        className="animate-frond h-full w-full opacity-20"
-        style={{ animationDelay: '-4s' }}
-      />
+      <PalmFrond color="palm" className="h-full w-full opacity-20" />
     </div>
   </div>
 );

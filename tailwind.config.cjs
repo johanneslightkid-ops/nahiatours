@@ -13,7 +13,7 @@
  *      a pale tint — sun glare, foam, sand. Nothing bright is "washed out".
  *   2. LIGHT ON WATER IS A WHITE LINE. Hockney drew pool caustics as thin
  *      wavy white strokes over flat turquoise. That is the signature motif,
- *      and it is a handful of gradients rather than a simulation.
+ *      and it is two sheets of static noise drifting rather than a simulation.
  *   3. THE OVER-UNDER. Dive photographers split the frame at the waterline:
  *      sky and beach above, lit water below. Sections divide that way.
  *   4. SEA IS THE WORLD, SUN IS THE ACTION. Blue reads as trust, but a travel
