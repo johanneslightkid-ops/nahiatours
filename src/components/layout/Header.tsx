@@ -32,10 +32,22 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
+  /* The section pills live on /admin and are selected by its `section` query.
+     Transport is a route of its own, so it is excluded here and handled by
+     `adminRouteNavClass` below — and, importantly, none of these may light up
+     while we are on that route: with no `section` in the URL the default below
+     would otherwise mark Brand Settings as the current page from /admin/transport. */
+  const isToursAdmin = location.pathname === '/admin';
+
   const adminNavClass = (section: string) => {
     const currentSection = searchParams.get('section') || 'brand';
-    return `nav-link-pill p-3 !rounded-full ${currentSection === section ? 'nav-link-pill-active' : ''}`;
+    const active = isToursAdmin && currentSection === section;
+    return `nav-link-pill p-3 !rounded-full ${active ? 'nav-link-pill-active' : ''}`;
   };
+
+  /* For admin areas that are their own page rather than a section of one. */
+  const adminRouteNavClass = (path: string) =>
+    `nav-link-pill p-3 !rounded-full ${location.pathname === path ? 'nav-link-pill-active' : ''}`;
 
   const handleNavClick = () => {
     playClickFx();
@@ -102,7 +114,7 @@ const Header: React.FC = () => {
               <Link to="/admin?section=tours" onClick={handleNavClick} className={adminNavClass('tours')} title="Tours">
                 <MdTour className="h-6 w-6" />
               </Link>
-              <Link to="/admin?section=transport" onClick={handleNavClick} className={adminNavClass('transport')} title="Transport">
+              <Link to="/admin/transport" onClick={handleNavClick} className={adminRouteNavClass('/admin/transport')} title="Transport">
                 <MdLocalTaxi className="h-6 w-6" />
               </Link>
               <Link to="/admin?section=tiktok" onClick={handleNavClick} className={adminNavClass('tiktok')} title="TikTok">

@@ -226,12 +226,10 @@ const Admin: React.FC = () => {
           />
         )}
 
-        {/* Transport Admin Section */}
-        {activeSection === 'transport' && (
-          <div className="rounded-3xl bg-white p-6 shadow-lg">
-            <p className="text-slate-600">Transport Admin Section (navigate from Tours Admin)</p>
-          </div>
-        )}
+        {/* There is no transport section here any more. The header pill goes
+            straight to /admin/transport, which is a real page with the fleet,
+            the pricing and the municipio multipliers on it — this used to be a
+            paragraph telling you to navigate somewhere else. */}
 
         {/* TikTok Videos Admin Panel */}
         {activeSection === 'tiktok' && (
