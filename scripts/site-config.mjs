@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-const DEFAULT_SITE_URL = 'https://beautiful-tours.johannes-neugschwentner.workers.dev';
+const DEFAULT_SITE_URL = 'https://transporturist.johannes-neugschwentner.workers.dev';
 const DEFAULT_BRAND_NAME = 'Beautiful Tours';
 
 /** Accepts "example.com", "https://example.com" or a trailing slash. */

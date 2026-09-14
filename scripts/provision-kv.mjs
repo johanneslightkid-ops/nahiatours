@@ -29,7 +29,11 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_PATH = join(ROOT, 'wrangler.toml');
 const API = 'https://api.cloudflare.com/client/v4';
 
-const NAMESPACE_TITLE = process.env.KV_NAMESPACE_TITLE || 'nahiatours-data';
+// This branch deploys the `transporturist` Worker, so its namespace default
+// follows. The workflow sets KV_NAMESPACE_TITLE explicitly; this only matters
+// for a local `npm run build`, where inheriting "nahiatours-data" would bind
+// this build to the production site's data.
+const NAMESPACE_TITLE = process.env.KV_NAMESPACE_TITLE || 'transporturist-data';
 const BINDING = process.env.KV_BINDING || 'DATA_KV_F';
 
 // The generated block is delimited so re-runs replace it rather than stacking

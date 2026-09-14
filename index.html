@@ -20,16 +20,16 @@
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
-    <link rel="canonical" href="https://beautiful-tours.johannes-neugschwentner.workers.dev" />
-    <link rel="alternate" hreflang="en" href="https://beautiful-tours.johannes-neugschwentner.workers.dev/?lang=en" />
-    <link rel="alternate" hreflang="es" href="https://beautiful-tours.johannes-neugschwentner.workers.dev/?lang=es" />
-    <link rel="alternate" hreflang="x-default" href="https://beautiful-tours.johannes-neugschwentner.workers.dev" />
+    <link rel="canonical" href="https://transporturist.johannes-neugschwentner.workers.dev" />
+    <link rel="alternate" hreflang="en" href="https://transporturist.johannes-neugschwentner.workers.dev/?lang=en" />
+    <link rel="alternate" hreflang="es" href="https://transporturist.johannes-neugschwentner.workers.dev/?lang=es" />
+    <link rel="alternate" hreflang="x-default" href="https://transporturist.johannes-neugschwentner.workers.dev" />
 
     <meta property="og:title" content="Beautiful Tours — Caribbean Tours &amp; Excursions in Punta Cana" />
     <meta property="og:description" content="Caribbean tours and excursions in Punta Cana with Beautiful Tours." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://beautiful-tours.johannes-neugschwentner.workers.dev" />
-    <meta property="og:image" content="https://beautiful-tours.johannes-neugschwentner.workers.dev/og-image.jpg" />
+    <meta property="og:url" content="https://transporturist.johannes-neugschwentner.workers.dev" />
+    <meta property="og:image" content="https://transporturist.johannes-neugschwentner.workers.dev/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Beautiful Tours" />
@@ -39,7 +39,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Beautiful Tours — Caribbean Tours &amp; Excursions in Punta Cana" />
     <meta name="twitter:description" content="Caribbean tours and excursions in Punta Cana with Beautiful Tours." />
-    <meta name="twitter:image" content="https://beautiful-tours.johannes-neugschwentner.workers.dev/og-image.jpg" />
+    <meta name="twitter:image" content="https://transporturist.johannes-neugschwentner.workers.dev/og-image.jpg" />
 
     <meta name="geo.region" content="DO-11" />
     <meta name="geo.placename" content="Punta Cana" />
@@ -51,8 +51,8 @@
   "@context": "https://schema.org",
   "@type": "TravelAgency",
   "name": "Beautiful Tours",
-  "url": "https://beautiful-tours.johannes-neugschwentner.workers.dev",
-  "image": "https://beautiful-tours.johannes-neugschwentner.workers.dev/og-image.jpg",
+  "url": "https://transporturist.johannes-neugschwentner.workers.dev",
+  "image": "https://transporturist.johannes-neugschwentner.workers.dev/og-image.jpg",
   "description": "Caribbean tours and excursions in Punta Cana with Beautiful Tours.",
   "address": {
     "@type": "PostalAddress",
@@ -99,31 +99,31 @@
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://beautiful-tours.johannes-neugschwentner.workers.dev/"
+      "item": "https://transporturist.johannes-neugschwentner.workers.dev/"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Tours",
-      "item": "https://beautiful-tours.johannes-neugschwentner.workers.dev/tours"
+      "item": "https://transporturist.johannes-neugschwentner.workers.dev/tours"
     },
     {
       "@type": "ListItem",
       "position": 3,
       "name": "Transportation",
-      "item": "https://beautiful-tours.johannes-neugschwentner.workers.dev/transport"
+      "item": "https://transporturist.johannes-neugschwentner.workers.dev/transport"
     },
     {
       "@type": "ListItem",
       "position": 4,
       "name": "Blog",
-      "item": "https://beautiful-tours.johannes-neugschwentner.workers.dev/blog"
+      "item": "https://transporturist.johannes-neugschwentner.workers.dev/blog"
     },
     {
       "@type": "ListItem",
       "position": 5,
       "name": "Contact",
-      "item": "https://beautiful-tours.johannes-neugschwentner.workers.dev/contact"
+      "item": "https://transporturist.johannes-neugschwentner.workers.dev/contact"
     }
   ]
 }
@@ -133,7 +133,7 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Beautiful Tours",
-  "url": "https://beautiful-tours.johannes-neugschwentner.workers.dev",
+  "url": "https://transporturist.johannes-neugschwentner.workers.dev",
   "inLanguage": [
     "en",
     "es"
@@ -157,19 +157,20 @@
 
     <!-- Type.
 
-         This was an @import at the top of globals.css, which is the slowest
-         possible place to put it: the browser has to download the stylesheet,
-         parse it, discover the @import, and only then start on the fonts —
-         and nothing paints until that whole chain finishes. From here it
-         starts the moment the HTML arrives, alongside everything else.
+         Linked here rather than @import-ed from the stylesheet: an @import
+         cannot start downloading until the stylesheet itself has been fetched
+         and parsed, which puts the whole of the type behind a request chain
+         the browser could otherwise have started at the first byte.
 
-         Each family is asked for as a weight *range*, so Google serves one
-         variable file per family instead of one file per weight: three
-         downloads where there were twelve. The range runs to 800 because the
-         headings ask for extrabold, which until now the browser was faking. -->
+         Two families, asked for as weight ranges so Google serves one
+         variable file each. Playfair Display carries the display sizes — a
+         Didone's thick-to-thin is the typographic form of a loaded brush —
+         and its italic doubles as the signature in the corner of the canvas,
+         which is why there is no third script face to download. Manrope says
+         the prices. -->
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..800&family=Plus+Jakarta+Sans:wght@400..800&family=Caveat:wght@400..700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500..900;1,500..600&family=Manrope:wght@400..800&display=swap"
     />
 
     <!-- The hero photograph is what a visitor is waiting for, and in a

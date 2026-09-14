@@ -8,95 +8,118 @@
 @tailwind utilities;
 
 /* ══════════════════════════════════════════════════════════════════════════
-   BEAUTIFUL TOURS — CARIBBEAN DAYLIGHT
+   TRANSPORTURIST — THE CARIBBEAN, PAINTED IN OILS
    ──────────────────────────────────────────────────────────────────────────
-   The site was a flat screen-printed poster. It is now the light itself:
-   clear shallow water over white sand, palm shade, and golden hour. The
-   stylisation comes from painting and photography rather than illustration.
+   The previous design was watercolour: unpainted white paper, clear light,
+   everything quick and transparent. This one is the opposite material —
+   acrylic laid thick, glazed over in oil — and the rules follow the medium.
 
-   Five principles, each borrowed from a tradition and each doing a job:
+   The business drives people places, so the picture is the journey: the coast
+   road, the long horizon out of a window, the arrival. Not a beach on its own.
 
-     1. WHITE IS THE LIGHT. Homer painted the Bahamas by leaving the paper
-        bare where the sun struck. Highlights here are pure white, never a
-        pale tint. Sun glare, sea foam and sand glare are all #FFF, and the
-        foam along every waterline is literally unpainted band.
-     2. LIGHT ON WATER IS A WHITE LINE. Hockney drew pool caustics as thin
-        wavy white strokes over flat turquoise. `.caustics` is that: two
-        static sheets of fractal noise, rasterised once and slid across each
-        other by the compositor. No simulation, and nothing per frame for the
-        CPU to do.
-     3. THE OVER-UNDER. Dive photographers split the frame at the waterline.
-        Sections divide the same way: the band above ends in foam, the band
-        below is lit water.
-     4. SEA IS THE WORLD, SUN IS THE ACTION. Blue reads as trust, but a
-        travel brand that leads with blue looks like every airline. The blues
-        build the place; the warm coral is spent only on what a visitor can
-        DO — book, plan, call, submit, the chosen option, the live total.
-     5. EDITORIAL IS SATURATED, TRANSACTIONAL IS CALM. Hero and story
-        surfaces lean into photographic colour. Booking forms, prices and the
-        planner go quiet and white. The closer to paying, the calmer it gets.
+     1. NOTHING STARTS ON WHITE. Painters tone the canvas before the first
+        stroke, because white lies about value. `--paper` is raw linen and no
+        surface here is `var(--white)` — even the white is titanium white, which is
+        warm. Pure white on a toned ground reads as a hole in the canvas.
+     2. THE DARKS CARRY THE PICTURE. Value before colour: deep viridian-umber
+        masses with the light pulled out of them, which is why the deep bands
+        go much darker here than the last design dared.
+     3. PIGMENT, NOT LIGHT. Every colour is named for the tube it comes from
+        and mixed the way paint mixes — warm darks, cool lights, earths under
+        everything to keep the brights believable.
+     4. THE BRUSH IS VISIBLE. Canvas tooth runs under the whole site and over
+        every photograph. Sections break on a palette-knife edge, not a wave.
+        Corners are a stretched panel rather than a pebble.
+     5. A PAINTING DOES NOT MOVE. The last design's signature drifted; this
+        one's cannot, because paint is dry. Nothing here animates on its own —
+        the life is in the surface and in what happens when you reach for
+        something. That is also why this is the cheapest thing this site has
+        ever rendered: there is no steady-state cost at all.
+
+   The varnish is what ties it together. A finished canvas is varnished, and
+   the glaze is what makes separately-painted passages read as one picture —
+   here, what makes a dozen photographs shot on a dozen phones belong to the
+   same painting.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Depth: the colour of water, read downward ────────────────────────── */
-  --ink: #0e2e3b;
-  --ink-soft: #3d5a66;
-  --ink-light: #7b95a1;
+  /* ── The darks. Ivory black mixed toward ultramarine — nobody paints with
+        a true black, and a dark with daylight in it never looks like one. ── */
+  --ink: #22252b;
+  --ink-soft: #4a4e57;
+  --ink-light: #6e727b;
 
-  /* ── Sand ─────────────────────────────────────────────────────────────── */
-  --paper: #fffbf5;
-  --paper-warm: #fff3e4;
-  --paper-deep: #fbe6cb;
-  --white: #ffffff;
+  /* ── The ground. Raw linen, then heavier umber washes over it. ───────── */
+  --paper: #f0e7d7;
+  --paper-warm: #e5d7be;
+  --paper-deep: #d2bf9e;
+  /* Titanium white: warm, slightly grey, and the lightest thing permitted. */
+  --white: #fbf6ec;
 
-  /* ── The sea ──────────────────────────────────────────────────────────── */
-  --lagoon-light: #9cede6;
-  --lagoon: #14b8c4;
-  --lagoon-dark: #0a7c93;
-  --abyss: #08415c;
+  /* ── The sea: cerulean mixed into viridian. ──────────────────────────── */
+  --lagoon-light: #7fcfc8;
+  --lagoon: #1e8e96;
+  --lagoon-dark: #0e5c66;
+  --abyss: #123a41;
+  --abyss-dark: #0a2429;
 
-  /* ── The sky ──────────────────────────────────────────────────────────── */
-  --sky-light: #d6f1ff;
-  --sky: #5ec5f5;
-  --sky-dark: #2a7fb8;
+  /* ── The sky: cerulean. ──────────────────────────────────────────────── */
+  --sky-light: #cfe3ec;
+  --sky: #6fafce;
+  --sky-dark: #3a6e93;
 
-  /* ── The sun, and the action it stands for ────────────────────────────── */
-  --coral-light: #ff9b76;
-  --coral: #ff6b45;
-  --coral-dark: #dc4a22;
-  --gold-light: #ffd68c;
-  --gold: #ffb703;
-  --gold-dark: #e08700;
+  /* ── The action. Cadmium orange knocked back into burnt sienna, because
+        straight from the tube it is too light to carry white type. ─────── */
+  --coral-light: #ee8b4a;
+  --coral: #c4501a;
+  --coral-dark: #8e3409;
+  /* Cadmium yellow deep — the light source itself. */
+  --gold-light: #f6d36a;
+  --gold: #eda91b;
+  --gold-dark: #c07c0a;
 
-  /* ── Growing things ───────────────────────────────────────────────────── */
-  --palm-light: #93dca9;
-  --palm: #2fa36b;
-  --palm-dark: #186b48;
+  /* ── Growing things: sap green over viridian. ────────────────────────── */
+  --palm-light: #92b36a;
+  --palm: #4c7a3a;
+  --palm-dark: #2a4a27;
+
+  /* ── The earths. Half of any real palette, and what keeps the rest
+        believable. ─────────────────────────────────────────────────────── */
+  --sienna: #b07a3c;
+  --umber: #6b4626;
+  --umber-deep: #3e2a1a;
 
   /* Legacy token names, remapped so every stray utility in the markup lands
      inside this palette. */
   --mango: var(--coral);
   --mango-light: var(--coral-light);
   --mango-dark: var(--coral-dark);
-  --hibiscus: #ff5f7e;
-  --hibiscus-light: #ffa9b9;
+  --hibiscus: #9e2b3f;
+  --hibiscus-light: #c9697c;
   --jungle: var(--palm);
   --jungle-light: var(--palm-light);
   --jungle-dark: var(--palm-dark);
   --sunset: var(--gold);
-  --grape: #7c5fd3;
+  --grape: #35478c;
 
-  /* Light is soft here, and it bounces off water. Every shadow is two stops:
-     a tight contact shadow and a wide ambient one, tinted towards the sea. */
-  --shadow-sm: 0 1px 2px rgba(14, 46, 59, 0.06), 0 2px 6px rgba(14, 46, 59, 0.05);
-  --shadow-md: 0 3px 6px rgba(14, 46, 59, 0.07), 0 10px 22px rgba(14, 46, 59, 0.08);
-  --shadow-lg: 0 6px 12px rgba(14, 46, 59, 0.07), 0 18px 38px rgba(14, 46, 59, 0.1);
-  --shadow-xl: 0 10px 20px rgba(14, 46, 59, 0.08), 0 30px 60px rgba(14, 46, 59, 0.12);
-  --shadow-lift: 0 14px 26px -10px rgba(14, 46, 59, 0.2), 0 34px 60px -24px rgba(14, 46, 59, 0.26);
+  /* ── Canvas tooth ─────────────────────────────────────────────────────
+     The weave the paint sits in. One 180px tile of fractal noise, tinted
+     umber and thresholded to a low alpha, generated once as a data URI and
+     repeated. It is the single most important texture on the site and it
+     costs one rasterisation — there is no filter here and nothing moves. */
+  --canvas-tooth: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='t' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.24 0 0 0 0 0.16 0 0 0 0 0.10 0.74 0 0 0 -0.24'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23t)'/%3E%3C/svg%3E");
 
-  --radius: 18px;
-  --radius-lg: 24px;
-  --radius-xl: 30px;
+  /* Light is warm and comes from one direction. Shadows are tight, close and
+     umber — a painted world gets its depth from value, not from blur. */
+  --shadow-sm: 0 1px 2px rgba(62, 42, 26, 0.1);
+  --shadow-md: 0 2px 5px rgba(62, 42, 26, 0.13), 0 8px 16px rgba(62, 42, 26, 0.1);
+  --shadow-lg: 0 4px 8px rgba(62, 42, 26, 0.14), 0 14px 28px rgba(62, 42, 26, 0.12);
+  --shadow-xl: 0 6px 14px rgba(62, 42, 26, 0.16), 0 24px 44px rgba(62, 42, 26, 0.16);
+  --shadow-lift: 0 8px 16px -6px rgba(62, 42, 26, 0.24), 0 20px 38px -16px rgba(62, 42, 26, 0.26);
+
+  --radius: 9px;
+  --radius-lg: 13px;
+  --radius-xl: 17px;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -109,6 +132,26 @@ html {
   background: var(--paper);
 }
 
+/* The varnish. A finished canvas carries a warm glaze and darkens slightly
+   toward its edges, and that single film is what makes a dozen photographs
+   shot on a dozen different phones read as one painted surface. It is fixed,
+   static and un-animated, so it rasterises once and then costs nothing. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 120% 100% at 50% 38%,
+      rgba(237, 169, 27, 0.05) 0%,
+      rgba(107, 70, 38, 0) 42%,
+      rgba(62, 42, 26, 0.13) 78%,
+      rgba(62, 42, 26, 0.26) 100%
+    );
+}
+
 /* Palms, glare and floating cards reach past the layout; none of them are
    content. `clip` rather than `hidden` keeps the viewport as the scroll
    container, so the sticky header still sticks. */
@@ -119,7 +162,7 @@ body {
 
 body {
   min-height: 100vh;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Manrope', system-ui, sans-serif;
   font-weight: 400;
   font-size: 1.0625rem;
   line-height: 1.65;
@@ -140,11 +183,13 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Fraunces', Georgia, serif;
-  font-weight: 600;
-  font-variation-settings: 'SOFT' 40, 'WONK' 1;
-  letter-spacing: -0.018em;
-  line-height: 1.08;
+  font-family: 'Playfair Display', Georgia, serif;
+  /* A Didone's whole character is the thick-to-thin, and it only shows up
+     with weight behind it. At 600 this face reads as a book; at 800 it reads
+     as a loaded brush, which is the point. */
+  font-weight: 800;
+  letter-spacing: -0.012em;
+  line-height: 1.06;
   color: var(--ink);
 }
 
@@ -180,174 +225,100 @@ a:hover {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   Caustics — the signature
-   Crossed straight gradients make a lattice, and a lattice reads as a fence
-   rather than as light. Real caustics are an irregular web: fractal noise,
-   thresholded, so bright veins pool and branch. feTurbulence plus a shaped
-   feColorMatrix on the alpha gives exactly that, once, as a data URI.
+   The glaze — the signature
+   The last design's signature was light moving on water, and it drifted. This
+   one cannot drift, because paint is dry.
 
-   Everything else here is about what a drifting sheet is allowed to carry.
-   Measured on a throttled desktop, with the rest of the page unchanged:
+   What goes over a photograph instead is what a painter would actually put
+   there: the weave of the canvas it is painted on, and a thin warm glaze. The
+   two together pull a snapshot into the same material as everything around
+   it — the same trick a varnish plays across a finished canvas, and the whole
+   reason the photography on this site reads as belonging together.
 
-       sheet drifting under `filter: blur()` and `mix-blend-mode`   16 fps
-       the same, without the blend mode                             21 fps
-       the same again, without the blur                             53 fps
-       one sheet instead of two, no blur, no blend                  60 fps
-
-   A filter has to be re-run every frame the element moves — the browser
-   cannot keep the blurred result, so a full-viewport gaussian is paid sixty
-   times a second — and a blend mode forces everything sharing the stacking
-   context to be rasterised as one piece, which costs the whole backdrop.
-
-   So neither is used. Rendered side by side against the original, the blur
-   turns out to have been doing almost nothing visible: at a 700px tile a
-   1.5px radius is under a quarter of a percent of the texture, and the
-   turbulence already arrives soft. The blend mode is replaced by plain alpha
-   at a slightly higher opacity, which over this gradient lands in the same
-   place. What is left is two static sheets sliding over each other — a
-   composite, and nothing more.
+   It is also, as it happens, free. No filter, no blend mode, no animation:
+   two static layers that rasterise once and are never touched again.
    ══════════════════════════════════════════════════════════════════════════ */
-
-:root {
-  --caustic-web: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.013 0.019' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.4 0 0 0 -1.15'/%3E%3C/filter%3E%3Crect width='700' height='700' filter='url(%23c)'/%3E%3C/svg%3E");
-}
 
 .caustics {
   position: absolute;
   inset: 0;
-  overflow: hidden;
   pointer-events: none;
-  opacity: 0.7;
+  background-image:
+    linear-gradient(
+      165deg,
+      rgba(237, 169, 27, 0.14) 0%,
+      rgba(196, 80, 26, 0.06) 38%,
+      rgba(18, 58, 65, 0.1) 74%,
+      rgba(62, 42, 26, 0.2) 100%
+    ),
+    var(--canvas-tooth);
+  background-size: 100% 100%, 180px 180px;
+  background-repeat: no-repeat, repeat;
+  opacity: 0.9;
 }
 
-.caustics::before,
-.caustics::after {
-  content: '';
-  position: absolute;
-  /* Slack for the drift, so a sheet never runs off its own edge. The motion
-     alternates rather than wrapping, so there is no tile seam to hide. */
-  inset: -160px;
-  background-image: var(--caustic-web);
-  background-repeat: repeat;
-}
-
-.caustics::before {
-  background-size: 700px 700px;
-  animation: causticDriftA 26s ease-in-out infinite alternate;
-}
-
-/* The second sheet is what stops the loop from being legible — its beat
-   against the first is the whole trick. It is also the one a cheap phone can
-   least afford, so below the tablet breakpoint the first sheet drifts alone. */
-.caustics::after {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .caustics::after {
-    display: block;
-    background-size: 460px 460px;
-    background-position: 120px 80px;
-    opacity: 0.75;
-    animation: causticDriftB 34s ease-in-out infinite alternate;
-  }
-}
-
-/* Over a photograph the web has to be fainter, or it reads as scratches on
-   the print rather than as light in the water. */
+/* Over a face the glaze has to lift, or the picture goes muddy — the one
+   thing a portrait cannot survive is being painted over. */
 .caustics-soft {
-  opacity: 0.34;
+  opacity: 0.55;
 }
 
-/* The sheet in the fixed scene behind every page is a special case, because
-   of where it lives rather than what it is. Anything animating inside a
-   full-viewport fixed layer makes the browser re-composite a screenful every
-   frame, and the bill is the size of the viewport:
-
-       phone, drifting                                60 fps
-       1440×900 desktop, drifting              29 idle / 21 scrolling
-       1440×900 desktop, held still            45 idle / 30 scrolling
-       1440×900 desktop, no scene at all       61 idle / 60 scrolling
-
-   Shrinking the sheet does not help — it is the recomposite, not the sheet.
-   So the drift runs where it is both cheap and worth having: on a phone the
-   sea fills the bottom third of the screen and the layer is small. On a wide
-   screen the same band is a strip at the foot of the viewport, mostly behind
-   opaque content, and costs four times as much to move. There it sits still.
-
-   Light on the water still moves on every screen — every photograph on the
-   page carries `.caustics-soft`, and those scroll with the page rather than
-   sitting under it. */
-@media (min-width: 1024px) {
-  .caustics-scene::before,
-  .caustics-scene::after {
-    animation: none;
-  }
-}
-
-@keyframes causticDriftA {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(92px, -62px, 0); }
-}
-
-@keyframes causticDriftB {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-74px, 108px, 0); }
-}
-
-/* Sun glare. Pure white at the centre — principle one, as a light source. */
+/* The sun, painted rather than lit: titanium white at the core going out
+   through cadmium. It does not shimmer — see the motion section — because a
+   painted light source is a passage of thick pale paint, and paint holds
+   still. */
 .sun-glare {
   position: absolute;
   pointer-events: none;
   border-radius: 9999px;
+  opacity: 0.8;
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 214, 140, 0.5) 32%,
-    rgba(255, 183, 3, 0.16) 52%,
+    rgba(251, 246, 236, 0.92) 0%,
+    rgba(246, 211, 106, 0.5) 30%,
+    rgba(237, 169, 27, 0.2) 50%,
     transparent 72%
   );
-  animation: shimmer 7s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0%, 100% { opacity: 0.55; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.06); }
 }
 
 /* ── Type accents ───────────────────────────────────────────────────────── */
 
+/* The signature in the corner of the canvas. A painter signs in their own
+   hand, not in a script font bought for the occasion — so this is the display
+   face's own italic, set small and low-contrast the way a signature sits. */
 .hand-note {
-  font-family: 'Caveat', cursive;
-  font-weight: 600;
-  font-size: 1.6rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.45rem;
   line-height: 1;
-  color: var(--lagoon-dark);
-  transform: rotate(-2deg);
+  letter-spacing: 0.01em;
+  color: var(--umber);
   display: inline-block;
 }
 
-/* A wash of light behind a headline — the sun catching the words, not a
-   marker stroke. Cloned per line so a wrapping headline keeps it. */
+/* Cadmium dragged under the words with a loaded brush. Where the wash it
+   replaces deliberately had no edge — light does not have one — this does,
+   because paint does. It sits low and goes heaviest near the baseline, where
+   the pigment pooled off the brush. Cloned per line so a wrapping headline
+   keeps it. */
 .marker-highlight {
   display: inline;
-  padding: 0 0.14em;
-  /* Sun falling across the words. A hard-edged band reads as a highlighter
-     pen; light does not have an edge, so every stop here is soft and the
-     whole thing fades out before it reaches the cap height. */
+  padding: 0 0.16em;
   background-image: linear-gradient(
     to bottom,
-    transparent 48%,
-    rgba(255, 214, 140, 0.28) 62%,
-    rgba(255, 183, 3, 0.42) 82%,
-    rgba(255, 214, 140, 0.1) 96%,
-    transparent 100%
+    transparent 52%,
+    rgba(246, 211, 106, 0.5) 58%,
+    rgba(237, 169, 27, 0.72) 76%,
+    rgba(196, 80, 26, 0.55) 93%,
+    rgba(196, 80, 26, 0.12) 100%
   );
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
 
-/* A soft swell underlining a title, drawn like a shallow wave. */
+/* A single pull of the knife under a title — flat, with the abrupt steps a
+   blade leaves where it lifted and was set down again. */
 .scribble-title-bg {
   position: relative;
   display: inline-block;
@@ -361,7 +332,7 @@ a:hover {
   right: 0;
   bottom: 0;
   height: 0.42rem;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2,7 C34,1 60,9 100,5 C140,1 168,9 198,3' stroke='%2314B8C4' stroke-width='4' stroke-linecap='round' fill='none' opacity='0.85'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2,6 L38,4 L44,7 L96,5 L104,8 L150,4 L158,7 L198,5' stroke='%23C4501A' stroke-width='5' stroke-linecap='butt' fill='none' opacity='0.9'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -379,49 +350,58 @@ a:hover {
   background-size: var(--band-texture-size, auto);
 }
 
-/* Dry sand in full sun. */
+/* Every band carries the weave, so paint is always sitting on canvas rather
+   than on glass. `--band-texture` layers over `--band`, and the tooth goes
+   under both. */
+
+/* Raw linen, barely worked. */
 .shore-section {
   --band: var(--paper);
+  --band-texture: var(--canvas-tooth);
+  --band-texture-size: 180px 180px;
 }
 
-/* Warm sand, a little further up the beach. */
+/* The same ground with an umber wash pulled across it. */
 .cove-section {
   --band: var(--paper-warm);
+  --band-texture: var(--canvas-tooth);
+  --band-texture-size: 180px 180px;
 }
 
-/* THE LAGOON. Shallow water over white sand — the brand's own colour, and
-   the one band that carries live caustics. */
+/* THE SEA, mixed on the palette: cerulean into viridian, going down into
+   depth. The brand's own colour and the one band with real saturation. */
 .lagoon-section {
-  --band: #d9f6f4;
-  --band-texture: linear-gradient(180deg, #eafbf9 0%, #c3efec 55%, #9fe4e0 100%);
-  --band-texture-size: 100% 100%;
+  --band: #1e8e96;
+  --band-texture: linear-gradient(180deg, #7fcfc8 0%, #1e8e96 52%, #0e5c66 100%), var(--canvas-tooth);
+  --band-texture-size: 100% 100%, 180px 180px;
 }
 
-/* Deeper water, further out. */
+/* Further out, and colder. */
 .bay-section {
-  --band: #bfeaf0;
-  --band-texture: linear-gradient(180deg, #d8f4f7 0%, #a9e0e9 60%, #7fcbdc 100%);
-  --band-texture-size: 100% 100%;
+  --band: #0e5c66;
+  --band-texture: linear-gradient(180deg, #2f9aa0 0%, #14707a 55%, #0c4a54 100%), var(--canvas-tooth);
+  --band-texture-size: 100% 100%, 180px 180px;
 }
 
-/* First light on the water. */
+/* First light, before the colour comes up. Raw sienna through the haze. */
 .dawn-section {
   --band: var(--paper-warm);
-  --band-texture: linear-gradient(180deg, #fff8ec 0%, #ffeed7 55%, #ffe0bd 100%);
-  --band-texture-size: 100% 100%;
+  --band-texture: linear-gradient(180deg, #f4e8d2 0%, #e8cfa4 52%, #cfa86e 100%), var(--canvas-tooth);
+  --band-texture-size: 100% 100%, 180px 180px;
 }
 
-/* GOLDEN HOUR. The warm band, and the one that holds the big call to act. */
+/* GOLDEN HOUR. Cadmium yellow burning down through orange into crimson —
+   the full heat of the palette, and where the big call to act lives. */
 .sunset-section {
   position: relative;
   overflow: hidden;
   --band: var(--coral);
-  --band-texture: linear-gradient(170deg, #ffd68c 0%, #ff9b76 46%, #ff6b45 100%);
-  --band-texture-size: 100% 100%;
-  color: #fff;
+  --band-texture: linear-gradient(174deg, #f6d36a 0%, #eda91b 28%, #c4501a 66%, #6e1a2a 100%), var(--canvas-tooth);
+  --band-texture-size: 100% 100%, 180px 180px;
+  color: var(--white);
 }
 
-/* The sun sitting low in that band, throwing glare up the page. */
+/* The sun sitting low in that band, throwing its glare up the page. */
 .sunset-section::before {
   content: '';
   position: absolute;
@@ -434,56 +414,92 @@ a:hover {
   border-radius: 9999px;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 236, 190, 0.6) 26%,
-    rgba(255, 183, 3, 0.25) 44%,
-    transparent 66%
+    rgba(251, 246, 236, 0.85) 0%,
+    rgba(246, 211, 106, 0.5) 26%,
+    rgba(237, 169, 27, 0.18) 46%,
+    transparent 68%
   );
   pointer-events: none;
 }
 
-/* THE REEF. Deep water — the darkest surface on the site, and the only one
-   where the type goes white. */
+/* THE DEEP. Viridian dirtied with burnt umber — the darkest mass on the
+   site, and principle two in one rule: this is the value the whole picture
+   is measured against. */
 .reef-section {
   position: relative;
   overflow: hidden;
   --band: var(--abyss);
-  --band-texture: linear-gradient(180deg, #14b8c4 0%, #0a7c93 40%, #08415c 100%);
-  --band-texture-size: 100% 100%;
-  color: #fff;
+  --band-texture: linear-gradient(180deg, #1b4e56 0%, #123a41 46%, #0a2429 100%), var(--canvas-tooth);
+  --band-texture-size: 100% 100%, 180px 180px;
+  color: var(--white);
 }
 
-/* Shafts of light falling through deep water. */
+/* Light coming down through deep water, broken by the surface above. */
 .reef-section::before {
   content: '';
   position: absolute;
   z-index: -1;
   inset: -10% 0 0 0;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.3;
   background: repeating-linear-gradient(
     97deg,
-    transparent 0 42px,
-    rgba(255, 255, 255, 0.16) 42px 58px,
-    transparent 58px 120px
+    transparent 0 46px,
+    rgba(246, 211, 106, 0.14) 46px 62px,
+    transparent 62px 128px
   );
   -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
   mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
 }
 
-.sunset-section h1,
-.sunset-section h2,
-.sunset-section h3,
-.reef-section h1,
-.reef-section h2,
-.reef-section h3 {
-  color: #fff;
-  text-shadow: 0 2px 18px rgba(14, 46, 59, 0.28);
+/* Any band dark enough to need it takes white type. Principle two pushed the
+   sea down into real darkness, so `lagoon` and `bay` now belong on this list
+   alongside the two that always did — on the previous palette they were pale
+   enough for ink, and they are not any more. */
+.sunset-section :is(h1, h2, h3, h4, h5, h6),
+.reef-section :is(h1, h2, h3, h4, h5, h6),
+.lagoon-section :is(h1, h2, h3, h4, h5, h6),
+.bay-section :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--white);
+  text-shadow: 0 2px 14px rgba(10, 36, 41, 0.35);
 }
 
 .sunset-section p,
-.reef-section p {
-  color: rgba(255, 255, 255, 0.93);
+.reef-section p,
+.lagoon-section p,
+.bay-section p,
+.sunset-section li,
+.reef-section li,
+.lagoon-section li,
+.bay-section li {
+  color: rgba(251, 246, 236, 0.93);
+}
+
+/* Small print and labels on a dark band, which otherwise inherit an ink tone
+   mixed for linen. */
+.lagoon-section .text-ink,
+.lagoon-section .text-ink-soft,
+.lagoon-section .text-ink-light,
+.bay-section .text-ink,
+.bay-section .text-ink-soft,
+.bay-section .text-ink-light,
+.reef-section .text-ink,
+.reef-section .text-ink-soft,
+.reef-section .text-ink-light,
+.sunset-section .text-ink,
+.sunset-section .text-ink-soft,
+.sunset-section .text-ink-light {
+  color: rgba(251, 246, 236, 0.9);
+}
+
+/* …except inside a card, which is its own lit surface sitting on that band
+   and keeps its own ink. */
+.lagoon-section :is(.booking-card, .story-copy-card, .home-feature-card, .planner-card, .pathway-card) :is(h1, h2, h3, h4, h5, h6, p, li),
+.bay-section :is(.booking-card, .story-copy-card, .home-feature-card, .planner-card, .pathway-card) :is(h1, h2, h3, h4, h5, h6, p, li),
+.reef-section :is(.booking-card, .story-copy-card, .home-feature-card, .planner-card, .pathway-card) :is(h1, h2, h3, h4, h5, h6, p, li),
+.sunset-section :is(.booking-card, .story-copy-card, .home-feature-card, .planner-card, .pathway-card) :is(h1, h2, h3, h4, h5, h6, p, li) {
+  color: var(--ink);
+  text-shadow: none;
 }
 
 /* On a band that is itself warm, the coral button disappears — coral on
@@ -495,7 +511,7 @@ a:hover {
 .reef-section .tropical-button,
 .sunset-section .planner-cta,
 .reef-section .planner-cta {
-  background: #fff;
+  background: var(--white);
   color: var(--coral-dark);
   box-shadow: 0 10px 26px -8px rgba(14, 46, 59, 0.35);
 }
@@ -516,16 +532,16 @@ a:hover {
 
 .sunset-section .tropical-button-outline,
 .reef-section .tropical-button-outline {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.6);
-  color: #fff;
+  background: rgba(251, 246, 236, 0.14);
+  border-color: rgba(251, 246, 236, 0.6);
+  color: var(--white);
 }
 
 .sunset-section .tropical-button-outline:hover,
 .reef-section .tropical-button-outline:hover {
-  background: rgba(255, 255, 255, 0.26);
-  border-color: #fff;
-  color: #fff;
+  background: rgba(251, 246, 236, 0.26);
+  border-color: var(--white);
+  color: var(--white);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -537,20 +553,29 @@ a:hover {
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --wave-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,58 C150,14 300,98 450,60 C600,22 750,102 900,64 C1020,34 1120,78 1200,52 L1200,120 L0,120 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,68 C1120,42 1020,86 900,56 C750,18 600,98 450,60 C300,22 150,106 0,62 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-height: 4rem;
+  /* A palette knife does not draw a curve. It scrapes: long flat pulls with
+     abrupt steps where the blade lifted and was set down again. These two
+     paths are that edge, and they are what a section break looks like here. */
+  --wave-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,74 L118,52 L262,66 L318,38 L470,58 L534,44 L676,70 L742,48 L884,62 L962,36 L1082,60 L1200,46 L1200,120 L0,120 Z' fill='%23000'/%3E%3C/svg%3E");
+  --wave-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,58 L1074,78 L940,54 L866,84 L722,60 L648,80 L502,52 L430,76 L286,56 L206,82 L92,58 L0,74 Z' fill='%23000'/%3E%3C/svg%3E");
+  --wave-height: 2.6rem;
+  /* Where the knife lifted, pigment stands proud of the surface and catches
+     the light along the pull. Titanium white warmed with cadmium — not the
+     unpainted paper of the last design, because here there is no bare paper
+     left anywhere to leave. */
   --foam: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.98) 0%,
-    rgba(255, 255, 255, 0.82) 42%,
-    rgba(255, 255, 255, 0) 100%
+    rgba(251, 246, 236, 0.95) 0%,
+    rgba(246, 211, 106, 0.55) 34%,
+    rgba(107, 70, 38, 0.22) 72%,
+    rgba(62, 42, 26, 0) 100%
   );
   --foam-up: linear-gradient(
     0deg,
-    rgba(255, 255, 255, 0.98) 0%,
-    rgba(255, 255, 255, 0.82) 42%,
-    rgba(255, 255, 255, 0) 100%
+    rgba(251, 246, 236, 0.95) 0%,
+    rgba(246, 211, 106, 0.55) 34%,
+    rgba(107, 70, 38, 0.22) 72%,
+    rgba(62, 42, 26, 0) 100%
   );
 }
 
@@ -615,16 +640,35 @@ a:hover {
 
 /* ══════════════════════════════════════════════════════════════════════════
    Surfaces
-   Cards are things resting in sunlight: white, generously rounded, lifted on
-   soft layered shadow. They rise towards the light on hover.
+   A card is a panel painted on the same canvas as everything else — not a
+   sheet of glass hovering above it. So every card carries the weave, sits on
+   a toned ground rather than on white, and is held down by a tight umber
+   shadow instead of floating on a soft one. Reaching for a card lifts it a
+   little and brings the raking light across it, the way tilting a canvas
+   toward a window makes the brushwork show.
    ══════════════════════════════════════════════════════════════════════════ */
+
+/* The weave, applied to any painted panel. Cheap: one repeated tile, no
+   filter, no blend, nothing that changes between frames. */
+.sticker-card,
+.artsy-glass-card,
+.glass-card,
+.booking-card,
+.story-copy-card,
+.pathway-card,
+.planner-card,
+.home-feature-card {
+  background-image: var(--canvas-tooth);
+  background-size: 180px 180px;
+  background-repeat: repeat;
+}
 
 .sticker-card,
 .artsy-glass-card,
 .glass-card {
   position: relative;
-  background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  background: var(--white);
+  border: 1px solid rgba(107, 70, 38, 0.16);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
@@ -643,10 +687,10 @@ a:hover {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-xl);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(251, 246, 236, 0.85);
   -webkit-backdrop-filter: blur(12px) saturate(1.25);
   backdrop-filter: blur(12px) saturate(1.25);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(251, 246, 236, 0.7);
   box-shadow: var(--shadow-xl);
 }
 
@@ -656,7 +700,7 @@ a:hover {
 .home-feature-card {
   position: relative;
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(251, 246, 236, 0.96);
   color: var(--ink);
   box-shadow: var(--shadow-lg);
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
@@ -681,8 +725,8 @@ a:hover {
    lifted — no colour of its own, so the coral button is the only warm thing
    in the card and reads as the single thing to do. */
 .booking-card {
-  background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  background: var(--white);
+  border: 1px solid rgba(107, 70, 38, 0.16);
   box-shadow: var(--shadow-lg);
   transition: transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
 }
@@ -694,8 +738,8 @@ a:hover {
 
 .story-copy-card {
   border-radius: var(--radius-lg);
-  background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  background: var(--white);
+  border: 1px solid rgba(107, 70, 38, 0.16);
   padding: 1.9rem;
   box-shadow: var(--shadow-md);
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
@@ -756,7 +800,7 @@ a:hover .photo-pop,
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.18) 0%,
+    rgba(251, 246, 236, 0.18) 0%,
     transparent 26%,
     transparent 62%,
     rgba(14, 46, 59, 0.22) 100%
@@ -770,8 +814,8 @@ a:hover .photo-pop,
   height: 78px;
   place-items: center;
   border-radius: 9999px;
-  background: linear-gradient(160deg, #fff 0%, var(--gold-light) 62%, var(--gold) 100%);
-  box-shadow: 0 10px 26px -8px rgba(255, 183, 3, 0.6), 0 0 0 8px rgba(255, 255, 255, 0.55);
+  background: linear-gradient(160deg, var(--white) 0%, var(--gold-light) 58%, var(--gold) 100%);
+  box-shadow: 0 10px 26px -8px rgba(255, 183, 3, 0.6), 0 0 0 8px rgba(251, 246, 236, 0.55);
   font-size: 2.3rem;
   line-height: 1;
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
@@ -779,7 +823,7 @@ a:hover .photo-pop,
 
 .section-icon:hover {
   transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 16px 34px -8px rgba(255, 183, 3, 0.7), 0 0 0 10px rgba(255, 255, 255, 0.7);
+  box-shadow: 0 16px 34px -8px rgba(255, 183, 3, 0.7), 0 0 0 10px rgba(251, 246, 236, 0.7);
 }
 
 /* Broad, soft colour washes — light pooling behind a section, not paint.
@@ -829,7 +873,7 @@ a:hover .photo-pop,
    ══════════════════════════════════════════════════════════════════════════ */
 
 button {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Manrope', system-ui, sans-serif;
   font-weight: 700;
   border-radius: 9999px;
 }
@@ -837,10 +881,18 @@ button {
 .tropical-button {
   @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-8 py-3.5 text-sm font-bold;
   letter-spacing: 0.01em;
-  background: linear-gradient(140deg, var(--coral-light) 0%, var(--coral) 55%, var(--coral-dark) 100%);
-  color: #fff;
-  box-shadow: 0 10px 26px -8px rgba(255, 107, 69, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), filter 0.3s ease;
+  /* Cadmium orange mixed down into burnt sienna. Straight from the tube the
+     pigment is too light to carry white type — this runs it dark enough that
+     the label actually passes, which is a property of the paint and not a
+     compromise of the design. The inner highlight along the top edge is the
+     wet ridge where thick colour was pushed up. */
+  background: linear-gradient(160deg, var(--coral-light) 0%, var(--coral) 48%, var(--coral-dark) 100%);
+  color: var(--white);
+  box-shadow:
+    0 2px 4px rgba(62, 42, 26, 0.24),
+    0 8px 18px -6px rgba(142, 52, 9, 0.45),
+    inset 0 1px 0 rgba(246, 211, 106, 0.45);
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), filter 0.25s ease;
 }
 
 /* Sun catching the edge as it rises. */
@@ -851,7 +903,7 @@ button {
   left: -60%;
   width: 60%;
   height: 220%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  background: linear-gradient(90deg, transparent, rgba(251, 246, 236, 0.45), transparent);
   transform: rotate(18deg);
   transition: left 0.7s var(--ease-out);
   pointer-events: none;
@@ -863,7 +915,7 @@ button {
 
 .tropical-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 18px 36px -10px rgba(255, 107, 69, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: 0 18px 36px -10px rgba(255, 107, 69, 0.7), inset 0 1px 0 rgba(251, 246, 236, 0.5);
   filter: brightness(1.04);
 }
 
@@ -875,16 +927,16 @@ button {
 /* The quieter route: an outlined pill that fills with sea on hover. */
 .tropical-button-outline {
   @apply relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(251, 246, 236, 0.9);
   color: var(--ink);
-  border: 1.5px solid rgba(14, 46, 59, 0.14);
+  border: 1.5px solid rgba(107, 70, 38, 0.22);
   box-shadow: var(--shadow-sm);
   transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 .tropical-button-outline:hover {
   transform: translateY(-3px);
-  background: #fff;
+  background: var(--white);
   border-color: var(--lagoon);
   color: var(--lagoon-dark);
   box-shadow: 0 14px 30px -10px rgba(20, 184, 196, 0.45);
@@ -896,26 +948,26 @@ button {
 
 .btn-lagoon {
   background: linear-gradient(140deg, var(--lagoon-light) 0%, var(--lagoon) 55%, var(--lagoon-dark) 100%);
-  color: #fff;
+  color: var(--white);
   border-color: transparent;
-  box-shadow: 0 10px 26px -8px rgba(20, 184, 196, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 26px -8px rgba(20, 184, 196, 0.6), inset 0 1px 0 rgba(251, 246, 236, 0.4);
 }
 
 .btn-lagoon:hover {
   background: linear-gradient(140deg, var(--lagoon-light) 0%, var(--lagoon) 45%, var(--lagoon-dark) 100%);
-  color: #fff;
+  color: var(--white);
   border-color: transparent;
   box-shadow: 0 18px 36px -10px rgba(20, 184, 196, 0.7);
 }
 
 .btn-hibiscus {
   background: linear-gradient(140deg, var(--hibiscus-light) 0%, var(--hibiscus) 100%);
-  color: #fff;
+  color: var(--white);
   border-color: transparent;
 }
 
 .btn-hibiscus:hover {
-  color: #fff;
+  color: var(--white);
   border-color: transparent;
 }
 
@@ -933,7 +985,7 @@ select {
 input:not([type='range']),
 textarea,
 select {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Manrope', system-ui, sans-serif;
   font-weight: 500;
   color: var(--ink);
 }
@@ -948,9 +1000,9 @@ input[type='search'],
 input[type='password'],
 textarea,
 select {
-  border: 1.5px solid rgba(14, 46, 59, 0.14);
+  border: 1.5px solid rgba(107, 70, 38, 0.22);
   border-radius: 14px;
-  background: #fff;
+  background: var(--white);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1024,7 +1076,7 @@ select:focus {
 }
 
 .language-toggle-button.active {
-  background: #fff;
+  background: var(--white);
   color: var(--lagoon-dark);
   box-shadow: var(--shadow-sm);
 }
@@ -1042,9 +1094,9 @@ select:focus {
   padding: 0.34rem 0.85rem;
   border-radius: 9999px;
   /* 92% opaque — see `.home-feature-card` on why there is no blur behind it. */
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(251, 246, 236, 0.94);
   color: var(--lagoon-dark);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1059,8 +1111,8 @@ select:focus {
   padding: 0.34rem 0.85rem;
   border-radius: 9999px;
   background: linear-gradient(135deg, var(--lagoon) 0%, var(--lagoon-dark) 100%);
-  color: #fff;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--white);
+  font-family: 'Manrope', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1073,7 +1125,7 @@ select:focus {
   padding: 0.7rem 1.5rem;
   border-radius: var(--radius);
   background: linear-gradient(135deg, var(--lagoon) 0%, var(--lagoon-dark) 100%);
-  color: #fff;
+  color: var(--white);
   box-shadow: 0 12px 28px -10px rgba(20, 184, 196, 0.55);
 }
 
@@ -1081,7 +1133,7 @@ select:focus {
   display: inline-block;
   padding: 0.7rem 1.5rem;
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(251, 246, 236, 0.92);
   color: var(--ink);
   box-shadow: var(--shadow-md);
 }
@@ -1089,7 +1141,7 @@ select:focus {
 /* Kept for the hero portrait; a soft scalloped edge rather than a stamp. */
 .stamp-edge {
   border-radius: var(--radius-xl);
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(251, 246, 236, 0.72);
   padding: 6px;
 }
 
@@ -1099,8 +1151,8 @@ select:focus {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-xl);
-  background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  background: var(--white);
+  border: 1px solid rgba(107, 70, 38, 0.16);
   box-shadow: var(--shadow-lg);
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
 }
@@ -1112,12 +1164,12 @@ select:focus {
 
 .pathway-card-dark {
   background: linear-gradient(160deg, #0f6a80 0%, #08415c 100%);
-  color: #fff;
+  color: var(--white);
   border-color: transparent;
 }
 
 .pathway-card-dark :is(h1, h2, h3, h4, h5, h6) {
-  color: #fff;
+  color: var(--white);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -1147,7 +1199,7 @@ select:focus {
 .planner-panel {
   border-radius: var(--radius-xl);
   background: linear-gradient(165deg, #0f6a80 0%, #08415c 62%, #052a3d 100%);
-  color: #fff;
+  color: var(--white);
   box-shadow: var(--shadow-xl);
 }
 
@@ -1156,22 +1208,22 @@ select:focus {
    muddy against the water — so out here the card is simply white. */
 .planner-card {
   border-radius: var(--radius-lg);
-  background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  background: var(--white);
+  border: 1px solid rgba(107, 70, 38, 0.16);
   box-shadow: var(--shadow-md);
 }
 
 .planner-panel-soft {
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(251, 246, 236, 0.1);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(251, 246, 236, 0.16);
 }
 
 .planner-panel :is(h1, h2, h3, h4, h5, h6),
 .planner-panel-soft :is(h1, h2, h3, h4, h5, h6) {
-  color: #fff;
+  color: var(--white);
 }
 
 /* An answer is a white card. Choosing it warms it — the only warm thing in
@@ -1183,8 +1235,8 @@ select:focus {
   align-items: flex-start;
   gap: 1rem;
   border-radius: var(--radius);
-  border: 1.5px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(251, 246, 236, 0.14);
+  background: rgba(251, 246, 236, 0.95);
   padding: 1.1rem 1.2rem;
   text-align: left;
   color: var(--ink);
@@ -1194,12 +1246,12 @@ select:focus {
 
 .planner-option:hover {
   transform: translateY(-3px);
-  background: #fff;
+  background: var(--white);
   box-shadow: 0 14px 30px -10px rgba(20, 184, 196, 0.45);
 }
 
 .planner-option[data-selected='true'] {
-  background: linear-gradient(140deg, #fff 0%, #ffe9dd 100%);
+  background: linear-gradient(140deg, var(--white) 0%, var(--paper-warm) 100%);
   border-color: var(--coral);
   box-shadow: 0 14px 30px -10px rgba(255, 107, 69, 0.5);
 }
@@ -1216,10 +1268,10 @@ select:focus {
   align-items: center;
   gap: 0.5rem;
   border-radius: 9999px;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.94);
+  border: 1.5px solid rgba(251, 246, 236, 0.2);
+  background: rgba(251, 246, 236, 0.94);
   padding: 0.5rem 1rem;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--ink);
@@ -1229,12 +1281,12 @@ select:focus {
 
 .planner-chip:hover {
   transform: translateY(-2px);
-  background: #fff;
+  background: var(--white);
 }
 
 .planner-chip[data-selected='true'] {
   background: linear-gradient(140deg, var(--coral-light) 0%, var(--coral) 100%);
-  color: #fff;
+  color: var(--white);
   border-color: transparent;
 }
 
@@ -1258,7 +1310,7 @@ select:focus {
 .planner-cta {
   @apply inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold;
   background: linear-gradient(140deg, var(--coral-light) 0%, var(--coral) 55%, var(--coral-dark) 100%);
-  color: #fff;
+  color: var(--white);
   box-shadow: 0 12px 28px -8px rgba(255, 107, 69, 0.6);
   transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
 }
@@ -1274,15 +1326,15 @@ select:focus {
 
 .planner-cta-ghost {
   @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold;
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  border: 1.5px solid rgba(251, 246, 236, 0.45);
+  background: rgba(251, 246, 236, 0.08);
+  color: var(--white);
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .planner-cta-ghost:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(251, 246, 236, 0.18);
+  border-color: rgba(251, 246, 236, 0.7);
 }
 
 .planner-key {
@@ -1292,7 +1344,7 @@ select:focus {
   place-items: center;
   border-radius: 8px;
   background: rgba(14, 46, 59, 0.08);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--ink-soft);
@@ -1311,18 +1363,29 @@ select:focus {
 }
 
 /* ── Motion ───────────────────────────────────────────────────────────────
-   Everything here drifts the way things do in warm water: slow, buoyant,
-   and never quite in step with its neighbour.
+   Principle five, as CSS: a painting does not move.
 
-   All of it is `transform` and `opacity`, so it runs on the compositor and
-   never asks the main thread for a repaint. */
+   The previous design had ten cards drifting on their own clocks, a sun
+   turning, clouds crossing, fronds swaying and a button pulsing — and all of
+   it together was most of the frame budget, on a phone, permanently. Here
+   none of that is switched off for performance; it is absent because paint
+   is dry. The gain is a side effect, and it is total: this site has no
+   steady-state rendering cost at all. Nothing is animating, so there is
+   nothing to composite between frames.
 
-/* The entrance, as used by `<Reveal>`. This replaced a forty-kilobyte
-   animation runtime that was only ever asked to fade things up. */
+   What is left is motion that answers something a person did — an entrance
+   as the page is hung, and the raking light coming across a panel as they
+   reach for it. Both are `transform` and `opacity` only.
+
+   The `animate-*` class names below are inherited from the markup, which
+   still asks for them in a dozen places. They resolve to nothing now. That
+   is deliberate and cheaper than editing them out of every component. */
+
+/* The entrance, as used by `<Reveal>`: the canvas going up on the wall. */
 .reveal {
   opacity: 0;
-  transform: translateY(26px);
-  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  transform: translateY(22px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
 }
 
 .reveal.is-revealed {
@@ -1330,91 +1393,76 @@ select:focus {
   transform: none;
 }
 
-@keyframes swell1 { 0%, 100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-12px) rotate(0.4deg); } }
-@keyframes swell2 { 0%, 100% { transform: translateY(0) rotate(0.6deg); } 50% { transform: translateY(-9px) rotate(-0.5deg); } }
-@keyframes swell3 { 0%, 100% { transform: translateY(0) rotate(-0.7deg); } 50% { transform: translateY(-14px) rotate(0.3deg); } }
-@keyframes swell4 { 0%, 100% { transform: translateY(0) rotate(0.4deg); } 50% { transform: translateY(-8px) rotate(-0.6deg); } }
-@keyframes swell5 { 0%, 100% { transform: translateY(0) rotate(-0.3deg); } 50% { transform: translateY(-16px) rotate(0.5deg); } }
-
-.animate-wave-sway-1 { animation: swell1 9s ease-in-out infinite; }
-.animate-wave-sway-2 { animation: swell2 11s ease-in-out infinite; animation-delay: -2s; }
-.animate-wave-sway-3 { animation: swell3 10s ease-in-out infinite; animation-delay: -4.5s; }
-.animate-wave-sway-4 { animation: swell4 12s ease-in-out infinite; animation-delay: -1.5s; }
-.animate-wave-sway-5 { animation: swell5 8.5s ease-in-out infinite; animation-delay: -6s; }
-.animate-wave-sway-6 { animation: swell1 10.5s ease-in-out infinite; animation-delay: -3s; }
-.animate-wave-sway-7 { animation: swell2 12.5s ease-in-out infinite; animation-delay: -7s; }
-.animate-wave-sway-8 { animation: swell3 9.5s ease-in-out infinite; animation-delay: -1s; }
-.animate-wave-sway-9 { animation: swell4 11.5s ease-in-out infinite; animation-delay: -5s; }
-.animate-wave-sway-10 { animation: swell5 10.2s ease-in-out infinite; animation-delay: -8s; }
-
-/* A card being reached for stops drifting, so the lift reads cleanly. */
-[class*='animate-wave-sway-']:hover {
-  animation-play-state: paused;
-}
-
-/* On a phone the swell is switched off entirely. Every one of these cards
-   holds a shadow and a graded photograph, so each drifting card is its own
-   composited layer being held in video memory for an effect nobody looks at
-   while they are scrolling past it. A card that sits still still reads as a
-   card; a phone that scrolls smoothly is the thing being bought here. */
-@media (max-width: 767px) {
-  .animate-wave-sway-1,
-  .animate-wave-sway-2,
-  .animate-wave-sway-3,
-  .animate-wave-sway-4,
-  .animate-wave-sway-5,
-  .animate-wave-sway-6,
-  .animate-wave-sway-7,
-  .animate-wave-sway-8,
-  .animate-wave-sway-9,
-  .animate-wave-sway-10,
-  .animate-float,
-  .animate-bob,
-  .animate-sway {
-    animation: none;
-  }
-}
-
-/* The booking button breathes like something floating.
-
-   The breath used to be an animated `box-shadow`, which is a paint every
-   frame, forever, on an element pinned to the viewport — it never scrolls out
-   of the way and never stops. The same halo drawn as a ring behind the button
-   and scaled costs a composite instead. */
+/* Ambient drift, retired. Held as explicit no-ops so a stray class in the
+   markup cannot resurrect an animation this design does not have. */
+.animate-wave-sway-1,
+.animate-wave-sway-2,
+.animate-wave-sway-3,
+.animate-wave-sway-4,
+.animate-wave-sway-5,
+.animate-wave-sway-6,
+.animate-wave-sway-7,
+.animate-wave-sway-8,
+.animate-wave-sway-9,
+.animate-wave-sway-10,
+.animate-float,
+.animate-bob,
+.animate-sway,
+.animate-frond,
+.animate-spin-slow,
 .animate-fab-glow-wave {
-  /* No `position` here — the button that carries this is already `fixed`, and
-     declaring `relative` would land after Tailwind's utilities and quietly
-     unpin it. The ring below only needs *a* positioned ancestor, not this
-     one specifically. */
-  box-shadow: 0 12px 30px -8px rgba(255, 107, 69, 0.6);
+  animation: none;
 }
 
-.animate-fab-glow-wave::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 2px solid rgba(255, 107, 69, 0.34);
-  animation: fabPulse 3.4s ease-in-out infinite;
-  pointer-events: none;
-}
+/* The booking button does not pulse for attention any more. It does not have
+   to: on a palette this muted, one hot cadmium is the only warm thing on the
+   screen, and colour carries it further than movement did. */
 
-@keyframes fabPulse {
-  0%, 100% { transform: scale(1); opacity: 0; }
-  50% { transform: scale(1.22); opacity: 1; }
-}
+/* Raking light. Tilt a canvas toward a window and the ridges of paint light
+   up along one edge — this is that, triggered by reaching for a panel, and
+   it is a gradient sliding on `transform` rather than anything repainting.
+   Pointer devices only: there is no hover on a phone, and a touch device
+   should not pay for the extra layer. */
+@media (hover: hover) {
+  .sticker-card,
+  .booking-card,
+  .pathway-card,
+  .story-copy-card,
+  .home-feature-card,
+  .photo-frame {
+    position: relative;
+    overflow: hidden;
+  }
 
-/* Palm fronds move in the trade wind — from the stem, not the middle. Only
-   where a frond sits in the page's own flow; the ones in the fixed backdrop
-   are still, because anything moving in that layer redraws a whole screen. */
-@keyframes frondSway {
-  0%, 100% { transform: rotate(-2.2deg); }
-  50% { transform: rotate(2.2deg); }
-}
+  .sticker-card::after,
+  .booking-card::after,
+  .pathway-card::after,
+  .story-copy-card::after,
+  .home-feature-card::after {
+    content: '';
+    position: absolute;
+    inset: -40% -60%;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(
+      104deg,
+      transparent 38%,
+      rgba(246, 211, 106, 0.16) 48%,
+      rgba(251, 246, 236, 0.2) 52%,
+      transparent 62%
+    );
+    transform: translateX(-38%);
+    transition: opacity 0.45s ease, transform 0.75s var(--ease-out);
+  }
 
-.animate-frond {
-  animation: frondSway 11s ease-in-out infinite;
-  transform-origin: bottom center;
+  .sticker-card:hover::after,
+  .booking-card:hover::after,
+  .pathway-card:hover::after,
+  .story-copy-card:hover::after,
+  .home-feature-card:hover::after {
+    opacity: 1;
+    transform: translateX(38%);
+  }
 }
 
 /* ── Long-form copy ─────────────────────────────────────────────────────── */

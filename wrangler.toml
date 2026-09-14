@@ -13,16 +13,18 @@
 # now Workers-shaped. worker/index.ts dispatches to the same functions/*
 # handlers the Pages deployment used, so no endpoint logic is duplicated.
 
-# BEAUTIFUL TOURS deploys as its own Worker, entirely separate from the
-# production site. The name is what keeps them apart: `wrangler deploy` writes
-# to the Worker this names, so leaving it as "nahiatours" would have published
-# this branch straight over the live site. It must stay "beautiful-tours".
+# TRANSPORTURIST deploys as its own Worker, separate from BOTH the production
+# site and the Beautiful Tours design. The name is the only thing keeping them
+# apart: `wrangler deploy` writes to the Worker this line names, so inheriting
+# "beautiful-tours" from the branch this was cut from would have published
+# straight over that design, and "nahiatours" would have gone over the live
+# site. It must stay "transporturist".
 #
-# `workers_dev = true` publishes it at beautiful-tours.<subdomain>.workers.dev.
+# `workers_dev = true` publishes it at transporturist.<subdomain>.workers.dev.
 # No CANONICAL_HOST is set anywhere in this file, deliberately: that variable
 # is what redirects the production Worker to its own domain, and inheriting it
 # here would bounce every visitor off this deployment.
-name = "beautiful-tours"
+name = "transporturist"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 workers_dev = true
@@ -56,7 +58,7 @@ run_worker_first = true
 #
 # Uncomment once the namespace exists and paste its id. Create it with either:
 #
-#   npx wrangler kv namespace create beautiful-tours-data
+#   npx wrangler kv namespace create transporturist-data
 #   ./scripts/deploy-cloudflare.sh      (creates, binds and deploys in one go)
 #
 # The handlers read DATA_KV_F first and fall back to DATA_KV

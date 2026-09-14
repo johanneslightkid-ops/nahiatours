@@ -1,128 +1,133 @@
-# Design system — Caribbean daylight
+# Design system — Transporturist
 
-The site is **photographic, not drawn**. It is the light of a Bávaro morning:
-clear shallow water, white sand glare, palm shade and golden hour. The
-stylisation comes from painting and from dive photography rather than from
-illustration, and the pictures of real families on real boats are the subject —
-everything else is the room they hang in.
+The Caribbean, **painted in oils**. The previous design was watercolour:
+unpainted white paper, clear light, everything quick and transparent. This one
+is the opposite material — acrylic laid thick and glazed over in oil — and
+every rule below follows from the medium rather than from taste.
 
-Everything below lives in three files — `tailwind.config.cjs` (palette, type,
-shadows, radii), `src/styles/globals.css` (tokens and component classes) and
-`src/components/ui/Illustrations.tsx` (the SVG set) — plus the fixed scene in
+The subject follows the business. This is a transport and excursion operator,
+so the picture is not a beach on its own: it is the journey. The coast road,
+the long horizon out of a window, the arrival. Somebody drives you there.
+
+Everything lives in four files — `tailwind.config.cjs` (palette, type, shadows,
+radii), `src/styles/globals.css` (tokens and component classes),
+`src/components/ui/Illustrations.tsx` (the SVG set) and the painted scene in
 `src/components/ui/IllustratedBackdrop.tsx`.
 
 ## The five principles
 
-Each is taken from a specific tradition, and each one decides a concrete rule.
+1. **Nothing starts on white.** Painters tone the canvas before the first
+   stroke, because white lies about value — every colour laid on it looks
+   darker than it really is. `--paper` is raw linen (`#F0E7D7`), and there is
+   no `#ffffff` anywhere on the site. Even the white is titanium white
+   (`--white: #FBF6EC`), which is warm. Pure white on a toned ground reads as a
+   hole torn in the canvas.
+2. **The darks carry the picture.** Value structure before colour: deep
+   viridian-umber masses with the light pulled out of them. This is why the sea
+   bands go far darker here than the last design dared — and why `lagoon` and
+   `bay` now take white type, which on the old pale palette they did not.
+3. **Pigment, not light.** Every colour is named for the tube it comes out of
+   and mixed the way paint mixes: cadmium orange, cadmium yellow deep, alizarin
+   crimson, ultramarine, viridian, sap green, raw sienna, burnt umber. Screen
+   primaries are banned, and the earths are under everything — they are what
+   stop the cadmiums looking like a monitor.
+4. **The brush is visible.** Canvas tooth runs under every band and over every
+   photograph. Sections break on a palette-knife edge — flat pulls with abrupt
+   steps where the blade lifted — not on a wave. Corners are a stretched panel,
+   not a pebble, which is why the radii are a third of what they were.
+5. **A painting does not move.** The last design's signature drifted; this one
+   cannot, because paint is dry. Nothing animates on its own. The life is in
+   the surface and in what happens when you reach for something.
 
-1. **White is the light.** Homer painted his Bahamas watercolours by leaving the
-   paper bare where the sun hit. Highlights here are pure `#fff`, never a pale
-   tint — sun glare, foam, sand, the unpainted stripe in a section divider.
-   Nothing bright is a washed-out version of a colour.
-2. **Light on water is a white line.** Hockney drew pool caustics as thin wavy
-   white strokes over flat turquoise. That is the signature motif: `.caustics`,
-   a fractal-noise texture thresholded to hard white filaments, drifting in
-   `soft-light`. It costs one composite, not a simulation.
-3. **The over-under.** Dive photographers split the frame at the waterline: sky
-   and beach above, lit water below. Sections divide that way — see *The
-   waterline* below.
-4. **Sea is the world, sun is the action.** Blue reads as trust, but a travel
-   brand that leads with blue looks like every airline. So the blues build the
-   place and the warm coral is spent **only** on what a visitor can do. If a
-   surface is warm, the action inverts to white rather than competing.
-5. **Editorial is saturated, transactional is calm.** Story and hero surfaces
-   lean into photographic colour; booking cards, prices and the planner go quiet
-   and white. The closer a surface gets to taking money, the calmer it is.
+## The palette
 
-## Palette
+Named from the box, not the colour wheel.
 
-The legacy token *names* are kept on purpose — several hundred colour utilities
-are scattered through the markup, so remapping the tokens landed all of them
-inside the new palette at once. Here `lagoon` finally means lagoon.
-
-| Token | Value | What it is |
+| Token | Pigment | Value |
 | --- | --- | --- |
-| `ink` / `-soft` / `-light` | `#0E2E3B` `#3D5A66` `#7B95A1` | Deep-sea navy for type — warmer and friendlier than neutral grey |
-| `paper` / `-warm` / `-deep` | `#FFFBF5` `#FFF3E4` `#FBE6CB` | Sand, in three weights |
-| `mango` (coral) | `#FF9B76` `#FF6B45` `#DC4A22` | **The action colour.** Complement of the sea, so it never sinks into a photograph of one |
-| `lagoon` | `#9CEDE6` `#14B8C4` `#0A7C93` | Shallow water over white sand — the signature hue |
-| `sky` | `#D6F1FF` `#5EC5F5` `#2A7FB8` | Horizon haze up to zenith |
-| `jungle` | `#93DCA9` `#2FA36B` `#186B48` | Palm and sea-grape |
-| `sunset` | `#FFD68C` `#FFB703` `#E08700` | The sun and the light it throws |
-| `hibiscus` | `#FFA9B9` `#FF5F7E` `#D33A5C` | Warmth that is *not* an action |
-| `abyss` | `#0F5A73` `#08415C` `#052A3D` | Water read as depth: deep panels, scrims over photography |
+| `--ink` | ivory black toward ultramarine | `#22252B` |
+| `--paper` | raw linen ground | `#F0E7D7` |
+| `--paper-warm` / `--paper-deep` | umber washes over it | `#E5D7BE` / `#D2BF9E` |
+| `--white` | titanium white — warm, the lightest value allowed | `#FBF6EC` |
+| `--coral` | cadmium orange into burnt sienna — **the action colour** | `#C4501A` |
+| `--gold` | cadmium yellow deep — the light source | `#EDA91B` |
+| `--lagoon` | cerulean into viridian — the sea | `#1E8E96` |
+| `--abyss` | viridian dirtied with burnt umber — the darkest mass | `#123A41` |
+| `--sky` | cerulean | `#6FAFCE` |
+| `--palm` | sap green over viridian | `#4C7A3A` |
+| `--hibiscus` | alizarin crimson | `#9E2B3F` |
+| `--grape` | ultramarine | `#35478C` |
+| `--sienna` / `--umber` | the earths, under everything | `#B07A3C` / `#6B4626` |
+
+The action colour is knocked back from the tube on purpose. Cadmium orange
+straight is too light to carry white type; running it down into burnt sienna
+is what lets the button label actually pass. That is a property of the paint,
+not a compromise of the design.
 
 ## Type
 
-- **Fraunces** — display, headings, the serif voice. Soft, sunny, and warm
-  where a geometric sans would read corporate.
-- **Plus Jakarta Sans** — body, prices, forms. Clean and open at small sizes.
-- **Caveat** — `.hand-note`, the hand-lettered aside above a headline.
+Two variable families, three files.
 
-`.marker-highlight` washes a headline in a soft gold gradient that fades out at
-both edges; `.scribble-title-bg` rules a section heading with a lagoon stroke.
+- **Playfair Display** carries every display size. A Didone's thick-to-thin is
+  the typographic form of a loaded brush, and it only shows up with weight
+  behind it — headings are set at 800, not 600.
+- Its **italic** is the signature in the corner of the canvas (`.hand-note`).
+  A painter signs in their own hand, not in a script face bought for the
+  occasion, and it saves a font download.
+- **Manrope** says the prices. Warm, geometric-humanist and completely quiet:
+  pickup times and totals want to be read, not admired.
 
-## Shape and depth
+## The surfaces
 
-Tailwind's own `borderRadius` and `boxShadow` scales are **overridden**, not
-extended, so every existing utility in the markup adopts the new system.
-
-- Radii are generous — `lg` 18px through `3xl` 38px. Nothing is sharp: the
-  shapes are pebbles and pool edges.
-- Every shadow is two stops — a tight contact shadow plus a wide ambient one —
-  tinted `rgba(14,46,59,…)` towards the sea rather than towards neutral grey.
-  Named lifts: `lift`, `float`, `lagoon`, `sun`, `coral`, `glow`.
-- The old hard-offset `ink-*` names survive as softened aliases so any stray
-  class still lands inside the system.
-
-## The waterline
-
-Bands meet the way a dive photographer's frame does: the edge is a swell, and
-along that swell the band goes white — foam. Principle 1, structurally: the
-foam is not painted on top, it is a white stripe in the band's *own* background
-that the wave mask cuts through.
-
-- `.wavy-band` cuts both edges, `.wavy-band-top` / `.wavy-band-bottom` one.
-- A section declares its colour with `--band` and optionally `--band-texture`;
-  `.home-section` reads both. The bands are `shore`, `cove`, `lagoon`, `bay`,
-  `dawn`, `sunset` and `reef`.
-- Parking an unused foam layer uses the **length** `0 -9999px`, never a
-  percentage: a percentage background-position collapses to `0` for a layer
-  that is 100% wide, which prints the hidden stripe across the band.
-
-## Surfaces
-
-| Class | Use |
-| --- | --- |
-| `.photo-frame` | A picture bedded into the page: soft corners, wide shadow, a gradient scrim for captions |
-| `.photo-pop` | Golden-hour grading (`saturate`/`contrast`/`brightness`) that lifts further on hover |
-| `.booking-card` | Principle 5: white, hairline-ruled, softly lifted. Tour cards, adventure cards, feature cards |
-| `.story-copy-card` | The narrative aside inside a story section |
-| `.hero-glass` | Frosted glass, used once — the review pinned below the hero photograph |
-| `.planner-panel` | Deep water. `.planner-option` answers are white cards on it, and choosing one warms it |
-| `.planner-card` | A white planner card **outside** the deep panel, where frosted white would go muddy |
-| `.tropical-button` | The coral action, with a highlight that sweeps across on hover |
-| `.tropical-button-outline` | Everything secondary |
-
-On `.sunset-section` and `.reef-section` the action rules invert: the coral
-button becomes unpainted white with coral type, because coral on coral is
-invisible and principle 4 is about *contrast with the surface*, not about the
-hue itself.
+- **Canvas tooth** (`--canvas-tooth`) is one 180px tile of fractal noise,
+  tinted umber and thresholded low, generated once as a data URI. It goes under
+  every band and over every photograph. No filter, no blend, nothing per frame.
+- **The glaze** (`.caustics`, keeping its old class name) is what goes over a
+  photograph: a thin warm film plus the weave. Together they pull a snapshot
+  into the same material as everything around it — the reason a dozen pictures
+  shot on a dozen phones read as one painted surface.
+- **The varnish** (`body::after`) is a fixed, static warm glaze with a slight
+  darkening toward the edges, exactly as a finished canvas is varnished.
+- **Cards** are panels painted on the same canvas, not glass floating above
+  it: they carry the weave, sit on a toned ground, and are held down by a tight
+  umber shadow rather than a soft photographic one.
 
 ## Motion
 
-Slow and ambient — nothing snaps. `caustics` (18s), `tide` (11s), `float` (7s),
-`bob` (5.5s), `frondSway`, `cloudDrift` (150–300s), and the `animate-wave-sway-*`
-family that gives a grid of cards a gentle, uncorrelated swell. Interaction
-easing is `cubic-bezier(0.16, 1, 0.3, 1)`.
+There is none, at rest. What exists:
 
-## The backdrop
+- `.reveal` — the entrance, as the canvas goes up on the wall.
+- **Raking light** — reaching for a panel brings a warm sheen across it, the
+  way tilting a canvas toward a window makes the brushwork show. Pointer
+  devices only.
 
-`IllustratedBackdrop` is the fixed world the whole site stands in: a sky
-gradient, a slowly turning sun, two drifting clouds and a line of birds above;
-a 32vh block of sea below with caustics, sun glare on the water and a white foam
-line along the horizon; and two palm fronds leaning in from the corners at 20–25%
-opacity. It is all CSS and inline SVG — no images, no canvas, no GL context.
-The horizon sits at 32vh rather than mid-viewport so it never runs through hero
-copy, and the hero carries its own haze scrim over the text column for the
-viewports where it still would.
+Both are `transform` and `opacity`. Every `animate-*` class the markup still
+asks for resolves to `animation: none`, held as explicit no-ops so a stray
+class cannot resurrect a drift this design does not have.
+
+Measured on an emulated Pixel 5 (CPU ×6) and a 1440×900 desktop (CPU ×4), both
+in a software renderer — worst case, no GPU:
+
+| | original | after the perf pass | this design |
+| --- | --- | --- | --- |
+| phone, idle | 12.7 fps | 60.2 | **60.1** |
+| phone, scrolling | 8.6 fps | 60.0 | **60.2** |
+| desktop, idle | 10.0 fps | 34.6 | **60.1** |
+| desktop, scrolling | 9.0 fps | 21.5 | **59.5** |
+
+The desktop column is the interesting one. The optimisation pass could not get
+past ~34/21 there, because a full-viewport fixed scene re-composites a
+screenful for any animation inside it, whichever animation it is. Deciding the
+painting holds still removed the cause rather than trimming the cost — a design
+decision doing what an optimisation could not.
+
+## Deployment
+
+This design deploys as its own Cloudflare Worker, `transporturist`, from the
+branch of the same name, with its own KV namespace `transporturist-data`
+cloned from the newest existing one. It shares a codebase with `nahiatours`
+(production) and `beautiful-tours` (the daylight design) and nothing else.
+
+`wrangler.toml` names the Worker and `.github/workflows/deploy-transporturist.yml`
+runs on pushes to this branch. Both have to be wrong at once for a deploy here
+to touch another site.

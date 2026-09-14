@@ -19,7 +19,9 @@
  *   DEST_KV_ID            — write into this namespace, no lookup.
  *   DEST_KV_TITLE         — find or create a namespace with this title.
  *                           Defaults to KV_NAMESPACE_TITLE, then
- *                           "beautiful-tours-data".
+ *                           "transporturist-data" — this branch's own
+ *                           namespace, so a manual run here cannot write
+ *                           into another design's data.
  *
  * Set OVERWRITE=false to keep any key the destination already has; the default
  * is to make the destination match the source for every key the source holds.
@@ -41,7 +43,7 @@ const API = 'https://api.cloudflare.com/client/v4';
 const token = (process.env.CLOUDFLARE_API_TOKEN || '').trim();
 const OVERWRITE = process.env.OVERWRITE !== 'false';
 const DEST_TITLE =
-  process.env.DEST_KV_TITLE || process.env.KV_NAMESPACE_TITLE || 'beautiful-tours-data';
+  process.env.DEST_KV_TITLE || process.env.KV_NAMESPACE_TITLE || 'transporturist-data';
 
 const log = (message) => console.log(`[clone-kv] ${message}`);
 

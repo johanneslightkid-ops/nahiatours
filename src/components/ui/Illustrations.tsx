@@ -1,52 +1,70 @@
 import React, { useId } from 'react';
 
 /**
- * Caribbean daylight scenery.
+ * Caribbean scenery, painted in oils.
  *
- * These were flat poster shapes. They are now lit: every form is modelled
- * with gradients — a light side, a shadow side, and a bounce where the sea
- * throws light back up underneath. The result reads as photography reduced to
- * its essentials rather than as illustration, which is the register the rest
- * of the design works in.
+ * These were lit the way a photograph is lit: warm light, cool shadow, forms
+ * modelled smoothly out of gradients. They are now painted the way a picture
+ * is painted, which is a different discipline:
  *
- * Two rules carry over from the research and apply to every drawing here:
- *
- *   • White is the light. Highlights are pure white, never a pale tint —
- *     sun on a wave crest, glare on a leaf, foam.
- *   • Warm light, cool shadow. Sunlit faces run towards gold, shadowed ones
- *     towards the sea. That single relationship is what makes flat vector
- *     shapes read as though they are actually outdoors.
+ *   • VALUE BEFORE COLOUR. Every form is built from a dark mass with light
+ *     pulled out of it, not from a mid-tone with highlights added on. The
+ *     darks here go far deeper than the previous set allowed, because that is
+ *     what holds a painting together.
+ *   • THE LIGHTS ARE THICK, THE DARKS ARE THIN. On a real canvas the sunlit
+ *     passages are loaded impasto and the shadows are transparent glaze. Here
+ *     that shows up as opacity: highlights near-opaque, shadows let the
+ *     ground beneath show through.
+ *   • NO PURE WHITE. Titanium white is warm. `#fff` on a toned ground reads
+ *     as a hole torn in the canvas, so the brightest value available is
+ *     `PALETTE.white` below, and it is not white.
+ *   • EARTHS CARRY THE BRIGHTS. Raw sienna and burnt umber are under almost
+ *     everything. They are what stop the cadmiums looking like a screen.
  *
  * Gradients need document-unique ids, so each component takes one from
  * `useId()`. Sharing a static id across instances renders correctly today but
  * is invalid markup and breaks the moment two instances want to differ.
  *
  * Everything is decorative: each drawing is `aria-hidden` and takes its size
- * from the caller's className.
+ * from the caller's className. Nothing in here animates — see the motion note
+ * in `globals.css`.
  */
 
-export const INK = '#0E2E3B';
+export const INK = '#22252B';
 
 const PALETTE = {
   ink: INK,
-  inkSoft: '#3D5A66',
-  lagoonLight: '#9CEDE6',
-  lagoon: '#14B8C4',
-  lagoonDark: '#0A7C93',
-  abyss: '#08415C',
-  skyLight: '#D6F1FF',
-  sky: '#5EC5F5',
-  skyDark: '#2A7FB8',
-  sand: '#FFF3E4',
-  sandDeep: '#FBE6CB',
-  coral: '#FF6B45',
-  coralLight: '#FF9B76',
-  gold: '#FFB703',
-  goldLight: '#FFD68C',
-  palm: '#2FA36B',
-  palmLight: '#93DCA9',
-  palmDark: '#186B48',
-  white: '#FFFFFF',
+  inkSoft: '#4A4E57',
+  // The sea: cerulean mixed into viridian, read down into depth.
+  lagoonLight: '#7FCFC8',
+  lagoon: '#1E8E96',
+  lagoonDark: '#0E5C66',
+  abyss: '#123A41',
+  abyssDeep: '#0A2429',
+  // Cerulean sky.
+  skyLight: '#CFE3EC',
+  sky: '#6FAFCE',
+  skyDark: '#3A6E93',
+  // The ground: raw linen and the umber washes over it.
+  sand: '#F0E7D7',
+  sandDeep: '#D2BF9E',
+  // Cadmium orange knocked into burnt sienna — the action, and the heat.
+  coral: '#C4501A',
+  coralLight: '#EE8B4A',
+  coralDark: '#8E3409',
+  // Cadmium yellow deep: the light source.
+  gold: '#EDA91B',
+  goldLight: '#F6D36A',
+  // Sap green over viridian. Foliage in shadow is colder than anyone expects.
+  palm: '#4C7A3A',
+  palmLight: '#92B36A',
+  palmDark: '#2A4A27',
+  // The earths, under everything.
+  sienna: '#B07A3C',
+  umber: '#6B4626',
+  umberDeep: '#3E2A1A',
+  // Titanium white. Warm, and the lightest value permitted anywhere.
+  white: '#FBF6EC',
 };
 
 export interface IllustrationProps {
@@ -146,10 +164,13 @@ export const PalmFrond: React.FC<IllustrationProps & { color?: 'palm' | 'light' 
   color = 'palm',
 }) => {
   const id = useId();
+  /* `dark` is a silhouette, not a dark green. Against a hot sky a palm reads
+     almost black — foliage lit from behind has no local colour left in it —
+     and that contrast is what makes the light behind it look strong. */
   const top =
-    color === 'light' ? PALETTE.palmLight : color === 'dark' ? PALETTE.palm : PALETTE.palmLight;
+    color === 'light' ? PALETTE.palmLight : color === 'dark' ? PALETTE.palmDark : PALETTE.palmLight;
   const bottom =
-    color === 'light' ? PALETTE.palm : color === 'dark' ? PALETTE.palmDark : PALETTE.palmDark;
+    color === 'light' ? PALETTE.palm : color === 'dark' ? PALETTE.umberDeep : PALETTE.palmDark;
 
   return (
     <svg viewBox="0 0 110 130" className={className} style={style} {...svgProps}>

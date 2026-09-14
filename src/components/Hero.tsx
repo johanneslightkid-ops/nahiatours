@@ -90,12 +90,32 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
       <SunGlare className="-right-[10vw] -top-[16vw] h-[46vw] w-[46vw]" />
 
       {/* Copy has to stay readable wherever the horizon happens to fall on a
-          given viewport, so the text column carries its own breath of haze. */}
+          given viewport, so the text column sits on a passage of ground
+          colour. Painted, not hazed: linen scumbled over the scene, thinning
+          out to nothing before it reaches the picture — and warm, because a
+          cool scrim over this palette turns the whole left-hand side grey. */}
       <div
-        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[62%] lg:block"
+        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[70%] lg:block"
+        style={{
+          /* Reaches zero well before the element's own edge — at a slant, a
+             gradient that only finishes at 100% still has colour left in one
+             corner, and that showed up as a seam down the sky. */
+          background:
+            'linear-gradient(96deg, rgba(240,231,215,0.88) 0%, rgba(240,231,215,0.62) 34%, rgba(229,215,190,0.26) 60%, rgba(229,215,190,0) 82%)',
+        }}
+      />
+
+      {/* The same passage of ground colour for a phone, where the copy runs
+          the full width and the horizon falls behind the middle of it. Without
+          this the subtitle sits in ink on open sea, which is unreadable — the
+          previous design got away with no scrim here only because its backdrop
+          was pale all the way down. Vertical rather than diagonal: on a narrow
+          screen there is no "text side" to fade away from. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[76%] lg:hidden"
         style={{
           background:
-            'linear-gradient(100deg, rgba(255,251,245,0.92) 0%, rgba(255,251,245,0.72) 46%, rgba(255,251,245,0) 100%)',
+            'linear-gradient(180deg, rgba(240,231,215,0.9) 0%, rgba(240,231,215,0.8) 46%, rgba(229,215,190,0.42) 78%, rgba(229,215,190,0) 100%)',
         }}
       />
 

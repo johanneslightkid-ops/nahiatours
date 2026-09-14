@@ -1,31 +1,44 @@
 /**
- * BEAUTIFUL TOURS — the Caribbean daylight design system.
+ * TRANSPORTURIST — the Caribbean, painted in oils.
  *
- * This is a photographic world, not a drawn one. The site had been a flat
- * screen-printed poster; it is now the light itself — clear shallow water,
- * white sand glare, palm shade and golden hour — with the stylisation coming
- * from painting rather than from illustration.
+ * The previous design was daylight: watercolour, unpainted white paper, the
+ * clear shallow light of a Bávaro morning. This one is the opposite material.
+ * It is pigment — acrylic laid thick and oil glazed over it — and it behaves
+ * the way paint behaves rather than the way a screen does.
  *
- * Five principles, each taken from a specific tradition:
+ * The subject is a transport and excursion business, so the picture it paints
+ * is not a beach in isolation. It is the journey: the coast road, the long
+ * horizon out of a window, the arrival. Somebody drives you there.
  *
- *   1. WHITE IS THE LIGHT. Homer painted his Bahamas watercolours by leaving
- *      the paper bare where the sun hit. Highlights here are pure white, never
- *      a pale tint — sun glare, foam, sand. Nothing bright is "washed out".
- *   2. LIGHT ON WATER IS A WHITE LINE. Hockney drew pool caustics as thin
- *      wavy white strokes over flat turquoise. That is the signature motif,
- *      and it is two sheets of static noise drifting rather than a simulation.
- *   3. THE OVER-UNDER. Dive photographers split the frame at the waterline:
- *      sky and beach above, lit water below. Sections divide that way.
- *   4. SEA IS THE WORLD, SUN IS THE ACTION. Blue reads as trust, but a travel
- *      brand that leads with blue looks like every airline. So the blues build
- *      the place and the warm coral is spent only on what a visitor can do.
- *   5. EDITORIAL IS SATURATED, TRANSACTIONAL IS CALM. Story and hero surfaces
- *      lean into photographic colour; booking forms, prices and the planner go
- *      quiet and white. The closer to paying, the calmer the surface.
+ * Five principles. Each is how painters actually work, and each decides a
+ * concrete rule in this file.
  *
- * The old token names are kept deliberately — several hundred colour utilities
- * are scattered through the markup, so remapping the tokens lands all of them
- * inside the new palette at once. Here `lagoon` finally means lagoon.
+ *   1. NOTHING STARTS ON WHITE. A painter tones the canvas before the first
+ *      stroke, because white lies about value — every colour laid on it looks
+ *      darker than it is. So `paper` here is raw linen, not near-white, and no
+ *      surface on this site is `#ffffff`.
+ *   2. THE DARKS CARRY THE PICTURE. Value structure is built before colour:
+ *      deep viridian-umber masses with the light pulled out of them. This is
+ *      why the deep surfaces here go far darker than the last design dared.
+ *   3. PIGMENT, NOT LIGHT. Every colour below is named for the tube it comes
+ *      out of and mixed the way paint mixes — cadmium, alizarin, viridian,
+ *      ultramarine, raw sienna, burnt umber. Screen primaries are banned.
+ *      Even the white is titanium white, which is warm; `#fff` on a painted
+ *      ground reads as a hole torn in the canvas.
+ *   4. THE BRUSH IS VISIBLE. Edges are worked, not geometric. Sections break
+ *      on a palette-knife edge, canvas tooth runs under everything, and the
+ *      corners are a stretched panel rather than a pebble — hence the much
+ *      tighter radii below.
+ *   5. VARNISH UNIFIES. A finished canvas is varnished, and the glaze is what
+ *      makes a dozen separately-painted passages read as one picture. Here it
+ *      is what makes a dozen photographs, shot by different people on
+ *      different phones, belong to the same site.
+ *
+ * Token names are inherited from the previous design on purpose: several
+ * hundred colour utilities are already scattered through the markup, so
+ * remapping the tokens repaints all of them at once. `lagoon` is still the
+ * sea — it is just mixed from cerulean and viridian now instead of picked
+ * off a colour wheel.
  */
 module.exports = {
   content: [
@@ -34,144 +47,164 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Deep-sea navy rather than black: it is the colour of water read at
-        // depth, and it is warmer and friendlier than neutral grey for type.
+        // Ivory black is never sold as a true black, and nobody paints with
+        // one: this is black mixed toward ultramarine, which is what a dark
+        // reads as when there is daylight in the room.
         ink: {
-          DEFAULT: '#0E2E3B',
-          soft: '#3D5A66',
-          light: '#7B95A1',
+          DEFAULT: '#22252B',
+          soft: '#4A4E57',
+          light: '#6E727B',
         },
-        // Sand, in three weights, warmed by sun.
+        // The ground. Raw linen, then two heavier umber washes over it. This
+        // is principle one — the site's "white" is a toned canvas.
         paper: {
-          DEFAULT: '#FFFBF5',
-          warm: '#FFF3E4',
-          deep: '#FBE6CB',
+          DEFAULT: '#F0E7D7',
+          warm: '#E5D7BE',
+          deep: '#D2BF9E',
         },
-        // THE action colour. Coral at golden hour — the complement of the sea,
-        // so it never disappears against any photograph of one.
+        // THE ACTION COLOUR. Cadmium orange, knocked back into burnt sienna
+        // so that white type can actually sit on it — straight from the tube
+        // it is too light to carry a label, which is a real constraint of the
+        // pigment and not a compromise of the design.
         mango: {
-          light: '#FF9B76',
-          DEFAULT: '#FF6B45',
-          dark: '#DC4A22',
+          light: '#EE8B4A',
+          DEFAULT: '#C4501A',
+          dark: '#8E3409',
         },
-        // Shallow water over white sand: the brand's signature hue.
+        // The sea, mixed the way you would mix it: cerulean into viridian,
+        // never a screen cyan.
         lagoon: {
-          light: '#9CEDE6',
-          DEFAULT: '#14B8C4',
-          dark: '#0A7C93',
+          light: '#7FCFC8',
+          DEFAULT: '#1E8E96',
+          dark: '#0E5C66',
         },
-        // Caribbean sky, from haze at the horizon to zenith.
+        // Cerulean, for the sky and everything reading as distance.
         sky: {
-          light: '#D6F1FF',
-          DEFAULT: '#5EC5F5',
-          dark: '#2A7FB8',
+          light: '#CFE3EC',
+          DEFAULT: '#6FAFCE',
+          dark: '#3A6E93',
         },
-        // Palm and sea-grape.
+        // Sap green over viridian: foliage in shadow is cooler and darker
+        // than anybody expects.
         jungle: {
-          light: '#93DCA9',
-          DEFAULT: '#2FA36B',
-          dark: '#186B48',
+          light: '#92B36A',
+          DEFAULT: '#4C7A3A',
+          dark: '#2A4A27',
         },
-        // Hibiscus, for warmth that is not an action.
+        // Alizarin crimson. Warmth that is not an action — flowers, roofs.
         hibiscus: {
-          light: '#FFA9B9',
-          DEFAULT: '#FF5F7E',
-          dark: '#D33A5C',
+          light: '#C9697C',
+          DEFAULT: '#9E2B3F',
+          dark: '#6E1A2A',
         },
-        // The sun itself, and the low light it throws.
+        // Cadmium yellow deep: the light source itself.
         sunset: {
-          light: '#FFD68C',
-          DEFAULT: '#FFB703',
-          dark: '#E08700',
+          light: '#F6D36A',
+          DEFAULT: '#EDA91B',
+          dark: '#C07C0A',
         },
-        // Dusk, the one cool counterweight.
+        // Ultramarine — the one true cool on the palette, for dusk and for
+        // the shadow side of anything sunlit.
         grape: {
-          light: '#C9B6F0',
-          DEFAULT: '#7C5FD3',
-          dark: '#4F3A96',
+          light: '#8E9BCB',
+          DEFAULT: '#35478C',
+          dark: '#1E2A5A',
         },
-        // Water read as depth, for deep surfaces and scrims over photography.
+        // The darkest masses on the site: viridian dirtied with burnt umber.
+        // Principle two lives here — this is what the picture is built on.
         abyss: {
-          light: '#0F5A73',
-          DEFAULT: '#08415C',
-          dark: '#052A3D',
+          light: '#1B4E56',
+          DEFAULT: '#123A41',
+          dark: '#0A2429',
+        },
+        // The earths. Not decoration — these are what keep the brights
+        // believable, and they are half of any real palette.
+        earth: {
+          sienna: '#B07A3C',
+          umber: '#6B4626',
+          shadow: '#3E2A1A',
         },
         // Legacy aliases from earlier designs, kept live so no stray class
         // name falls out of the palette.
-        tropicalGreen: '#2FA36B',
-        tropicalBlue: '#14B8C4',
-        sandyBeige: '#FFF3E4',
-        sunsetOrange: '#FF6B45',
-        oceanWave: '#14B8C4',
+        tropicalGreen: '#4C7A3A',
+        tropicalBlue: '#1E8E96',
+        sandyBeige: '#E5D7BE',
+        sunsetOrange: '#C4501A',
+        oceanWave: '#1E8E96',
       },
       fontFamily: {
-        // Fraunces: a soft, sunny serif with real character. Warm and
-        // family-facing where a geometric sans would read corporate.
-        heading: ['Fraunces', 'Georgia', 'serif'],
-        display: ['Fraunces', 'Georgia', 'serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
-        // Plus Jakarta Sans: clean, open, highly legible at small sizes —
-        // the voice of prices, forms and everything transactional.
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        body: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        accent: ['Caveat', 'cursive'],
-        script: ['Caveat', 'cursive'],
+        // Playfair Display: a high-contrast serif from the era these paintings
+        // belong to. Thick-thin stroke modulation is the typographic form of a
+        // loaded brush, and at display sizes it carries the whole register.
+        heading: ['"Playfair Display"', 'Georgia', 'serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        // Manrope: warm geometric-humanist, and completely quiet. Prices,
+        // forms and pickup times want to be read, not admired.
+        sans: ['Manrope', 'system-ui', 'sans-serif'],
+        body: ['Manrope', 'system-ui', 'sans-serif'],
+        // The signature in the corner of the canvas. This is Playfair's own
+        // italic rather than a script face — a painter signs in their own
+        // hand, not in someone else's, and it saves a font download.
+        accent: ['"Playfair Display"', 'Georgia', 'serif'],
+        script: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       backgroundImage: {
-        // The sky, from horizon haze upward.
-        'sky-wash': 'linear-gradient(180deg, #5EC5F5 0%, #A5DFF9 45%, #D6F1FF 78%, #FFFBF5 100%)',
-        // Shallow water over sand: the single most important gradient here.
-        'lagoon-wash': 'linear-gradient(180deg, #9CEDE6 0%, #35C9CE 45%, #0A7C93 100%)',
-        // Golden hour, low and warm.
-        'sunset-wash': 'linear-gradient(180deg, #FFD68C 0%, #FF9B76 48%, #FF6B45 100%)',
-        'jungle-wash': 'linear-gradient(180deg, #93DCA9 0%, #2FA36B 55%, #186B48 100%)',
-        'paper-wash': 'linear-gradient(180deg, #FFFBF5 0%, #FFF3E4 100%)',
-        // Wet sand at the tideline, where the water has just pulled back.
-        'shore-wash': 'linear-gradient(180deg, #FFFBF5 0%, #FFF3E4 40%, #E9F6F2 100%)',
-        // Sun glare: the unpainted paper, as a radial.
-        'sun-glare': 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(255,214,140,0.45) 35%, transparent 70%)',
-        // Hockney's white squiggle, tiled. Light on a rippled surface.
-        'caustics': 'repeating-linear-gradient(102deg, transparent 0 18px, rgba(255,255,255,0.30) 18px 21px, transparent 21px 30px), repeating-linear-gradient(78deg, transparent 0 26px, rgba(255,255,255,0.22) 26px 28px, transparent 28px 44px)',
+        // Skies are mixed downward into the haze at the horizon, which is
+        // always warmer and lighter than the zenith.
+        'sky-wash': 'linear-gradient(180deg, #3A6E93 0%, #6FAFCE 42%, #CFE3EC 76%, #F0E7D7 100%)',
+        // The sea, read downward into depth.
+        'lagoon-wash': 'linear-gradient(180deg, #7FCFC8 0%, #1E8E96 46%, #123A41 100%)',
+        // Late light. Cadmium yellow burning down through orange into crimson.
+        'sunset-wash': 'linear-gradient(180deg, #F6D36A 0%, #EDA91B 34%, #C4501A 72%, #6E1A2A 100%)',
+        'jungle-wash': 'linear-gradient(180deg, #92B36A 0%, #4C7A3A 52%, #2A4A27 100%)',
+        'paper-wash': 'linear-gradient(180deg, #F0E7D7 0%, #E5D7BE 100%)',
+        // Wet asphalt at the edge of the sand — the road this business drives.
+        'shore-wash': 'linear-gradient(180deg, #E5D7BE 0%, #D2BF9E 45%, #6B4626 100%)',
+        // The sun through haze. Titanium white at the core, never #fff.
+        'sun-glare': 'radial-gradient(circle at 50% 50%, rgba(251,246,236,0.92) 0%, rgba(246,211,106,0.45) 34%, transparent 70%)',
       },
       boxShadow: {
-        // Real light casts soft, layered shadows with a warm bounce. Every one
-        // of these is two stops — a tight contact shadow and a wide ambient
-        // one — tinted towards the sea rather than towards neutral grey.
-        'sm': '0 1px 2px rgba(14, 46, 59, 0.06), 0 2px 6px rgba(14, 46, 59, 0.05)',
-        DEFAULT: '0 2px 4px rgba(14, 46, 59, 0.06), 0 6px 14px rgba(14, 46, 59, 0.07)',
-        'md': '0 3px 6px rgba(14, 46, 59, 0.07), 0 10px 22px rgba(14, 46, 59, 0.08)',
-        'lg': '0 6px 12px rgba(14, 46, 59, 0.07), 0 18px 38px rgba(14, 46, 59, 0.10)',
-        'xl': '0 10px 20px rgba(14, 46, 59, 0.08), 0 30px 60px rgba(14, 46, 59, 0.12)',
-        '2xl': '0 16px 32px rgba(14, 46, 59, 0.10), 0 48px 90px rgba(14, 46, 59, 0.16)',
-        'inner': 'inset 0 2px 6px rgba(14, 46, 59, 0.08)',
+        // A painted world has no photographic drop shadows: depth comes from
+        // value and from edge, not from blur. So these are tight and warm —
+        // tinted burnt umber, the colour a shadow actually is on a toned
+        // ground — and they stay close to the object instead of hazing out
+        // beneath it. Where the last design floated its cards, this one sets
+        // them down on the canvas.
+        'sm': '0 1px 2px rgba(62, 42, 26, 0.10)',
+        DEFAULT: '0 2px 4px rgba(62, 42, 26, 0.12), 0 4px 8px rgba(62, 42, 26, 0.08)',
+        'md': '0 2px 5px rgba(62, 42, 26, 0.13), 0 8px 16px rgba(62, 42, 26, 0.10)',
+        'lg': '0 4px 8px rgba(62, 42, 26, 0.14), 0 14px 28px rgba(62, 42, 26, 0.12)',
+        'xl': '0 6px 14px rgba(62, 42, 26, 0.16), 0 24px 44px rgba(62, 42, 26, 0.16)',
+        '2xl': '0 10px 22px rgba(62, 42, 26, 0.18), 0 38px 70px rgba(62, 42, 26, 0.20)',
+        'inner': 'inset 0 2px 5px rgba(62, 42, 26, 0.12)',
         'none': '0 0 #0000',
-        // Named lifts used through the markup.
-        'lift': '0 10px 20px -8px rgba(14, 46, 59, 0.18), 0 26px 50px -20px rgba(14, 46, 59, 0.22)',
-        'float': '0 24px 48px -18px rgba(10, 124, 147, 0.35)',
-        // A card resting on lit water picks up the water's colour underneath.
-        'lagoon': '0 12px 30px -10px rgba(20, 184, 196, 0.45)',
-        'sun': '0 12px 30px -10px rgba(255, 183, 3, 0.45)',
-        'coral': '0 10px 26px -8px rgba(255, 107, 69, 0.5)',
-        // The old hard-offset names, softened so any leftover use still fits.
-        'ink-sm': '0 2px 5px rgba(14, 46, 59, 0.10)',
-        'ink': '0 6px 16px rgba(14, 46, 59, 0.12)',
-        'ink-lg': '0 14px 34px rgba(14, 46, 59, 0.16)',
-        'ink-xl': '0 22px 52px rgba(14, 46, 59, 0.20)',
-        // Sun glare blooming off a bright edge.
-        'glow': '0 0 0 1px rgba(255,255,255,0.6), 0 8px 30px rgba(255, 214, 140, 0.55)',
+        'lift': '0 8px 16px -6px rgba(62, 42, 26, 0.24), 0 20px 38px -16px rgba(62, 42, 26, 0.26)',
+        'float': '0 18px 36px -14px rgba(18, 58, 65, 0.40)',
+        'lagoon': '0 10px 24px -10px rgba(14, 92, 102, 0.50)',
+        'sun': '0 10px 24px -10px rgba(192, 124, 10, 0.45)',
+        'coral': '0 8px 20px -8px rgba(142, 52, 9, 0.50)',
+        'ink-sm': '0 1px 3px rgba(34, 37, 43, 0.14)',
+        'ink': '0 4px 12px rgba(34, 37, 43, 0.16)',
+        'ink-lg': '0 10px 26px rgba(34, 37, 43, 0.20)',
+        'ink-xl': '0 18px 42px rgba(34, 37, 43, 0.24)',
+        // The wet edge where thick paint catches the light coming across it.
+        'glow': '0 0 0 1px rgba(251, 246, 236, 0.55), 0 6px 22px rgba(237, 169, 27, 0.45)',
       },
       borderRadius: {
-        // Generous and friendly. Nothing here should feel sharp: this is a
-        // family holiday, and the shapes are pebbles and pool edges.
-        'sm': '8px',
-        DEFAULT: '12px',
-        'md': '14px',
-        'lg': '18px',
-        'xl': '24px',
-        '2xl': '30px',
-        '3xl': '38px',
+        // A stretched canvas and a painted panel, not a pebble. The previous
+        // design rounded everything hard because it was drawn; this one is
+        // painted on something with corners, and the tighter radii are most
+        // of why the two feel unrelated at a glance.
+        'sm': '3px',
+        DEFAULT: '5px',
+        'md': '7px',
+        'lg': '9px',
+        'xl': '13px',
+        '2xl': '17px',
+        '3xl': '22px',
         'full': '9999px',
-        // A water-worn stone, for the occasional organic frame.
+        // Kept so any leftover use still resolves.
         'blob': '58% 42% 47% 53% / 46% 51% 49% 54%',
       },
       animation: {
