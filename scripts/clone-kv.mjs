@@ -186,14 +186,47 @@ const writeValue = async (accountId, namespaceId, key, value) => {
 
 const resolveDestination = async (accountId, namespaces) => {
   if (process.env.DEST_KV_ID) return { id: process.env.DEST_KV_ID, title: '(by id)' };
+
   const match = namespaces.find((ns) => ns.title === DEST_TITLE);
   if (match) return match;
-  const created = await cf(`/accounts/${accountId}/storage/kv/namespaces`, {
-    method: 'POST',
-    body: JSON.stringify({ title: DEST_TITLE }),
-  });
-  log(`created destination namespace "${DEST_TITLE}"`);
-  return created;
+
+  try {
+    const created = await cf(`/accounts/${accountId}/storage/kv/namespaces`, {
+      method: 'POST',
+      body: JSON.stringify({ title: DEST_TITLE }),
+    });
+    log(`created destination namespace "${DEST_TITLE}"`);
+    return created;
+  } catch (error) {
+    // 10014 is "a namespace with this account ID and title already exists" —
+    // which contradicts the listing we just read. Two things cause that, and
+    // they need different answers, so find out which before giving up.
+    if (!/10014|already exists/i.test(error.message)) throw error;
+
+    // Listings can lag a create by a moment, so ask once more before
+    // concluding anything.
+    const fresh = await listNamespaces(accountId);
+    const late = fresh.find((ns) => ns.title === DEST_TITLE);
+    if (late) {
+      log(`destination "${DEST_TITLE}" existed after all — using it`);
+      return late;
+    }
+
+    // It is real, and this token cannot see it. Cloudflare checks the title
+    // against the whole account when creating, but a token scoped to a list
+    // of namespaces only lists the ones in its scope — so a namespace can be
+    // simultaneously "already exists" and invisible here. Nothing this script
+    // can do resolves that; say exactly what would.
+    throw new Error(
+      `Cloudflare says a namespace titled "${DEST_TITLE}" already exists on this ` +
+        `account, but the token cannot see it — it listed ${fresh.length} ` +
+        `namespace(s) and that was not among them. The token is most likely ` +
+        `scoped to specific namespaces rather than to the whole account. ` +
+        `Either re-issue it with Workers KV Storage: Edit at account scope, or ` +
+        `set DEST_KV_ID to the namespace id from the Cloudflare dashboard ` +
+        `(Workers & Pages → KV) and re-run.`
+    );
+  }
 };
 
 const resolveSource = (namespaces, destinationId) => {
