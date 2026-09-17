@@ -15,14 +15,21 @@
 
 # BEAUTIFUL TOURS deploys as its own Worker, entirely separate from the
 # production site. The name is what keeps them apart: `wrangler deploy` writes
-# to the Worker this names, so leaving it as "nahiatours" would have published
-# this branch straight over the live site. It must stay "beautiful-tours".
+# to the Worker this names, so leaving it as "nahiatours" would publish this
+# branch straight over the live site.
 #
-# `workers_dev = true` publishes it at beautiful-tours.<subdomain>.workers.dev.
+# The Worker this design lives in was renamed to "beautifull" in the Cloudflare
+# dashboard, and this line has to follow it. `wrangler deploy` addresses a
+# Worker by name, not by id: while this said "beautiful-tours" a deploy from
+# here would have quietly created a second, empty Worker under the old name and
+# left the real one untouched. It must stay "beautifull" — including the double
+# l, which is how the project is actually spelled.
+#
+# `workers_dev = true` publishes it at beautifull.<subdomain>.workers.dev.
 # No CANONICAL_HOST is set anywhere in this file, deliberately: that variable
 # is what redirects the production Worker to its own domain, and inheriting it
 # here would bounce every visitor off this deployment.
-name = "beautiful-tours"
+name = "beautifull"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 workers_dev = true

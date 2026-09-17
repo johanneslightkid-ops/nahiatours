@@ -5,7 +5,7 @@
 # things keep them apart, and both have to fail at once for this to touch
 # nahiatours:
 #
-#   • wrangler.toml on this branch names the Worker `beautiful-tours`;
+#   • wrangler.toml on this branch names the Worker `beautifull`;
 #   • this workflow only runs on the `beautiful-tours` branch.
 #
 # The data is a copy, taken once at deploy time. scripts/clone-kv.mjs reads
@@ -200,5 +200,5 @@ jobs:
               echo "KV: ${{ steps.kv.outputs.keys_copied }} key(s) copied from \`${{ steps.kv.outputs.source_title }}\` into \`beautiful-tours-data\` (\`${{ steps.kv.outputs.namespace_id }}\`)."
             fi
             echo ""
-            echo "Live at https://beautiful-tours.johannes-neugschwentner.workers.dev"
+            echo "Live at https://beautifull.johannes-neugschwentner.workers.dev"
           } >> "$GITHUB_STEP_SUMMARY"
