@@ -8,8 +8,17 @@
 #   • wrangler.toml on this branch names the Worker `beautifull`;
 #   • this workflow only runs on the `beautiful-tours` branch.
 #
-# The data is a copy, taken once at deploy time. scripts/clone-kv.mjs reads
-# every key out of the source namespace and writes it into `beautiful-tours-data`,
+# The data is a copy taken at deploy time, from `nahiatours-data` — pinned by
+# SOURCE_KV_TITLE below, and pinned for a reason. Left unset, clone-kv falls
+# back to "the newest namespace on the account", and this account carries 27 of
+# them across a dozen unrelated projects. That guess had started resolving to
+# `slk-config`, so each deploy was copying another business's `terms` document
+# into this site's data. Never let it guess.
+#
+# The copy is additive: keys already in the destination are left alone, so a
+# redeploy tops up what is missing without overwriting anything edited in this
+# site's own admin. scripts/clone-kv.mjs reads every key out of the source
+# namespace and writes it into `beautiful-tours-data`,
 # so the new site opens with the real catalogue rather than the seed JSON —
 # and from that moment the two namespaces are independent. Editing a tour here
 # cannot reach the live site, and vice versa.
@@ -51,8 +60,8 @@ on:
         default: ''
       source_kv_title:
         description: >-
-          Title of the KV namespace to copy data from. Leave empty to use the
-          newest namespace that is not beautiful-tours-data.
+          Title of the KV namespace to copy data from. Leave empty to use
+          nahiatours-data, the production site this design is a copy of.
         required: false
         default: ''
       skip_kv_clone:
@@ -77,7 +86,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN || inputs.cloudflare_api_token }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
       KV_NAMESPACE_TITLE: beautiful-tours-data
-      SOURCE_KV_TITLE: ${{ inputs.source_kv_title }}
+      SOURCE_KV_TITLE: ${{ inputs.source_kv_title || 'nahiatours-data' }}
       SITE_URL: ${{ vars.SITE_URL }}
 
     steps:

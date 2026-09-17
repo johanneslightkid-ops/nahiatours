@@ -208,12 +208,19 @@ const resolveSource = (namespaces, destinationId) => {
     }
     return match;
   }
+  // No blind fallback. This used to take "the newest namespace that is not the
+  // destination", which was reasonable on an account with two of them and
+  // actively dangerous on this one: it carries 27 namespaces belonging to a
+  // dozen unrelated projects, and the guess had drifted onto `slk-config` —
+  // quietly copying another business's documents into this site's data on
+  // every deploy. Seeding a site from a namespace nobody named is never what
+  // was wanted, so say so instead of picking one.
   const candidates = namespaces.filter((ns) => ns.id !== destinationId);
-  if (candidates.length === 0) {
-    throw new Error('no other namespace to copy from — set SOURCE_KV_TITLE');
-  }
-  // Cloudflare returns namespaces oldest-first, so the last is the newest.
-  return candidates[candidates.length - 1];
+  throw new Error(
+    'refusing to guess a source namespace. Set SOURCE_KV_TITLE (or ' +
+      'SOURCE_KV_ID) to the one this site should be seeded from. ' +
+      `Available: ${candidates.map((ns) => ns.title).join(', ') || '(none)'}`
+  );
 };
 
 const main = async () => {
