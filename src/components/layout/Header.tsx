@@ -11,6 +11,17 @@ import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 
 import { getAdminPassword, clearAdminPassword } from '../../services/authStore';
 
+/**
+ * The masthead.
+ *
+ * The version this replaces hung a 147px circular sticker off the top-left
+ * corner in `position: fixed`, which forced every other element in the bar to
+ * be pushed right by a hard-coded 11rem and left the brand name orphaned. This
+ * one is an ordinary flex row: a small paper-mounted mark, the name set in the
+ * display face, and the navigation. The current page is marked by a painted
+ * stroke under its label rather than by a filled pill, the way a page is
+ * marked in a guidebook.
+ */
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { brandSettings } = useBrand();
@@ -32,101 +43,124 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
+  /** Sections of the tours admin, which live behind `?section=`. */
   const adminNavClass = (section: string) => {
     const currentSection = searchParams.get('section') || 'brand';
-    return `nav-link-pill p-3 !rounded-full ${currentSection === section ? 'nav-link-pill-active' : ''}`;
+    const active = location.pathname === '/admin' && currentSection === section;
+    return `nav-link-pill p-2.5 !rounded-full ${active ? 'nav-link-pill-active' : ''}`;
   };
+
+  /** Admin areas that are their own route, such as transport. */
+  const adminRouteNavClass = (path: string) =>
+    `nav-link-pill p-2.5 !rounded-full ${location.pathname === path ? 'nav-link-pill-active' : ''}`;
 
   const handleNavClick = () => {
     playClickFx();
     setIsMenuOpen(false);
   };
 
-  // Active route gets a drawn, filled pill so guests always know where they are.
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `nav-link-pill ${isActive ? 'nav-link-pill-active' : ''}`;
 
   return (
-    <header className="lobster-header sticky top-0 z-50 overflow-visible">
-      <div className="section-shell flex items-center justify-between py-3.5 pl-[10.5rem] sm:pl-[11.25rem] lg:pl-8">
+    <header className="lobster-header sticky top-0 z-50">
+      <div className="section-shell flex items-center justify-between gap-4 py-3">
         <Link
           to="/#top"
-          className="group flex items-center gap-3"
+          className="group flex shrink-0 items-center gap-3"
           onClick={() => playClickFx()}
           onMouseEnter={() => playHoverFx()}
         >
-          <div className="menu-logo-icon fixed left-4 top-2 flex h-[9.1875rem] w-[9.1875rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
+          <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-full border border-ink/15 bg-paper-warm shadow-ink-sm transition-transform duration-300 group-hover:scale-105 sm:h-14 sm:w-14">
             {brandSettings.brandicon ? (
-              <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
+              <img src={brandSettings.brandicon} alt="" className="h-full w-full object-cover" />
             ) : (
-              <img src="/competitor-logo.svg" alt="Logo" className="h-[7.875rem] w-[7.875rem]" />
+              <img src="/competitor-logo.svg" alt="" className="h-9 w-9" />
             )}
-          </div>
-          <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[10.75rem] sm:block lg:ml-[11.5rem]">
+          </span>
+          <span className="font-display text-xl font-semibold tracking-tight text-ink transition group-hover:text-coral-deep sm:text-2xl">
             {brandSettings.brandName}
-          </h1>
+          </span>
         </Link>
 
         <button
-          className="grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-mango-light text-ink shadow-ink-sm transition hover:bg-mango md:hidden"
+          className="grid h-11 w-11 place-items-center rounded-full border border-ink/15 bg-paper-warm text-ink transition hover:border-sea md:hidden"
           onClick={() => {
             playClickFx();
             setIsMenuOpen(!isMenuOpen);
           }}
           aria-label="Toggle navigation"
+          aria-expanded={isMenuOpen}
         >
-          {isMenuOpen ? <HiX className="h-8 w-8" /> : <HiMenu className="h-8 w-8" />}
+          {isMenuOpen ? <HiX className="h-6 w-6" /> : <HiMenu className="h-6 w-6" />}
         </button>
 
         <nav
-          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+12px)] flex-col gap-3 rounded-[24px] border-[3px] border-ink bg-paper px-5 py-5 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-2 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
+          className={`${
+            isMenuOpen ? 'flex' : 'hidden'
+          } absolute left-3 right-3 top-[calc(100%+10px)] flex-col gap-2 rounded-[22px_17px_24px_16px/17px_24px_16px_22px] border border-ink/12 bg-paper p-4 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-1 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
         >
           {isAdminRoute ? (
             <>
-              <Link to="/admin?section=brand" onClick={handleNavClick} className={adminNavClass('brand')} title="Brand Settings">
-                <MdSettings className="h-6 w-6" />
+              <Link to="/admin?section=brand" onClick={handleNavClick} className={adminNavClass('brand')} title="Marca">
+                <MdSettings className="h-5 w-5" />
               </Link>
-              <Link to="/admin?section=story" onClick={handleNavClick} className={adminNavClass('story')} title="Story">
-                <FaBook className="h-5 w-5" />
+              <Link to="/admin?section=story" onClick={handleNavClick} className={adminNavClass('story')} title="Historia">
+                <FaBook className="h-4 w-4" />
               </Link>
-              <Link to="/admin?section=tours" onClick={handleNavClick} className={adminNavClass('tours')} title="Tours">
-                <MdTour className="h-6 w-6" />
+              <Link to="/admin?section=tours" onClick={handleNavClick} className={adminNavClass('tours')} title="Excursiones">
+                <MdTour className="h-5 w-5" />
               </Link>
-              <Link to="/admin?section=transport" onClick={handleNavClick} className={adminNavClass('transport')} title="Transport">
-                <MdLocalTaxi className="h-6 w-6" />
+              {/* Transport is its own route, not a section of this page. It used
+                  to point at `?section=transport`, which rendered a dead end
+                  telling you to navigate somewhere else. */}
+              <Link
+                to="/admin/transport"
+                onClick={handleNavClick}
+                className={adminRouteNavClass('/admin/transport')}
+                title="Transporte"
+              >
+                <MdLocalTaxi className="h-5 w-5" />
               </Link>
               <Link to="/admin?section=tiktok" onClick={handleNavClick} className={adminNavClass('tiktok')} title="TikTok">
-                <FaTiktok className="h-5 w-5" />
+                <FaTiktok className="h-4 w-4" />
               </Link>
-              <Link to="/admin?section=social" onClick={handleNavClick} className={adminNavClass('social')} title="Social">
-                <FaShareAlt className="h-5 w-5" />
+              <Link to="/admin?section=social" onClick={handleNavClick} className={adminNavClass('social')} title="Redes sociales">
+                <FaShareAlt className="h-4 w-4" />
               </Link>
-              <Link to="/admin?section=aiSettings" onClick={handleNavClick} className={adminNavClass('aiSettings')} title="AI Config">
-                <FaRobot className="h-5 w-5" />
+              <Link to="/admin?section=aiSettings" onClick={handleNavClick} className={adminNavClass('aiSettings')} title="Configuración de IA">
+                <FaRobot className="h-4 w-4" />
               </Link>
-              <Link to="/admin?section=aiBlogGen" onClick={handleNavClick} className={adminNavClass('aiBlogGen')} title="AI Blog Gen">
-                <FaMagic className="h-5 w-5" />
+              <Link to="/admin?section=aiBlogGen" onClick={handleNavClick} className={adminNavClass('aiBlogGen')} title="Generador de blog">
+                <FaMagic className="h-4 w-4" />
               </Link>
-              <div className="mx-1 hidden h-6 w-0.5 bg-ink/30 md:block"></div>
-              <button onClick={handleLogout} className="nav-link-pill p-3 !rounded-full !text-hibiscus-dark hover:!bg-hibiscus-light" title="Log Out & Return">
-                <FaSignOutAlt className="h-5 w-5" />
+              <span className="mx-1 hidden h-5 w-px bg-ink/20 md:block" />
+              <button
+                onClick={handleLogout}
+                className="nav-link-pill p-2.5 !rounded-full !text-coral-deep"
+                title="Cerrar sesión y volver al sitio"
+              >
+                <FaSignOutAlt className="h-4 w-4" />
               </button>
             </>
           ) : (
             <>
               <NavLink to="/#top" end onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
-                <MdHome />
+                <MdHome className="h-4 w-4" />
                 <FormattedMessage id="nav.home" />
               </NavLink>
 
-              {/* The planner gets its own accented tab — it is the fastest way in. */}
+              {/* The planner is the fastest way in, so it is the one item in
+                  the bar that carries the primary pigment. */}
               <NavLink
                 to="/plan#top"
                 onClick={handleNavClick}
                 onMouseEnter={() => playHoverFx()}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 rounded-full border-[2.5px] border-ink px-4 py-2 font-extrabold text-ink shadow-ink-sm transition duration-200 hover:-translate-y-0.5 ${
-                    isActive ? 'bg-mango' : 'bg-mango-light hover:bg-mango'
+                  `flex items-center gap-2 rounded-full px-4 py-2 text-[0.95rem] font-semibold transition duration-200 ${
+                    isActive
+                      ? 'bg-coral-deep text-paper'
+                      : 'bg-coral-deep/10 text-coral-deep hover:bg-coral-deep hover:text-paper'
                   }`
                 }
               >
@@ -135,24 +169,24 @@ const Header: React.FC = () => {
               </NavLink>
 
               <NavLink to="/tours#top" onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
-                <MdTour />
+                <MdTour className="h-4 w-4" />
                 <FormattedMessage id="nav.tours" />
               </NavLink>
               <NavLink to="/transport#top" onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
-                <MdLocalTaxi />
+                <MdLocalTaxi className="h-4 w-4" />
                 <FormattedMessage id="nav.transport" defaultMessage="Transport" />
               </NavLink>
               <NavLink to="/blog#top" onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
-                <MdLibraryBooks />
+                <MdLibraryBooks className="h-4 w-4" />
                 <FormattedMessage id="nav.blog" defaultMessage="Blog" />
               </NavLink>
               <NavLink to="/contact#top" onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
-                <MdEmail />
+                <MdEmail className="h-4 w-4" />
                 <FormattedMessage id="nav.contact" />
               </NavLink>
             </>
           )}
-          <div className="flex items-center gap-3 pt-2 md:pt-0">
+          <div className="mt-2 flex items-center gap-2 border-t border-ink/10 pt-3 md:ml-2 md:mt-0 md:border-l md:border-t-0 md:pl-3 md:pt-0">
             <LanguageSwitcher />
             <SoundToggle />
           </div>
@@ -163,4 +197,3 @@ const Header: React.FC = () => {
 };
 
 export default Header;
-

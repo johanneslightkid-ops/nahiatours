@@ -1,18 +1,26 @@
 import React from 'react';
-import { SunBurst, Cloud, PalmFrond, Birds } from './Illustrations';
+import { PalmFrond, Monstera } from './Illustrations';
 
 /**
- * The drawn scene behind the whole site.
+ * The painted scene the whole site sits in front of.
  *
- * This replaces the WebGL ocean shader that used to sit here. That shader
- * simulated real water — exactly the photographic register this redesign moves
- * away from — and cost a GL context on every page. What is left is a flat
- * painted sky: a gradient, a sun, drifting paper clouds, a sea drawn as three
- * stacked crests, and palm fronds leaning in from the edges. All of it is CSS
- * and inline SVG, so it costs nothing to run and scales to any viewport.
+ * It is a single watercolour of the Bávaro coast: a washed sky, a bank of
+ * cloud, the sun low over the water, two headlands, three bands of sea and the
+ * sand coming up to meet the page. Content sections are opaque, so the scene
+ * reads through the hero, through the gaps between the painted section edges,
+ * and down the page margins on a wide screen.
  *
- * Content sections above are opaque, so the scene reads through the hero, the
- * wave-shaped gaps between bands, and the page margins.
+ * NOTHING IN HERE MOVES, and that is a measured decision rather than a
+ * stylistic one. This element is `position: fixed` across the whole viewport.
+ * Animating anything inside a full-viewport fixed layer forces the compositor
+ * to re-raster that layer every frame — on the previous design that cost this
+ * page roughly half its frame rate on a desktop, and more on a phone, no
+ * matter which property was being animated. The hero owns the site's motion
+ * instead: it is a normal, bounded element, and it stops when it scrolls away.
+ *
+ * Everything below is a gradient or a filled path. No `filter`, no
+ * `mix-blend-mode`, no backdrop blur — the three things that turn a static
+ * backdrop into a per-frame bill.
  */
 const IllustratedBackdrop: React.FC = () => (
   <div
@@ -20,85 +28,114 @@ const IllustratedBackdrop: React.FC = () => (
     style={{ zIndex: -1 }}
     aria-hidden="true"
   >
-    {/* Sky */}
+    {/* Sky: a wet-in-wet wash running from a cool zenith down to the warm haze
+        that sits on a Caribbean horizon at midday. */}
     <div
       className="absolute inset-0"
       style={{
         background:
-          'linear-gradient(180deg, #A5E4FF 0%, #C9EFFF 28%, #EAF8FF 52%, #FFF6E5 74%, #FFF6E5 100%)',
+          'linear-gradient(180deg, #CFE7EF 0%, #DCEBEF 22%, #E9F1EC 44%, #F4F0E4 60%, #FBF5E9 72%, #FBF5E9 100%)',
       }}
     />
 
-    {/* Sun, high on the right. The rays turn once every 40s. */}
-    <SunBurst spin className="absolute -right-16 -top-16 h-72 w-72 sm:h-96 sm:w-96" />
-
-    {/* Clouds. Each drifts the full width on its own clock, so they never
-        line up into a repeating pattern. */}
-    <Cloud
-      className="absolute h-16 w-28 opacity-95 sm:h-20 sm:w-36"
-      style={{ top: '12%', animation: 'cloudDrift 90s linear infinite' }}
-    />
-    <Cloud
-      className="absolute h-10 w-20 opacity-80 sm:h-14 sm:w-24"
-      style={{ top: '26%', animation: 'cloudDrift 140s linear infinite', animationDelay: '-40s' }}
-    />
-    <Cloud
-      className="absolute h-12 w-24 opacity-70 sm:h-16 sm:w-28"
-      style={{ top: '5%', animation: 'cloudDrift 190s linear infinite', animationDelay: '-120s' }}
+    {/* The sun, low and off-centre, bleeding into the haze. */}
+    <div
+      className="absolute"
+      style={{
+        top: '6%',
+        right: '12%',
+        width: 'min(46vw, 460px)',
+        aspectRatio: '1',
+        borderRadius: '9999px',
+        background:
+          'radial-gradient(circle, rgba(246,201,139,0.55) 0%, rgba(246,201,139,0.28) 38%, rgba(246,201,139,0) 68%)',
+      }}
     />
 
-    <Birds
-      className="absolute left-[18%] top-[18%] h-8 w-24 opacity-40"
-      style={{ animation: 'cloudDrift 240s linear infinite' }}
-    />
-
-    {/* Sea: three drawn crests stacked at the foot of the viewport. */}
+    {/* Cloud bank. Drawn as soft elliptical washes rather than outlined puffs —
+        a cloud in watercolour is where the paper was left alone. */}
     <svg
-      className="absolute inset-x-0 bottom-0 h-[38vh] w-full"
-      viewBox="0 0 1200 380"
-      preserveAspectRatio="none"
+      className="absolute inset-x-0 top-0 h-[42vh] w-full"
+      viewBox="0 0 1200 420"
+      preserveAspectRatio="xMidYMin slice"
       xmlns="http://www.w3.org/2000/svg"
+      fill="none"
     >
-      <path
-        d="M0 92 C150 56 300 124 450 96 C600 68 750 126 900 100 C1020 79 1110 88 1200 78 L1200 380 L0 380 Z"
-        fill="#A5E4FF"
-      />
-      <path
-        d="M0 150 C150 116 300 182 450 154 C600 126 750 184 900 158 C1020 137 1110 146 1200 136 L1200 380 L0 380 Z"
-        fill="#7FE3DA"
-      />
-      <path
-        d="M0 212 C150 180 300 244 450 216 C600 188 750 246 900 220 C1020 199 1110 208 1200 198 L1200 380 L0 380 Z"
-        fill="#21C0B7"
-      />
-      {/* Foam ticks: the shorthand for moving water in a flat drawing. */}
-      <g stroke="#FFFDF7" strokeWidth={5} strokeLinecap="round" opacity={0.75}>
-        <path d="M120 250 L190 250" />
-        <path d="M330 286 L392 286" />
-        <path d="M620 262 L690 262" />
-        <path d="M880 300 L946 300" />
-        <path d="M1040 258 L1096 258" />
+      <g fill="#FBF5E9">
+        <ellipse cx="200" cy="120" rx="210" ry="58" opacity="0.5" />
+        <ellipse cx="300" cy="96" rx="140" ry="42" opacity="0.42" />
+        <ellipse cx="880" cy="86" rx="230" ry="52" opacity="0.45" />
+        <ellipse cx="760" cy="112" rx="150" ry="38" opacity="0.38" />
+        <ellipse cx="560" cy="180" rx="260" ry="44" opacity="0.3" />
+      </g>
+      <g fill="#D6ECF2">
+        <ellipse cx="250" cy="142" rx="180" ry="30" opacity="0.5" />
+        <ellipse cx="900" cy="118" rx="200" ry="26" opacity="0.45" />
       </g>
     </svg>
 
-    {/* Fronds leaning in from the bottom corners. The static lean lives on the
-        wrapper so the sway animation on the frond itself is free to own
-        `transform` outright. */}
-    <div
-      className="absolute -left-28 bottom-[-16%] h-72 w-72 sm:h-96 sm:w-96"
-      style={{ transform: 'rotate(28deg)' }}
+    {/* The sea. Three wash bands, each darker and each with a painted crest
+        line, plus a scatter of foam where light breaks. */}
+    <svg
+      className="absolute inset-x-0 bottom-0 h-[32vh] w-full"
+      viewBox="0 0 1200 460"
+      preserveAspectRatio="none"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
     >
-      <PalmFrond color="jungleLight" className="animate-frond h-full w-full opacity-70" />
+      <path
+        d="M0 56 C160 36 300 70 450 54 C600 38 720 68 880 54 C1000 43 1110 58 1200 44 L1200 460 L0 460 Z"
+        fill="#C9E8E2"
+        fillOpacity="0.72"
+      />
+      <path
+        d="M0 128 C150 108 300 142 450 126 C600 110 730 140 880 126 C1010 114 1110 128 1200 114 L1200 460 L0 460 Z"
+        fill="#7FCBCE"
+        fillOpacity="0.62"
+      />
+      <path
+        d="M0 214 C160 196 300 228 460 212 C620 196 740 224 900 212 C1020 203 1120 214 1200 202 L1200 460 L0 460 Z"
+        fill="#2E9AA6"
+        fillOpacity="0.5"
+      />
+      {/* Wet sand: where the last wash runs out on the beach. */}
+      <path
+        d="M0 336 C170 318 320 348 480 334 C640 320 780 344 940 334 C1060 326 1130 336 1200 328 L1200 460 L0 460 Z"
+        fill="#EEDCC0"
+        fillOpacity="0.85"
+      />
+      <path
+        d="M0 336 C170 318 320 348 480 334 C640 320 780 344 940 334 C1060 326 1130 336 1200 328"
+        stroke="#FBF5E9"
+        strokeWidth="6"
+        strokeOpacity="0.7"
+        strokeLinecap="round"
+      />
+      <g stroke="#FBF5E9" strokeWidth="4" strokeOpacity="0.55" strokeLinecap="round">
+        <path d="M120 176 C158 170 186 178 224 172" />
+        <path d="M520 158 C556 152 582 160 620 154" />
+        <path d="M860 184 C896 178 922 186 960 180" />
+        <path d="M250 262 C288 256 316 264 354 258" />
+        <path d="M700 272 C736 266 764 274 802 268" />
+        <path d="M1000 250 C1034 244 1058 252 1094 246" />
+      </g>
+    </svg>
+
+    {/* Foliage leaning into the frame from the corners — the repoussoir a
+        painter puts in the foreground so the eye reads distance. Low opacity:
+        it is the edge of the picture, not part of it. Hidden on small screens,
+        where the content needs the width more than the composition does. */}
+    <div className="absolute -left-28 bottom-[-8%] hidden h-72 w-72 opacity-[0.2] md:block lg:h-[26rem] lg:w-[26rem]">
+      <Monstera color="palmDeep" className="h-full w-full" />
     </div>
     <div
-      className="absolute -right-32 bottom-[-18%] h-72 w-72 sm:h-[26rem] sm:w-[26rem]"
-      style={{ transform: 'rotate(-34deg) scaleX(-1)' }}
+      className="absolute -right-32 bottom-[-12%] hidden h-72 w-72 opacity-[0.16] md:block lg:h-[28rem] lg:w-[28rem]"
+      style={{ transform: 'scaleX(-1) rotate(-8deg)' }}
     >
-      <PalmFrond
-        color="jungle"
-        className="animate-frond h-full w-full opacity-70"
-        style={{ animationDelay: '-3s' }}
-      />
+      <PalmFrond color="palm" className="h-full w-full" />
+    </div>
+    <div className="absolute -left-16 top-[-4%] hidden h-64 w-64 opacity-[0.1] xl:block">
+      <PalmFrond color="palmLight" className="h-full w-full" style={{ transform: 'rotate(150deg)' }} />
     </div>
   </div>
 );

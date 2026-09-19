@@ -237,7 +237,7 @@ const ServiceDetails: React.FC = () => {
                       <select
                         value={selectedOrigin}
                         onChange={(event) => setSelectedOrigin(event.target.value)}
-                        className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
+                        className="w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-ink-soft outline-none"
                       >
                         {Array.from(new Set(availableOrigins)).map((origin) => (
                           <option key={origin} value={origin}>
@@ -254,7 +254,7 @@ const ServiceDetails: React.FC = () => {
                       <select
                         value={selectedDestination}
                         onChange={(event) => setSelectedDestination(event.target.value)}
-                        className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
+                        className="w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-ink-soft outline-none"
                       >
                         {availableDestinations.map((destination) => (
                           <option key={destination} value={destination}>
@@ -265,7 +265,7 @@ const ServiceDetails: React.FC = () => {
                     </label>
                   </div>
 
-                  <div className="rounded-3xl border-[2.5px] border-ink bg-white p-5 shadow-ink-sm">
+                  <div className="rounded-3xl border border-ink/15 bg-white p-5 shadow-ink-sm">
                     <p className="text-sm font-semibold text-ink-soft">
                       <FormattedMessage id="transport.estimate" defaultMessage="Estimated transfer price" />
                     </p>
@@ -280,7 +280,7 @@ const ServiceDetails: React.FC = () => {
                           <select
                             value={selectedVehicleKey}
                             onChange={(event) => setSelectedVehicleKey(event.target.value)}
-                            className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
+                            className="w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-ink-soft outline-none"
                           >
                             {transferConfig.vehicleTypes.map((vehicle) => (
                               <option key={vehicle.key} value={vehicle.key}>
@@ -297,7 +297,7 @@ const ServiceDetails: React.FC = () => {
                             max={service.transferRoutes?.length ? 30 : 10}
                             value={passengers}
                             onChange={(event) => setPassengers(Number(event.target.value))}
-                            className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
+                            className="w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-ink-soft outline-none"
                           />
                         </label>
                       </div>

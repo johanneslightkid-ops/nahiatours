@@ -57,8 +57,8 @@ const PlanMyDay: React.FC = () => {
         {stage === 'questions' && (
           <div className="mb-6 space-y-4">
             <div className="flex items-center justify-between gap-4">
-              <span className="font-display text-lg font-extrabold text-ink">{copy.tab}</span>
-              <span className="text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-ink-soft">
+              <span className="font-display text-lg font-semibold text-ink">{copy.tab}</span>
+              <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-soft">
                 {copy.ui.stepOf(stepIndex + 1, steps.length)}
               </span>
             </div>
@@ -91,7 +91,7 @@ const PlanMyDay: React.FC = () => {
         </div>
 
         {loading && stage === 'intro' && (
-          <p className="mt-6 text-center text-xs font-extrabold uppercase tracking-[0.18em] text-ink-soft">
+          <p className="mt-6 text-center text-xs font-semibold uppercase tracking-[0.18em] text-ink-soft">
             {copy.result.building}
           </p>
         )}

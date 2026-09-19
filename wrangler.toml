@@ -1,6 +1,22 @@
 # ==============================================================================
-# Cloudflare Worker configuration (static assets + API routes)
+# Cloudflare Worker configuration — LD VIP (static assets + API routes)
 # ==============================================================================
+#
+# THIS BRANCH IS ITS OWN SITE, NOT A CHANGE TO nahia.tours.
+#
+# `wrangler deploy` addresses a Worker BY THE NAME BELOW, so the one line that
+# keeps production safe is `name`. It says `ldvip`, and as long as it does,
+# nothing here can reach the `nahiatours` Worker no matter who runs it. Two
+# further things have to hold and both do: the deploy workflow only runs on the
+# `ldvip` branch, and the KV namespace is `ldvip-data`, created fresh and
+# seeded with a COPY of production's data at deploy time. From that copy
+# onwards the two sites are independent — editing a tour here cannot reach the
+# live site, and vice versa.
+#
+# If this is ever renamed in the Cloudflare dashboard, change it here too. A
+# rename there and not here does not fail loudly: wrangler simply creates a
+# second, empty Worker under the old name and leaves the renamed one serving
+# whatever it last had.
 #
 # The Cloudflare project deploys with `npx wrangler deploy`, the Workers
 # command. It needs `main` (a script entry point) and `[assets]` (a directory to
@@ -13,7 +29,7 @@
 # now Workers-shaped. worker/index.ts dispatches to the same functions/*
 # handlers the Pages deployment used, so no endpoint logic is duplicated.
 
-name = "nahiatours"
+name = "ldvip"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 
@@ -36,7 +52,7 @@ run_worker_first = true
 #
 # Uncomment once the namespace exists and paste its id. Create it with either:
 #
-#   npx wrangler kv namespace create nahiatours-data
+#   npx wrangler kv namespace create ldvip-data
 #   ./scripts/deploy-cloudflare.sh      (creates, binds and deploys in one go)
 #
 # The handlers read DATA_KV_F first and fall back to DATA_KV

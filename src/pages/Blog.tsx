@@ -118,7 +118,7 @@ const Blog = () => {
                     </h2>
                     <div className="flex flex-wrap items-center gap-4 text-sm font-body">
                       {article.tour && (
-                        <span className="inline-flex items-center gap-1.5 rounded-[16px_6px_14px_8px] border-2 border-ink bg-lagoon-light px-4 py-1.5 font-extrabold text-ink">
+                        <span className="inline-flex items-center gap-1.5 rounded-[16px_6px_14px_8px] border border-ink/15 bg-lagoon-light px-4 py-1.5 font-semibold text-ink">
                           <MdTour className="h-4 w-4 text-lagoon-dark" />
                           <FormattedMessage id="blog.relatedTourLabel" defaultMessage="Related tour" />: {article.tour}
                         </span>

@@ -121,7 +121,7 @@ const StorySection: React.FC<StorySectionProps> = ({
     <section
       ref={sectionRef}
       id={id}
-      className={`home-section wavy-band relative overflow-hidden px-4 py-28 sm:py-32 md:px-8 lg:py-36 ${
+      className={`home-section wavy-band relative overflow-hidden px-4 py-24 sm:py-28 md:px-8 lg:py-32 ${
         themeName ? themeName : isAlternate ? 'cove-section' : 'shore-section'
       }`}
     >
@@ -133,9 +133,9 @@ const StorySection: React.FC<StorySectionProps> = ({
         {/* Header with emoji and title */}
         <div className={`mb-10 text-center sm:mb-12 ${isAlternate ? 'md:text-right' : 'md:text-left'}`}>
           {emoji && <div className={`section-icon mb-5 ${isAlternate ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}>{emoji}</div>}
-          {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
+          {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
           {timeframe && (
-            <p className="inline-block rounded-full border-2 border-ink bg-mango-light px-4 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-ink-sm">
+            <p className="inline-block text-[0.68rem] font-bold uppercase tracking-[0.2em] text-ink-light">
               {timeframe}
             </p>
           )}
@@ -147,17 +147,15 @@ const StorySection: React.FC<StorySectionProps> = ({
           <div className={(imageUrl || vimeoUrl) && isAlternate ? 'md:order-2' : 'md:order-1'}>
             {/* Description */}
             {description && (
-              <div className="story-copy-card mb-6 rounded-[30px_16px_30px_18px] animate-wave-sway-2">
-                <p className="whitespace-pre-wrap text-base font-semibold leading-8 text-ink sm:text-lg">
-                  {description}
-                </p>
-              </div>
+              <p className="mb-6 whitespace-pre-wrap border-l-2 border-coral/50 pl-5 font-display text-lg leading-[1.7] text-ink sm:text-xl">
+                {description}
+              </p>
             )}
 
             {/* Narrative */}
             {narrative && (
               <div className="prose prose-lg max-w-none">
-                <p className="text-base font-semibold italic leading-8 text-ink-soft md:text-lg">
+                <p className="text-base leading-[1.8] text-ink-soft md:text-lg">
                   {narrative}
                 </p>
               </div>
@@ -169,9 +167,7 @@ const StorySection: React.FC<StorySectionProps> = ({
                 {mood.split(', ').filter(Boolean).map((m, idx) => (
                   <span
                     key={idx}
-                    className={`rounded-full border-[2.5px] border-ink px-4 py-1.5 text-sm font-extrabold text-ink shadow-ink-sm transition-transform hover:-translate-y-1 hover:rotate-2 ${
-                      ['bg-mango-light', 'bg-lagoon-light', 'bg-hibiscus-light', 'bg-jungle-light'][idx % 4]
-                    }`}
+                    className="rounded-full border border-ink/15 bg-paper-card/70 px-3.5 py-1 text-[0.72rem] font-bold uppercase tracking-[0.12em] text-ink-soft"
                   >
                     {m}
                   </span>
@@ -181,7 +177,7 @@ const StorySection: React.FC<StorySectionProps> = ({
 
             {/* Video (if we also have an image, video goes here below the text) */}
             {vimeoUrl && imageUrl && (
-              <div className="mt-8 story-media-frame flex justify-center w-full animate-wave-sway-3">
+              <div className="mt-8 story-media-frame flex justify-center w-full">
                 {isTikTok ? (
                   hasLoaded ? (
                     <div className="relative z-10 w-full overflow-hidden rounded-[28px_14px_30px_16px]">
@@ -195,7 +191,7 @@ const StorySection: React.FC<StorySectionProps> = ({
                       </blockquote>
                     </div>
                   ) : (
-                    <div className="relative w-full aspect-video rounded-[28px_14px_30px_16px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft">Loading TikTok...</div>
+                    <div className="relative w-full aspect-video rounded-[28px_14px_30px_16px] flex items-center justify-center border border-ink/15 bg-paper-warm font-bold text-ink-soft">Loading TikTok...</div>
                   )
                 ) : (
                   <iframe
@@ -212,12 +208,16 @@ const StorySection: React.FC<StorySectionProps> = ({
           {/* Media Column (Image or Video if no image) */}
           {(imageUrl || (!imageUrl && vimeoUrl)) && (
             <div className={`${isAlternate ? 'md:order-1' : 'md:order-2'} ${id === 'decision' ? 'md:mt-12' : ''}`}>
-              <div className={`story-media-frame group mb-10 md:mb-0 ${id === 'afternoon_post' ? 'mt-12 md:mt-0' : ''} animate-wave-sway-1`}>
+              <div className={`story-media-frame group mb-10 md:mb-0 ${id === 'afternoon_post' ? 'mt-12 md:mt-0' : ''}`}>
                 {imageUrl ? (
                   <img
                     src={imageUrl}
                     alt={title || 'Story image'}
-                    className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] object-cover shadow-[0_25px_60px_rgba(4,19,29,0.3)] transition-transform duration-700 group-hover:scale-105 sm:h-96 md:h-[520px]"
+                    width={720}
+                    height={520}
+                    loading="lazy"
+                    decoding="async"
+                    className="photo-pop relative h-[20rem] w-full rounded-[22px_17px_24px_16px/17px_24px_16px_22px] border-[6px] border-paper-card object-cover shadow-ink-lg transition-transform duration-[900ms] group-hover:scale-[1.02] sm:h-[24rem] md:h-[30rem]"
                   />
                 ) : isTikTok ? (
                   hasLoaded ? (
@@ -232,7 +232,7 @@ const StorySection: React.FC<StorySectionProps> = ({
                       </blockquote>
                     </div>
                   ) : (
-                     <div className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft sm:h-96 md:h-[520px]">Loading TikTok...</div>
+                     <div className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] flex items-center justify-center border border-ink/15 bg-paper-warm font-bold text-ink-soft sm:h-96 md:h-[520px]">Loading TikTok...</div>
                   )
                 ) : (
                   <iframe

@@ -47,7 +47,7 @@ const Admin: React.FC = () => {
       }
       setPendingIconFile(null);
     } catch (error) {
-      console.error('Brand icon upload failed:', error);
+      console.error('No se pudo subir el logo:', error);
     } finally {
       setUploadingIcon(false);
     }
@@ -61,13 +61,13 @@ const Admin: React.FC = () => {
   }, [locale]);
 
   return (
-    <div className="min-h-screen bg-slate-100 py-8">
+    <div className="min-h-screen bg-paper-warm py-8">
       <div className="container mx-auto space-y-8 px-4">
         {/* Admin Navigation */}
-        <div className="rounded-3xl bg-white p-4 md:p-6 shadow-lg">
+        <div className="rounded-3xl bg-paper-card p-4 md:p-6 shadow-lg">
           <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full overflow-hidden bg-slate-100 ring-1 ring-slate-200">
+              <div className="h-12 w-12 rounded-full overflow-hidden bg-paper-warm ring-1 ring-slate-200">
                 {brandSettings.brandicon ? (
                   <img
                     src={brandSettings.brandicon}
@@ -75,35 +75,35 @@ const Admin: React.FC = () => {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-slate-500 text-xs uppercase tracking-[.2em]">
+                  <div className="flex h-full w-full items-center justify-center text-ink-light text-xs uppercase tracking-[.2em]">
                     Logo
                   </div>
                 )}
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Admin Dashboard</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-ink">Panel de administración</h1>
             </div>
           </div>
         </div>
 
         {/* Brand Settings Section */}
         {activeSection === 'brand' && (
-          <div className="rounded-3xl bg-white p-6 shadow-lg">
-            <h2 className="mb-4 text-2xl font-bold text-slate-900">Brand Settings</h2>
+          <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
+            <h2 className="mb-4 text-2xl font-bold text-ink">Datos del negocio</h2>
             {editingBrand ? (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Brand Icon</label>
+                  <label className="block text-sm font-semibold text-ink-soft mb-2">Logo del negocio</label>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <div className="h-20 w-20 rounded-full overflow-hidden bg-slate-100 ring-1 ring-slate-200">
+                    <div className="h-20 w-20 rounded-full overflow-hidden bg-paper-warm ring-1 ring-slate-200">
                       {brandSettings.brandicon ? (
                         <img
                           src={brandSettings.brandicon}
-                          alt="Brand icon preview"
+                          alt="Vista previa del logo"
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center text-slate-500 text-xs uppercase tracking-[.2em]">
-                          No icon
+                        <div className="flex h-full w-full items-center justify-center text-ink-light text-xs uppercase tracking-[.2em]">
+                          Sin logo
                         </div>
                       )}
                     </div>
@@ -112,11 +112,11 @@ const Admin: React.FC = () => {
                         type="button"
                         onClick={triggerBrandIconUpload}
                         disabled={uploadingIcon}
-                        className="inline-flex items-center justify-center rounded-full bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700 disabled:bg-teal-400"
+                        className="inline-flex items-center justify-center rounded-full bg-sea-deep px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0f4f59] disabled:bg-sea"
                       >
-                        {uploadingIcon ? 'Uploading…' : 'Upload Brand Icon'}
+                        {uploadingIcon ? 'Subiendo…' : 'Subir logo'}
                       </button>
-                      <p className="text-xs text-slate-500">Upload a square logo or brand image to use in the admin menu and site header.</p>
+                      <p className="text-xs text-ink-light">Sube un logo cuadrado para usarlo en el menú del panel y en la cabecera del sitio.</p>
                     </div>
                   </div>
                   <input
@@ -141,29 +141,29 @@ const Admin: React.FC = () => {
                   type="text"
                   value={brandSettings.brandName}
                   onChange={(event) => setBrandSettings({ ...brandSettings, brandName: event.target.value })}
-                  placeholder="Brand Name"
-                  className="rounded-2xl border border-slate-200 px-4 py-3"
+                  placeholder="Nombre del negocio"
+                  className="rounded-2xl border border-ink/15 px-4 py-3"
                 />
                 <input
                   type="text"
                   value={brandSettings.phoneNumber}
                   onChange={(event) => setBrandSettings({ ...brandSettings, phoneNumber: event.target.value })}
-                  placeholder="Phone Number"
-                  className="rounded-2xl border border-slate-200 px-4 py-3"
+                  placeholder="Número de teléfono"
+                  className="rounded-2xl border border-ink/15 px-4 py-3"
                 />
                 <input
                   type="text"
                   value={brandSettings.paypalMeLink}
                   onChange={(event) => setBrandSettings({ ...brandSettings, paypalMeLink: event.target.value })}
-                  placeholder="PayPal link"
-                  className="rounded-2xl border border-slate-200 px-4 py-3 md:col-span-2"
+                  placeholder="Enlace de PayPal"
+                  className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
                 />
                 <input
                   type="text"
                   value={brandSettings.verifoneLink}
                   onChange={(event) => setBrandSettings({ ...brandSettings, verifoneLink: event.target.value })}
-                  placeholder="Verifone link"
-                  className="rounded-2xl border border-slate-200 px-4 py-3 md:col-span-2"
+                  placeholder="Enlace de Verifone"
+                  className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
                 />
                 <div className="flex gap-3">
                   <button
@@ -171,38 +171,38 @@ const Admin: React.FC = () => {
                       await saveBrandSettings(brandSettings);
                       setEditingBrand(false);
                     }}
-                    className="rounded-full bg-teal-600 px-5 py-2 font-semibold text-white"
+                    className="rounded-full bg-sea-deep px-5 py-2 font-semibold text-white"
                   >
-                    Save
+                    Guardar
                   </button>
                   <button
                     onClick={() => setEditingBrand(false)}
-                    className="rounded-full bg-slate-200 px-5 py-2 font-semibold text-slate-800"
+                    className="rounded-full bg-paper-deep px-5 py-2 font-semibold text-ink"
                   >
-                    Cancel
+                    Cancelar
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 text-slate-700">
+              <div className="space-y-4 text-ink-soft">
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full overflow-hidden bg-slate-100 ring-1 ring-slate-200">
+                  <div className="h-12 w-12 rounded-full overflow-hidden bg-paper-warm ring-1 ring-slate-200">
                     {brandSettings.brandicon ? (
-                      <img src={brandSettings.brandicon} alt="Brand icon" className="h-full w-full object-cover" />
+                      <img src={brandSettings.brandicon} alt="Logo del negocio" className="h-full w-full object-cover" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-slate-500 text-xs uppercase tracking-[.2em]">
-                        No icon
+                      <div className="flex h-full w-full items-center justify-center text-ink-light text-xs uppercase tracking-[.2em]">
+                        Sin logo
                       </div>
                     )}
                   </div>
-                  <span className="text-sm font-semibold text-slate-700">Top-left admin menu icon</span>
+                  <span className="text-sm font-semibold text-ink-soft">Icono del menú, arriba a la izquierda</span>
                 </div>
-                <p><strong>Brand:</strong> {brandSettings.brandName}</p>
-                <p><strong>Phone:</strong> {brandSettings.phoneNumber}</p>
+                <p><strong>Negocio:</strong> {brandSettings.brandName}</p>
+                <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>
                 <p><strong>Verifone:</strong> {brandSettings.verifoneLink || '—'}</p>
-                <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-blue-600 px-5 py-2 font-semibold text-white">
-                  Edit Brand Settings
+                <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-sea-deep px-5 py-2 font-semibold text-white">
+                  Editar datos del negocio
                 </button>
               </div>
             )}
@@ -215,30 +215,23 @@ const Admin: React.FC = () => {
         {/* Tours Admin Section */}
         {activeSection === 'tours' && (
           <ServiceAdminPanel
-            title="Tours Admin"
+            title="Excursiones"
             category="tours"
             services={tours}
             setServices={setTours}
             loadServices={loadTours}
             saveServices={(services) => saveTours(services, locale)}
             siblingAdminPath="/admin/transport"
-            siblingAdminLabel="Go to Transport Admin"
+            siblingAdminLabel="Ir a Transporte"
           />
-        )}
-
-        {/* Transport Admin Section */}
-        {activeSection === 'transport' && (
-          <div className="rounded-3xl bg-white p-6 shadow-lg">
-            <p className="text-slate-600">Transport Admin Section (navigate from Tours Admin)</p>
-          </div>
         )}
 
         {/* TikTok Videos Admin Panel */}
         {activeSection === 'tiktok' && (
-          <div className="rounded-3xl bg-white p-8 shadow-lg">
+          <div className="rounded-3xl bg-paper-card p-8 shadow-lg">
             <div className="mb-6 flex items-center gap-3">
               <FaVideo className="text-3xl text-pink-600" />
-              <h2 className="text-2xl font-bold text-slate-900">TikTok Videos Admin</h2>
+              <h2 className="text-2xl font-bold text-ink">Videos de TikTok</h2>
             </div>
             <TikTokAdmin />
           </div>
@@ -246,10 +239,10 @@ const Admin: React.FC = () => {
 
         {/* Social Media Admin Panel */}
         {activeSection === 'social' && (
-          <div className="rounded-3xl bg-white p-8 shadow-lg">
+          <div className="rounded-3xl bg-paper-card p-8 shadow-lg">
             <div className="mb-6 flex items-center gap-3">
               <FaShareAlt className="text-3xl text-blue-600" />
-              <h2 className="text-2xl font-bold text-slate-900">Social Media Management</h2>
+              <h2 className="text-2xl font-bold text-ink">Redes sociales</h2>
             </div>
             <SocialMediaAdmin />
           </div>
@@ -257,14 +250,14 @@ const Admin: React.FC = () => {
 
         {/* AI Settings Section */}
         {activeSection === 'aiSettings' && (
-          <div className="rounded-3xl bg-white p-6 shadow-lg">
+          <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
             <AIAssistantAdmin />
           </div>
         )}
 
         {/* AI Blog Gen Section */}
         {activeSection === 'aiBlogGen' && (
-          <div className="rounded-3xl bg-slate-50 p-6 shadow-lg border border-slate-200">
+          <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
             <AIBlogGenAdmin />
           </div>
         )}

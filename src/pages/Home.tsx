@@ -15,7 +15,10 @@ import { getIntroStoryPreferred, StoryData } from '../services/introStoryService
 import { useBlog } from '../contexts/BlogContext';
 import QuickFacts from '../components/home/QuickFacts';
 import PathwaysSection from '../components/home/PathwaysSection';
+import DestinationStrip from '../components/home/DestinationStrip';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
+import Reveal from '../components/ui/Reveal';
+import { SnorkelMask, Monstera, TransferVan } from '../components/ui/Illustrations';
 
 const HERO_BACKGROUND_IMAGE = '/imgs/tours/tour_saona_island_detail_12.jpg';
 const HERO_BACKGROUND_VIDEO = '/buggy.mp4';
@@ -83,6 +86,10 @@ const Home: React.FC = () => {
       {/* Hard facts, straight from the live catalogue */}
       <QuickFacts />
 
+      {/* Where the excursions actually go — read from the catalogue, so it can
+          never advertise a destination the business does not sell. */}
+      <DestinationStrip />
+
       {seoArticles.length > 0 && (
         <section aria-hidden="true" style={hiddenBlogStyle}>
           <h2>{locale === 'es' ? 'Blog' : 'Blog'}</h2>
@@ -128,7 +135,7 @@ const Home: React.FC = () => {
                       <div className="section-icon mx-auto mb-5">
                         {section.emoji}
                       </div>
-                      <h2 className="scribble-title-bg mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
+                      <h2 className="scribble-title-bg mb-4 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl md:text-5xl">
                         {section.title}
                       </h2>
                       <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold leading-8 text-ink-soft sm:text-xl">
@@ -174,7 +181,7 @@ const Home: React.FC = () => {
       {!storyData ? null : storyData.callToActions && storyData.callToActions.length > 0 ? (
         <section className="home-section sunset-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <h2 className="mb-6 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl md:text-6xl">
               {storyData.storyTitle || 'Ready for Your Perfect Day in Paradise?'}
             </h2>
             {storyData.storyTagline && (
@@ -206,11 +213,15 @@ const Home: React.FC = () => {
       ) : (
         <section className="home-section sunset-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
-              Ready for Your Perfect Day in Paradise?
+            <h2 className="mb-6 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl md:text-6xl">
+              {locale === 'es'
+                ? '¿Listo para tu día perfecto en el Caribe?'
+                : 'Ready for your perfect day in the Caribbean?'}
             </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
-              Your adventure is just one click away. Contact us on WhatsApp or choose your adventure below.
+            <p className="mx-auto mb-8 max-w-2xl text-lg leading-8 text-white sm:text-xl">
+              {locale === 'es'
+                ? 'Escríbenos por WhatsApp y armamos el día contigo, o mira las excursiones aquí abajo.'
+                : 'Message us on WhatsApp and we will put the day together with you, or browse the excursions below.'}
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <button
@@ -225,9 +236,9 @@ const Home: React.FC = () => {
                     '_blank'
                   );
                 }}
-                className="tropical-button"
+                className="tropical-button btn-whatsapp"
               >
-                Chat on WhatsApp
+                {locale === 'es' ? 'Escribir por WhatsApp' : 'Chat on WhatsApp'}
               </button>
               <button
                 onMouseEnter={() => playHoverFx()}
@@ -237,7 +248,7 @@ const Home: React.FC = () => {
                 }}
                 className="tropical-button-outline"
               >
-                View Adventures
+                {locale === 'es' ? 'Ver excursiones' : 'View excursions'}
               </button>
             </div>
           </div>
@@ -251,47 +262,49 @@ const Home: React.FC = () => {
       <section className="home-section reef-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
-            <h2 className="mb-4 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <h2 className="mb-4 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl md:text-6xl">
               <FormattedMessage id="features.title" />
             </h2>
-            <p className="text-lg font-bold leading-8 text-white sm:text-xl">
-              Thoughtful service from arrival to return with {brandSettings.brandName}
+            <p className="text-lg leading-8 text-white sm:text-xl">
+              {locale === 'es'
+                ? `Servicio cuidado de principio a fin con ${brandSettings.brandName}`
+                : `Thoughtful service from arrival to return with ${brandSettings.brandName}`}
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
             {/* Safety First */}
-            <div className="home-feature-card group p-8 animate-wave-sway-1">
-              <div className="text-5xl mb-4">🛡️</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+            <Reveal className="home-feature-card group p-8">
+              <SnorkelMask className="mb-4 h-12 w-14" />
+              <h3 className="mb-3 font-display text-2xl font-semibold text-ink">
                 <FormattedMessage id="features.safety.title" />
               </h3>
               <p className="font-semibold text-ink-soft">
                 <FormattedMessage id="features.safety.description" />
               </p>
-            </div>
+            </Reveal>
 
             {/* Curated Experiences */}
-            <div className="home-feature-card group p-8 animate-wave-sway-2">
-              <div className="text-5xl mb-4">🌿</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+            <Reveal delay={80} className="home-feature-card group p-8">
+              <Monstera className="mb-4 h-12 w-12" />
+              <h3 className="mb-3 font-display text-2xl font-semibold text-ink">
                 <FormattedMessage id="features.experiences.title" />
               </h3>
               <p className="font-semibold text-ink-soft">
                 <FormattedMessage id="features.experiences.description" />
               </p>
-            </div>
+            </Reveal>
 
             {/* Transportation */}
-            <div className="home-feature-card group p-8 animate-wave-sway-3">
-              <div className="text-5xl mb-4">🚗</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+            <Reveal delay={160} className="home-feature-card group p-8">
+              <TransferVan className="mb-4 h-12 w-16" />
+              <h3 className="mb-3 font-display text-2xl font-semibold text-ink">
                 <FormattedMessage id="features.transportation.title" />
               </h3>
               <p className="font-semibold text-ink-soft">
                 <FormattedMessage id="features.transportation.description" />
               </p>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>

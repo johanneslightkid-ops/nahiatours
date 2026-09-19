@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { FaPlayCircle, FaMapPin, FaClock, FaUsers } from 'react-icons/fa';
 import { useBrand } from '../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
+import { useIntl } from 'react-intl';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
+import Reveal from './ui/Reveal';
 
 interface Adventure {
   id: string;
@@ -31,8 +33,9 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
   const [showVideo, setShowVideo] = useState(false);
   const navigate = useNavigate();
   const { brandSettings } = useBrand();
+  const intl = useIntl();
+  const isEs = intl.locale === 'es';
   const whatsappPhone = brandSettings.phoneNumber || '+18095553333';
-  const swayClass = `animate-wave-sway-${(index % 10) + 1}`;
 
   const handleWhatsAppClick = () => {
     playClickFx();
@@ -51,23 +54,22 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
     navigate(detailPaths[adventure.id] || '/tours');
   };
 
-  const radiusClass = index % 3 === 0
-    ? 'rounded-[30px_20px_28px_22px]'
-    : index % 3 === 1
-    ? 'rounded-[22px_30px_20px_28px]'
-    : 'rounded-[28px_20px_30px_18px]';
-
   return (
-    <div
-      onMouseEnter={() => playHoverFx()}
-      className={`group flex h-full flex-col overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
+    <Reveal
+      delay={Math.min(index, 3) * 80}
+      className="postcard group flex h-full flex-col overflow-hidden"
     >
+      <div onMouseEnter={() => playHoverFx()} className="contents">
       {/* Image container */}
-      <div className="relative h-60 overflow-hidden border-b-[2.5px] border-ink bg-paper-warm sm:h-64 md:h-80">
+      <div className="relative h-60 overflow-hidden bg-paper-warm sm:h-64 md:h-72">
         <img
           src={adventure.imageUrl}
           alt={adventure.title}
-          className="photo-pop h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          width={640}
+          height={420}
+          loading="lazy"
+          decoding="async"
+          className="photo-pop h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.05]"
         />
         {/* Ink wash on hover, so the play button has something to sit against */}
         <div className="absolute inset-0 bg-ink/45 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -85,8 +87,8 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
           </button>
         )}
 
-        {/* Emoji badge */}
-        <div className="absolute right-4 top-4 rotate-3 rounded-full border-[2.5px] border-ink bg-mango-light p-3 text-3xl leading-none shadow-ink-sm">
+        {/* The section's own mark, on a paper disc rather than a sticker. */}
+        <div className="absolute right-4 top-4 grid h-12 w-12 place-items-center rounded-full bg-paper-card/90 text-2xl leading-none shadow-ink-sm">
           {adventure.emoji}
         </div>
       </div>
@@ -108,16 +110,16 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
               playClickFx();
               setShowVideo(false);
             }}
-            className="absolute right-2 top-2 z-10 rounded-full border-2 border-ink bg-hibiscus px-3 py-1 text-xs font-extrabold text-white"
+            className="absolute right-2 top-2 z-10 rounded-full bg-ink/80 px-3 py-1 text-xs font-bold text-paper"
           >
-            Close Video
+            {isEs ? 'Cerrar vídeo' : 'Close video'}
           </button>
         </div>
       )}
 
       {/* Content */}
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <h3 className="mb-3 font-display text-2xl font-extrabold leading-tight text-ink">{adventure.title}</h3>
+        <h3 className="mb-3 font-display text-2xl font-semibold leading-tight text-ink">{adventure.title}</h3>
 
         {/* Quick info */}
         <div className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-bold uppercase tracking-wider">
@@ -132,7 +134,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
         </div>
 
         {/* Description */}
-        <p className="mb-4 flex-1 font-semibold italic leading-relaxed text-ink-soft">{adventure.description}</p>
+        <p className="mb-4 flex-1 leading-relaxed text-ink-soft">{adventure.description}</p>
 
         {/* Expandable section */}
         <div
@@ -142,13 +144,13 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
         >
           <div className="mt-4 border-t-2 border-dashed border-ink/25 pt-4">
             <div className="mb-4">
-              <h4 className="mb-2 font-display font-extrabold text-ink">
+              <h4 className="mb-2 font-display font-semibold text-ink">
                 <FormattedMessage id="story.highlights" />
               </h4>
               <ul className="space-y-2">
                 {adventure.highlights.map((highlight, idx) => (
                   <li key={idx} className="flex gap-2 text-sm font-semibold text-ink-soft">
-                    <span className="font-extrabold text-jungle">✓</span>
+                    <span className="font-semibold text-jungle">✓</span>
                     <span>{highlight}</span>
                   </li>
                 ))}
@@ -156,7 +158,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
             </div>
 
             <div className="mb-4">
-              <h4 className="mb-2 font-display font-extrabold text-ink">
+              <h4 className="mb-2 font-display font-semibold text-ink">
                 <FormattedMessage id="story.bestFor" />
               </h4>
               <p className="text-sm font-semibold text-ink-soft">{adventure.bestFor}</p>
@@ -166,7 +168,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
               {adventure.mood.split(', ').map((mood, idx) => (
                 <span
                   key={idx}
-                  className="rounded-full border-2 border-ink bg-lagoon-light px-3 py-1 text-xs font-extrabold text-ink"
+                  className="rounded-full border border-ink/15 bg-lagoon-light px-3 py-1 text-xs font-semibold text-ink"
                 >
                   {mood}
                 </span>
@@ -182,26 +184,27 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
               playClickFx();
               setIsExpanded(!isExpanded);
             }}
-            className="flex-1 rounded-full border-[2.5px] border-ink bg-paper px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-lagoon-light"
+            className="flex-1 rounded-full border border-ink/20 px-4 py-2.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-ink-soft transition hover:border-sea hover:text-ink"
           >
-            {isExpanded ? 'Show Less' : 'Details'}
+            {isExpanded ? (isEs ? 'Ver menos' : 'Show less') : isEs ? 'Detalles' : 'Details'}
           </button>
           <button
             onClick={handleWhatsAppClick}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-mango px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-mango-light"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-jungle-dark px-4 py-2.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-paper transition hover:-translate-y-0.5 hover:bg-[#1a3f33]"
           >
-            <FaMapPin className="text-base" />
-            Book Now
+            <FaMapPin className="text-sm" />
+            {isEs ? 'Reservar' : 'Book now'}
           </button>
           <button
             onClick={handleShowDetails}
-            className="flex flex-1 items-center justify-center rounded-full border-[2.5px] border-ink bg-paper px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-hibiscus-light"
+            className="flex flex-1 items-center justify-center rounded-full border border-ink/20 px-4 py-2.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-ink-soft transition hover:border-coral hover:text-coral-deep"
           >
-            All Details
+            {isEs ? 'Ver todo' : 'Full details'}
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </Reveal>
   );
 };
 

@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiArrowRight, HiSparkles } from 'react-icons/hi';
 import { FaWhatsapp } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import Reveal from '../ui/Reveal';
+import { Shell, Island } from '../ui/Illustrations';
 import { useI18n } from '../../contexts/I18nContext';
 import { useBrand } from '../../contexts/BrandContext';
 import { usePlanner } from '../../contexts/PlannerContext';
@@ -71,25 +72,21 @@ const PathwaysSection: React.FC = () => {
 
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="artsy-brick-badge-inverted mb-5 inline-flex">{copy.eyebrow}</span>
-          <h2 className="mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
+          <div className="mb-5 flex justify-center">
+            <span className="hand-note">{copy.eyebrow}</span>
+          </div>
+          <h2 className="mb-4 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl md:text-[2.9rem]">
             {copy.title}
           </h2>
-          <p className="text-lg font-semibold leading-8 text-ink-soft">{copy.subtitle}</p>
+          <p className="text-lg leading-8 text-ink-soft">{copy.subtitle}</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Manual mode */}
-          <motion.div
-            initial={{ opacity: 0, y: 26 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="pathway-card flex flex-col p-8 sm:p-10"
-          >
-            <span className="text-4xl">🗂️</span>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-ink">{copy.catalogueTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-ink-soft">{copy.catalogueText}</p>
+          <Reveal className="pathway-card flex flex-col p-8 sm:p-10">
+            <Shell className="h-12 w-12 opacity-90" />
+            <h3 className="mt-5 font-display text-2xl font-semibold text-ink">{copy.catalogueTitle}</h3>
+            <p className="mt-3 flex-1 leading-relaxed text-ink-soft">{copy.catalogueText}</p>
             <Link
               to="/tours#top"
               onClick={() => playClickFx()}
@@ -98,24 +95,18 @@ const PathwaysSection: React.FC = () => {
             >
               {copy.catalogueCta} <HiArrowRight className="ml-2 h-4 w-4" />
             </Link>
-          </motion.div>
+          </Reveal>
 
           {/* Guided mode */}
-          <motion.div
-            initial={{ opacity: 0, y: 26 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="pathway-card pathway-card-dark flex flex-col p-8 sm:p-10"
-          >
+          <Reveal delay={90} className="pathway-card pathway-card-dark flex flex-col p-8 sm:p-10">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-4xl">🧭</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-mango-light px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-ink">
+              <Island className="h-12 w-20 opacity-90" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-paper/35 px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-sun-light">
                 <HiSparkles className="h-3 w-3" /> {copy.plannerBadge}
               </span>
             </div>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-paper">{copy.plannerTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-paper/85">{copy.plannerText}</p>
+            <h3 className="mt-5 font-display text-2xl font-semibold text-paper">{copy.plannerTitle}</h3>
+            <p className="mt-3 flex-1 leading-relaxed text-paper/85">{copy.plannerText}</p>
             <Link
               to="/plan#top"
               onClick={() => playClickFx()}
@@ -124,7 +115,7 @@ const PathwaysSection: React.FC = () => {
             >
               {copy.plannerCta} <HiArrowRight className="h-4 w-4" />
             </Link>
-          </motion.div>
+          </Reveal>
         </div>
 
         <div className="mt-10 flex flex-col items-center gap-3">

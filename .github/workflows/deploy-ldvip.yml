@@ -1,0 +1,248 @@
+# Deploys the LD VIP design to its own Cloudflare Worker, seeded with a copy of
+# production's data.
+#
+# This is a SEPARATE SITE out of the same repository, not a change to any
+# existing one. `nahiatours` is production at nahia.tours, `beautifull` and
+# `transporturist` are earlier designs, and this is the watercolour one.
+#
+# Three things keep it away from the live site, and all three would have to
+# fail at once for a run here to touch it:
+#
+#   • wrangler.toml on this branch names the Worker `ldvip`, and
+#     `wrangler deploy` addresses a Worker by name — never by id;
+#   • this workflow only runs on the `ldvip` branch;
+#   • the KV namespace is `ldvip-data`, created by this run.
+#
+# THE DATA is a copy, taken once at deploy time. scripts/clone-kv.mjs reads
+# every key out of `nahiatours-data` and writes it into `ldvip-data`, so the
+# new site opens with the real catalogue rather than the seed JSON — and from
+# that moment the two namespaces are independent. Editing a tour here cannot
+# reach the live site, and vice versa.
+#
+# The source namespace is PINNED rather than guessed. clone-kv.mjs used to take
+# "the newest namespace that is not the destination", which was fine on an
+# account with two of them and wrong on this one: the guess had drifted onto an
+# unrelated project and was copying a stranger's documents into the site on
+# every deploy.
+#
+# THE TOKEN comes from a repository secret, and falls back to a
+# workflow_dispatch input for a one-off run when no secret exists yet. The
+# input is masked on the first line of the job, but GitHub records dispatch
+# inputs against the run itself, where the log mask does not reach — so the
+# secret is the right home for anything long-lived, and a token passed as an
+# input should be rotated afterwards.
+#
+# The secret needs:
+#   • Workers Scripts: Edit    — to deploy
+#   • Workers KV Storage: Edit — to create `ldvip-data` and fill it
+# Add it under Settings → Secrets and variables → Actions. If the token can see
+# more than one Cloudflare account, add CLOUDFLARE_ACCOUNT_ID too.
+
+name: Deploy LD VIP
+
+# `push` is the trigger that matters, and not only because every push to this
+# branch should redeploy it. GitHub registers a `workflow_dispatch` workflow
+# only once its file has appeared on the DEFAULT branch — and `main` carries no
+# .github/workflows at all, so a dispatch-only workflow here is invisible to
+# the API and to the Actions UI: the dispatch endpoint answers 404 and nothing
+# ever runs. A push-triggered workflow has no such requirement; it runs from
+# whichever branch it lives on. So this branch deploys itself on push, and the
+# manual dispatch below only becomes usable once this file reaches main.
+on:
+  push:
+    branches: [ldvip]
+  workflow_dispatch:
+    inputs:
+      cloudflare_api_token:
+        description: >-
+          One-off Cloudflare API token (Workers Scripts: Edit + Workers KV
+          Storage: Edit). Leave empty to use the CLOUDFLARE_API_TOKEN secret.
+          Rotate any token passed this way once the deploy is done.
+        required: false
+        default: ''
+      source_kv_title:
+        description: >-
+          Title of the KV namespace to copy data from. Leave empty to use
+          nahiatours-data, the production site this design is a copy of.
+        required: false
+        default: ''
+      skip_kv_clone:
+        description: 'Deploy without copying KV data (the site falls back to /data/*.json)'
+        required: false
+        type: boolean
+        default: false
+
+# One deploy at a time; a newer run supersedes an in-flight one.
+concurrency:
+  group: deploy-ldvip
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Job-level env, not per-step: the `secrets` context is not available in a
+    # step's `if`, but `env` is. wrangler, provision-kv.mjs and clone-kv.mjs
+    # all read these names directly, so nothing else has to pass them along.
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN || inputs.cloudflare_api_token }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      KV_NAMESPACE_TITLE: ldvip-data
+      SOURCE_KV_TITLE: ${{ inputs.source_kv_title || 'nahiatours-data' }}
+      # So the sitemap, canonical URLs and OpenGraph tags point at this
+      # deployment rather than at production's domain. Override it with a
+      # repository variable once this design has a domain of its own.
+      SITE_URL: ${{ vars.LDVIP_SITE_URL || 'https://ldvip.johannes-neugschwentner.workers.dev' }}
+
+    steps:
+      # First thing in the job, before the token can reach any other output:
+      # a token that arrived as an input is not automatically a registered
+      # secret, so ask the runner to redact it from every subsequent log line.
+      - name: Mask the token
+        run: echo "::add-mask::${{ inputs.cloudflare_api_token }}"
+        if: inputs.cloudflare_api_token != ''
+
+      # Unlike the ld-vip workflow, this one FAILS without a token rather than
+      # skipping in green. That workflow was an optional second path alongside
+      # Cloudflare Workers Builds; this branch has no other way to ship, so a
+      # silent green here would be a lie.
+      - name: Require a token
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: |
+          echo "::error::No Cloudflare API token."
+          echo "Add CLOUDFLARE_API_TOKEN under Settings → Secrets and variables →"
+          echo "Actions (Workers Scripts: Edit + Workers KV Storage: Edit), or pass"
+          echo "one as the cloudflare_api_token input when dispatching this workflow."
+          exit 1
+
+      # Everything downstream reads the token from the environment — my two
+      # scripts and wrangler-action alike — so trim it in one place rather than
+      # in each of them. A secret pasted with a trailing newline builds an
+      # Authorization header Cloudflare rejects with 6003 before it ever looks
+      # at what the token is allowed to do, and wrangler fails the same way.
+      # Re-masking is required: the trimmed string is a different string from
+      # the registered secret, so the automatic redaction does not cover it.
+      - name: Normalize the token
+        run: |
+          clean="$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '[:space:]')"
+          echo "::add-mask::$clean"
+          echo "CLOUDFLARE_API_TOKEN=$clean" >> "$GITHUB_ENV"
+          echo "CLOUDFLARE_ACCOUNT_ID=$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+
+          # Enough to identify a mis-pasted credential without printing one.
+          # Which secret supplied it matters: the env expression falls back to
+          # CF_API_TOKEN, so a stale secret under that name is used silently
+          # whenever CLOUDFLARE_API_TOKEN is missing.
+          if   [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then src="CLOUDFLARE_API_TOKEN"
+          elif [ -n "${{ secrets.CF_API_TOKEN }}" ];         then src="CF_API_TOKEN (fallback — is this stale?)"
+          elif [ -n "${{ inputs.cloudflare_api_token }}" ];  then src="the workflow_dispatch input"
+          else src="nowhere"; fi
+          echo "Supplied by:  $src"
+          echo "Length:       ${#clean} (a Cloudflare API token here should be 53)"
+
+          case "$clean" in
+            cfut_*) echo "Prefix:       starts with cfut_, as expected" ;;
+            *)      echo "Prefix:       does NOT start with cfut_ — wrong value or wrapped" ;;
+          esac
+
+          # Only the offending punctuation is printed, never its context.
+          bad="$(printf '%s' "$clean" | tr -d 'A-Za-z0-9_.-' | fold -w1 | sort -u | tr -d '\n')"
+          if [ -n "$bad" ]; then
+            echo "Stray chars:  [$bad] — an API token contains none of these."
+            echo "              Quotes, angle brackets or backticks here mean the value"
+            echo "              was pasted with wrapping. Re-add the secret as the bare"
+            echo "              token, nothing around it."
+          else
+            echo "Stray chars:  none"
+          fi
+
+      - uses: actions/checkout@v4
+
+      # A deploy that reached the wrong Worker would be the one unrecoverable
+      # mistake here, so the name is asserted before anything is uploaded
+      # rather than read out of the log afterwards.
+      - name: Check this branch deploys to ldvip
+        run: |
+          name="$(grep -m1 '^name *= *' wrangler.toml | sed 's/.*= *"\(.*\)"/\1/')"
+          echo "wrangler.toml names the Worker: $name"
+          if [ "$name" != "ldvip" ]; then
+            echo "::error::wrangler.toml names \"$name\", not \"ldvip\". Refusing to deploy."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # .npmrc pins legacy-peer-deps, so a plain `npm ci` is enough.
+      - run: npm ci
+
+      # Create ldvip-data if needed and fill it from the source. This
+      # runs BEFORE the build, because `npm run build` invokes provision-kv.mjs,
+      # which resolves the same namespace title and writes the binding into
+      # wrangler.toml — so by deploy time the binding points at a namespace that
+      # already has the data in it.
+      # Copying the data is a convenience, not the ship. If it fails the site
+      # still serves — reads fall back to the JSON bundled at /data/*.json —
+      # so a naming conflict or a narrowly-scoped token should not stop the
+      # design from deploying. It must stay visible, though: the summary below
+      # says plainly when the copy did not happen, because a green run that
+      # quietly served stale seed data would be the actual lie.
+      #
+      # This is the opposite call from the token check above, deliberately.
+      # Without a token there is no deploy at all; without the copy there is a
+      # working site with different data in it.
+      - name: Clone the KV data
+        id: kv
+        if: inputs.skip_kv_clone != true
+        continue-on-error: true
+        run: node scripts/clone-kv.mjs
+
+      # provision-kv → populate-local-data → sitemap → SEO → vite build.
+      # provision-kv.mjs finds the namespace clone-kv just filled, by title.
+      - name: Build
+        run: npm run build
+
+      - name: Show the resolved KV binding
+        run: |
+          echo "wrangler.toml KV binding after the build:"
+          sed -n '/managed by scripts\/provision-kv/,/<<< managed/p' wrangler.toml
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          # The action defaults to wrangler 3, which does not understand
+          # `run_worker_first` under [assets] and drops it with a warning — the
+          # Worker would then never see requests for paths that match a static
+          # file, so the API routes would stop running. v4 is also what
+          # `npm run deploy` gets from npx.
+          wranglerVersion: '4'
+          # `npm run build` already ran above, and it is what writes the KV
+          # binding into wrangler.toml — so deploy only, never rebuild here.
+          command: deploy
+
+      - name: Report where it landed
+        run: |
+          {
+            echo "### LD VIP deployed"
+            echo ""
+            echo "Worker \`ldvip\`, from branch \`ldvip\` at \`${GITHUB_SHA::7}\`."
+            echo ""
+            if [ "${{ inputs.skip_kv_clone }}" = "true" ]; then
+              echo "KV: not copied (\`skip_kv_clone\`) — reading the bundled \`/data/*.json\`."
+            elif [ "${{ steps.kv.outcome }}" != "success" ]; then
+              echo "> [!WARNING]"
+              echo "> **KV was not copied.** The deploy went ahead and the site is up, but it"
+              echo "> is reading the seed data bundled at \`/data/*.json\`, not the live"
+              echo "> catalogue. See the *Clone the KV data* step for the reason."
+            else
+              echo "KV: ${{ steps.kv.outputs.keys_copied }} key(s) copied from \`${{ steps.kv.outputs.source_title }}\` into \`ldvip-data\` (\`${{ steps.kv.outputs.namespace_id }}\`)."
+            fi
+            echo ""
+            echo "Live at ${SITE_URL}"
+            echo ""
+            echo "nahia.tours is untouched: this run only ever addressed the \`ldvip\` Worker."
+          } >> "$GITHUB_STEP_SUMMARY"

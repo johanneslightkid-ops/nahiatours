@@ -6,6 +6,7 @@ import { useBrand } from '../contexts/BrandContext';
 import { PricingOption, perPersonTier } from '../services/toursService';
 import PaymentDropdown from './ui/PaymentDropdown';
 import MarkdownRenderer from './ui/MarkdownRenderer';
+import Reveal from './ui/Reveal';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
 
 interface TourCardProps {
@@ -38,7 +39,6 @@ const TourCard: React.FC<TourCardProps> = ({
   const intl = useIntl();
   const { brandSettings } = useBrand();
   const brandName = brandSettings.brandName;
-  const swayClass = `animate-wave-sway-${(index % 10) + 1}`;
   const locale = intl.locale === 'es' ? 'es' : 'en';
 
   // Everyone pays the same rate, so a tour has exactly one price and the only
@@ -84,28 +84,36 @@ const TourCard: React.FC<TourCardProps> = ({
     }
   };
 
-  const radiusClass = index % 3 === 0
-    ? 'rounded-[30px_18px_28px_22px]'
-    : index % 3 === 1
-    ? 'rounded-[20px_30px_20px_28px]'
-    : 'rounded-[26px_22px_30px_18px]';
-
   return (
-    <article
-      onMouseEnter={() => playHoverFx()}
-      className={`group mb-8 inline-block flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
+    <Reveal
+      as="article"
+      delay={Math.min(index, 5) * 60}
+      className="postcard group flex h-full w-full flex-col justify-between overflow-hidden"
     >
-      {/* Media Frame */}
-      <div className="relative aspect-[16/10] overflow-hidden border-b-[2.5px] border-ink">
+      <div onMouseEnter={() => playHoverFx()} className="contents">
+      {/* The picture side of the postcard. */}
+      <div className="relative aspect-[16/10] overflow-hidden">
         <Link to={detailsPath} onClick={() => playClickFx()} className="block h-full w-full" aria-label={title}>
           <img
             src={image}
             alt={title}
-            className="photo-pop h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            width={640}
+            height={400}
+            // Below the fold on every page that renders these, so the browser
+            // should not be racing them against the hero.
+            loading="lazy"
+            decoding="async"
+            className="photo-pop h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]"
           />
         </Link>
+        {/* A wash running up from the bottom of the photograph, so the frame
+            hands over to the paper instead of stopping at a hard edge. */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
+          style={{ background: 'linear-gradient(180deg, transparent, rgba(254,250,241,0.85))' }}
+        />
         <div className="artsy-brick-badge absolute left-4 top-4">
-          <span>★ Excursion</span>
+          <span>{locale === 'es' ? 'Excursión' : 'Excursion'}</span>
         </div>
       </div>
 
@@ -114,10 +122,10 @@ const TourCard: React.FC<TourCardProps> = ({
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-lagoon-dark">
-                {brandName} Collection
+              <span className="text-[0.64rem] font-bold uppercase tracking-[0.2em] text-ink-light">
+                {brandName}
               </span>
-              <h3 className="mt-1 font-display text-2xl font-extrabold text-ink">
+              <h3 className="mt-1.5 font-display text-2xl font-semibold leading-tight text-ink">
                 {title}
               </h3>
             </div>
@@ -125,7 +133,7 @@ const TourCard: React.FC<TourCardProps> = ({
               <Link
                 to={detailsPath}
                 onClick={() => playClickFx()}
-                className="shrink-0 text-xs font-extrabold uppercase tracking-wider text-lagoon-dark underline decoration-mango decoration-2 underline-offset-4 transition hover:text-mango-dark"
+                className="shrink-0 text-xs font-semibold uppercase tracking-wider text-lagoon-dark underline decoration-mango decoration-2 underline-offset-4 transition hover:text-mango-dark"
               >
                 <FormattedMessage id="details.view" defaultMessage="View Details" />
               </Link>
@@ -138,8 +146,9 @@ const TourCard: React.FC<TourCardProps> = ({
 
           {showPrice && (
             <div className="flex flex-wrap gap-2 pt-1">
-              <span className="inline-flex items-center rounded-full border-2 border-ink bg-lagoon-light px-3.5 py-1 text-xs font-extrabold text-ink">
-                {rate.tier}: <strong className="ml-1 text-ink">{rate.price}</strong>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-sea-foam px-3.5 py-1 text-xs font-semibold text-sea-deep">
+                {rate.tier}
+                <strong className="font-display text-sm font-semibold text-ink">{rate.price}</strong>
               </span>
             </div>
           )}
@@ -147,8 +156,8 @@ const TourCard: React.FC<TourCardProps> = ({
 
         {enabled && (
           <div className="mt-6 space-y-4 border-t-2 border-dashed border-ink/25 pt-6">
-            <label className="block space-y-1.5 rounded-2xl border-2 border-ink bg-paper p-3 text-left">
-              <span className="block text-xs font-extrabold uppercase tracking-wider text-ink-soft">
+            <label className="block space-y-1.5 rounded-2xl border border-ink/15 bg-paper p-3 text-left">
+              <span className="block text-xs font-semibold uppercase tracking-wider text-ink-soft">
                 {rate.tier}
               </span>
               <input
@@ -156,27 +165,27 @@ const TourCard: React.FC<TourCardProps> = ({
                 min="0"
                 value={persons}
                 onChange={(event) => handlePersonsChange(event.target.value)}
-                className="w-full rounded-xl border-2 border-ink bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none transition focus:bg-lagoon-light"
+                className="w-full rounded-xl border border-ink/15 bg-white px-3 py-1.5 text-sm font-semibold text-ink outline-none transition focus:border-sea"
               />
             </label>
 
             <label className="block space-y-1.5 text-left">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-ink-soft">
+              <span className="text-xs font-semibold uppercase tracking-wider text-ink-soft">
                 <FormattedMessage id="tours.dateLabel" defaultMessage="Preferred Date" />
               </span>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(event) => setSelectedDate(event.target.value)}
-                className="w-full rounded-xl border-2 border-ink bg-white px-4 py-2.5 text-sm font-bold text-ink outline-none transition focus:bg-lagoon-light"
+                className="w-full rounded-xl border border-ink/15 bg-white px-4 py-2.5 text-sm font-bold text-ink outline-none transition focus:border-sea"
               />
             </label>
 
-            <div className="flex items-center justify-between rounded-2xl border-[2.5px] border-ink bg-mango px-5 py-3 shadow-ink-sm">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-ink">
+            <div className="flex items-center justify-between rounded-[14px_11px_16px_10px/11px_16px_10px_15px] bg-mango px-5 py-3">
+              <span className="text-[0.66rem] font-bold uppercase tracking-[0.16em] text-ink">
                 <FormattedMessage id="payment.total" defaultMessage="Total Estimate" />
               </span>
-              <span className="font-display text-xl font-extrabold text-ink">
+              <span className="font-display text-xl font-semibold text-ink">
                 {totalAmount > 0 ? `$${totalAmount} USD` : price}
               </span>
             </div>
@@ -196,7 +205,8 @@ const TourCard: React.FC<TourCardProps> = ({
           </div>
         )}
       </div>
-    </article>
+      </div>
+    </Reveal>
   );
 };
 

@@ -20,10 +20,10 @@ const AIBlogGenAdmin: React.FC = () => {
 
   // Form State
   const [selectedTours, setSelectedTours] = useState<string[]>([]);
-  const [povOrigin, setPovOrigin] = useState('USA');
-  const [povAge, setPovAge] = useState('Adults');
-  const [povGroup, setPovGroup] = useState('Family');
-  const [povGender, setPovGender] = useState('Mixed');
+  const [povOrigin, setPovOrigin] = useState('Estados Unidos');
+  const [povAge, setPovAge] = useState('Adultos');
+  const [povGroup, setPovGroup] = useState('Familia');
+  const [povGender, setPovGender] = useState('Mixto');
   const [povExclusivity, setPovExclusivity] = useState('Standard');
   const [numPosts, setNumPosts] = useState(1);
   const [autoPost, setAutoPost] = useState(false);
@@ -139,7 +139,7 @@ const AIBlogGenAdmin: React.FC = () => {
 
   const handleGenerate = async () => {
     if (!aiSettings || !aiSettings.activeProvider) {
-      alert("Please configure an AI provider in the AI Integrations tab first.");
+      alert("Primero configura un proveedor de IA en la pestaña de Integraciones de IA.");
       return;
     }
 
@@ -181,7 +181,7 @@ const AIBlogGenAdmin: React.FC = () => {
       setGeneratedPosts(newPosts);
     } catch (error) {
       console.error(error);
-      alert("Failed to generate blog posts. Please check AI settings and console.");
+      alert("No se pudieron generar las entradas. Revisa la configuración de IA y la consola.");
     } finally {
       setLoading(false);
     }
@@ -202,7 +202,7 @@ const AIBlogGenAdmin: React.FC = () => {
       const data = await res.json();
       return data.secure_url || '';
     } catch (e) {
-      console.error('Upload failed', e);
+      console.error('No se pudo subir el archivo', e);
       return '';
     }
   };
@@ -231,7 +231,7 @@ const AIBlogGenAdmin: React.FC = () => {
         });
       }
     } catch (e) {
-      console.error('Social Publish failed', e);
+      console.error('No se pudo publicar en redes', e);
     }
   };
 
@@ -273,13 +273,13 @@ const AIBlogGenAdmin: React.FC = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert('Copied to clipboard!');
+    alert('¡Copiado al portapapeles!');
   };
 
   return (
     <div className="w-full space-y-8">
-      <h2 className="text-3xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-        <FaMagic className="text-purple-600" /> AI Blog Generator
+      <h2 className="text-3xl font-bold text-ink mb-6 flex items-center gap-3">
+        <FaMagic className="text-purple-600" /> Generador de blog con IA
       </h2>
 
       <div className="grid lg:grid-cols-2 gap-8">
@@ -288,88 +288,88 @@ const AIBlogGenAdmin: React.FC = () => {
           
           {/* Media & Voice */}
           <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Content Input</h3>
+            <h3 className="text-lg font-bold text-ink mb-4">Contenido de partida</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Voice Dictation (Notes)</label>
+                <label className="block text-sm font-semibold text-ink-soft mb-2">Dictado por voz (notas)</label>
                 <div className="flex gap-2 mb-2">
                   <button 
                     onClick={toggleRecording}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-white transition ${isRecording ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-blue-500 hover:bg-blue-600'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-white transition ${isRecording ? 'bg-red-500 hover:bg-coral-deep animate-pulse' : 'bg-blue-500 hover:bg-sea-deep'}`}
                   >
-                    {isRecording ? <><FaStop /> Stop Recording</> : <><FaMicrophone /> Start Mic</>}
+                    {isRecording ? <><FaStop /> Detener grabación</> : <><FaMicrophone /> Activar micrófono</>}
                   </button>
                 </div>
                 <textarea
                   value={voiceTranscript}
                   onChange={(e) => setVoiceTranscript(e.target.value)}
-                  placeholder="Speak or type your notes here..."
-                  className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500 h-24"
+                  placeholder="Habla o escribe tus notas aquí..."
+                  className="w-full p-3 rounded-xl border border-ink/15 focus:ring-2 focus:ring-purple-500 h-24"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Media Upload</label>
+                <label className="block text-sm font-semibold text-ink-soft mb-2">Subir archivo</label>
                 <div className="flex items-center gap-4">
-                  <label className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg cursor-pointer transition">
-                    <FaUpload /> Select Image/Video
+                  <label className="flex items-center gap-2 px-4 py-2 bg-paper-warm hover:bg-paper-deep text-ink-soft font-bold rounded-lg cursor-pointer transition">
+                    <FaUpload /> Elegir imagen o video
                     <input type="file" accept="image/*,video/*" className="hidden" onChange={handleMediaUpload} />
                   </label>
-                  {mediaBase64 && <span className="text-sm text-green-600 font-bold flex items-center gap-1"><FaCheck /> Media attached</span>}
+                  {mediaBase64 && <span className="text-sm text-green-600 font-bold flex items-center gap-1"><FaCheck /> Archivo adjunto</span>}
                 </div>
-                <p className="text-xs text-slate-500 mt-2">Connecting to Social Media directly is coming soon. For now, download from Facebook/Instagram and upload here.</p>
+                <p className="text-xs text-ink-light mt-2">La conexión directa con las redes sociales llegará pronto. Por ahora, descarga el archivo de Facebook o Instagram y súbelo aquí.</p>
               </div>
             </div>
           </div>
 
           {/* POV & Tours */}
           <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Target Audience (POV) & Subject</h3>
+            <h3 className="text-lg font-bold text-ink mb-4">Público al que le hablas y tema</h3>
             
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Origin</label>
-                <select value={povOrigin} onChange={e=>setPovOrigin(e.target.value)} className="w-full p-2 rounded-lg border border-slate-200">
-                  <option>USA</option><option>Canada</option><option>Latin America</option><option>Europe</option><option>Asia</option>
+                <label className="block text-xs font-semibold text-ink-light uppercase tracking-wide mb-1">Procedencia</label>
+                <select value={povOrigin} onChange={e=>setPovOrigin(e.target.value)} className="w-full p-2 rounded-lg border border-ink/15">
+                  <option>Estados Unidos</option><option>Canadá</option><option>América Latina</option><option>Europa</option><option>Asia</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Age Group</label>
-                <select value={povAge} onChange={e=>setPovAge(e.target.value)} className="w-full p-2 rounded-lg border border-slate-200">
-                  <option>Youth</option><option>Adults</option><option>Seniors</option>
+                <label className="block text-xs font-semibold text-ink-light uppercase tracking-wide mb-1">Grupo de edad</label>
+                <select value={povAge} onChange={e=>setPovAge(e.target.value)} className="w-full p-2 rounded-lg border border-ink/15">
+                  <option>Jóvenes</option><option>Adultos</option><option>Personas mayores</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Group</label>
-                <select value={povGroup} onChange={e=>setPovGroup(e.target.value)} className="w-full p-2 rounded-lg border border-slate-200">
-                  <option>Family</option><option>Friends</option><option>Couple</option><option>Single</option>
+                <label className="block text-xs font-semibold text-ink-light uppercase tracking-wide mb-1">Grupo</label>
+                <select value={povGroup} onChange={e=>setPovGroup(e.target.value)} className="w-full p-2 rounded-lg border border-ink/15">
+                  <option>Familia</option><option>Amigos</option><option>Pareja</option><option>Solo/a</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Gender</label>
-                <select value={povGender} onChange={e=>setPovGender(e.target.value)} className="w-full p-2 rounded-lg border border-slate-200">
-                  <option>Mixed</option><option>Male</option><option>Female</option>
+                <label className="block text-xs font-semibold text-ink-light uppercase tracking-wide mb-1">Género</label>
+                <select value={povGender} onChange={e=>setPovGender(e.target.value)} className="w-full p-2 rounded-lg border border-ink/15">
+                  <option>Mixto</option><option>Hombres</option><option>Mujeres</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Budget/Vibe</label>
-                <select value={povExclusivity} onChange={e=>setPovExclusivity(e.target.value)} className="w-full p-2 rounded-lg border border-slate-200">
+                <label className="block text-xs font-semibold text-ink-light uppercase tracking-wide mb-1">Budget/Vibe</label>
+                <select value={povExclusivity} onChange={e=>setPovExclusivity(e.target.value)} className="w-full p-2 rounded-lg border border-ink/15">
                   <option>Standard / Economic</option><option>Exclusive / VIP</option><option>Party / Fiesta</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Select Tours Featured</label>
-              <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-3 space-y-2">
+              <label className="block text-sm font-semibold text-ink-soft mb-2">Excursiones que aparecen</label>
+              <div className="max-h-40 overflow-y-auto border border-ink/15 rounded-xl p-3 space-y-2">
                 {tours.map(tour => (
                   <label key={tour.id} className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" checked={selectedTours.includes(tour.id)} onChange={() => toggleTourSelection(tour.id)} className="rounded text-purple-600 focus:ring-purple-500" />
                     <span className="text-sm">{tour.title}</span>
                   </label>
                 ))}
-                {tours.length === 0 && <span className="text-slate-500 text-sm">No tours available.</span>}
+                {tours.length === 0 && <span className="text-ink-light text-sm">No hay excursiones disponibles.</span>}
               </div>
             </div>
           </div>
@@ -378,17 +378,17 @@ const AIBlogGenAdmin: React.FC = () => {
           <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
              <div className="flex items-center gap-6 mb-4">
                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Variations</label>
-                  <input type="number" min="1" max="5" value={numPosts} onChange={e=>setNumPosts(parseInt(e.target.value))} className="w-24 p-2 rounded-lg border border-slate-200" />
+                  <label className="block text-sm font-semibold text-ink-soft mb-1">Variaciones</label>
+                  <input type="number" min="1" max="5" value={numPosts} onChange={e=>setNumPosts(parseInt(e.target.value))} className="w-24 p-2 rounded-lg border border-ink/15" />
                </div>
                <div className="pt-5 flex flex-col gap-2">
                  <label className="flex items-center gap-2 cursor-pointer">
                    <input type="checkbox" checked={autoPost} onChange={e=>setAutoPost(e.target.checked)} className="rounded text-purple-600 focus:ring-purple-500 w-5 h-5" />
-                   <span className="font-semibold text-slate-700">Auto Save to Website</span>
+                   <span className="font-semibold text-ink-soft">Guardar automáticamente en el sitio</span>
                  </label>
                  <label className="flex items-center gap-2 cursor-pointer">
                    <input type="checkbox" checked={autoPostSocial} onChange={e=>setAutoPostSocial(e.target.checked)} className="rounded text-blue-600 focus:ring-blue-500 w-5 h-5" />
-                   <span className="font-semibold text-slate-700">Auto Post to FB & IG</span>
+                   <span className="font-semibold text-ink-soft">Publicar automáticamente en FB e IG</span>
                  </label>
                </div>
              </div>
@@ -398,7 +398,7 @@ const AIBlogGenAdmin: React.FC = () => {
                 disabled={loading}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold rounded-xl text-lg hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center gap-2"
              >
-               {loading ? 'Generating...' : <><FaMagic /> Generate Blog Posts</>}
+               {loading ? 'Generando…' : <><FaMagic /> Generar entradas</>}
              </button>
           </div>
         </div>
@@ -406,37 +406,37 @@ const AIBlogGenAdmin: React.FC = () => {
         {/* Right Column: Output */}
         <div className="space-y-6">
           {generatedPosts.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 p-8">
+            <div className="h-full flex flex-col items-center justify-center text-slate-400 bg-paper rounded-2xl border-2 border-dashed border-ink/15 p-8">
               <FaMagic className="text-6xl mb-4 opacity-20" />
-              <p className="text-center font-semibold">Generated blog posts will appear here.</p>
+              <p className="text-center font-semibold">Las entradas generadas aparecerán aquí.</p>
             </div>
           ) : (
             generatedPosts.map((post, idx) => (
-              <div key={idx} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-                <div className="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
-                  <h3 className="font-bold text-slate-800">Generated Post {idx + 1}</h3>
+              <div key={idx} className="bg-white rounded-2xl shadow-lg border border-ink/15 overflow-hidden">
+                <div className="bg-paper p-4 border-b border-ink/15 flex justify-between items-center">
+                  <h3 className="font-bold text-ink">Entrada generada {idx + 1}</h3>
                   <div className="flex gap-2">
-                    <button onClick={() => handleSavePost(post, idx)} disabled={post.saved} className="px-3 py-1 bg-teal-600 text-white rounded font-bold text-sm hover:bg-teal-700 disabled:opacity-50">
-                      {post.saved ? 'Saved' : 'Save Internally'}
+                    <button onClick={() => handleSavePost(post, idx)} disabled={post.saved} className="px-3 py-1 bg-sea-deep text-white rounded font-bold text-sm hover:bg-[#0f4f59] disabled:opacity-50">
+                      {post.saved ? 'Guardado' : 'Guardar en el sitio'}
                     </button>
                   </div>
                 </div>
                 
                 <div className="p-6">
                   <h4 className="font-bold text-xl mb-4 flex justify-between items-center">
-                    English Version
-                    <button onClick={() => copyToClipboard(post.en.title + '\n\n' + post.en.content)} className="text-slate-400 hover:text-slate-600"><FaCopy /></button>
+                    Versión en inglés
+                    <button onClick={() => copyToClipboard(post.en.title + '\n\n' + post.en.content)} className="text-slate-400 hover:text-ink-soft"><FaCopy /></button>
                   </h4>
-                  <div className="bg-slate-50 p-4 rounded-xl text-sm whitespace-pre-wrap text-slate-700 max-h-64 overflow-y-auto mb-6">
+                  <div className="bg-paper p-4 rounded-xl text-sm whitespace-pre-wrap text-ink-soft max-h-64 overflow-y-auto mb-6">
                     <strong>{post.en.title}</strong><br/><br/>
                     {post.en.content}
                   </div>
 
                   <h4 className="font-bold text-xl mb-4 flex justify-between items-center">
-                    Spanish Version
-                    <button onClick={() => copyToClipboard(post.es.title + '\n\n' + post.es.content)} className="text-slate-400 hover:text-slate-600"><FaCopy /></button>
+                    Versión en español
+                    <button onClick={() => copyToClipboard(post.es.title + '\n\n' + post.es.content)} className="text-slate-400 hover:text-ink-soft"><FaCopy /></button>
                   </h4>
-                  <div className="bg-slate-50 p-4 rounded-xl text-sm whitespace-pre-wrap text-slate-700 max-h-64 overflow-y-auto">
+                  <div className="bg-paper p-4 rounded-xl text-sm whitespace-pre-wrap text-ink-soft max-h-64 overflow-y-auto">
                     <strong>{post.es.title}</strong><br/><br/>
                     {post.es.content}
                   </div>

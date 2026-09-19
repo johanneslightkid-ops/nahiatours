@@ -59,7 +59,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
       setTimeout(() => setApiSaveSuccess(false), 3000);
       onSave?.();
     } catch (error) {
-      console.error('Failed to save API settings', error);
+      console.error('No se pudo guardar la configuración de API', error);
     } finally {
       setSavingApi(false);
     }
@@ -147,55 +147,55 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
 
   return (
     <div className="w-full space-y-8">
-      <h2 className="text-3xl font-bold text-slate-900 mb-6">Social Media Management</h2>
+      <h2 className="text-3xl font-bold text-ink mb-6">Redes sociales</h2>
 
       {/* Social Media API Integrations */}
       {apiSettings && (
         <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl p-8 text-white">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-bold flex items-center gap-2">
-              <FaFacebookSquare /> Facebook & Instagram API
+              <FaFacebookSquare /> API de Facebook e Instagram
             </h3>
             <button
               onClick={handleSaveApiSettings}
               disabled={savingApi}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-sea-deep text-white font-bold rounded-lg hover:bg-[#0f4f59] transition-all disabled:opacity-50"
             >
-              {savingApi ? 'Saving...' : apiSaveSuccess ? <><FaCheck /> Saved</> : <><FaSave /> Save API Settings</>}
+              {savingApi ? 'Guardando…' : apiSaveSuccess ? <><FaCheck /> Guardado</> : <><FaSave /> Guardar configuración de API</>}
             </button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-950/50 rounded-xl p-6">
             <div className="md:col-span-2">
               <p className="text-sm text-blue-200 mb-4">
-                Configure your Facebook Developer App to enable automatic publishing of AI generated blogs. You will need a Graph API Long-Lived Token with <code>pages_manage_posts</code> and <code>instagram_content_publish</code> permissions.
+                Configura tu app de Facebook Developers para poder publicar automáticamente los blogs generados con IA. Necesitas un token de larga duración de Graph API con los permisos <code>pages_manage_posts</code> e <code>instagram_content_publish</code>.
               </p>
             </div>
             
             <div>
-              <label className="block text-sm font-semibold mb-2">Facebook App ID</label>
+              <label className="block text-sm font-semibold mb-2">ID de la app de Facebook</label>
               <input
                 type="text"
                 value={apiSettings.facebookAppId}
                 onChange={(e) => setApiSettings({ ...apiSettings, facebookAppId: e.target.value })}
-                placeholder="App ID"
+                placeholder="ID de la app"
                 className="w-full px-4 py-2 bg-blue-800/50 border-2 border-blue-500 rounded-lg text-white focus:outline-none placeholder-blue-300"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2">Facebook App Secret</label>
+              <label className="block text-sm font-semibold mb-2">Clave secreta de la app de Facebook</label>
               <input
                 type="password"
                 value={apiSettings.facebookAppSecret}
                 onChange={(e) => setApiSettings({ ...apiSettings, facebookAppSecret: e.target.value })}
-                placeholder="App Secret"
+                placeholder="Clave secreta"
                 className="w-full px-4 py-2 bg-blue-800/50 border-2 border-blue-500 rounded-lg text-white focus:outline-none placeholder-blue-300"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold mb-2">Graph API Access Token (Long-Lived)</label>
+              <label className="block text-sm font-semibold mb-2">Token de acceso de Graph API (larga duración)</label>
               <input
                 type="password"
                 value={apiSettings.facebookLongLivedToken}
@@ -206,7 +206,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2">Facebook Page ID (For publishing)</label>
+              <label className="block text-sm font-semibold mb-2">ID de la página de Facebook (para publicar)</label>
               <input
                 type="text"
                 value={apiSettings.selectedFacebookPageId}
@@ -217,7 +217,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2">Instagram Business Account ID</label>
+              <label className="block text-sm font-semibold mb-2">ID de la cuenta de empresa de Instagram</label>
               <input
                 type="text"
                 value={apiSettings.selectedInstagramAccountId}
@@ -233,16 +233,16 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
       {/* Social Media Accounts Section */}
       <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 text-white">
         <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <FaLink /> Social Media Accounts
+          <FaLink /> Cuentas de redes sociales
         </h3>
 
         {/* Add new account */}
         <div className="bg-slate-800/50 rounded-xl p-6 mb-6 space-y-4">
-          <h4 className="font-bold text-lg">Add Account</h4>
+          <h4 className="font-bold text-lg">Agregar cuenta</h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold mb-2">Platform</label>
+              <label className="block text-sm font-semibold mb-2">Plataforma</label>
               <select
                 value={newAccount.platform}
                 onChange={(e) => setNewAccount({ ...newAccount, platform: e.target.value as any })}
@@ -258,23 +258,23 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2">Username</label>
+              <label className="block text-sm font-semibold mb-2">Usuario</label>
               <input
                 type="text"
                 value={newAccount.username}
                 onChange={(e) => setNewAccount({ ...newAccount, username: e.target.value })}
-                placeholder="e.g., @yourhandle"
+                placeholder="ej.: @tucuenta"
                 className="w-full px-4 py-2 bg-slate-700 border-2 border-pink-500 rounded-lg text-white focus:outline-none placeholder-slate-400"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold mb-2">Profile URL</label>
+              <label className="block text-sm font-semibold mb-2">Enlace del perfil</label>
               <input
                 type="url"
                 value={newAccount.url}
                 onChange={(e) => setNewAccount({ ...newAccount, url: e.target.value })}
-                placeholder="https://instagram.com/yourhandle"
+                placeholder="https://instagram.com/tucuenta"
                 className="w-full px-4 py-2 bg-slate-700 border-2 border-pink-500 rounded-lg text-white focus:outline-none placeholder-slate-400"
               />
             </div>
@@ -285,13 +285,13 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
             disabled={!newAccount.username || !newAccount.url}
             className="w-full py-3 px-4 bg-gradient-to-r from-pink-600 to-orange-600 text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FaPlus className="inline mr-2" /> Add Account
+            <FaPlus className="inline mr-2" /> Agregar cuenta
           </button>
         </div>
 
         {/* Current accounts */}
         <div>
-          <h4 className="font-bold text-lg mb-4">Active Accounts ({data.accounts.length})</h4>
+          <h4 className="font-bold text-lg mb-4">Cuentas activas ({data.accounts.length})</h4>
           {data.accounts.length > 0 ? (
             <div className="space-y-3">
               {data.accounts.map((account) => (
@@ -315,7 +315,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
                           : 'bg-slate-500 hover:bg-slate-600'
                       }`}
                     >
-                      {account.enabled ? 'Active' : 'Disabled'}
+                      {account.enabled ? 'Activa' : 'Desactivada'}
                     </button>
                     <a
                       href={account.url}
@@ -323,11 +323,11 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
                       rel="noopener noreferrer"
                       className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded font-bold transition-all"
                     >
-                      Visit
+                      Visitar
                     </a>
                     <button
                       onClick={() => handleRemoveAccount(account.platform)}
-                      className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded transition-all"
+                      className="px-4 py-2 bg-red-500 hover:bg-coral-deep rounded transition-all"
                     >
                       <FaTrash />
                     </button>
@@ -336,7 +336,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
               ))}
             </div>
           ) : (
-            <p className="text-slate-400 italic">No social media accounts added yet</p>
+            <p className="text-slate-400 italic">Todavía no hay cuentas agregadas</p>
           )}
         </div>
       </div>
@@ -344,16 +344,16 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
       {/* Social Media Videos Section */}
       <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl p-8 text-white">
         <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <FaYoutube /> Social Media Videos
+          <FaYoutube /> Videos de redes sociales
         </h3>
 
         {/* Add new video */}
         <div className="bg-purple-800/50 rounded-xl p-6 mb-6 space-y-4">
-          <h4 className="font-bold text-lg">Add Video</h4>
+          <h4 className="font-bold text-lg">Agregar video</h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold mb-2">Platform</label>
+              <label className="block text-sm font-semibold mb-2">Plataforma</label>
               <select
                 value={newVideo.platform}
                 onChange={(e) => setNewVideo({ ...newVideo, platform: e.target.value as any })}
@@ -368,33 +368,33 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2">Video Title</label>
+              <label className="block text-sm font-semibold mb-2">Título del video</label>
               <input
                 type="text"
                 value={newVideo.title}
                 onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
-                placeholder="e.g., Amazing Quad Adventure"
+                placeholder="ej.: Aventura en cuatrimoto"
                 className="w-full px-4 py-2 bg-purple-700 border-2 border-blue-400 rounded-lg text-white focus:outline-none placeholder-purple-300"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold mb-2">Video URL</label>
+              <label className="block text-sm font-semibold mb-2">Enlace del video</label>
               <input
                 type="url"
                 value={newVideo.url}
                 onChange={(e) => setNewVideo({ ...newVideo, url: e.target.value })}
-                placeholder="https://www.tiktok.com/@yourhandle/video/123456789"
+                placeholder="https://www.tiktok.com/@tucuenta/video/123456789"
                 className="w-full px-4 py-2 bg-purple-700 border-2 border-blue-400 rounded-lg text-white focus:outline-none placeholder-purple-300"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold mb-2">Description</label>
+              <label className="block text-sm font-semibold mb-2">Descripción</label>
               <textarea
                 value={newVideo.description}
                 onChange={(e) => setNewVideo({ ...newVideo, description: e.target.value })}
-                placeholder="Brief description of this video..."
+                placeholder="Descripción corta de este video..."
                 rows={3}
                 className="w-full px-4 py-2 bg-purple-700 border-2 border-blue-400 rounded-lg text-white focus:outline-none placeholder-purple-300 resize-none"
               />
@@ -406,18 +406,18 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
             disabled={!newVideo.title || !newVideo.url}
             className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FaPlus className="inline mr-2" /> Add Video
+            <FaPlus className="inline mr-2" /> Agregar video
           </button>
         </div>
 
         {/* Current videos */}
         <div>
-          <h4 className="font-bold text-lg mb-4">Current Videos ({data.videos.length})</h4>
+          <h4 className="font-bold text-lg mb-4">Videos actuales ({data.videos.length})</h4>
           {data.videos.length > 0 ? (
             <div className="grid md:grid-cols-2 gap-6">
               {data.videos.map((video) => (
                 <div key={video.id} className="bg-purple-700/50 rounded-lg overflow-hidden border-2 border-purple-600">
-                  <div className="h-40 bg-slate-900 flex items-center justify-center">
+                  <div className="h-40 bg-ink flex items-center justify-center">
                     {platformIcons[video.platform] && (
                       <div className="text-6xl opacity-50">{platformIcons[video.platform]}</div>
                     )}
@@ -434,13 +434,13 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
                         href={video.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded text-center hover:bg-blue-700 transition-all"
+                        className="flex-1 px-3 py-2 bg-sea-deep text-white text-sm font-bold rounded text-center hover:bg-[#0f4f59] transition-all"
                       >
-                        View
+                        Ver
                       </a>
                       <button
                         onClick={() => handleRemoveVideo(video.id)}
-                        className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all"
+                        className="px-3 py-2 bg-coral-deep text-white rounded hover:bg-[#9d3d26] transition-all"
                       >
                         <FaTrash />
                       </button>
@@ -450,7 +450,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
               ))}
             </div>
           ) : (
-            <p className="text-purple-300 italic">No videos added yet</p>
+            <p className="text-purple-300 italic">Todavía no hay videos agregados</p>
           )}
         </div>
       </div>
