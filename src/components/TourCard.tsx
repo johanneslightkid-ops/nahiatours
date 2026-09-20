@@ -9,6 +9,10 @@ import MarkdownRenderer from './ui/MarkdownRenderer';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
 
 interface TourCardProps {
+  /** Positional catalogue id — lets the server price the booking itself. */
+  serviceId?: number | string;
+  /** Which catalogue the server should look this up in. */
+  category?: string;
   image: string;
   title: string;
   description: string;
@@ -23,6 +27,8 @@ interface TourCardProps {
 }
 
 const TourCard: React.FC<TourCardProps> = ({
+  serviceId,
+  category = 'tours',
   image,
   title,
   description,
@@ -189,7 +195,13 @@ const TourCard: React.FC<TourCardProps> = ({
                 <PaymentDropdown
                   excursionTitle={title}
                   selectedPrice={totalAmount > 0 ? `$${totalAmount} USD` : price}
+                  selectedTier={rate.tier}
                   className="w-full"
+                  category={category}
+                  serviceId={serviceId}
+                  persons={persons}
+                  bookingDate={formattedSelectedDate}
+                  locale={locale}
                 />
               </div>
             </div>

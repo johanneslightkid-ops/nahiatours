@@ -10,6 +10,7 @@ import StoryAdmin from '../components/admin/StoryAdmin';
 import AIAssistantAdmin from '../components/admin/AIAssistantAdmin';
 import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
+import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
 import { FaVideo, FaShareAlt, FaBook, FaRobot, FaMagic } from 'react-icons/fa';
 import { useSearchParams } from 'react-router-dom';
 
@@ -208,9 +209,13 @@ const Admin: React.FC = () => {
               </div>
             )}
 
-            {/* Who can get in here at all. Lives with the brand settings
-                because that is the page an operator opens to change "our"
-                things, and the password is one of them. */}
+            {/* How the business takes money, and who can get in here at all.
+                Both live with the brand settings because that is the page an
+                operator opens to change "our" things. */}
+            <PaymentSettingsPanel
+              brandSettings={brandSettings}
+              setBrandSettings={setBrandSettings}
+            />
             <AdminPasswordPanel />
           </div>
         )}

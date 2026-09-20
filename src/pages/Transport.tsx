@@ -14,6 +14,8 @@ import PlaceAutocomplete from '../components/PlaceAutocomplete';
 import DateTimePicker from '../components/ui/DateTimePicker';
 import MobileNumberPicker from '../components/ui/MobileNumberPicker';
 import RouteMap from '../components/RouteMap';
+import { createStripeCheckout, isStripeReady } from '../services/paymentService';
+import { isPaymentMethodVisible } from '../utils/paymentMethods';
 
 type TripType = 'one-way' | 'round-trip';
 
@@ -41,6 +43,11 @@ const Transport: React.FC = () => {
   const [tripType, setTripType] = useState<TripType>('round-trip');
   const [priceResult, setPriceResult] = useState<TransferPriceResult | null>(null);
   const [priceError, setPriceError] = useState<string | null>(null);
+  // Card payment for a transfer: whether Stripe can take one, and how the
+  // attempt is going.
+  const [stripeReady, setStripeReady] = useState(false);
+  const [startingCard, setStartingCard] = useState(false);
+  const [cardError, setCardError] = useState('');
 
   const [originAddress, setOriginAddress] = useState('');
   const [destAddress, setDestAddress] = useState('');
@@ -213,14 +220,63 @@ const Transport: React.FC = () => {
     window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   }, [priceResult, form, hotelName, departureDate, locale, waPhone]);
 
+  useEffect(() => {
+    let current = true;
+    isStripeReady().then((ready) => {
+      if (current) setStripeReady(ready);
+    });
+    return () => {
+      current = false;
+    };
+  }, []);
+
+  const cardVisible = isPaymentMethodVisible(brandSettings, 'stripe', stripeReady);
+  const paypalVisible = isPaymentMethodVisible(brandSettings, 'paypal');
+
   const handlePayWithPayPal = useCallback(() => {
     if (!priceResult) return;
     const total = priceResult.estimatedPrice;
-    const paypalUrl = brandSettings.paypalMeLink || 'https://www.paypal.com/paypalme/carlostours';
+    // No fallback: an unconfigured PayPal used to send the guest to
+    // paypal.me/carlostours, which is somebody else's account.
+    const paypalUrl = brandSettings.paypalMeLink;
+    if (!paypalUrl) return;
     const separator = paypalUrl.endsWith('/') ? '' : '/';
     const url = total > 0 ? `${paypalUrl}${separator}${total}` : paypalUrl;
     window.open(url, '_blank');
   }, [priceResult, brandSettings.paypalMeLink]);
+
+  /**
+   * Pay for a transfer by card.
+   *
+   * A transfer price is computed from the route and a dozen modifiers rather
+   * than read off a catalogue, so the server cannot recompute it and the
+   * amount travels from here. The session is tagged `price_source=client` for
+   * exactly that reason, and the operator's WhatsApp message says so, so a
+   * quote that looks wrong is visible rather than silently trusted.
+   */
+  const handlePayByCard = useCallback(async () => {
+    if (!priceResult) return;
+    setCardError('');
+    setStartingCard(true);
+    try {
+      const route = `${originAddress || 'Pickup'} → ${destAddress || 'Drop-off'}`;
+      const url = await createStripeCheckout({
+        category: 'transport',
+        title: `Private transfer · ${route}`.slice(0, 120),
+        // The quote is already the total for the whole vehicle, so it is one
+        // line item of one — not one per passenger.
+        persons: 1,
+        date: departureDate || '',
+        amount: priceResult.estimatedPrice,
+        locale,
+        returnPath: '/transport',
+      });
+      window.location.href = url;
+    } catch (error: any) {
+      setStartingCard(false);
+      setCardError(error?.message || 'Could not start the card payment.');
+    }
+  }, [priceResult, originAddress, destAddress, departureDate, locale]);
 
   const handleOriginSelect = useCallback((place: { placeId: string; address: string; lat: number; lng: number }) => {
     setOriginAddress(place.address);
@@ -704,7 +760,26 @@ const Transport: React.FC = () => {
                     📱 <FormattedMessage id="transport.bookNow" defaultMessage="Book via WhatsApp" />
                   </button>
 
-                  {priceResult && !priceError && brandSettings.paypalMeLink && (
+                  {priceResult && !priceError && cardVisible && (
+                    <button
+                      onClick={handlePayByCard}
+                      disabled={startingCard}
+                      className="w-full rounded-2xl bg-sea px-6 py-4 text-center text-base font-bold text-white shadow-oil-sm transition hover:bg-sea-light active:scale-[0.97] disabled:opacity-60"
+                    >
+                      💳{' '}
+                      {startingCard
+                        ? '…'
+                        : <FormattedMessage id="payment.card" defaultMessage="Pay by card" />}
+                    </button>
+                  )}
+
+                  {cardError && (
+                    <p className="rounded-2xl bg-coral-deep/10 px-4 py-3 text-center text-xs text-coral-deep">
+                      {cardError}
+                    </p>
+                  )}
+
+                  {priceResult && !priceError && paypalVisible && (
                     <button
                       onClick={handlePayWithPayPal}
                       className="w-full rounded-2xl bg-[#0070ba] px-6 py-4 text-center text-base font-bold text-white shadow-oil-sm transition hover:bg-[#003087] active:scale-[0.97]"

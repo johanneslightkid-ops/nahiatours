@@ -50,6 +50,8 @@ const Tours: React.FC = () => {
           {tours.map((tour, index) => (
             <TourCard
               key={tour.id}
+              serviceId={tour.id}
+              category="tours"
               image={tour.image}
               title={tour.title}
               description={tour.description}

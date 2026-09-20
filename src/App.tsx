@@ -5,6 +5,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToHash from './components/ScrollToHash';
+import PaymentReturn from './components/PaymentReturn';
 import IllustratedBackdrop from './components/ui/IllustratedBackdrop';
 import { PlannerProvider } from './contexts/PlannerContext';
 
@@ -47,6 +48,10 @@ const App = () => {
           <IllustratedBackdrop />
 
           <ScrollToHash />
+          {/* Catches the guest coming back from Stripe on whatever page they
+              left from, so the receipt appears in context rather than on a
+              dedicated thank-you route. */}
+          <PaymentReturn />
           <Header />
           <main id="top" className="relative z-20 flex-grow">
             <Suspense fallback={<RouteFallback />}>

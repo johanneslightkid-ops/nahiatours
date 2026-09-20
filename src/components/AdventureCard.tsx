@@ -31,7 +31,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
   const [showVideo, setShowVideo] = useState(false);
   const navigate = useNavigate();
   const { brandSettings } = useBrand();
-  const whatsappPhone = brandSettings.phoneNumber || '+18095553333';
+  const whatsappPhone = brandSettings.phoneNumber;
   const swayClass = `animate-wave-sway-${(index % 10) + 1}`;
 
   const handleWhatsAppClick = () => {

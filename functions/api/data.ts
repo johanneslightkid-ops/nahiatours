@@ -1,4 +1,5 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
+import { PROTECTED_RESOURCES } from '../../shared/paymentConfig';
 
 const RESOURCE_WITH_LOCALE = new Set([
   'blog',
@@ -32,6 +33,16 @@ const readLocalJson = async (key: string, requestUrl?: string): Promise<unknown 
 
 const buildResourceKey = (resource: string, locale?: string) => {
   const normalized = resource.trim().toLowerCase();
+
+  // Some KV keys hold credentials — the Stripe secret key, the admin password.
+  // This endpoint is unauthenticated on GET and cached publicly, so it must
+  // never be able to name one, however it is asked. Returning null here makes
+  // the request a 400 alongside any other unknown resource, which also avoids
+  // confirming that the key exists.
+  if (PROTECTED_RESOURCES.has(normalized)) {
+    return null;
+  }
+
   if (RESOURCE_WITH_LOCALE.has(normalized)) {
     const lang = locale?.trim().toLowerCase();
     if (!lang) {
