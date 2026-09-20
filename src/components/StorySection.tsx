@@ -148,7 +148,7 @@ const StorySection: React.FC<StorySectionProps> = ({
             {/* Description */}
             {description && (
               <div className="story-copy-card mb-6 rounded-[30px_16px_30px_18px] animate-wave-sway-2">
-                <p className="whitespace-pre-wrap text-base font-semibold leading-8 text-ink sm:text-lg">
+                <p className="whitespace-pre-wrap text-base leading-8 text-ink sm:text-lg">
                   {description}
                 </p>
               </div>
@@ -157,7 +157,7 @@ const StorySection: React.FC<StorySectionProps> = ({
             {/* Narrative */}
             {narrative && (
               <div className="prose prose-lg max-w-none">
-                <p className="text-base font-semibold italic leading-8 text-ink-soft md:text-lg">
+                <p className="text-base italic leading-8 text-ink-soft md:text-lg">
                   {narrative}
                 </p>
               </div>

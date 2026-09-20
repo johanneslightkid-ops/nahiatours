@@ -75,7 +75,7 @@ const PathwaysSection: React.FC = () => {
           <h2 className="mb-4 font-display text-3xl font-bold leading-tight text-ink sm:text-4xl md:text-5xl">
             {copy.title}
           </h2>
-          <p className="text-lg font-semibold leading-8 text-ink-soft">{copy.subtitle}</p>
+          <p className="text-lg leading-8 text-ink-soft">{copy.subtitle}</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -89,7 +89,7 @@ const PathwaysSection: React.FC = () => {
           >
             <span className="text-4xl">🗂️</span>
             <h3 className="mt-4 font-display text-2xl font-bold text-ink">{copy.catalogueTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-ink-soft">{copy.catalogueText}</p>
+            <p className="mt-3 flex-1 text-base leading-relaxed text-ink-soft">{copy.catalogueText}</p>
             <Link
               to="/tours#top"
               onClick={() => playClickFx()}
@@ -115,7 +115,7 @@ const PathwaysSection: React.FC = () => {
               </span>
             </div>
             <h3 className="mt-4 font-display text-2xl font-bold text-paper">{copy.plannerTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-paper/85">{copy.plannerText}</p>
+            <p className="mt-3 flex-1 text-base leading-relaxed text-paper/85">{copy.plannerText}</p>
             <Link
               to="/plan#top"
               onClick={() => playClickFx()}

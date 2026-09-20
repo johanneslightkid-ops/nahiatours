@@ -182,34 +182,59 @@ const ServiceDetails: React.FC = () => {
   };
 
   return (
-    <div className="bg-paper py-16">
+    <div className="py-20 lg:py-24">
       <div className="section-shell space-y-8">
         <div className="flex items-center justify-between gap-4">
-          <Link to={category === 'transport' ? '/transport' : '/tours'} className="text-sm font-semibold text-lagoon-dark hover:text-lagoon-dark">
+          <Link to={category === 'transport' ? '/transport' : '/tours'} className="tropical-button-outline !px-5 !py-2 text-xs uppercase tracking-[0.16em]">
             <FormattedMessage id="details.back" defaultMessage="← Back to listings" />
           </Link>
         </div>
 
-        <article className="glass-card overflow-hidden rounded-[2rem]">
-          <div className="relative bg-ink">
-            <img src={currentImage} alt={service.title} className="h-[420px] w-full object-cover" />
-            <div className="absolute inset-x-0 bottom-0 bg-ink/75 p-8 text-white">
-              <h1 className="text-4xl font-bold md:text-5xl">{service.title}</h1>
-              <div className="mt-3 max-w-3xl text-paper/85">
-                <MarkdownRenderer content={service.description} />
-              </div>
+        <article className="glass-card overflow-hidden rounded-[34px_24px_32px_26px]">
+          {/* The title sits IN the photograph, so the photograph needs a scrim
+              rather than a panel: a flat 75% block over the bottom half swallowed
+              the picture whole, and the whole description used to ride in it. The
+              description now belongs to the page, where there is room for it. */}
+          <div className="relative">
+            <img
+              src={currentImage}
+              alt={service.title}
+              className="photo-pop h-[420px] w-full object-cover"
+            />
+            <div
+              aria-hidden
+              className="absolute inset-x-0 bottom-0 h-2/3"
+              style={{
+                background:
+                  'linear-gradient(180deg, rgba(18,47,54,0) 0%, rgba(18,47,54,0.55) 55%, rgba(18,47,54,0.88) 100%)',
+              }}
+            />
+            <div className="absolute inset-x-0 bottom-0 p-8">
+              <h1 className="font-display text-4xl font-bold text-canvas-lift drop-shadow md:text-5xl">
+                {service.title}
+              </h1>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 border-b border-ink/20 bg-white px-6 py-6 md:grid-cols-4">
+          <div className="border-b border-[rgba(150,112,31,0.28)] px-6 py-7 sm:px-8">
+            <div className="prose max-w-measure text-ink-soft">
+              <MarkdownRenderer content={service.description} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 border-b border-[rgba(150,112,31,0.28)] px-6 py-6 sm:px-8 md:grid-cols-4">
             {images.map((image, index) => (
               <button
                 key={`${image}-${index}`}
                 onClick={() => setActiveIndex(index)}
-                className={`overflow-hidden rounded-2xl border-2 transition ${index === activeIndex ? 'border-lagoon' : 'border-ink'}`}
+                className={`overflow-hidden rounded-[18px_12px_16px_14px] border transition ${
+                  index === activeIndex
+                    ? 'border-lagoon-dark shadow-oil-sm'
+                    : 'border-[rgba(150,112,31,0.35)] opacity-80 hover:opacity-100'
+                }`}
                 aria-label={`Show image ${index + 1}`}
               >
-                <img src={image} alt={`${service.title} ${index + 1}`} className="h-24 w-full object-cover" />
+                <img src={image} alt={`${service.title} ${index + 1}`} className="photo-pop h-24 w-full object-cover" />
               </button>
             ))}
           </div>

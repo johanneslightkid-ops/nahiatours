@@ -132,7 +132,7 @@ const TourCard: React.FC<TourCardProps> = ({
             )}
           </div>
 
-          <div className="text-sm font-semibold leading-relaxed text-ink-soft">
+          <div className="text-sm leading-relaxed text-ink-soft">
             <MarkdownRenderer content={description} />
           </div>
 
