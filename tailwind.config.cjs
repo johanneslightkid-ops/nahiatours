@@ -25,6 +25,9 @@ module.exports = {
           DEFAULT: '#FFF6E5',
           warm: '#FFEFD6',
           deep: '#F7E3C2',
+          // The surface an admin card sits on: lighter than the page so forms
+          // read as sheets laid on the ground.
+          card: '#FFFDF7',
         },
         mango: {
           light: '#FFC861',
@@ -61,6 +64,18 @@ module.exports = {
           DEFAULT: '#9163DE',
           dark: '#6B3FB5',
         },
+        // Semantic surface and accent names used by the admin panel. The admin
+        // is written against roles rather than hues — a card is `paper-card`,
+        // a primary action is `sea-deep` — so a redesign can repoint the whole
+        // back office by redefining these three, without touching its markup.
+        // Here they resolve into the poster palette above.
+        coral: {
+          deep: '#E03B57',
+        },
+        sea: {
+          deep: '#128C8A',
+        },
+
         // Legacy aliases kept so any stray class name still resolves to a
         // colour inside the new palette instead of disappearing.
         tropicalGreen: '#2FA84F',

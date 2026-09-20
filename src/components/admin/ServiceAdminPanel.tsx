@@ -20,7 +20,7 @@ interface ServiceAdminPanelProps {
  * Label stored with every price.
  *
  * Services used to carry a list of tiers the operator typed themselves
- * ("Adults", "Children", "VIP"). There is now one rate that everybody pays, so
+ * ("Adultos", "Children", "VIP"). There is now one rate that everybody pays, so
  * the tier is no longer an editable field — it is this, and the reader sees it
  * translated (see perPersonTier in toursService).
  */
@@ -192,34 +192,40 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
-        <Link to={siblingAdminPath} className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
+        <h1 className="text-3xl font-bold text-ink">{title}</h1>
+        <Link to={siblingAdminPath} className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">
           {siblingAdminLabel}
         </Link>
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-semibold text-slate-900">
-          {isEditing ? `Edit ${category}` : `Add ${category}`}
+      <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
+        <h2 className="mb-4 text-xl font-semibold text-ink">
+          {isEditing
+            ? category === 'transport'
+              ? 'Editar servicio de transporte'
+              : 'Editar excursión'
+            : category === 'transport'
+            ? 'Agregar servicio de transporte'
+            : 'Agregar excursión'}
         </h2>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <input
             type="text"
             value={draft.title}
             onChange={(event) => setDraft({ ...draft, title: event.target.value })}
-            placeholder="Title"
-            className="rounded-2xl border border-slate-200 px-4 py-3"
+            placeholder="Título"
+            className="rounded-2xl border border-ink/15 px-4 py-3"
           />
           <input
             type="text"
             value={draft.image}
             onChange={(event) => setDraft({ ...draft, image: normalizeImageEntry(event.target.value) })}
-            placeholder="Cover image path"
-            className="rounded-2xl border border-slate-200 px-4 py-3"
+            placeholder="Ruta de la imagen de portada"
+            className="rounded-2xl border border-ink/15 px-4 py-3"
           />
           <div className="lg:col-span-2">
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
-              Detailed description (supports Markdown formatting)
+            <label className="mb-2 block text-sm font-semibold text-ink-soft">
+              Descripción detallada (acepta formato Markdown)
             </label>
             <MarkdownEditor
               value={draft.details.description}
@@ -233,58 +239,58 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
           </div>
         </div>
 
-        <div className="mt-6 rounded-3xl border border-slate-200 p-5">
-          <h3 className="mb-1 text-lg font-semibold text-slate-900">Price</h3>
-          <p className="mb-4 text-sm text-slate-600">
-            One rate per person — the same for adults and children.
+        <div className="mt-6 rounded-3xl border border-ink/15 p-5">
+          <h3 className="mb-1 text-lg font-semibold text-ink">Precio</h3>
+          <p className="mb-4 text-sm text-ink-soft">
+            Una sola tarifa por persona: la misma para adultos y niños.
           </p>
           <input
             type="text"
             value={draft.pricingOptions[0]?.price ?? ''}
             onChange={(event) => updatePrice(event.target.value)}
             placeholder={category === 'transport' ? 'From USD 15' : '$55'}
-            className="w-full rounded-2xl border border-slate-200 px-4 py-3 md:max-w-xs"
+            className="w-full rounded-2xl border border-ink/15 px-4 py-3 md:max-w-xs"
           />
         </div>
 
         {category === 'transport' && (
-          <div className="mt-6 rounded-3xl border border-slate-200 p-5">
+          <div className="mt-6 rounded-3xl border border-ink/15 p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">Transfer routes</h3>
+              <h3 className="text-lg font-semibold text-ink">Rutas de traslado</h3>
               <button
                 onClick={() => setDraft((current) => ({
                   ...current,
                   transferRoutes: [...(current.transferRoutes ?? []), createEmptyRoute()],
                 }))}
-                className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white"
               >
-                Add route
+                Agregar ruta
               </button>
             </div>
             <div className="space-y-4">
               {(draft.transferRoutes ?? []).map((route, index) => (
-                <div key={route.id || index} className="space-y-4 rounded-3xl border border-slate-200 p-4">
+                <div key={route.id || index} className="space-y-4 rounded-3xl border border-ink/15 p-4">
                   <div className="grid gap-3 md:grid-cols-[1fr,1fr,1fr,auto]">
                     <input
                       type="text"
                       value={(route as any).origin}
                       onChange={(event) => updateRoute(index, 'origin', event.target.value)}
-                      placeholder="Origin"
-                      className="rounded-2xl border border-slate-200 px-4 py-3"
+                      placeholder="Procedencia"
+                      className="rounded-2xl border border-ink/15 px-4 py-3"
                     />
                     <input
                       type="text"
                       value={(route as any).destination}
                       onChange={(event) => updateRoute(index, 'destination', event.target.value)}
-                      placeholder="Destination"
-                      className="rounded-2xl border border-slate-200 px-4 py-3"
+                      placeholder="Destino"
+                      className="rounded-2xl border border-ink/15 px-4 py-3"
                     />
                     <input
                       type="text"
                       value={(route as any).price}
                       onChange={(event) => updateRoute(index, 'price', event.target.value)}
-                      placeholder="Price"
-                      className="rounded-2xl border border-slate-200 px-4 py-3"
+                      placeholder="Precio"
+                      className="rounded-2xl border border-ink/15 px-4 py-3"
                     />
                     <button
                       onClick={() => setDraft((current) => ({
@@ -293,9 +299,9 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
                           ? (current.transferRoutes ?? []).filter((_: any, routeIndex: number) => routeIndex !== index)
                           : [createEmptyRoute()],
                       }))}
-                      className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white"
+                      className="rounded-full bg-coral-deep px-4 py-2 text-sm font-semibold text-white"
                     >
-                      Remove
+                      Quitar
                     </button>
                   </div>
 
@@ -304,8 +310,8 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
                       type="number"
                       value={(route as any).distanceKm ?? ''}
                       onChange={(event) => updateRoute(index, 'distanceKm', event.target.value)}
-                      placeholder="Distance km"
-                      className="rounded-2xl border border-slate-200 px-4 py-3"
+                      placeholder="Distancia km"
+                      className="rounded-2xl border border-ink/15 px-4 py-3"
                       min={0}
                       step={0.1}
                     />
@@ -313,8 +319,8 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
                       type="number"
                       value={(route as any).durationMinutes ?? ''}
                       onChange={(event) => updateRoute(index, 'durationMinutes', event.target.value)}
-                      placeholder="Duration min"
-                      className="rounded-2xl border border-slate-200 px-4 py-3"
+                      placeholder="Duración min"
+                      className="rounded-2xl border border-ink/15 px-4 py-3"
                       min={0}
                     />
                   </div>
@@ -324,41 +330,45 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
           </div>
         )}
 
-        <div className="mt-6 rounded-3xl border border-slate-200 p-5">
+        <div className="mt-6 rounded-3xl border border-ink/15 p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-900">Detail images</h3>
+            <h3 className="text-lg font-semibold text-ink">Imágenes de detalle</h3>
             <button
               onClick={() => setDraft((current) => ({
                 ...current,
                 details: { ...current.details, images: [...current.details.images, ''] },
               }))}
-              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+              className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white"
             >
-              Add image
+              Agregar imagen
             </button>
           </div>
           <div className="space-y-4">
             {draft.details.images.map((image, index) => (
-              <div key={`${image}-${index}`} className="rounded-2xl border border-slate-200 p-4">
+              <div key={`${image}-${index}`} className="rounded-2xl border border-ink/15 p-4">
                 <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr,auto,auto]">
                   <input
                     type="text"
                     value={image}
                     onChange={(event) => updateImage(index, event.target.value)}
                     placeholder="imgs/tours/example_detail_1.jpg"
-                    className="rounded-2xl border border-slate-200 px-4 py-3"
+                    className="rounded-2xl border border-ink/15 px-4 py-3"
                   />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={async (event) => {
-                      const file = event.target.files?.[0];
-                      if (file) {
-                        await handleImageUpload(index, file);
-                      }
-                    }}
-                    className="rounded-2xl border border-slate-200 px-4 py-3"
-                  />
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-ink/25 px-4 py-3 text-sm font-semibold text-ink-soft transition hover:border-sea hover:text-ink">
+                    Subir imagen
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (event) => {
+                        const file = event.target.files?.[0];
+                        if (file) {
+                          await handleImageUpload(index, file);
+                        }
+                        event.target.value = '';
+                      }}
+                    />
+                  </label>
                   <button
                     onClick={() => setDraft((current) => ({
                       ...current,
@@ -369,9 +379,9 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
                           : [''],
                       },
                     }))}
-                    className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white"
+                    className="rounded-full bg-coral-deep px-4 py-2 text-sm font-semibold text-white"
                   >
-                    Remove
+                    Quitar
                   </button>
                 </div>
               </div>
@@ -380,33 +390,36 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
         </div>
 
         <div className="mt-4 flex gap-3">
-          <button onClick={handleSave} className="rounded-full bg-teal-600 px-5 py-2 font-semibold text-white">
-            Save
+          <button onClick={handleSave} className="rounded-full bg-sea-deep px-5 py-2 font-semibold text-white">
+            Guardar
           </button>
-          <button onClick={resetDraft} className="rounded-full bg-slate-200 px-5 py-2 font-semibold text-slate-800">
-            Cancel
+          <button onClick={resetDraft} className="rounded-full bg-paper-deep px-5 py-2 font-semibold text-ink">
+            Cancelar
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {sortedServices.map((service) => (
-          <article key={service.id} className="rounded-3xl bg-white p-5 shadow-lg">
+          <article key={service.id} className="rounded-3xl bg-paper-card p-5 shadow-lg">
             <img src={service.image} alt={service.title} className="mb-4 h-44 w-full rounded-2xl object-cover" />
-            <h3 className="text-xl font-semibold text-slate-900">{service.title}</h3>
-            <p className="mt-2 text-sm text-slate-600">{service.description.slice(0, 180)}{service.description.length > 180 ? '…' : ''}</p>
+            <h3 className="text-xl font-semibold text-ink">{service.title}</h3>
+            <p className="mt-2 text-sm text-ink-soft">{service.description.slice(0, 180)}{service.description.length > 180 ? '…' : ''}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                {service.pricingOptions[0]?.price || service.price || 'No price set'} per person
+              <span className="rounded-full bg-paper-warm px-3 py-1 text-xs font-semibold text-ink-soft">
+                {service.pricingOptions[0]?.price || service.price || 'Sin precio'} por persona
               </span>
             </div>
-            <p className="mt-3 text-xs font-medium text-slate-500">{service.details.images.length} detail images</p>
+            <p className="mt-3 text-xs font-medium text-ink-light">
+              {service.details.images.length}{' '}
+              {service.details.images.length === 1 ? 'imagen de detalle' : 'imágenes de detalle'}
+            </p>
             <div className="mt-4 flex gap-3">
-              <button onClick={() => startEditing(service)} className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
-                Edit
+              <button onClick={() => startEditing(service)} className="rounded-full bg-sea-deep px-4 py-2 text-sm font-semibold text-white">
+                Editar
               </button>
-              <button onClick={() => handleDelete(service.id)} className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white">
-                Delete
+              <button onClick={() => handleDelete(service.id)} className="rounded-full bg-coral-deep px-4 py-2 text-sm font-semibold text-white">
+                Eliminar
               </button>
             </div>
           </article>
