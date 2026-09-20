@@ -13,11 +13,19 @@ export interface AISettings {
   activeProvider: 'gemini' | 'cloudflare' | 'openrouter';
 }
 
+/**
+ * `cloudflare` is the default provider because it is the only one that works
+ * with nothing configured: wrangler.toml binds the account's own Workers AI as
+ * `AI`, and /api/cf-ai runs the model through that binding whenever no account
+ * id and token have been entered. Gemini and OpenRouter both need a key pasted
+ * in before they produce a sentence, so defaulting to either meant a fresh
+ * deployment shipped a blog generator that could only fail.
+ */
 const defaultAISettings: AISettings = {
   gemini: { apiKey: '', selectedModel: 'gemini-1.5-pro' },
   cloudflare: { apiKey: '', accountId: '', selectedModel: '@cf/meta/llama-3.1-8b-instruct-fp8' },
   openrouter: { apiKey: '', selectedModel: 'google/gemini-pro-1.5' },
-  activeProvider: 'gemini',
+  activeProvider: 'cloudflare',
 };
 
 const normalizeAISettings = (input: unknown): AISettings => {

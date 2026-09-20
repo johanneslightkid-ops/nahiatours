@@ -236,7 +236,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
 
     if (request.method === 'PUT') {
       // Authenticate admin writes against the deployment's configured password.
-      const auth = verifyAdminRequest(env, request);
+      const auth = await verifyAdminRequest(env, request);
       if (!auth.ok) {
         return createErrorResponse(auth.error, auth.status);
       }

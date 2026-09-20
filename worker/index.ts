@@ -24,6 +24,7 @@ import { onRequest as handleSocialPublish } from '../functions/api/social-publis
 import { onRequest as handleInitData } from '../functions/init-data';
 import { onRequest as handleBlog } from '../functions/blog';
 import { onRequest as handleAdminAuth } from '../functions/api/admin-auth';
+import { onRequest as handleAdminPassword } from '../functions/api/admin-password';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
 
 export interface Env {
@@ -41,6 +42,7 @@ type RouteHandler = (context: {
 const ROUTES: Record<string, RouteHandler> = {
   '/api/data': handleData,
   '/api/admin-auth': handleAdminAuth,
+  '/api/admin-password': handleAdminPassword,
   '/api/cf-ai': handleCfAi,
   '/api/upload': handleUpload,
   '/api/social-publish': handleSocialPublish,

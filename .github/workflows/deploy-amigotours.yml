@@ -1,0 +1,224 @@
+# Deploys the Amigo Tours design to its own Cloudflare Worker, seeded with a
+# copy of production's data.
+#
+# This is a SEPARATE SITE out of the same repository, not a change to any
+# existing one. `nahiatours` is production, `ldvip` and `transporturist` are
+# earlier designs, and this is the oil-painting one.
+#
+# Three things keep it away from the live site, and all three would have to
+# fail at once for a run here to touch it:
+#
+#   • wrangler.toml on this branch names the Worker `amigotours`, and
+#     `wrangler deploy` addresses a Worker by name — never by id;
+#   • this workflow only runs on the `amigotours` branch;
+#   • the KV namespace is `amigotours-data`, created by this run.
+#
+# THE DATA is a copy, taken once at deploy time. scripts/clone-kv.mjs reads
+# every key out of `nahiatours-data` and writes it into `amigotours-data`, so
+# the new site opens with the real catalogue rather than the seed JSON — and
+# from that moment the two namespaces are independent. Editing a tour here
+# cannot reach the live site, and vice versa.
+#
+# That copy is also how the AI settings arrive: `ai-settings` is one of the
+# keys, so whatever provider and credentials production already has come with
+# it. The Worker does not depend on that, though — wrangler.toml binds the
+# account's own Workers AI as `AI`, and /api/cf-ai uses the binding whenever no
+# token has been entered, so the blog generator works on a deployment whose KV
+# copy never happened.
+#
+# THE TOKEN comes from a repository secret. It needs:
+#   • Workers Scripts: Edit    — to deploy
+#   • Workers KV Storage: Edit — to create `amigotours-data` and fill it
+# Add it under Settings → Secrets and variables → Actions.
+
+name: Deploy Amigo Tours
+
+# `push` is the trigger that matters. GitHub registers a `workflow_dispatch`
+# workflow only once its file has appeared on the DEFAULT branch — and `main`
+# carries no .github/workflows, so a dispatch-only workflow here would be
+# invisible to the API and to the Actions UI. A push-triggered workflow has no
+# such requirement; it runs from whichever branch it lives on.
+on:
+  push:
+    branches: [amigotours]
+  workflow_dispatch:
+    inputs:
+      cloudflare_api_token:
+        description: >-
+          One-off Cloudflare API token (Workers Scripts: Edit + Workers KV
+          Storage: Edit). Leave empty to use the CLOUDFLARE_API_TOKEN secret.
+          Rotate any token passed this way once the deploy is done.
+        required: false
+        default: ''
+      source_kv_title:
+        description: >-
+          Title of the KV namespace to copy data from. Leave empty to use
+          nahiatours-data.
+        required: false
+        default: ''
+      skip_kv_clone:
+        description: 'Deploy without copying KV data (the site falls back to /data/*.json)'
+        required: false
+        type: boolean
+        default: false
+
+# One deploy at a time; a newer run supersedes an in-flight one.
+concurrency:
+  group: deploy-amigotours
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Job-level env, not per-step: the `secrets` context is not available in a
+    # step's `if`, but `env` is. wrangler, provision-kv.mjs and clone-kv.mjs
+    # all read these names directly, so nothing else has to pass them along.
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN || inputs.cloudflare_api_token }}
+      # Falls back to the literal account id, which is also pinned in
+      # wrangler.toml. Without it, the KV scripts have to discover the account
+      # by listing /accounts and wrangler by reading /memberships — an endpoint
+      # a Workers-scoped token cannot read.
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID || 'd5272033401c64f8cc6ce650a8321cb2' }}
+      KV_NAMESPACE_TITLE: amigotours-data
+      SOURCE_KV_TITLE: ${{ inputs.source_kv_title || 'nahiatours-data' }}
+      # So the sitemap, canonical URLs and OpenGraph tags point at this
+      # deployment rather than at production's domain.
+      SITE_URL: ${{ vars.AMIGOTOURS_SITE_URL || 'https://amigotours.johannes-neugschwentner.workers.dev' }}
+
+    steps:
+      # First thing in the job, before the token can reach any other output: a
+      # token that arrived as an input is not automatically a registered
+      # secret, so ask the runner to redact it from every subsequent log line.
+      - name: Mask the token
+        run: echo "::add-mask::${{ inputs.cloudflare_api_token }}"
+        if: inputs.cloudflare_api_token != ''
+
+      # This branch has no other way to ship, so a silent green here would be a
+      # lie. Fail rather than skip.
+      - name: Require a token
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: |
+          echo "::error::No Cloudflare API token."
+          echo "Add CLOUDFLARE_API_TOKEN under Settings → Secrets and variables →"
+          echo "Actions (Workers Scripts: Edit + Workers KV Storage: Edit), or pass"
+          echo "one as the cloudflare_api_token input when dispatching this workflow."
+          exit 1
+
+      # Everything downstream reads the token from the environment, so trim it
+      # in one place. A secret pasted with a trailing newline builds an
+      # Authorization header Cloudflare rejects with 6003 before it ever looks
+      # at what the token is allowed to do. Re-masking is required: the trimmed
+      # string is a different string from the registered secret, so the
+      # automatic redaction does not cover it.
+      - name: Normalize the token
+        run: |
+          clean="$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '[:space:]')"
+          echo "::add-mask::$clean"
+          echo "CLOUDFLARE_API_TOKEN=$clean" >> "$GITHUB_ENV"
+          echo "CLOUDFLARE_ACCOUNT_ID=$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+
+          # Enough to identify a mis-pasted credential without printing one.
+          if   [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then src="CLOUDFLARE_API_TOKEN"
+          elif [ -n "${{ secrets.CF_API_TOKEN }}" ];         then src="CF_API_TOKEN (fallback — is this stale?)"
+          elif [ -n "${{ inputs.cloudflare_api_token }}" ];  then src="the workflow_dispatch input"
+          else src="nowhere"; fi
+          echo "Supplied by:  $src"
+          echo "Length:       ${#clean}"
+
+          bad="$(printf '%s' "$clean" | tr -d 'A-Za-z0-9_.-' | fold -w1 | sort -u | tr -d '\n')"
+          if [ -n "$bad" ]; then
+            echo "Stray chars:  [$bad] — an API token contains none of these."
+            echo "              Re-add the secret as the bare token, nothing around it."
+          else
+            echo "Stray chars:  none"
+          fi
+
+      - uses: actions/checkout@v4
+
+      # A deploy that reached the wrong Worker would be the one unrecoverable
+      # mistake here, so the name is asserted before anything is uploaded
+      # rather than read out of the log afterwards.
+      - name: Check this branch deploys to amigotours
+        run: |
+          name="$(grep -m1 '^name *= *' wrangler.toml | sed 's/.*= *"\(.*\)"/\1/')"
+          echo "wrangler.toml names the Worker: $name"
+          if [ "$name" != "amigotours" ]; then
+            echo "::error::wrangler.toml names \"$name\", not \"amigotours\". Refusing to deploy."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # .npmrc pins legacy-peer-deps, so a plain `npm ci` is enough.
+      - run: npm ci
+
+      # Create amigotours-data if needed and fill it from the source. This runs
+      # BEFORE the build, because `npm run build` invokes provision-kv.mjs,
+      # which resolves the same namespace title and writes the binding into
+      # wrangler.toml — so by deploy time the binding points at a namespace
+      # that already has the data in it.
+      #
+      # Copying the data is a convenience, not the ship. If it fails the site
+      # still serves — reads fall back to the JSON bundled at /data/*.json — so
+      # a naming conflict or a narrowly-scoped token should not stop the design
+      # from deploying. It must stay visible, though: the summary below says
+      # plainly when the copy did not happen, because a green run that quietly
+      # served stale seed data would be the actual lie.
+      - name: Clone the KV data
+        id: kv
+        if: inputs.skip_kv_clone != true
+        continue-on-error: true
+        run: node scripts/clone-kv.mjs
+
+      # provision-kv → populate-local-data → sitemap → SEO → vite build.
+      # provision-kv.mjs finds the namespace clone-kv just filled, by title.
+      - name: Build
+        run: npm run build
+
+      - name: Show the resolved KV binding
+        run: |
+          echo "wrangler.toml KV binding after the build:"
+          sed -n '/managed by scripts\/provision-kv/,/<<< managed/p' wrangler.toml
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          # The action defaults to wrangler 3, which does not understand
+          # `run_worker_first` under [assets] and drops it with a warning — the
+          # Worker would then never see requests for paths that match a static
+          # file, so the API routes would stop running.
+          wranglerVersion: '4'
+          # `npm run build` already ran above, and it is what writes the KV
+          # binding into wrangler.toml — so deploy only, never rebuild here.
+          command: deploy
+
+      - name: Report where it landed
+        run: |
+          {
+            echo "### Amigo Tours deployed"
+            echo ""
+            echo "<https://amigotours.johannes-neugschwentner.workers.dev>"
+            echo ""
+            echo "Worker \`amigotours\`, from branch \`amigotours\` at \`${GITHUB_SHA::7}\`."
+            echo ""
+            if [ "${{ inputs.skip_kv_clone }}" = "true" ]; then
+              echo "KV: not copied (\`skip_kv_clone\`) — reading the bundled \`/data/*.json\`."
+            elif [ "${{ steps.kv.outcome }}" != "success" ]; then
+              echo "> [!WARNING]"
+              echo "> **KV was not copied.** The deploy went ahead and the site is up, but it"
+              echo "> is reading the seed data bundled at \`/data/*.json\`, not the live"
+              echo "> catalogue. See the *Clone the KV data* step for the reason."
+            else
+              echo "KV: ${{ steps.kv.outputs.keys_copied }} key(s) copied from \`${{ steps.kv.outputs.source_title }}\` into \`amigotours-data\` (\`${{ steps.kv.outputs.namespace_id }}\`)."
+            fi
+            echo ""
+            echo "Workers AI is bound as \`AI\` in wrangler.toml, so the blog generator"
+            echo "runs without any key being entered in the admin panel."
+          } >> "$GITHUB_STEP_SUMMARY"

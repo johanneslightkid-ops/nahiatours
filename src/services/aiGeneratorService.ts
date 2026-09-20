@@ -22,6 +22,13 @@ export interface BlogGenerationParams {
 const TARGET_CHARACTERS = 1500;
 
 /**
+ * Used when the admin has chosen Cloudflare but never picked a model — which
+ * is the normal state on a deployment that relies on the `AI` binding and so
+ * never opened the provider settings at all.
+ */
+const DEFAULT_CLOUDFLARE_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8';
+
+/**
  * Output ceiling for every provider.
  *
  * None of the three used to be given one, so each fell back to its own
@@ -203,9 +210,16 @@ const generateWithGemini = async (config: any, prompt: string, mediaBase64?: str
   return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 };
 
+/**
+ * Cloudflare Workers AI.
+ *
+ * Credentials are optional. When the admin has not entered an account id and
+ * token, none are sent and the server runs the model through the Worker's own
+ * `AI` binding instead (functions/api/cf-ai.ts) — so a fresh deployment can
+ * generate a post without anyone pasting a key first. Entering credentials
+ * switches it to the REST API against that account.
+ */
 const generateWithCloudflare = async (config: any, prompt: string): Promise<string> => {
-  if (!config.accountId || !config.apiKey) throw new Error('Cloudflare Account ID or API Token missing');
-  
   const payload = {
     messages: [
       {
@@ -220,10 +234,11 @@ const generateWithCloudflare = async (config: any, prompt: string): Promise<stri
     temperature: 0.9,
   };
 
+  const useOwnAccount = Boolean(config.accountId && config.apiKey);
+
   const data = await apiPost<any>('cf-ai', {
-    accountId: config.accountId,
-    token: config.apiKey,
-    model: config.selectedModel,
+    ...(useOwnAccount ? { accountId: config.accountId, token: config.apiKey } : {}),
+    model: config.selectedModel || DEFAULT_CLOUDFLARE_MODEL,
     payload
   });
 

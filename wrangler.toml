@@ -1,21 +1,26 @@
 # ==============================================================================
-# Cloudflare Worker configuration (static assets + API routes)
+# Amigo Tours — Cloudflare Worker (static assets + API routes)
 # ==============================================================================
 #
-# The Cloudflare project deploys with `npx wrangler deploy`, the Workers
-# command. It needs `main` (a script entry point) and `[assets]` (a directory to
-# upload); a Pages config with `pages_build_output_dir` provides neither, which
-# is what produced:
+# A SEPARATE SITE out of the same repository, not a change to any existing one.
+# `nahiatours` is production, `ldvip` and `transporturist` are earlier designs,
+# and this is the oil-painting one. `wrangler deploy` addresses a Worker by
+# name, so the name below is the only thing that decides where this lands, and
+# the deploy workflow asserts it before it uploads anything.
 #
-#   ✘ [ERROR] Missing entry-point to Worker script or to assets directory
+# Served at https://amigotours.johannes-neugschwentner.workers.dev
 #
-# `main` and `pages_build_output_dir` are mutually exclusive, so this file is
-# now Workers-shaped. worker/index.ts dispatches to the same functions/*
-# handlers the Pages deployment used, so no endpoint logic is duplicated.
+# worker/index.ts dispatches to the same functions/* handlers the Pages
+# deployment used, so no endpoint logic is duplicated.
 
-name = "nahiatours"
+name = "amigotours"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
+workers_dev = true
+
+# Pinned so neither wrangler nor the KV scripts have to discover the account by
+# listing /memberships — an endpoint a Workers-scoped token cannot read.
+account_id = "d5272033401c64f8cc6ce650a8321cb2"
 
 # Static build output. `single-page-application` serves index.html for paths
 # with no matching file, which is what React Router needs for /tours, /plan and
@@ -26,48 +31,55 @@ binding = "ASSETS"
 not_found_handling = "single-page-application"
 # Without this, the asset server answers before the Worker for any path that
 # matches a file, so the canonical-host redirect would silently stop applying
-# to page loads. Pages ran _middleware.ts on every path (_routes.json includes
-# "/*"), and this keeps that true.
+# to page loads.
 run_worker_first = true
+
+# ==============================================================================
+# Workers AI
+# ==============================================================================
+#
+# The blog generator used to need an account id and an API token typed into the
+# admin panel before it would produce a sentence — on a fresh deployment that
+# meant the feature was present and dead. This binding is the account's own
+# Workers AI, granted to the Worker at deploy time, so /api/cf-ai can run a
+# model with no credentials at all (functions/api/cf-ai.ts prefers it and only
+# falls back to the REST API when the admin has entered a token of their own).
+#
+# Nothing to create and nothing to paste: the binding exists because this line
+# does.
+[ai]
+binding = "AI"
 
 # ==============================================================================
 # KV
 # ==============================================================================
 #
-# Uncomment once the namespace exists and paste its id. Create it with either:
-#
-#   npx wrangler kv namespace create nahiatours-data
-#   ./scripts/deploy-cloudflare.sh      (creates, binds and deploys in one go)
+# scripts/provision-kv.mjs rewrites the block below during `npm run build`,
+# resolving KV_NAMESPACE_TITLE (amigotours-data in the deploy workflow) to an
+# id and creating the namespace if it does not exist yet. Do not edit it by
+# hand — the next build overwrites it.
 #
 # The handlers read DATA_KV_F first and fall back to DATA_KV
 # (functions/api/data.ts), so binding either name is enough.
 #
-# Until then the site still works: reads fall back to the JSON bundled at
-# /data/*.json. Only admin writes and /api/init-data need KV.
-#
-# Note this is a Worker, so wrangler.toml is the source of truth for bindings —
-# a binding added in the dashboard is overwritten by the next deploy.
-#
-# [[kv_namespaces]]
-# binding = "DATA_KV_F"
-# id = "<namespace id>"
+# Until a namespace exists the site still works: reads fall back to the JSON
+# bundled at /data/*.json. Only admin writes and /api/init-data need KV.
 
 # ==============================================================================
 # Environment variables
 # ==============================================================================
 #
-# ADMIN_PASSWORD is read only on the server (shared/adminAuth.ts) and never
-# reaches the browser — but it is committed here in plaintext, so treat it as
-# public. It is the default, not a secret.
+# ADMIN_PASSWORD is the INITIAL password only. It is read on the server
+# (shared/adminAuth.ts) and never reaches the browser, but it is committed here
+# in plaintext, so treat it as public.
 #
-# To use a real one without putting it in the repo:
-#   1. delete the ADMIN_PASSWORD line below
-#   2. npx wrangler secret put ADMIN_PASSWORD
-# Do both: a [vars] entry and a secret of the same name collide, and the
-# plaintext var can win on deploy.
+# Once the site is up, change it from the admin panel (Ajustes de marca →
+# Contraseña del panel). That writes the new password to KV, and KV wins over
+# this var from then on — so the committed value stops being the password the
+# moment somebody changes it, without a redeploy.
 #
-# TODO: the same goes for CLOUDINARY_API_SECRET. Its VITE_ copy is compiled
-# into the client bundle where any visitor can read it, so that one needs
+# TODO: CLOUDINARY_API_SECRET is in plaintext here and its VITE_ copy is
+# compiled into the client bundle where any visitor can read it. That one needs
 # rotating, not just relocating.
 
 [vars]
