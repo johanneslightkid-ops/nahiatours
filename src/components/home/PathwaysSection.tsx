@@ -72,7 +72,7 @@ const PathwaysSection: React.FC = () => {
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <span className="artsy-brick-badge-inverted mb-5 inline-flex">{copy.eyebrow}</span>
-          <h2 className="mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
+          <h2 className="mb-4 font-display text-3xl font-bold leading-tight text-ink sm:text-4xl md:text-5xl">
             {copy.title}
           </h2>
           <p className="text-lg font-semibold leading-8 text-ink-soft">{copy.subtitle}</p>
@@ -88,7 +88,7 @@ const PathwaysSection: React.FC = () => {
             className="pathway-card flex flex-col p-8 sm:p-10"
           >
             <span className="text-4xl">🗂️</span>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-ink">{copy.catalogueTitle}</h3>
+            <h3 className="mt-4 font-display text-2xl font-bold text-ink">{copy.catalogueTitle}</h3>
             <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-ink-soft">{copy.catalogueText}</p>
             <Link
               to="/tours#top"
@@ -110,11 +110,11 @@ const PathwaysSection: React.FC = () => {
           >
             <div className="flex items-center justify-between gap-3">
               <span className="text-4xl">🧭</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-mango-light px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-ink">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(150,112,31,0.4)] bg-mango-light px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-ink">
                 <HiSparkles className="h-3 w-3" /> {copy.plannerBadge}
               </span>
             </div>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-paper">{copy.plannerTitle}</h3>
+            <h3 className="mt-4 font-display text-2xl font-bold text-paper">{copy.plannerTitle}</h3>
             <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-paper/85">{copy.plannerText}</p>
             <Link
               to="/plan#top"

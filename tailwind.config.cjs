@@ -1,172 +1,228 @@
 /**
- * Illustrated tropical design system.
+ * Amigo Tours — oil on canvas.
  *
- * The site used to be a dark "luxury" theme leaning on photography, glass and
- * blur. It is now drawn rather than photographed: flat poster colours, ink
- * outlines, hard offset shadows and rounded sticker shapes. Everything here is
- * intentionally opaque — no translucent surfaces — so the illustration reads
- * cleanly at any size.
+ * The previous design was a sticker sheet: flat poster colour, a hard black
+ * outline round every object and a 4px offset shadow under it. This one is a
+ * painting, in the tradition of Dominican and Haitian tropical oils — thick
+ * saturated colour, a warm linen ground showing through everywhere, and
+ * ornament borrowed from Taino pottery geometry rather than from a marker pen.
+ *
+ * THREE RULES, and every token below serves one of them.
+ *
+ *   1. EVERYTHING IS ON CANVAS. One warm linen ground runs under the whole
+ *      site. There is no pure white and no pure black anywhere: the lightest
+ *      value is `canvas-lift` and the darkest is `ink`, a deep umber-teal —
+ *      what a dark oil dries to, not what a printer prints.
+ *
+ *   2. EDGES ARE BRUSHED, NOT DRAWN. Where a shape meets the ground it does so
+ *      with a soft painted edge. Depth comes from the paint lifting off the
+ *      weave (`shadow-oil-*`, warm close in and violet further out), never
+ *      from an offset slab of colour.
+ *
+ *   3. COLOUR IS MIXED, NOT PICKED. Every hue carries some of its neighbour —
+ *      greens lean gold, blues lean green, pinks lean coral. Shadows go
+ *      violet, highlights go warm. Nothing here is a hue straight from the
+ *      tube.
+ *
+ * MOTION. Every keyframe in this file moves `transform` or `opacity` and
+ * nothing else, so it composites on the GPU and never triggers layout or
+ * paint. The durations are long on purpose: a painting that fidgets is a
+ * cartoon. WHERE each one is allowed to run is decided by useMotionBudget(),
+ * not here.
  */
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        // Poster palette. Each hue is flat and saturated enough to hold its own
-        // next to a black ink outline.
-        ink: {
-          DEFAULT: '#1E2A3A',
-          soft: '#42566B',
-          light: '#7C8FA3',
-        },
-        paper: {
-          DEFAULT: '#FFF6E5',
-          warm: '#FFEFD6',
-          deep: '#F7E3C2',
-          // The surface an admin card sits on: lighter than the page so forms
-          // read as sheets laid on the ground.
-          card: '#FFFDF7',
-        },
-        mango: {
-          light: '#FFC861',
-          DEFAULT: '#FFA62B',
-          dark: '#F07E13',
-        },
-        hibiscus: {
-          light: '#FF9AA8',
-          DEFAULT: '#FF5D73',
-          dark: '#E03B57',
-        },
-        lagoon: {
-          light: '#7FE3DA',
-          DEFAULT: '#21C0B7',
-          dark: '#128C8A',
-        },
-        sky: {
-          light: '#A5E4FF',
-          DEFAULT: '#4CC3F0',
-          dark: '#1C86BE',
-        },
-        jungle: {
-          light: '#7BD389',
-          DEFAULT: '#2FA84F',
-          dark: '#1B7A3C',
-        },
-        sunset: {
-          light: '#FFB38A',
-          DEFAULT: '#FF7A45',
-          dark: '#DD4F1E',
-        },
-        grape: {
-          light: '#C9A7F5',
-          DEFAULT: '#9163DE',
-          dark: '#6B3FB5',
-        },
-        // Semantic surface and accent names used by the admin panel. The admin
-        // is written against roles rather than hues — a card is `paper-card`,
-        // a primary action is `sea-deep` — so a redesign can repoint the whole
-        // back office by redefining these three, without touching its markup.
-        // Here they resolve into the poster palette above.
-        coral: {
-          deep: '#E03B57',
-        },
-        sea: {
-          deep: '#128C8A',
+        // ── The ground ──────────────────────────────────────────────────────
+        // Linen, sized and toned. `lift` is a sheet laid on top of the weave,
+        // not a white card: it still carries the warmth underneath.
+        canvas: {
+          DEFAULT: '#F7EEDC',
+          deep: '#EFE0C6',
+          shade: '#E4D2B4',
+          lift: '#FDF8EE',
         },
 
-        // Legacy aliases kept so any stray class name still resolves to a
-        // colour inside the new palette instead of disappearing.
-        tropicalGreen: '#2FA84F',
-        tropicalBlue: '#4CC3F0',
-        sandyBeige: '#FFEFD6',
-        sunsetOrange: '#FF7A45',
-        oceanWave: '#21C0B7',
+        // ── The darkest value ───────────────────────────────────────────────
+        // Umber mixed into viridian. Every piece of text is one of these, and
+        // `ink` at full strength is as dark as this site goes.
+        ink: {
+          DEFAULT: '#22342E',
+          soft: '#476056',
+          light: '#84978D',
+          wash: '#B9C4BB',
+        },
+
+        // ── Sea ─────────────────────────────────────────────────────────────
+        // Bavaro turquoise over an ultramarine shelf.
+        lagoon: {
+          light: '#8FDCD0',
+          DEFAULT: '#2FB6A4',
+          dark: '#12796F',
+        },
+        sea: {
+          light: '#5C9DBA',
+          DEFAULT: '#1F6285',
+          dark: '#0E3B52',
+          // The admin's primary action, and the deepest water in the paintings.
+          deep: '#0E3B52',
+        },
+
+        // ── Sun and sand ────────────────────────────────────────────────────
+        mango: {
+          light: '#FFCE7A',
+          DEFAULT: '#F2A32B',
+          dark: '#CE7A0D',
+        },
+        ochre: {
+          light: '#E2C078',
+          DEFAULT: '#C2963C',
+          dark: '#96701F',
+        },
+
+        // ── Flamboyan ───────────────────────────────────────────────────────
+        // The national tree's flower: red with orange in it, never scarlet.
+        coral: {
+          light: '#FF9A81',
+          DEFAULT: '#E4573F',
+          dark: '#B33421',
+          deep: '#B33421',
+        },
+        hibiscus: {
+          light: '#F599BA',
+          DEFAULT: '#DB5589',
+          dark: '#A82F5E',
+        },
+
+        // ── Foliage ─────────────────────────────────────────────────────────
+        palm: {
+          light: '#9CC873',
+          DEFAULT: '#57913C',
+          dark: '#2F5B24',
+        },
+
+        // ── The shadow colour ───────────────────────────────────────────────
+        // Nothing is shadowed with black. Violet-grey is what a warm light
+        // leaves behind, and it is most of the reason the page reads as paint.
+        shade: {
+          light: '#A79ABC',
+          DEFAULT: '#6B5B8A',
+          dark: '#413656',
+        },
+
+        // ── Admin surface roles ─────────────────────────────────────────────
+        // The back office is written against roles rather than hues, so it
+        // follows this palette without a single edit to its markup.
+        paper: {
+          DEFAULT: '#F7EEDC',
+          warm: '#EFE0C6',
+          deep: '#E4D2B4',
+          card: '#FDF8EE',
+        },
+
+        // Legacy aliases, so a class name left over from an older design still
+        // lands somewhere inside this palette instead of disappearing.
+        sky: { light: '#B7E2EC', DEFAULT: '#5C9DBA', dark: '#1F6285' },
+        jungle: { light: '#9CC873', DEFAULT: '#57913C', dark: '#2F5B24' },
+        sunset: { light: '#FFB68F', DEFAULT: '#E4573F', dark: '#B33421' },
+        grape: { light: '#A79ABC', DEFAULT: '#6B5B8A', dark: '#413656' },
+        tropicalGreen: '#57913C',
+        tropicalBlue: '#5C9DBA',
+        sandyBeige: '#EFE0C6',
+        sunsetOrange: '#E4573F',
+        oceanWave: '#2FB6A4',
       },
+
       fontFamily: {
-        // Rounded poster display + a friendly humanist body face.
-        heading: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
-        display: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
-        // `font-serif` is still sprinkled through the markup; point it at the
-        // display face so nothing falls back to Times.
-        serif: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
-        sans: ['Nunito', 'system-ui', 'sans-serif'],
-        body: ['Nunito', 'system-ui', 'sans-serif'],
-        accent: ['Caveat', '"Baloo 2"', 'cursive'],
-        script: ['Caveat', 'cursive'],
+        // A high-contrast serif for anything that is a statement, set the way
+        // a sign painter would set it. Italic is used deliberately and often.
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
+        heading: ['"Playfair Display"', 'Georgia', 'serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        // A warm humanist sans underneath it, so the paragraphs stay quiet.
+        sans: ['Figtree', 'system-ui', '-apple-system', 'sans-serif'],
+        body: ['Figtree', 'system-ui', '-apple-system', 'sans-serif'],
       },
-      backgroundImage: {
-        'sun-rays': 'repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,200,97,0.35) 0deg 9deg, transparent 9deg 18deg)',
-        'sky-wash': 'linear-gradient(180deg, #A5E4FF 0%, #CFF1FF 45%, #FFF6E5 100%)',
-        'sunset-wash': 'linear-gradient(180deg, #FFC861 0%, #FF9A5B 55%, #FF5D73 100%)',
-        'lagoon-wash': 'linear-gradient(180deg, #7FE3DA 0%, #21C0B7 60%, #128C8A 100%)',
-        'jungle-wash': 'linear-gradient(180deg, #7BD389 0%, #2FA84F 60%, #1B7A3C 100%)',
-        'paper-wash': 'linear-gradient(180deg, #FFF6E5 0%, #FFEFD6 100%)',
-      },
+
       boxShadow: {
-        // Hard, un-blurred drop shadows: the sticker look.
-        'ink-sm': '2px 2px 0 0 #1E2A3A',
-        'ink': '4px 4px 0 0 #1E2A3A',
-        'ink-lg': '7px 7px 0 0 #1E2A3A',
-        'ink-xl': '10px 10px 0 0 #1E2A3A',
-        'mango': '4px 4px 0 0 #F07E13',
-        'lagoon': '4px 4px 0 0 #128C8A',
-        'hibiscus': '4px 4px 0 0 #E03B57',
-        // A very soft lift used sparingly under floating elements.
-        'lift': '0 12px 24px -12px rgba(30, 42, 58, 0.45)',
+        // Paint lifting off the weave: warm close in, violet further out.
+        // Never offset sideways — that reads as a sticker, which is the look
+        // this design replaces.
+        'oil-sm': '0 2px 6px -2px rgba(65, 54, 86, 0.22)',
+        oil: '0 10px 24px -14px rgba(65, 54, 86, 0.38), 0 2px 6px -3px rgba(150, 112, 31, 0.18)',
+        'oil-lg':
+          '0 24px 48px -26px rgba(65, 54, 86, 0.42), 0 6px 14px -8px rgba(150, 112, 31, 0.2)',
+        'oil-xl':
+          '0 40px 80px -40px rgba(65, 54, 86, 0.48), 0 10px 22px -12px rgba(150, 112, 31, 0.22)',
+        // A gilded edge, for the few things that are literally framed.
+        frame: '0 0 0 1px rgba(150, 112, 31, 0.28), 0 18px 38px -22px rgba(65, 54, 86, 0.45)',
+        glow: '0 0 34px -6px rgba(47, 182, 164, 0.55)',
       },
+
       borderRadius: {
-        'sm': '10px',
-        'md': '14px',
-        'lg': '20px',
-        'xl': '26px',
-        '2xl': '32px',
-        '3xl': '40px',
-        'blob': '46% 54% 52% 48% / 52% 46% 54% 48%',
+        // Shapes vary on purpose — a painted edge is never the same twice —
+        // but they all come from this small vocabulary, so the variation reads
+        // as intent rather than as noise.
+        brush: '18px 26px 20px 30px',
+        'brush-lg': '34px 48px 36px 52px',
+        petal: '60% 40% 55% 45% / 50% 55% 45% 50%',
+        shell: '50% 50% 46% 54% / 60% 58% 42% 40%',
       },
-      animation: {
-        'float': 'float 6s ease-in-out infinite',
-        'sway': 'sway 7s ease-in-out infinite',
-        'spin-slow': 'spin 40s linear infinite',
-        'bob': 'bob 4.5s ease-in-out infinite',
-        'fade-in': 'fadeIn 0.7s ease-out forwards',
-        'slide-up': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'drift': 'drift 60s linear infinite',
+
+      spacing: {
+        // Generous, painterly gutters. These are the two steps the sections
+        // actually use.
+        gallery: '7.5rem',
+        'gallery-lg': '11rem',
       },
+
+      maxWidth: {
+        measure: '64ch',
+      },
+
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
+        // Every one of these is transform/opacity only.
+        drift: {
+          '0%': { transform: 'translate3d(-12vw, 0, 0)' },
+          '100%': { transform: 'translate3d(112vw, 0, 0)' },
+        },
+        glide: {
+          '0%, 100%': { transform: 'translate3d(0, 0, 0) rotate(0deg)' },
+          '50%': { transform: 'translate3d(0, -14px, 0) rotate(1.5deg)' },
+        },
+        flutter: {
+          '0%, 100%': { transform: 'translate3d(0,0,0) rotate(-4deg) scale(1)' },
+          '25%': { transform: 'translate3d(6px,-10px,0) rotate(3deg) scale(0.97)' },
+          '50%': { transform: 'translate3d(2px,-18px,0) rotate(-2deg) scale(1.02)' },
+          '75%': { transform: 'translate3d(-5px,-9px,0) rotate(4deg) scale(0.98)' },
+        },
+        swell: {
+          '0%, 100%': { transform: 'translate3d(0,0,0) scaleY(1)' },
+          '50%': { transform: 'translate3d(0,-6px,0) scaleY(1.04)' },
+        },
+        shimmer: {
+          '0%, 100%': { opacity: '0.35' },
+          '50%': { opacity: '0.7' },
         },
         sway: {
-          '0%, 100%': { transform: 'rotate(-2deg)' },
-          '50%': { transform: 'rotate(2deg)' },
-        },
-        bob: {
-          '0%, 100%': { transform: 'translateY(0) rotate(-1deg)' },
-          '50%': { transform: 'translateY(-8px) rotate(1deg)' },
-        },
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        drift: {
-          from: { transform: 'translate3d(0, 0, 0)' },
-          to: { transform: 'translate3d(-50%, 0, 0)' },
+          '0%, 100%': { transform: 'rotate(-1.6deg)' },
+          '50%': { transform: 'rotate(1.6deg)' },
         },
       },
-      maxWidth: {
-        '8xl': '88rem',
-        '9xl': '96rem',
+
+      animation: {
+        // Slow. A painting that fidgets is a cartoon.
+        drift: 'drift 90s linear infinite',
+        'drift-slow': 'drift 150s linear infinite',
+        glide: 'glide 11s ease-in-out infinite',
+        flutter: 'flutter 9s ease-in-out infinite',
+        swell: 'swell 7s ease-in-out infinite',
+        shimmer: 'shimmer 6s ease-in-out infinite',
+        sway: 'sway 8s ease-in-out infinite',
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
-}
+  plugins: [require('@tailwindcss/typography')],
+};

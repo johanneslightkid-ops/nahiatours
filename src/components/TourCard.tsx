@@ -96,7 +96,7 @@ const TourCard: React.FC<TourCardProps> = ({
       className={`group mb-8 inline-block flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
     >
       {/* Media Frame */}
-      <div className="relative aspect-[16/10] overflow-hidden border-b-[2.5px] border-ink">
+      <div className="relative aspect-[16/10] overflow-hidden border-b border-[rgba(150,112,31,0.28)]">
         <Link to={detailsPath} onClick={() => playClickFx()} className="block h-full w-full" aria-label={title}>
           <img
             src={image}
@@ -117,7 +117,7 @@ const TourCard: React.FC<TourCardProps> = ({
               <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-lagoon-dark">
                 {brandName} Collection
               </span>
-              <h3 className="mt-1 font-display text-2xl font-extrabold text-ink">
+              <h3 className="mt-1 font-display text-2xl font-bold text-ink">
                 {title}
               </h3>
             </div>
@@ -138,7 +138,7 @@ const TourCard: React.FC<TourCardProps> = ({
 
           {showPrice && (
             <div className="flex flex-wrap gap-2 pt-1">
-              <span className="inline-flex items-center rounded-full border-2 border-ink bg-lagoon-light px-3.5 py-1 text-xs font-extrabold text-ink">
+              <span className="inline-flex items-center rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon-light px-3.5 py-1 text-xs font-extrabold text-ink">
                 {rate.tier}: <strong className="ml-1 text-ink">{rate.price}</strong>
               </span>
             </div>
@@ -147,7 +147,7 @@ const TourCard: React.FC<TourCardProps> = ({
 
         {enabled && (
           <div className="mt-6 space-y-4 border-t-2 border-dashed border-ink/25 pt-6">
-            <label className="block space-y-1.5 rounded-2xl border-2 border-ink bg-paper p-3 text-left">
+            <label className="block space-y-1.5 rounded-2xl border border-[rgba(150,112,31,0.4)] bg-paper p-3 text-left">
               <span className="block text-xs font-extrabold uppercase tracking-wider text-ink-soft">
                 {rate.tier}
               </span>
@@ -156,7 +156,7 @@ const TourCard: React.FC<TourCardProps> = ({
                 min="0"
                 value={persons}
                 onChange={(event) => handlePersonsChange(event.target.value)}
-                className="w-full rounded-xl border-2 border-ink bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none transition focus:bg-lagoon-light"
+                className="w-full rounded-xl border border-[rgba(150,112,31,0.4)] bg-white px-3 py-1.5 text-sm font-extrabold text-ink outline-none transition focus:bg-lagoon-light"
               />
             </label>
 
@@ -168,15 +168,15 @@ const TourCard: React.FC<TourCardProps> = ({
                 type="date"
                 value={selectedDate}
                 onChange={(event) => setSelectedDate(event.target.value)}
-                className="w-full rounded-xl border-2 border-ink bg-white px-4 py-2.5 text-sm font-bold text-ink outline-none transition focus:bg-lagoon-light"
+                className="w-full rounded-xl border border-[rgba(150,112,31,0.4)] bg-white px-4 py-2.5 text-sm font-bold text-ink outline-none transition focus:bg-lagoon-light"
               />
             </label>
 
-            <div className="flex items-center justify-between rounded-2xl border-[2.5px] border-ink bg-mango px-5 py-3 shadow-ink-sm">
+            <div className="flex items-center justify-between rounded-2xl border border-[rgba(150,112,31,0.4)] bg-mango px-5 py-3 shadow-oil-sm">
               <span className="text-xs font-extrabold uppercase tracking-wider text-ink">
                 <FormattedMessage id="payment.total" defaultMessage="Total Estimate" />
               </span>
-              <span className="font-display text-xl font-extrabold text-ink">
+              <span className="font-display text-xl font-bold text-ink">
                 {totalAmount > 0 ? `$${totalAmount} USD` : price}
               </span>
             </div>

@@ -35,7 +35,7 @@ const PlanMyDay: React.FC = () => {
   }, [stage, stepIndex]);
 
   return (
-    <div className="planner relative min-h-screen px-4 py-12 sm:py-16 md:px-8">
+    <div className="planner relative min-h-screen px-4 py-16 sm:py-20 md:px-8 lg:py-24">
       <FABWhatsApp phoneNumber={brandSettings.phoneNumber} />
 
       {/* Painted washes behind the panels. They deliberately bleed past the
@@ -44,11 +44,11 @@ const PlanMyDay: React.FC = () => {
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div
           className="planner-glow left-[-10%] top-24 h-[28rem] w-[28rem]"
-          style={{ background: '#7FE3DA' }}
+          style={{ background: '#2FB6A4' }}
         />
         <div
           className="planner-glow bottom-10 right-[-8%] h-[24rem] w-[24rem]"
-          style={{ background: '#FFC861' }}
+          style={{ background: '#F2A32B' }}
         />
       </div>
 
@@ -57,8 +57,8 @@ const PlanMyDay: React.FC = () => {
         {stage === 'questions' && (
           <div className="mb-6 space-y-4">
             <div className="flex items-center justify-between gap-4">
-              <span className="font-display text-lg font-extrabold text-ink">{copy.tab}</span>
-              <span className="text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-ink-soft">
+              <span className="font-display text-lg font-bold text-canvas-lift">{copy.tab}</span>
+              <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-canvas/70">
                 {copy.ui.stepOf(stepIndex + 1, steps.length)}
               </span>
             </div>
@@ -91,7 +91,7 @@ const PlanMyDay: React.FC = () => {
         </div>
 
         {loading && stage === 'intro' && (
-          <p className="mt-6 text-center text-xs font-extrabold uppercase tracking-[0.18em] text-ink-soft">
+          <p className="mt-6 text-center text-xs font-bold uppercase tracking-[0.18em] text-canvas/60">
             {copy.result.building}
           </p>
         )}

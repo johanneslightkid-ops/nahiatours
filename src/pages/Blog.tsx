@@ -110,7 +110,7 @@ const Blog = () => {
                 <article
                   key={article.id}
                   id={article.slug}
-                  className={`glass-card ${radiusClass} ${swayClass} p-6 md:p-12 transition-all duration-500 hover:scale-[1.015] shadow-ink-sm border border-ink/15`}
+                  className={`glass-card ${radiusClass} ${swayClass} p-6 md:p-12 transition-all duration-500 hover:scale-[1.015] shadow-oil-sm border border-ink/15`}
                 >
                   <header className="mb-8 border-b border-ink/20 pb-6">
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-ink font-display tracking-tight leading-tight mb-5">
@@ -118,7 +118,7 @@ const Blog = () => {
                     </h2>
                     <div className="flex flex-wrap items-center gap-4 text-sm font-body">
                       {article.tour && (
-                        <span className="inline-flex items-center gap-1.5 rounded-[16px_6px_14px_8px] border-2 border-ink bg-lagoon-light px-4 py-1.5 font-extrabold text-ink">
+                        <span className="inline-flex items-center gap-1.5 rounded-[16px_6px_14px_8px] border border-[rgba(150,112,31,0.4)] bg-lagoon-light px-4 py-1.5 font-extrabold text-ink">
                           <MdTour className="h-4 w-4 text-lagoon-dark" />
                           <FormattedMessage id="blog.relatedTourLabel" defaultMessage="Related tour" />: {article.tour}
                         </span>

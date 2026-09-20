@@ -58,7 +58,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onAuthenticate }) => {
 
 	return (
 		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-ink/60 p-4">
-			<div className="w-full max-w-md rounded-[26px] border border-ink/15 bg-paper p-6 shadow-ink-lg">
+			<div className="w-full max-w-md rounded-[26px] border border-ink/15 bg-paper p-6 shadow-oil-lg">
 				<h2 className="mb-4 font-display text-xl font-semibold text-ink">Acceso al panel</h2>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<input

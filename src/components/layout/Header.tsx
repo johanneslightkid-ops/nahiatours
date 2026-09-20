@@ -13,6 +13,17 @@ import { getAdminPassword, clearAdminPassword } from '../../services/authStore';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  /**
+   * The logo medallion is deliberately oversized — it is the brand mark, and
+   * it hangs below the bar into the page. That is right at the top of a page
+   * and wrong everywhere else: once you scroll, a fixed 147px disc sits on
+   * top of whatever you are reading. So it shrinks into the bar as soon as the
+   * page moves, and comes back when you return to the top.
+   *
+   * The shrink is `scale` on a transform, so it costs a composite and never a
+   * layout.
+   */
+  const [isScrolled, setIsScrolled] = useState(false);
   const { brandSettings } = useBrand();
   const location = useLocation();
   const navigate = useNavigate();
@@ -23,6 +34,23 @@ const Header: React.FC = () => {
     const handleAuthChange = () => setIsAuthenticated(!!getAdminPassword());
     window.addEventListener('authChange', handleAuthChange);
     return () => window.removeEventListener('authChange', handleAuthChange);
+  }, []);
+
+  useEffect(() => {
+    // Coalesced to one read per frame: a scroll handler that touches the DOM
+    // on every event is the classic way to make a smooth page stutter.
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 40);
+        ticking = false;
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const isAdminRoute = location.pathname.startsWith('/admin') && isAuthenticated;
@@ -48,27 +76,37 @@ const Header: React.FC = () => {
 
   return (
     <header className="lobster-header sticky top-0 z-50 overflow-visible">
-      <div className="section-shell flex items-center justify-between py-3.5 pl-[10.5rem] sm:pl-[11.25rem] lg:pl-8">
+      <div
+        className={`section-shell flex items-center justify-between py-3.5 transition-[padding] duration-500 lg:pl-8 ${
+          isScrolled ? 'pl-[4.75rem] sm:pl-[6.5rem]' : 'pl-[6.75rem] sm:pl-[11.25rem]'
+        }`}
+      >
         <Link
           to="/#top"
           className="group flex items-center gap-3"
           onClick={() => playClickFx()}
           onMouseEnter={() => playHoverFx()}
         >
-          <div className="menu-logo-icon fixed left-4 top-2 flex h-[9.1875rem] w-[9.1875rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
+          <div
+            className={`menu-logo-icon fixed left-3 top-1.5 flex h-[5.75rem] w-[5.75rem] origin-top-left items-center justify-center overflow-hidden rounded-full border-[3px] border-[rgba(150,112,31,0.55)] bg-gradient-to-br from-canvas-lift via-mango-light to-ochre shadow-oil-lg transition-transform duration-500 ease-out group-hover:-rotate-2 sm:left-6 sm:top-2 sm:h-[9.1875rem] sm:w-[9.1875rem] lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))] ${
+              isScrolled ? 'scale-[0.46] sm:scale-[0.38]' : 'group-hover:scale-[1.03]'
+            }`}
+          >
             {brandSettings.brandicon ? (
               <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
             ) : (
-              <img src="/competitor-logo.svg" alt="Logo" className="h-[7.875rem] w-[7.875rem]" />
+              <img src="/competitor-logo.svg" alt="Logo" className="h-[4.9rem] w-[4.9rem] sm:h-[7.875rem] sm:w-[7.875rem]" />
             )}
           </div>
-          <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[10.75rem] sm:block lg:ml-[11.5rem]">
+          <h1 className={`relative hidden font-display text-[1.7rem] font-bold tracking-tight text-ink transition-all duration-500 group-hover:text-coral-dark sm:block ${
+              isScrolled ? 'sm:ml-0 lg:ml-[4.75rem]' : 'sm:ml-[10.75rem] lg:ml-[11.5rem]'
+            }`}>
             {brandSettings.brandName}
           </h1>
         </Link>
 
         <button
-          className="grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-mango-light text-ink shadow-ink-sm transition hover:bg-mango md:hidden"
+          className="grid h-11 w-11 place-items-center rounded-full border border-[rgba(150,112,31,0.5)] bg-gradient-to-br from-canvas-lift to-mango-light text-ink shadow-oil-sm transition hover:from-mango-light hover:to-ochre md:hidden"
           onClick={() => {
             playClickFx();
             setIsMenuOpen(!isMenuOpen);
@@ -79,7 +117,7 @@ const Header: React.FC = () => {
         </button>
 
         <nav
-          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+12px)] flex-col gap-3 rounded-[24px] border-[3px] border-ink bg-paper px-5 py-5 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-2 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
+          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+12px)] flex-col gap-2 rounded-[26px_18px_24px_20px] border border-[rgba(150,112,31,0.45)] bg-canvas-lift px-5 py-5 shadow-oil-lg md:static md:flex md:flex-row md:items-center md:gap-2 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
         >
           {isAdminRoute ? (
             <>
@@ -107,8 +145,8 @@ const Header: React.FC = () => {
               <Link to="/admin?section=aiBlogGen" onClick={handleNavClick} className={adminNavClass('aiBlogGen')} title="AI Blog Gen">
                 <FaMagic className="h-5 w-5" />
               </Link>
-              <div className="mx-1 hidden h-6 w-0.5 bg-ink/30 md:block"></div>
-              <button onClick={handleLogout} className="nav-link-pill p-3 !rounded-full !text-hibiscus-dark hover:!bg-hibiscus-light" title="Log Out & Return">
+              <div className="mx-1 hidden h-6 w-px bg-[rgba(150,112,31,0.45)] md:block"></div>
+              <button onClick={handleLogout} className="nav-link-pill p-3 !rounded-full !text-coral-dark hover:!bg-coral-light/40" title="Log Out & Return">
                 <FaSignOutAlt className="h-5 w-5" />
               </button>
             </>
@@ -125,8 +163,10 @@ const Header: React.FC = () => {
                 onClick={handleNavClick}
                 onMouseEnter={() => playHoverFx()}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 rounded-full border-[2.5px] border-ink px-4 py-2 font-extrabold text-ink shadow-ink-sm transition duration-200 hover:-translate-y-0.5 ${
-                    isActive ? 'bg-mango' : 'bg-mango-light hover:bg-mango'
+                  `flex items-center gap-2 rounded-full border border-[rgba(150,112,31,0.5)] px-4 py-2 text-sm font-bold text-ink shadow-oil-sm transition duration-300 hover:-translate-y-0.5 ${
+                    isActive
+                      ? 'bg-gradient-to-br from-mango to-ochre'
+                      : 'bg-gradient-to-br from-canvas-lift to-mango-light hover:to-mango'
                   }`
                 }
               >

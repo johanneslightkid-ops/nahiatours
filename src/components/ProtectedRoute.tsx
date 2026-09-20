@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
-import { Route, Routes, RouteProps } from 'react-router-dom';
-import PasswordModal from '../components/PasswordModal';
-import Admin from '../pages/Admin';
+import PasswordModal from './PasswordModal';
 
-interface ProtectedRouteProps extends RouteProps {
+interface ProtectedRouteProps {
   component: React.ComponentType;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component, ...rest }) => {
+/**
+ * The gate in front of the admin.
+ *
+ * This used to `import Admin from '../pages/Admin'` at the top and never use
+ * it, and it extended RouteProps for a `...rest` it also never used. The dead
+ * import was not free: it pulled the admin panel — and the 300kB markdown
+ * editor inside it — into the entry chunk, for every visitor, including the
+ * ones who never open the admin. Both are gone; the component to render now
+ * arrives as a prop, lazily, from App.
+ */
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   if (!isAuthenticated) {

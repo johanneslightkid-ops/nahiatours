@@ -133,9 +133,9 @@ const StorySection: React.FC<StorySectionProps> = ({
         {/* Header with emoji and title */}
         <div className={`mb-10 text-center sm:mb-12 ${isAlternate ? 'md:text-right' : 'md:text-left'}`}>
           {emoji && <div className={`section-icon mb-5 ${isAlternate ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}>{emoji}</div>}
-          {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
+          {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl font-bold leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
           {timeframe && (
-            <p className="inline-block rounded-full border-2 border-ink bg-mango-light px-4 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-ink-sm">
+            <p className="inline-block rounded-full border border-[rgba(150,112,31,0.4)] bg-mango-light px-4 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-oil-sm">
               {timeframe}
             </p>
           )}
@@ -169,8 +169,8 @@ const StorySection: React.FC<StorySectionProps> = ({
                 {mood.split(', ').filter(Boolean).map((m, idx) => (
                   <span
                     key={idx}
-                    className={`rounded-full border-[2.5px] border-ink px-4 py-1.5 text-sm font-extrabold text-ink shadow-ink-sm transition-transform hover:-translate-y-1 hover:rotate-2 ${
-                      ['bg-mango-light', 'bg-lagoon-light', 'bg-hibiscus-light', 'bg-jungle-light'][idx % 4]
+                    className={`rounded-full border border-[rgba(150,112,31,0.4)] px-4 py-1.5 text-sm font-extrabold text-ink shadow-oil-sm transition-transform hover:-translate-y-1 hover:rotate-2 ${
+                      ['bg-mango-light', 'bg-lagoon-light', 'bg-hibiscus-light', 'bg-palm-light'][idx % 4]
                     }`}
                   >
                     {m}
@@ -195,7 +195,7 @@ const StorySection: React.FC<StorySectionProps> = ({
                       </blockquote>
                     </div>
                   ) : (
-                    <div className="relative w-full aspect-video rounded-[28px_14px_30px_16px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft">Loading TikTok...</div>
+                    <div className="relative w-full aspect-video rounded-[28px_14px_30px_16px] flex items-center justify-center border border-[rgba(150,112,31,0.4)] bg-paper-warm font-bold text-ink-soft">Loading TikTok...</div>
                   )
                 ) : (
                   <iframe
@@ -232,7 +232,7 @@ const StorySection: React.FC<StorySectionProps> = ({
                       </blockquote>
                     </div>
                   ) : (
-                     <div className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] flex items-center justify-center border-[2.5px] border-ink bg-paper-warm font-bold text-ink-soft sm:h-96 md:h-[520px]">Loading TikTok...</div>
+                     <div className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] flex items-center justify-center border border-[rgba(150,112,31,0.4)] bg-paper-warm font-bold text-ink-soft sm:h-96 md:h-[520px]">Loading TikTok...</div>
                   )
                 ) : (
                   <iframe

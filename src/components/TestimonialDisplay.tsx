@@ -66,7 +66,7 @@ const TestimonialDisplay: React.FC<TestimonialDisplayProps> = ({ locale }) => {
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
-                className="group rounded-[28px] border border-ink/15 bg-paper p-7 shadow-ink-sm transition-all hover:-translate-y-2 hover: shadow-ink-sm"
+                className="group rounded-[28px] border border-ink/15 bg-paper p-7 shadow-oil-sm transition-all hover:-translate-y-2 hover: shadow-oil-sm"
               >
                 {/* Rating */}
                 <div className="flex gap-1 mb-4">

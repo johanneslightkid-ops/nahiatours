@@ -16,6 +16,9 @@ import { useBlog } from '../contexts/BlogContext';
 import QuickFacts from '../components/home/QuickFacts';
 import PathwaysSection from '../components/home/PathwaysSection';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
+import Reveal from '../components/ui/Reveal';
+import ParallaxWash from '../components/ui/ParallaxWash';
+import { Turtle, Butterfly, Sailboat, TainoBand } from '../components/ui/Illustrations';
 
 const HERO_BACKGROUND_IMAGE = '/imgs/tours/tour_saona_island_detail_12.jpg';
 const HERO_BACKGROUND_VIDEO = '/buggy.mp4';
@@ -98,15 +101,15 @@ const Home: React.FC = () => {
       {/* Story Narrative Sections */}
       <div className="space-y-0 min-h-[50vh]">
         {!storyData ? (
-          <section className="home-section shore-section py-24">
+          <section className="home-section shore-section">
             <div className="section-shell grid gap-10 md:grid-cols-2 md:items-center">
               <div className="animate-pulse space-y-4">
                 <div className="h-4 w-32 rounded-full bg-ink/10" />
                 <div className="h-10 w-3/4 rounded-2xl bg-ink/10" />
-                <div className="h-24 w-full rounded-3xl border-2 border-ink/15 bg-paper-warm" />
+                <div className="h-24 w-full rounded-3xl border border-[rgba(150,112,31,0.25)] bg-canvas-deep" />
                 <div className="h-4 w-2/3 rounded-full bg-ink/10" />
               </div>
-              <div className="h-64 w-full animate-pulse rounded-[28px_16px_30px_18px] border-2 border-ink/15 bg-paper-warm md:h-80" />
+              <div className="h-64 w-full animate-pulse rounded-[28px_16px_30px_18px] border border-[rgba(150,112,31,0.25)] bg-canvas-deep md:h-80" />
             </div>
           </section>
         ) : (
@@ -117,24 +120,23 @@ const Home: React.FC = () => {
                 <section
                   key={section.id}
                   id={section.id}
-                  className="home-section lagoon-section wavy-band relative overflow-hidden px-4 py-28 sm:py-32 md:px-8 lg:py-36"
+                  className="home-section lagoon-section wavy-band relative overflow-hidden px-4 md:px-8"
                 >
-                  <div className="parallax-wash parallax-wash-left" />
-                  <div className="parallax-wash parallax-wash-right" />
+                  <ParallaxWash side="left" />
+                  <ParallaxWash side="right" depth={16} />
 
                   <div className="relative z-10 max-w-6xl mx-auto">
                     {/* Header */}
-                    <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
-                      <div className="section-icon mx-auto mb-5">
-                        {section.emoji}
-                      </div>
-                      <h2 className="scribble-title-bg mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
+                    <Reveal className="mx-auto mb-14 max-w-3xl text-center sm:mb-20">
+                      <div className="section-icon mx-auto mb-6">{section.emoji}</div>
+                      <h2 className="scribble-title-bg mb-5 font-display text-4xl font-bold leading-tight text-ink sm:text-5xl md:text-[3.4rem]">
                         {section.title}
                       </h2>
-                      <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold leading-8 text-ink-soft sm:text-xl">
+                      <TainoBand className="mx-auto my-6 h-5 w-40 opacity-60" />
+                      <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-ink-soft">
                         {section.description}
                       </p>
-                    </div>
+                    </Reveal>
 
                     {/* Adventure cards grid */}
                     {section.adventures && (
@@ -172,13 +174,13 @@ const Home: React.FC = () => {
 
       {/* Call-to-Action Banner: prefer dynamic CTAs from storyData.callToActions */}
       {!storyData ? null : storyData.callToActions && storyData.callToActions.length > 0 ? (
-        <section className="home-section sunset-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
+        <section className="home-section sunset-section wavy-band px-4 text-ink md:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <h2 className="mb-6 font-display text-4xl font-bold italic leading-tight text-ink sm:text-5xl md:text-[3.6rem]">
               {storyData.storyTitle || 'Ready for Your Perfect Day in Paradise?'}
             </h2>
             {storyData.storyTagline && (
-              <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
+              <p className="mx-auto mb-10 max-w-2xl text-lg leading-8 text-ink-soft">
                 {storyData.storyTagline}
               </p>
             )}
@@ -204,12 +206,12 @@ const Home: React.FC = () => {
           </div>
         </section>
       ) : (
-        <section className="home-section sunset-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
+        <section className="home-section sunset-section wavy-band px-4 text-ink md:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <h2 className="mb-6 font-display text-4xl font-bold italic leading-tight text-ink sm:text-5xl md:text-[3.6rem]">
               Ready for Your Perfect Day in Paradise?
             </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
+            <p className="mx-auto mb-10 max-w-2xl text-lg leading-8 text-ink-soft">
               Your adventure is just one click away. Contact us on WhatsApp or choose your adventure below.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
@@ -248,50 +250,50 @@ const Home: React.FC = () => {
       <TestimonialDisplay locale={locale} />
 
       {/* Why Choose Us Section - Enhanced */}
-      <section className="home-section reef-section wavy-band px-4 py-24 text-white sm:py-28 md:px-8">
+      <section className="home-section reef-section wavy-band px-4 text-ink md:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
-            <h2 className="mb-4 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+          <Reveal className="mx-auto mb-14 max-w-3xl text-center sm:mb-20">
+            <h2 className="mb-5 font-display text-4xl font-bold leading-tight text-ink sm:text-5xl md:text-[3.4rem]">
               <FormattedMessage id="features.title" />
             </h2>
-            <p className="text-lg font-bold leading-8 text-white sm:text-xl">
+            <p className="mx-auto max-w-measure text-lg leading-8 text-ink-soft">
               Thoughtful service from arrival to return with {brandSettings.brandName}
             </p>
-          </div>
+          </Reveal>
 
           <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
             {/* Safety First */}
-            <div className="home-feature-card group p-8 animate-wave-sway-1">
-              <div className="text-5xl mb-4">🛡️</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+            <Reveal as="div" delay={0} className="home-feature-card group">
+              <Turtle className="mb-5 h-20 w-24" />
+              <h3 className="mb-3 font-display text-2xl font-bold text-ink">
                 <FormattedMessage id="features.safety.title" />
               </h3>
-              <p className="font-semibold text-ink-soft">
+              <p className="text-ink-soft">
                 <FormattedMessage id="features.safety.description" />
               </p>
-            </div>
+            </Reveal>
 
             {/* Curated Experiences */}
-            <div className="home-feature-card group p-8 animate-wave-sway-2">
-              <div className="text-5xl mb-4">🌿</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+            <Reveal as="div" delay={0.12} className="home-feature-card group">
+              <Butterfly className="mb-5 h-20 w-24" />
+              <h3 className="mb-3 font-display text-2xl font-bold text-ink">
                 <FormattedMessage id="features.experiences.title" />
               </h3>
-              <p className="font-semibold text-ink-soft">
+              <p className="text-ink-soft">
                 <FormattedMessage id="features.experiences.description" />
               </p>
-            </div>
+            </Reveal>
 
             {/* Transportation */}
-            <div className="home-feature-card group p-8 animate-wave-sway-3">
-              <div className="text-5xl mb-4">🚗</div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
+            <Reveal as="div" delay={0.24} className="home-feature-card group">
+              <Sailboat className="mb-5 h-20 w-20" />
+              <h3 className="mb-3 font-display text-2xl font-bold text-ink">
                 <FormattedMessage id="features.transportation.title" />
               </h3>
-              <p className="font-semibold text-ink-soft">
+              <p className="text-ink-soft">
                 <FormattedMessage id="features.transportation.description" />
               </p>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>

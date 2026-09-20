@@ -94,7 +94,7 @@ const RouteMap: React.FC<Props> = ({ origin, destination, geometry, className = 
   }, [origin, destination, geometry]);
 
   return (
-    <div ref={mapContainer} className={`w-full rounded-xl border-[2.5px] border-ink bg-paper-warm ${className}`} style={{ height: '300px' }} />
+    <div ref={mapContainer} className={`w-full rounded-xl border border-[rgba(150,112,31,0.4)] bg-paper-warm ${className}`} style={{ height: '300px' }} />
   );
 };
 

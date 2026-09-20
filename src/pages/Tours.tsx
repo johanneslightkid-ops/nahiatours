@@ -26,7 +26,7 @@ const Tours: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="grid min-h-screen place-items-center font-display text-xl font-extrabold text-ink">
+      <div className="grid min-h-screen place-items-center font-display text-xl font-bold text-ink">
         Loading…
       </div>
     );

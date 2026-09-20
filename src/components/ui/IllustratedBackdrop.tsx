@@ -1,106 +1,131 @@
 import React from 'react';
-import { SunBurst, Cloud, PalmFrond, Birds } from './Illustrations';
+import { SunBurst, Cloud, PalmFrond, Birds, TainoSpiral } from './Illustrations';
+import { useMotionBudget } from '../../lib/useMotionBudget';
 
 /**
- * The drawn scene behind the whole site.
+ * The painting behind every page.
  *
- * This replaces the WebGL ocean shader that used to sit here. That shader
- * simulated real water — exactly the photographic register this redesign moves
- * away from — and cost a GL context on every page. What is left is a flat
- * painted sky: a gradient, a sun, drifting paper clouds, a sea drawn as three
- * stacked crests, and palm fronds leaning in from the edges. All of it is CSS
- * and inline SVG, so it costs nothing to run and scales to any viewport.
+ * One composed scene of the Bavaro coast — a low horizon, the sun burning
+ * through haze above it, headlands either side and fronds leaning in at the
+ * top corners. It is `position: fixed`, so the content scrolls over a still
+ * painting the way a page of a book moves over the table under it.
  *
- * Content sections above are opaque, so the scene reads through the hero, the
- * wave-shaped gaps between bands, and the page margins.
+ * NOTHING INSIDE THIS LAYER ANIMATES, and that is a performance decision, not
+ * an aesthetic one. A fixed, full-viewport element is the largest composited
+ * layer on the page; anything that moves inside it forces the compositor to
+ * re-raster all of it, on every frame, for the whole session. An earlier
+ * design on this repository ran two drifting clouds here and gave up roughly
+ * half its scroll frame rate for them. The drifting happens in the hero
+ * instead, where the layer is bounded.
+ *
+ * `contain: paint` tells the browser that nothing here can draw outside its
+ * own box, so it can skip this subtree entirely while compositing the rest.
  */
-const IllustratedBackdrop: React.FC = () => (
-  <div
-    className="pointer-events-none fixed inset-0 select-none overflow-hidden"
-    style={{ zIndex: -1 }}
-    aria-hidden="true"
-  >
-    {/* Sky */}
+const IllustratedBackdrop: React.FC = () => {
+  const budget = useMotionBudget();
+  // On a phone the corner ornaments are the first things to go: they are
+  // nearly off-screen at that width, and every one of them is a paint.
+  const ornate = budget === 'full';
+
+  return (
     <div
-      className="absolute inset-0"
-      style={{
-        background:
-          'linear-gradient(180deg, #A5E4FF 0%, #C9EFFF 28%, #EAF8FF 52%, #FFF6E5 74%, #FFF6E5 100%)',
-      }}
-    />
-
-    {/* Sun, high on the right. The rays turn once every 40s. */}
-    <SunBurst spin className="absolute -right-16 -top-16 h-72 w-72 sm:h-96 sm:w-96" />
-
-    {/* Clouds. Each drifts the full width on its own clock, so they never
-        line up into a repeating pattern. */}
-    <Cloud
-      className="absolute h-16 w-28 opacity-95 sm:h-20 sm:w-36"
-      style={{ top: '12%', animation: 'cloudDrift 90s linear infinite' }}
-    />
-    <Cloud
-      className="absolute h-10 w-20 opacity-80 sm:h-14 sm:w-24"
-      style={{ top: '26%', animation: 'cloudDrift 140s linear infinite', animationDelay: '-40s' }}
-    />
-    <Cloud
-      className="absolute h-12 w-24 opacity-70 sm:h-16 sm:w-28"
-      style={{ top: '5%', animation: 'cloudDrift 190s linear infinite', animationDelay: '-120s' }}
-    />
-
-    <Birds
-      className="absolute left-[18%] top-[18%] h-8 w-24 opacity-40"
-      style={{ animation: 'cloudDrift 240s linear infinite' }}
-    />
-
-    {/* Sea: three drawn crests stacked at the foot of the viewport. */}
-    <svg
-      className="absolute inset-x-0 bottom-0 h-[38vh] w-full"
-      viewBox="0 0 1200 380"
-      preserveAspectRatio="none"
-      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      style={{ contain: 'paint' }}
     >
-      <path
-        d="M0 92 C150 56 300 124 450 96 C600 68 750 126 900 100 C1020 79 1110 88 1200 78 L1200 380 L0 380 Z"
-        fill="#A5E4FF"
+      {/* ── Sky ──────────────────────────────────────────────────────────── */}
+      <div
+        className="absolute inset-x-0 top-0 h-[62vh]"
+        style={{
+          background:
+            'linear-gradient(180deg, #B3DDE2 0%, #D8E9DC 30%, #F2DDBA 58%, #F2E6CD 100%)',
+        }}
       />
-      <path
-        d="M0 150 C150 116 300 182 450 154 C600 126 750 184 900 158 C1020 137 1110 146 1200 136 L1200 380 L0 380 Z"
-        fill="#7FE3DA"
-      />
-      <path
-        d="M0 212 C150 180 300 244 450 216 C600 188 750 246 900 220 C1020 199 1110 208 1200 198 L1200 380 L0 380 Z"
-        fill="#21C0B7"
-      />
-      {/* Foam ticks: the shorthand for moving water in a flat drawing. */}
-      <g stroke="#FFFDF7" strokeWidth={5} strokeLinecap="round" opacity={0.75}>
-        <path d="M120 250 L190 250" />
-        <path d="M330 286 L392 286" />
-        <path d="M620 262 L690 262" />
-        <path d="M880 300 L946 300" />
-        <path d="M1040 258 L1096 258" />
-      </g>
-    </svg>
 
-    {/* Fronds leaning in from the bottom corners. The static lean lives on the
-        wrapper so the sway animation on the frond itself is free to own
-        `transform` outright. */}
-    <div
-      className="absolute -left-28 bottom-[-16%] h-72 w-72 sm:h-96 sm:w-96"
-      style={{ transform: 'rotate(28deg)' }}
-    >
-      <PalmFrond color="jungleLight" className="animate-frond h-full w-full opacity-70" />
-    </div>
-    <div
-      className="absolute -right-32 bottom-[-18%] h-72 w-72 sm:h-[26rem] sm:w-[26rem]"
-      style={{ transform: 'rotate(-34deg) scaleX(-1)' }}
-    >
+      {/* Sun, burning through the haze just above the horizon. */}
+      <SunBurst className="absolute left-[64%] top-[6vh] h-[34vh] w-[34vh] opacity-80" />
+
+      {/* Two clouds, painted in place. */}
+      <Cloud className="absolute left-[6%] top-[9vh] w-[30vw] max-w-[420px] opacity-70" />
+      <Cloud className="absolute left-[52%] top-[19vh] w-[22vw] max-w-[320px] opacity-45" />
+
+      <Birds className="absolute left-[22%] top-[22vh] w-[14vw] max-w-[190px] opacity-60" />
+
+      {/* ── Sea ──────────────────────────────────────────────────────────── */}
+      {/* The water has to ARRIVE rather than start: a gradient that opens at
+          full strength draws a hard horizontal rule across the page, and the
+          eye reads it as a seam rather than as a horizon.
+
+          Hidden below `sm`. A fixed band across the middle of a phone screen
+          does not read as a horizon at all — the content scrolls over it and
+          it just looks like a grey panel someone left behind the text. */}
+      <div
+        className="absolute inset-x-0 top-[44vh] hidden h-[26vh] sm:block"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(31,98,133,0) 0%, rgba(31,98,133,0.3) 14%, rgba(47,182,164,0.26) 48%, rgba(143,220,208,0.16) 78%, rgba(247,238,220,0) 100%)',
+        }}
+      />
+      {/* The line where the water meets the sky, softened and faded at both
+          ends so it never reaches the edge of the frame. */}
+      <div
+        className="absolute inset-x-0 top-[45vh] hidden h-px sm:block"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent, rgba(14,59,82,0.28) 18%, rgba(14,59,82,0.28) 82%, transparent)',
+          filter: 'blur(0.6px)',
+        }}
+      />
+
+      {/* Headlands, left and right, keeping the eye in the middle. */}
+      <svg
+        className="absolute inset-x-0 top-[40vh] hidden h-[12vh] w-full sm:block"
+        viewBox="0 0 1440 140"
+        preserveAspectRatio="none"
+        aria-hidden
+      >
+        <path d="M0 140V72c90-30 180-22 268 10 42 15 78 22 110 20V140Z" fill="#4C7E6E" opacity="0.4" />
+        <path d="M1440 140V60c-110-26-200-12-276 26-38 19-72 28-102 28V140Z" fill="#4C7E6E" opacity="0.32" />
+      </svg>
+
+      {/* ── Sand ─────────────────────────────────────────────────────────── */}
+      <div
+        className="absolute inset-x-0 bottom-0 top-[52vh] sm:top-[64vh]"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(255,206,122,0.24) 0%, rgba(233,217,185,0.5) 40%, #F2E6CD 100%)',
+        }}
+      />
+
+      {/* ── Foliage leaning into the frame ───────────────────────────────── */}
+      <PalmFrond className="absolute -left-[14vw] -top-[3vh] h-[30vh] origin-top rotate-[24deg] opacity-60 sm:-left-[7vw] sm:-top-[4vh] sm:h-[46vh] sm:opacity-80" />
       <PalmFrond
-        color="jungle"
-        className="animate-frond h-full w-full opacity-70"
-        style={{ animationDelay: '-3s' }}
+        color="lagoon"
+        className="absolute -right-[8vw] -top-[6vh] hidden h-[52vh] origin-top -rotate-[26deg] scale-x-[-1] opacity-70 sm:block"
+      />
+
+      {ornate && (
+        <>
+          <PalmFrond
+            color="ochre"
+            className="absolute -bottom-[14vh] -left-[4vw] h-[40vh] rotate-[168deg] opacity-40"
+          />
+          {/* Pottery ornament, ghosted into the corners. */}
+          <TainoSpiral className="absolute bottom-[6vh] right-[4vw] h-24 w-24 opacity-25" />
+          <TainoSpiral tone="lagoon" className="absolute left-[5vw] top-[52vh] h-16 w-16 opacity-20" />
+        </>
+      )}
+
+      {/* A final varnish, so the content always has something to sit on. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(130% 85% at 50% 38%, rgba(242,230,205,0) 0%, rgba(242,230,205,0.42) 62%, rgba(242,230,205,0.8) 100%)',
+        }}
       />
     </div>
-  </div>
-);
+  );
+};
 
 export default IllustratedBackdrop;
