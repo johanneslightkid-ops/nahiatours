@@ -83,6 +83,14 @@ binding = "AI"
 # rotating, not just relocating.
 
 [vars]
+# Which site and which branch this configuration belongs to, reported by
+# /api/health. Five sites share this repository, and when one of them starts
+# serving another's pages there is otherwise nothing to read: these two lines
+# make a wrongly-routed domain say so in one request. They are labels, not
+# settings — nothing reads them but the health endpoint.
+SITE = "amigotours"
+SITE_BRANCH = "amigotours"
+
 ADMIN_PASSWORD = "admin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
 CLOUDINARY_API_KEY = "896279918126553"

@@ -15,16 +15,64 @@ const RESOURCE_WITH_LOCALE = new Set([
   'translations',
 ]);
 
-const readLocalJson = async (key: string, requestUrl?: string): Promise<unknown | null> => {
-  try {
-    // Data files in public/data/ are served as static assets at /data/{key}.json
-    const origin = requestUrl ? new URL(requestUrl).origin : '';
-    const url = `${origin}/data/${key}.json`;
-    const response = await fetch(url);
-    if (!response.ok) {
+/**
+ * Read the copy of a resource that ships in the build, at /data/{key}.json.
+ *
+ * This asks the ASSETS binding rather than the network, and that is the whole
+ * fix for a pair of 404s that looked like missing data and were not:
+ *
+ *   GET /api/data?resource=tours&locale=en          404
+ *   GET /api/data?resource=social-api-settings      404
+ *
+ * Both files are in public/data and both are deployed. What failed was the
+ * fallback: it called global `fetch` on the site's own origin, so the Worker
+ * issued a request straight back at itself. With `run_worker_first = true`
+ * that request re-enters this same Worker, and Cloudflare will not let a
+ * Worker recurse into itself — the subrequest fails, the catch returns null,
+ * and the endpoint reports the resource missing while the file sits in the
+ * bundle it just served.
+ *
+ * `env.ASSETS.fetch` reads the uploaded asset directly. No subrequest, no
+ * loop, no network. The origin-relative URL is still built because the assets
+ * runtime matches on the path.
+ */
+const readLocalJson = async (
+  key: string,
+  env: Record<string, any>,
+  requestUrl?: string
+): Promise<unknown | null> => {
+  const origin = requestUrl ? new URL(requestUrl).origin : 'https://assets.local';
+  const url = `${origin}/data/${key}.json`;
+
+  const read = async (response: Response | null): Promise<unknown | null> => {
+    if (!response || !response.ok) return null;
+    const body = await response.text();
+    // A single-page-application 404 handler answers with index.html, which
+    // parses as neither JSON nor a missing file. Catch it by its first
+    // character rather than by its status.
+    if (!body || body.trimStart().startsWith('<')) return null;
+    try {
+      return JSON.parse(body);
+    } catch {
       return null;
     }
-    return await response.json();
+  };
+
+  const assets = env?.ASSETS;
+  if (assets && typeof assets.fetch === 'function') {
+    try {
+      return await read(await assets.fetch(new Request(url)));
+    } catch (err) {
+      console.warn('[Cloudflare Function] ASSETS read failed for', key, err);
+      return null;
+    }
+  }
+
+  // No ASSETS binding: a Pages deployment, or `wrangler dev` without assets.
+  // There the origin fetch is a genuine request to a different server, so it
+  // cannot loop.
+  try {
+    return await read(await fetch(url));
   } catch (err) {
     console.warn('[Cloudflare Function] Failed to read local JSON for', key, err);
     return null;
@@ -52,6 +100,17 @@ const buildResourceKey = (resource: string, locale?: string) => {
   }
   return normalized;
 };
+
+/**
+ * Resources that are configuration rather than content.
+ *
+ * Nothing is wrong with a site that has never opened the social accounts panel
+ * or saved an AI key, so "nothing stored yet" is an empty configuration, not a
+ * missing page. Answering 404 for these put a red line in the console of every
+ * admin session and taught operators to ignore the console, which is where the
+ * real failures are printed.
+ */
+const EMPTY_WHEN_UNSET = new Set(['social-api-settings', 'ai-settings', 'payment-config-public']);
 
 const createErrorResponse = (message: string, status = 400) =>
   new Response(JSON.stringify({ error: message }), {
@@ -151,7 +210,7 @@ const loadStoredData = async (key: string, env: Record<string, any>, requestUrl?
     }
   }
 
-  const localData = await readLocalJson(key, requestUrl);
+  const localData = await readLocalJson(key, env, requestUrl);
   if (localData !== null) {
     return localData;
   }
@@ -237,6 +296,12 @@ export async function onRequest(context: { request: Request; env: Record<string,
     if (request.method === 'GET') {
       const data = await loadStoredData(key, env, request.url);
       if (data === null || data === undefined) {
+        if (EMPTY_WHEN_UNSET.has(key)) {
+          return new Response('{}', {
+            status: 200,
+            headers: { 'Content-Type': 'application/json', 'X-Data-Source': 'unset' },
+          });
+        }
         return createErrorResponse(`Data for resource '${resource}' not found.`, 404);
       }
       return new Response(JSON.stringify(data), {
