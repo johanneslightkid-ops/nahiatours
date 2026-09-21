@@ -45,10 +45,16 @@ const main = async () => {
     .filter(Boolean);
 
   for (const name of scripts) {
-    console.log(`\n═══ ${name} ═══`);
+    console.log(`\n═══ ${name} ═══  (newest first)`);
     try {
       const result = await cf(`/accounts/${accountId}/workers/scripts/${name}/deployments`);
-      const list = (result?.deployments || []).slice(-6).reverse();
+      // Cloudflare returns these newest-first, but do not rely on it: sort by
+      // the timestamp so the newest is the newest whichever order arrives.
+      // Getting this backwards showed the six OLDEST deployments, which looks
+      // exactly like a Worker that has not been deployed for weeks.
+      const list = [...(result?.deployments || [])]
+        .sort((a, b) => new Date(b.created_on) - new Date(a.created_on))
+        .slice(0, 8);
       if (!list.length) {
         console.log('  no deployment history');
       }
