@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
 import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks } from 'react-icons/md';
-import { FaSignOutAlt } from 'react-icons/fa';
-import { ADMIN_NAV, adminLabel } from '../../lib/adminNav';
+import AdminNav from './AdminNav';
 import LanguageSwitcher from '../LanguageSwitcher';
 import SoundToggle from '../SoundToggle';
 import { useBrand } from '../../contexts/BrandContext';
@@ -17,8 +16,6 @@ const Header: React.FC = () => {
   const { brandSettings } = useBrand();
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const intl = useIntl();
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAdminPassword());
 
   useEffect(() => {
@@ -34,18 +31,6 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
-  /**
-   * A menu entry is active when its section is the one showing — or, for the
-   * entries that are their own route, when that route is the one open.
-   *
-   * The pill is no longer a circle: it holds a name now as well as an icon.
-   */
-  const adminPillClass = (active: boolean) =>
-    `nav-link-pill flex items-center gap-2 !rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap ${
-      active ? 'nav-link-pill-active' : ''
-    }`;
-
-  const currentSection = searchParams.get('section') || 'brand';
 
   const handleNavClick = () => {
     playClickFx();
@@ -93,34 +78,7 @@ const Header: React.FC = () => {
         >
           {isAdminRoute ? (
             <>
-              {ADMIN_NAV.map((item) => {
-                const Icon = item.icon;
-                const to = item.path ?? `/admin?section=${item.section}`;
-                const active = item.path
-                  ? location.pathname === item.path
-                  : location.pathname === '/admin' && currentSection === item.section;
-                const name = adminLabel(item, intl.locale);
-                return (
-                  <Link
-                    key={item.path ?? item.section}
-                    to={to}
-                    onClick={handleNavClick}
-                    className={adminPillClass(active)}
-                    aria-current={active ? 'page' : undefined}
-                  >
-                    <Icon className="h-5 w-5 shrink-0" />
-                    <span>{name}</span>
-                  </Link>
-                );
-              })}
-              <div className="mx-1 hidden h-6 w-0.5 bg-ink/30 md:block"></div>
-              <button
-                onClick={handleLogout}
-                className="nav-link-pill flex items-center gap-2 !rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap !text-hibiscus-dark hover:!bg-hibiscus-light"
-              >
-                <FaSignOutAlt className="h-5 w-5 shrink-0" />
-                <span>{intl.locale.toLowerCase().startsWith('en') ? 'Log out' : 'Salir'}</span>
-              </button>
+              <AdminNav onNavigate={handleNavClick} onLogout={handleLogout} />
             </>
           ) : (
             <>
