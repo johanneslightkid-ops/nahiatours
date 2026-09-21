@@ -58,6 +58,21 @@ not_found_handling = "single-page-application"
 run_worker_first = true
 
 # ==============================================================================
+# Workers AI
+# ==============================================================================
+#
+# The blog generator used to need an account id and an API token typed into the
+# admin panel before it would produce a sentence — on a fresh deployment that
+# meant the feature was present and dead. This binding is the account's own
+# Workers AI, granted to the Worker at deploy time, so /api/ai can run a model
+# with no credentials at all.
+#
+# Nothing to create and nothing to paste: the binding exists because this line
+# does.
+[ai]
+binding = "AI"
+
+# ==============================================================================
 # KV
 # ==============================================================================
 #

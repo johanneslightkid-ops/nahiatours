@@ -21,12 +21,17 @@ interface BrandProviderProps {
 }
 
 export const BrandProvider: React.FC<BrandProviderProps> = ({ children }) => {
+  // What the page holds for the moment before the real settings arrive. No
+  // phone and no payment links, so nothing offers a way to pay somebody who
+  // was never configured — not even for that one render.
   const [brandSettings, setBrandSettings] = useState<BrandSettings>({
-    brandName: 'Beautiful Tours',
-    phoneNumber: '+1 (809) 555-0123',
-    paypalMeLink: 'https://www.paypal.com/paypalme/carlostours',
+    brandName: 'Tours',
+    phoneNumber: '',
+    paypalMeLink: '',
     verifoneLink: '',
     brandicon: '',
+    stripeEnabled: false,
+    paymentVisibility: { stripe: true, paypal: true, cash: true },
   });
 
   useEffect(() => {

@@ -127,15 +127,15 @@ const BrandIconEditor: React.FC<BrandIconEditorProps> = ({ file, onCancel, onApp
 
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/60 p-4">
-      <div className="w-full max-w-md rounded-3xl ring-1 ring-ink/10 bg-paper p-6 shadow-xl">
-        <h3 className="mb-1 font-display text-xl font-extrabold text-ink">Frame the icon</h3>
+      <div className="w-full max-w-md rounded-[26px] border border-ink/15 bg-paper p-6 shadow-ink-lg">
+        <h3 className="mb-1 font-display text-xl font-semibold text-ink">Encuadra el logo</h3>
         <p className="mb-4 text-xs font-semibold text-ink-light">
-          Drag to reposition, use the slider to zoom. The circle is exactly what the site will show.
+          Arrastra para moverlo y usa la barra para acercar. El círculo es exactamente lo que se verá en el sitio.
         </p>
 
         <div className="flex flex-col items-center gap-4">
           <div
-            className="relative touch-none overflow-hidden rounded-full ring-1 ring-ink/10 bg-white shadow-md"
+            className="relative touch-none overflow-hidden rounded-full border border-ink/15 bg-white shadow-ink-sm"
             style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE, cursor: image ? 'grab' : 'default' }}
             onMouseDown={(e) => startDrag(e.clientX, e.clientY)}
             onMouseMove={(e) => moveDrag(e.clientX, e.clientY)}
@@ -148,7 +148,7 @@ const BrandIconEditor: React.FC<BrandIconEditorProps> = ({ file, onCancel, onApp
             {imageUrl && image && (
               <img
                 src={imageUrl}
-                alt="Brand icon preview"
+                alt="Vista previa del logo"
                 draggable={false}
                 className="pointer-events-none absolute select-none"
                 style={{
@@ -164,7 +164,7 @@ const BrandIconEditor: React.FC<BrandIconEditorProps> = ({ file, onCancel, onApp
           </div>
 
           <label className="w-full">
-            <span className="mb-1 block text-xs font-extrabold uppercase tracking-wider text-ink-soft">
+            <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-ink-soft">
               Zoom · {zoom.toFixed(2)}×
             </span>
             <input
@@ -186,7 +186,7 @@ const BrandIconEditor: React.FC<BrandIconEditorProps> = ({ file, onCancel, onApp
             disabled={busy}
             className="tropical-button-outline disabled:opacity-60"
           >
-            Cancel
+            Cancelar
           </button>
           <button
             type="button"
@@ -194,7 +194,7 @@ const BrandIconEditor: React.FC<BrandIconEditorProps> = ({ file, onCancel, onApp
             disabled={busy || !image}
             className="tropical-button disabled:opacity-60"
           >
-            {busy ? 'Uploading…' : 'Use this framing'}
+            {busy ? 'Subiendo…' : 'Usar este encuadre'}
           </button>
         </div>
       </div>

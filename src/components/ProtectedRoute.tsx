@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { Route, Routes, RouteProps } from 'react-router-dom';
 import PasswordModal from '../components/PasswordModal';
-import Admin from '../pages/Admin';
 
-interface ProtectedRouteProps extends RouteProps {
+interface ProtectedRouteProps {
   component: React.ComponentType;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component, ...rest }) => {
+/**
+ * The admin gate.
+ *
+ * This file used to `import Admin from '../pages/Admin'` without ever using
+ * it. The import alone was enough to drag the whole admin — and the markdown
+ * editor inside it — into the eager bundle, which cancelled out the route
+ * splitting in App.tsx. The component arrives as a prop; nothing else is
+ * needed here.
+ */
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   if (!isAuthenticated) {

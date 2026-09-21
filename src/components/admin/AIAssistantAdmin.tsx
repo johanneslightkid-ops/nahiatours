@@ -4,11 +4,10 @@ import {
   AISettings,
   getAISettings,
   saveAISettings,
-  fetchGeminiModels,
-  fetchCloudflareModels,
-  fetchOpenRouterModels,
+  fetchModels,
   AIModel
 } from '../../services/aiSettingsService';
+import { probeProvider } from '../../services/aiGeneratorService';
 
 const AIAssistantAdmin: React.FC = () => {
   const [settings, setSettings] = useState<AISettings | null>(null);
@@ -25,6 +24,13 @@ const AIAssistantAdmin: React.FC = () => {
   const [loadingCloudflare, setLoadingCloudflare] = useState(false);
   const [loadingOpenRouter, setLoadingOpenRouter] = useState(false);
 
+  /** Result of the last "test this provider" round trip. */
+  const [probe, setProbe] = useState<{
+    provider: string;
+    state: 'running' | 'ok' | 'fail';
+    message: string;
+  } | null>(null);
+
   useEffect(() => {
     loadSettings();
   }, []);
@@ -32,28 +38,48 @@ const AIAssistantAdmin: React.FC = () => {
   const loadSettings = async () => {
     const data = await getAISettings();
     setSettings(data);
-    if (data.gemini.apiKey) fetchModels('gemini', data.gemini.apiKey);
-    if (data.cloudflare.accountId && data.cloudflare.apiKey) fetchModels('cloudflare', data.cloudflare.apiKey, data.cloudflare.accountId);
-    if (data.openrouter.apiKey) fetchModels('openrouter', data.openrouter.apiKey);
+    // Cloudflare always lists: with the Workers AI binding it needs no key.
+    loadModels('cloudflare', data);
+    if (data.gemini.apiKey) loadModels('gemini', data);
+    if (data.openrouter.apiKey) loadModels('openrouter', data);
   };
 
-  const fetchModels = async (provider: 'gemini' | 'cloudflare' | 'openrouter', key: string, accountId?: string) => {
-    if (provider === 'gemini') {
-      setLoadingGemini(true);
-      const models = await fetchGeminiModels(key);
-      setGeminiModels(models);
-      setLoadingGemini(false);
-    } else if (provider === 'cloudflare') {
-      if (!accountId) return;
-      setLoadingCloudflare(true);
-      const models = await fetchCloudflareModels(accountId, key);
-      setCloudflareModels(models);
-      setLoadingCloudflare(false);
-    } else if (provider === 'openrouter') {
-      setLoadingOpenRouter(true);
-      const models = await fetchOpenRouterModels(key);
-      setOpenRouterModels(models);
-      setLoadingOpenRouter(false);
+  /**
+   * Load a provider's model list through the Worker.
+   *
+   * The three browser-side fetchers this replaces each sent the provider's API
+   * token from the page, which put it in the network tab and which
+   * api.cloudflare.com refuses cross-origin anyway. `settings` goes along so a
+   * key that has been typed but not yet saved can still list its models.
+   */
+  const loadModels = async (provider: 'gemini' | 'cloudflare' | 'openrouter', current?: AISettings) => {
+    const setLoading =
+      provider === 'gemini' ? setLoadingGemini : provider === 'cloudflare' ? setLoadingCloudflare : setLoadingOpenRouter;
+    const setList =
+      provider === 'gemini' ? setGeminiModels : provider === 'cloudflare' ? setCloudflareModels : setOpenRouterModels;
+
+    setLoading(true);
+    setList(await fetchModels(provider, current ?? settings ?? undefined));
+    setLoading(false);
+  };
+
+  /** Prove a provider answers, and show exactly why when it does not. */
+  const testProvider = async (provider: 'gemini' | 'cloudflare' | 'openrouter') => {
+    if (!settings) return;
+    setProbe({ provider, state: 'running', message: 'Probando…' });
+    try {
+      const result = await probeProvider(settings, provider);
+      setProbe({
+        provider,
+        state: 'ok',
+        message: `Responde correctamente — modelo ${result.model || 'predeterminado'}`,
+      });
+    } catch (error) {
+      setProbe({
+        provider,
+        state: 'fail',
+        message: error instanceof Error ? error.message : String(error),
+      });
     }
   };
 
@@ -66,42 +92,59 @@ const AIAssistantAdmin: React.FC = () => {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       
-      // Refresh models after save just in case keys changed
-      if (settings.gemini.apiKey) fetchModels('gemini', settings.gemini.apiKey);
-      if (settings.cloudflare.accountId && settings.cloudflare.apiKey) fetchModels('cloudflare', settings.cloudflare.apiKey, settings.cloudflare.accountId);
-      if (settings.openrouter.apiKey) fetchModels('openrouter', settings.openrouter.apiKey);
+      // Refresh models after save, in case the keys changed.
+      loadModels('cloudflare', settings);
+      if (settings.gemini.apiKey) loadModels('gemini', settings);
+      if (settings.openrouter.apiKey) loadModels('openrouter', settings);
     } catch (error) {
-      console.error('Save failed', error);
+      console.error('No se pudo guardar', error);
     } finally {
       setIsSaving(false);
     }
   };
 
   if (!settings) {
-    return <div className="p-8 text-center text-slate-500">Loading AI settings...</div>;
+    return <div className="p-8 text-center text-ink-light">Cargando la configuración de IA...</div>;
   }
 
   return (
     <div className="w-full space-y-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-          <FaRobot className="text-teal-600" /> AI Integrations
+        <h2 className="text-3xl font-bold text-ink flex items-center gap-3">
+          <FaRobot className="text-teal-600" /> Integraciones de IA
         </h2>
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-3 bg-lagoon-dark text-white font-bold rounded-lg hover:bg-[#0f4f59] transition-all disabled:opacity-50"
         >
-          {isSaving ? 'Saving...' : saveSuccess ? <><FaCheck /> Saved</> : <><FaSave /> Save Settings</>}
+          {isSaving ? 'Guardando…' : saveSuccess ? <><FaCheck /> Guardado</> : <><FaSave /> Guardar configuración</>}
         </button>
       </div>
+
+      {probe && (
+        <div
+          className={`rounded-2xl border px-5 py-4 text-sm font-semibold ${
+            probe.state === 'ok'
+              ? 'border-jungle/40 bg-jungle/10 text-jungle-dark'
+              : probe.state === 'fail'
+              ? 'border-hibiscus/40 bg-hibiscus/10 text-hibiscus-dark'
+              : 'border-ink/15 bg-paper-warm text-ink-soft'
+          }`}
+        >
+          <span className="uppercase tracking-[0.14em] text-[0.7rem]">{probe.provider}</span>
+          {/* The provider's own words, including the model it tried. Before
+              this the panel could only say "Failed to generate". */}
+          <p className="mt-1 whitespace-pre-wrap font-medium">{probe.message}</p>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Active Provider Selection */}
         <div className="lg:col-span-3 bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex flex-col md:flex-row items-center gap-6">
           <div>
-            <h3 className="text-xl font-bold text-slate-800">Active AI Provider</h3>
-            <p className="text-sm text-slate-500">Choose which provider to use for blog generation and other AI tasks.</p>
+            <h3 className="text-xl font-bold text-ink">Proveedor de IA activo</h3>
+            <p className="text-sm text-ink-light">Elige qué proveedor usar para generar el blog y otras tareas de IA.</p>
           </div>
           <div className="flex-1 flex flex-wrap gap-4">
             {(['gemini', 'cloudflare', 'openrouter'] as const).map(provider => (
@@ -110,7 +153,7 @@ const AIAssistantAdmin: React.FC = () => {
                 className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                   settings.activeProvider === provider
                     ? 'border-teal-500 bg-teal-50 text-teal-700 font-bold'
-                    : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
+                    : 'border-ink/15 bg-white hover:border-slate-300 text-ink-soft'
                 }`}
               >
                 <input
@@ -133,12 +176,19 @@ const AIAssistantAdmin: React.FC = () => {
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-xl font-bold text-blue-900">Google Gemini</h3>
             <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-600 hover:underline bg-white px-3 py-1 rounded-full shadow-sm">
-              Get Free Key
+              Obtener clave gratis
             </a>
+            <button
+              type="button"
+              onClick={() => testProvider('gemini')}
+              className="rounded-full border border-ink/25 px-3 py-1 text-xs font-bold text-ink-soft transition hover:border-lagoon hover:text-ink"
+            >
+              Probar
+            </button>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-blue-900 mb-2">API Key</label>
+              <label className="block text-sm font-semibold text-blue-900 mb-2">Clave de API</label>
               <div className="relative">
                 <FaKey className="absolute left-3 top-3 text-slate-400" />
                 <input
@@ -152,8 +202,8 @@ const AIAssistantAdmin: React.FC = () => {
             </div>
             <div>
               <label className="block text-sm font-semibold text-blue-900 mb-2">
-                Selected Model
-                {loadingGemini && <span className="ml-2 text-xs font-normal text-blue-600 animate-pulse">Fetching...</span>}
+                Modelo seleccionado
+                {loadingGemini && <span className="ml-2 text-xs font-normal text-blue-600 animate-pulse">Buscando...</span>}
               </label>
               <select
                 value={settings.gemini.selectedModel}
@@ -172,37 +222,44 @@ const AIAssistantAdmin: React.FC = () => {
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-xl font-bold text-orange-900">Cloudflare AI</h3>
             <a href="https://dash.cloudflare.com/" target="_blank" rel="noreferrer" className="text-xs font-bold text-orange-600 hover:underline bg-white px-3 py-1 rounded-full shadow-sm">
-              Get Tokens
+              Obtener tokens
             </a>
+            <button
+              type="button"
+              onClick={() => testProvider('cloudflare')}
+              className="rounded-full border border-ink/25 px-3 py-1 text-xs font-bold text-ink-soft transition hover:border-lagoon hover:text-ink"
+            >
+              Probar
+            </button>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-orange-900 mb-2">Account ID</label>
+              <label className="block text-sm font-semibold text-orange-900 mb-2">ID de cuenta</label>
               <input
                 type="text"
                 value={settings.cloudflare.accountId || ''}
                 onChange={e => setSettings({ ...settings, cloudflare: { ...settings.cloudflare, accountId: e.target.value } })}
-                placeholder="Cloudflare Account ID"
+                placeholder="ID de cuenta de Cloudflare"
                 className="w-full px-4 py-2 rounded-lg border-none focus:ring-2 focus:ring-orange-500 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-orange-900 mb-2">API Token</label>
+              <label className="block text-sm font-semibold text-orange-900 mb-2">Token de API</label>
               <div className="relative">
                 <FaKey className="absolute left-3 top-3 text-slate-400" />
                 <input
                   type="password"
                   value={settings.cloudflare.apiKey}
                   onChange={e => setSettings({ ...settings, cloudflare: { ...settings.cloudflare, apiKey: e.target.value } })}
-                  placeholder="Workers AI token"
+                  placeholder="Token de Workers AI"
                   className="w-full pl-10 pr-4 py-2 rounded-lg border-none focus:ring-2 focus:ring-orange-500 shadow-sm"
                 />
               </div>
             </div>
             <div>
               <label className="block text-sm font-semibold text-orange-900 mb-2">
-                Selected Model
-                {loadingCloudflare && <span className="ml-2 text-xs font-normal text-orange-600 animate-pulse">Fetching...</span>}
+                Modelo seleccionado
+                {loadingCloudflare && <span className="ml-2 text-xs font-normal text-orange-600 animate-pulse">Buscando...</span>}
               </label>
               <select
                 value={settings.cloudflare.selectedModel}
@@ -221,12 +278,19 @@ const AIAssistantAdmin: React.FC = () => {
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-xl font-bold text-purple-900">OpenRouter</h3>
             <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" className="text-xs font-bold text-purple-600 hover:underline bg-white px-3 py-1 rounded-full shadow-sm">
-              Get Free Key
+              Obtener clave gratis
             </a>
+            <button
+              type="button"
+              onClick={() => testProvider('openrouter')}
+              className="rounded-full border border-ink/25 px-3 py-1 text-xs font-bold text-ink-soft transition hover:border-lagoon hover:text-ink"
+            >
+              Probar
+            </button>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-purple-900 mb-2">API Key</label>
+              <label className="block text-sm font-semibold text-purple-900 mb-2">Clave de API</label>
               <div className="relative">
                 <FaKey className="absolute left-3 top-3 text-slate-400" />
                 <input
@@ -240,8 +304,8 @@ const AIAssistantAdmin: React.FC = () => {
             </div>
             <div>
               <label className="block text-sm font-semibold text-purple-900 mb-2">
-                Selected Model (Free only)
-                {loadingOpenRouter && <span className="ml-2 text-xs font-normal text-purple-600 animate-pulse">Fetching...</span>}
+                Modelo seleccionado (solo gratuitos)
+                {loadingOpenRouter && <span className="ml-2 text-xs font-normal text-purple-600 animate-pulse">Buscando...</span>}
               </label>
               <select
                 value={settings.openrouter.selectedModel}

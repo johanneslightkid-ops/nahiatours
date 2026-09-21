@@ -1,17 +1,22 @@
 import { normalizeDRPhoneNumber } from './normalizePhoneNumber';
 
 /**
- * Generates a WhatsApp URL with a normalized phone number
- * and a properly encoded message.
+ * A WhatsApp link, or nothing.
+ *
+ * It used to return `https://wa.me/?text=…` when no number was configured — a
+ * link that opens WhatsApp with no recipient. Every caller already guards with
+ * `if (url)`, so returning an empty string is what makes those guards mean
+ * something: no number, no button.
  */
 export const generateWhatsAppMessage = (
   rawPhoneNumber: string,
   message: string
 ): string => {
   const phone = normalizeDRPhoneNumber(rawPhoneNumber);
-  const encodedMessage = encodeURIComponent(message);
-
-  return `https://wa.me/${phone}?text=${encodedMessage}`;
+  if (!phone || !/\d/.test(phone)) {
+    return '';
+  }
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 };
 
 export const generateContactWhatsAppMessage = (name: string, email: string, phone: string, message: string) => {

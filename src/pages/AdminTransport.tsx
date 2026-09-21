@@ -15,19 +15,19 @@ const AdminTransport: React.FC = () => {
   }, [locale]);
 
   return (
-    <div className="min-h-screen bg-slate-100 py-8">
+    <div className="min-h-screen bg-paper-warm py-8">
       <div className="container mx-auto px-4 space-y-8">
         <TransferConfigAdminPanel />
         <MunicipioPriceAdminPanel />
         <ServiceAdminPanel
-          title="Transport Admin"
+          title="Transporte"
           category="transport"
           services={services}
           setServices={setServices}
           loadServices={loadServices}
           saveServices={(nextServices) => saveTransportServices(nextServices, locale)}
           siblingAdminPath="/admin"
-          siblingAdminLabel="Go to Tours Admin"
+          siblingAdminLabel="Ir a Excursiones"
         />
       </div>
     </div>

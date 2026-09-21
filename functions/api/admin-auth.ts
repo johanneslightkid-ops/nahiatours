@@ -24,7 +24,7 @@ export async function onRequest(context: { request: Request; env: AdminAuthEnv }
     });
   }
 
-  const result = verifyAdminRequest(env, request);
+  const result = await verifyAdminRequest(env, request);
 
   return new Response(
     JSON.stringify(result.ok ? { ok: true } : { ok: false, error: result.error }),

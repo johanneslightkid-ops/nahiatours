@@ -48,9 +48,9 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onAuthenticate }) => {
 			const body = await response.json().catch(() => null);
 			// A 500 means the deployment has no password configured — say so,
 			// rather than leaving someone retyping a correct password.
-			setError(body?.error || 'Incorrect password');
+			setError(body?.error || 'Contraseña incorrecta');
 		} catch {
-			setError('Could not reach the server. Check your connection and try again.');
+			setError('No se pudo conectar con el servidor. Revisa tu conexión e inténtalo otra vez.');
 		} finally {
 			setIsChecking(false);
 		}
@@ -58,26 +58,26 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onAuthenticate }) => {
 
 	return (
 		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-ink/60 p-4">
-			<div className="w-full max-w-md rounded-3xl ring-1 ring-ink/10 bg-paper p-6 shadow-xl">
-				<h2 className="mb-4 font-display text-xl font-extrabold text-ink">Admin login</h2>
+			<div className="w-full max-w-md rounded-[26px] border border-ink/15 bg-paper p-6 shadow-ink-lg">
+				<h2 className="mb-4 font-display text-xl font-semibold text-ink">Acceso al panel</h2>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<input
 						type="password"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
-						placeholder="Enter admin password"
+						placeholder="Escribe la contraseña del panel"
 						autoFocus
 						disabled={isChecking}
-						className="w-full rounded-xl ring-1 ring-ink/10 px-4 py-3 disabled:opacity-60"
+						className="w-full rounded-xl border border-ink/15 px-4 py-3 disabled:opacity-60"
 					/>
 					{error && <div className="text-sm font-bold text-hibiscus-dark">{error}</div>}
 					<div className="flex justify-end">
 						<button type="submit" disabled={isChecking || !password} className="tropical-button disabled:opacity-60">
-							{isChecking ? 'Checking…' : 'Enter'}
+							{isChecking ? 'Verificando…' : 'Entrar'}
 						</button>
 					</div>
 				</form>
-				<p className="mt-3 text-xs font-semibold text-ink-light">Enter admin password to access dashboard.</p>
+				<p className="mt-3 text-xs font-semibold text-ink-light">Escribe la contraseña para entrar al panel.</p>
 			</div>
 		</div>
 	);

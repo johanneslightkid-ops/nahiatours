@@ -65,11 +65,48 @@ const isStoryElementsData = (input: unknown): input is StoryElementsData => {
   );
 };
 
+/**
+ * Stored blocks use two spellings for the same two types.
+ *
+ * The seed data — and therefore every site that has ever been deployed from it
+ * — writes `image` and `text`, while the type in this file says `picture` and
+ * `paragraph`. The public renderer accepts both (introStoryService switches on
+ * either), but the admin panel switched on the canonical names only, so a real
+ * page of twenty blocks arrived in the editor with the images and the text
+ * blocks unrecognised: no preview, no editor, and in the rewritten panel a
+ * crash on the missing type entry.
+ *
+ * Normalising on the way in means the editor only ever sees the two canonical
+ * names, and what it saves back is a spelling the public side already reads.
+ */
+const TYPE_ALIASES: Record<string, StoryElementType> = {
+  image: 'picture',
+  picture: 'picture',
+  text: 'paragraph',
+  paragraph: 'paragraph',
+  title: 'title',
+  video: 'video',
+  cta: 'cta',
+};
+
+const normalizeElements = (data: StoryElementsData): StoryElementsData => ({
+  ...data,
+  elements: (data.elements || []).map((element, index) => ({
+    ...element,
+    id: element.id || `element-${index}`,
+    order: typeof element.order === 'number' ? element.order : index,
+    // An unknown type would otherwise reach the panel and be looked up in a
+    // table that has no entry for it.
+    type: TYPE_ALIASES[String(element.type)] ?? 'paragraph',
+    content: element.content ?? {},
+  })),
+});
+
 export const getStoryElements = async (locale: JourneyLocale): Promise<StoryElementsData | null> => {
   try {
     const response = await apiGet<unknown>('story-elements', { locale });
     const payload = unwrapRecord(response);
-    return isStoryElementsData(payload) ? payload : null;
+    return isStoryElementsData(payload) ? normalizeElements(payload) : null;
   } catch (error) {
     console.warn(`Failed to fetch ${locale} story elements:`, error);
     return null;
@@ -90,7 +127,9 @@ export const saveStoryElements = async (
 };
 
 export const createNewElement = (type: StoryElementType, order: number): StoryElement => ({
-  id: `element-${Date.now()}`,
+  // Date.now() alone collides when two blocks are added inside one millisecond,
+  // which React then renders with duplicate keys.
+  id: `element-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
   type,
   order,
   content: {},
