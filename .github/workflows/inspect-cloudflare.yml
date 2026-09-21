@@ -1,0 +1,29 @@
+# Who last deployed each Worker, and which domains point at it.
+#
+# Read-only, manual, and deploys nothing. It exists because a site serving
+# another site's pages has two possible causes that look identical from a
+# browser — the wrong build was written INTO the Worker, or the domain is
+# attached to a different Worker — and neither can be told apart without
+# Cloudflare's own records.
+
+name: Inspect Cloudflare deployments
+
+on:
+  workflow_dispatch:
+    inputs:
+      workers:
+        description: 'Comma-separated Worker names to inspect.'
+        required: false
+        default: 'nahiatours,beautifull,transporturist,ldvip,amigotours'
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      WORKER_NAMES: ${{ inputs.workers }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the deployment history
+        run: node scripts/worker-deployments.mjs
