@@ -27,6 +27,9 @@ const Blog = lazy(() => import('./pages/Blog'));
 const ServiceDetails = lazy(() => import('./pages/ServiceDetails'));
 const AdminTransport = lazy(() => import('./pages/AdminTransport'));
 const PlanMyDay = lazy(() => import('./pages/PlanMyDay'));
+// Where Stripe sends the customer back to. Lazy like every other
+// non-home route: nobody lands here first.
+const PaymentReturn = lazy(() => import('./components/PaymentReturn'));
 
 /**
  * Deliberately blank, and deliberately tall.
@@ -57,6 +60,7 @@ const App = () => {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/details/:category/:id" element={<ServiceDetails />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/payment/return" element={<PaymentReturn />} />
                 <Route path="/admin" element={<ProtectedRoute component={Admin} />} />
                 <Route path="/admin/transport" element={<ProtectedRoute component={AdminTransport} />} />
               </Routes>

@@ -8,7 +8,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
   }
 
   // Authenticate request
-  const auth = verifyAdminRequest(env, request);
+  const auth = await verifyAdminRequest(env, request);
   if (!auth.ok) {
     return new Response(JSON.stringify({ error: auth.error }), {
       status: auth.status,

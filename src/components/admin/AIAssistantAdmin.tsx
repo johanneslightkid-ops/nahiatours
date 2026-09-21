@@ -116,7 +116,7 @@ const AIAssistantAdmin: React.FC = () => {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-6 py-3 bg-sea-deep text-white font-bold rounded-lg hover:bg-[#0f4f59] transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-3 bg-lagoon-dark text-white font-bold rounded-lg hover:bg-[#0f4f59] transition-all disabled:opacity-50"
         >
           {isSaving ? 'Guardando…' : saveSuccess ? <><FaCheck /> Guardado</> : <><FaSave /> Guardar configuración</>}
         </button>

@@ -299,7 +299,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
                           ? (current.transferRoutes ?? []).filter((_: any, routeIndex: number) => routeIndex !== index)
                           : [createEmptyRoute()],
                       }))}
-                      className="rounded-full bg-coral-deep px-4 py-2 text-sm font-semibold text-white"
+                      className="rounded-full bg-sunset-dark px-4 py-2 text-sm font-semibold text-white"
                     >
                       Quitar
                     </button>
@@ -354,7 +354,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
                     placeholder="imgs/tours/example_detail_1.jpg"
                     className="rounded-2xl border border-ink/15 px-4 py-3"
                   />
-                  <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-ink/25 px-4 py-3 text-sm font-semibold text-ink-soft transition hover:border-sea hover:text-ink">
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-ink/25 px-4 py-3 text-sm font-semibold text-ink-soft transition hover:border-lagoon hover:text-ink">
                     Subir imagen
                     <input
                       type="file"
@@ -379,7 +379,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
                           : [''],
                       },
                     }))}
-                    className="rounded-full bg-coral-deep px-4 py-2 text-sm font-semibold text-white"
+                    className="rounded-full bg-sunset-dark px-4 py-2 text-sm font-semibold text-white"
                   >
                     Quitar
                   </button>
@@ -390,7 +390,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
         </div>
 
         <div className="mt-4 flex gap-3">
-          <button onClick={handleSave} className="rounded-full bg-sea-deep px-5 py-2 font-semibold text-white">
+          <button onClick={handleSave} className="rounded-full bg-lagoon-dark px-5 py-2 font-semibold text-white">
             Guardar
           </button>
           <button onClick={resetDraft} className="rounded-full bg-paper-deep px-5 py-2 font-semibold text-ink">
@@ -415,10 +415,10 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
               {service.details.images.length === 1 ? 'imagen de detalle' : 'imágenes de detalle'}
             </p>
             <div className="mt-4 flex gap-3">
-              <button onClick={() => startEditing(service)} className="rounded-full bg-sea-deep px-4 py-2 text-sm font-semibold text-white">
+              <button onClick={() => startEditing(service)} className="rounded-full bg-lagoon-dark px-4 py-2 text-sm font-semibold text-white">
                 Editar
               </button>
-              <button onClick={() => handleDelete(service.id)} className="rounded-full bg-coral-deep px-4 py-2 text-sm font-semibold text-white">
+              <button onClick={() => handleDelete(service.id)} className="rounded-full bg-sunset-dark px-4 py-2 text-sm font-semibold text-white">
                 Eliminar
               </button>
             </div>
