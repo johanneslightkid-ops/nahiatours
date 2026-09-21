@@ -1395,10 +1395,12 @@ select:focus {
   }
 
   .caustics {
-    /* Blending is per-frame work against whatever is underneath. The texture
-       alone reads close enough at this size. */
-    mix-blend-mode: normal;
-    opacity: 0.32;
+    /* The blend STAYS. What cost anything here was the animation, not
+       `soft-light`: a blend of a layer that never moves is composited once,
+       not per frame. Turning it off as well was over-reach — it turns light
+       on water into a grey haze over the whole page, which is most of what
+       makes this site look like itself. */
+    opacity: 0.5;
   }
 
   [class*='animate-wave-sway-'],
@@ -1415,24 +1417,23 @@ select:focus {
     will-change: auto;
   }
 
-  .hero-glass,
-  .home-feature-card,
+  /* ONLY THE ONES THAT RE-BLUR WHILE YOU SCROLL.
+     `backdrop-filter` costs on every frame the content behind it changes. For
+     the header that is every scroll frame, because it is sticky and the whole
+     page slides under it — and it is full width, so it is the most expensive
+     surface on the site. The planner panel is large and sits over moving
+     scenery for the same reason.
+     The frosted rating pip, the review card and the feature cards are small,
+     static, and scroll WITH the page, so their blur is composited once and
+     costs nothing per frame. They are this design's signature and they stay:
+     dropping them flattened the site into something that was not itself. */
   .lobster-header,
-  .stamp-edge,
-  .planner-panel-soft,
-  /* And the Tailwind utilities used directly in the markup — the rating pip,
-     the price chips, the mobile nav sheet. Every one of them already sits on
-     a background between 85% and 95% opaque, so dropping the blur costs a
-     little depth and no legibility at all. */
-  [class*='backdrop-blur'] {
+  .planner-panel-soft {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 
-  .hero-glass { background: rgba(255, 255, 255, 0.95); }
-  .home-feature-card { background: rgba(255, 255, 255, 0.98); }
   .lobster-header { background: rgba(253, 249, 241, 0.97); }
-  .stamp-edge { background: rgba(255, 255, 255, 0.88); }
   .planner-panel-soft { background: rgba(255, 255, 255, 0.16); }
 }
 
