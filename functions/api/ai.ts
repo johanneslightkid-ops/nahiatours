@@ -406,6 +406,12 @@ const listModels = async (provider: Provider, config: ProviderSettings) => {
  */
 const explain = (provider: Provider, status: number | undefined, detail: string): string => {
   const d = detail || '';
+  // "No key saved" and "the key was rejected" are different problems with
+  // different fixes, and they both contain the words "api key". Nothing is
+  // more annoying than being told to check a credential that was never there.
+  if (/^no .* api key saved/i.test(d)) {
+    return `No ${provider} API key is saved. Paste one under AI settings, or switch the active provider to Cloudflare, which needs no key on this deployment.`;
+  }
   if (status === 401 || status === 403 || /api[_ -]?key|unauthor|forbidden|invalid.*credential/i.test(d)) {
     return provider === 'cloudflare'
       ? 'Cloudflare rejected the account id or token saved under AI settings. Clear both to use this Worker\u2019s own Workers AI binding instead \u2014 it needs no credentials.'
