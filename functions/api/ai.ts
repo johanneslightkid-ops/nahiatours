@@ -57,7 +57,34 @@ const FALLBACK_MODELS: Record<Provider, string[]> = {
     'google/gemma-2-9b-it:free',
     'mistralai/mistral-7b-instruct:free',
   ],
-  cloudflare: ['@cf/meta/llama-3.1-8b-instruct-fp8', '@cf/meta/llama-3-8b-instruct'],
+  // The 70b model writes a far better 1500-word article than the 8b one, and
+  // `-fast` is the variant priced and rate-limited for exactly this. The 8b
+  // models stay in the chain underneath because they are available on every
+  // account, including ones the big model has not been enabled for.
+  cloudflare: [
+    '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+    '@cf/meta/llama-3.1-8b-instruct-fp8',
+    '@cf/meta/llama-3-8b-instruct',
+  ],
+};
+
+/**
+ * What a provider needs before it is worth calling.
+ *
+ * Cloudflare is the odd one out: with the `[ai]` binding in wrangler.toml it
+ * needs no credential at all, which is what makes it a usable last resort on a
+ * deployment nobody has configured.
+ */
+const providerIsUsable = (
+  provider: Provider,
+  settings: AISettings,
+  env: Record<string, any>
+): boolean => {
+  const config = (settings as any)[provider] as ProviderSettings | undefined;
+  if (provider === 'cloudflare') {
+    return Boolean(env?.AI) || Boolean(config?.accountId?.trim() && config?.apiKey?.trim());
+  }
+  return Boolean(config?.apiKey?.trim());
 };
 
 const json = (body: unknown, status = 200) =>
@@ -370,77 +397,206 @@ const listModels = async (provider: Provider, config: ProviderSettings) => {
     .map((m: any) => ({ id: m.name, name: m.name }));
 };
 
+/**
+ * A failure an operator can act on, in one sentence.
+ *
+ * Every provider says "no" in its own dialect, and the dialect is what an
+ * operator is least equipped to read. These map the four that actually happen
+ * onto what to do about them.
+ */
+const explain = (provider: Provider, status: number | undefined, detail: string): string => {
+  const d = detail || '';
+  if (status === 401 || status === 403 || /api[_ -]?key|unauthor|forbidden|invalid.*credential/i.test(d)) {
+    return provider === 'cloudflare'
+      ? 'Cloudflare rejected the account id or token saved under AI settings. Clear both to use this Worker\u2019s own Workers AI binding instead \u2014 it needs no credentials.'
+      : `The ${provider} API key was rejected. Check it under AI settings, or switch the active provider to Cloudflare, which needs no key on this deployment.`;
+  }
+  if (status === 429 || /quota|rate.?limit|too many requests|exceeded/i.test(d)) {
+    return `${provider} is refusing further requests right now (quota or rate limit). Wait a few minutes, or switch the active provider under AI settings.`;
+  }
+  if (/model|not found|does not exist|decommission|deprecat/i.test(d)) {
+    return `Every model tried on ${provider} was refused. Pick a different one under AI settings \u2014 the list there is fetched live.`;
+  }
+  if (provider === 'cloudflare' && /no Workers AI binding/i.test(d)) {
+    return 'This Worker was deployed without the Workers AI binding. Redeploy it \u2014 wrangler.toml declares [ai], so a fresh deploy grants it \u2014 or paste a Cloudflare account id and API token under AI settings.';
+  }
+  return d || `${provider} failed without saying why.`;
+};
+
+const runProvider = async (
+  provider: Provider,
+  env: Record<string, any>,
+  settings: AISettings,
+  prompt: string,
+  system: string | undefined,
+  maxTokens: number,
+  temperature: number,
+  image: string | undefined,
+  origin: string,
+  attempts: Attempt[]
+): Promise<RunResult> => {
+  const config: ProviderSettings = (settings as any)[provider] || {};
+  if (provider === 'gemini') {
+    return runGemini(config, prompt, system, maxTokens, temperature, image, attempts);
+  }
+  if (provider === 'openrouter') {
+    return runOpenRouter(config, prompt, system, maxTokens, temperature, image, origin, attempts);
+  }
+  return runCloudflare(env, config, prompt, system, maxTokens, temperature, attempts);
+};
+
 export async function onRequest(context: { request: Request; env: Record<string, any> }) {
   const { request, env } = context;
 
-  if (request.method !== 'POST') {
-    return json({ ok: false, error: 'Method not allowed' }, 405);
-  }
-
-  // Generation spends the account's money, so it is admin-only.
-  const auth = await verifyAdminRequest(env, request);
-  if (!auth.ok) {
-    return json({ ok: false, error: auth.error }, auth.status);
-  }
-
-  let body: any;
   try {
-    body = await request.json();
-  } catch {
-    return json({ ok: false, error: 'Expected a JSON body' }, 400);
-  }
+    if (request.method !== 'POST') {
+      return json({ ok: false, error: 'Method not allowed' }, 405);
+    }
 
-  const saved = await loadSettings(env);
-  // An override is accepted so the admin panel can test a key that has been
-  // typed but not yet saved.
-  const settings: AISettings = { ...saved, ...(body.settings || {}) };
-  const provider: Provider = (body.provider || settings.activeProvider || 'cloudflare') as Provider;
-  const config: ProviderSettings = (settings as any)[provider] || {};
+    // Generation spends the account’s money, so it is admin-only.
+    const auth = await verifyAdminRequest(env, request);
+    if (!auth.ok) {
+      return json({ ok: false, error: auth.error }, auth.status);
+    }
 
-  if (body.action === 'models') {
+    let body: any;
     try {
-      return json({ ok: true, provider, models: await listModels(provider, config) });
-    } catch (error: any) {
-      return json({ ok: false, provider, error: String(error?.message || error) }, 502);
+      body = await request.json();
+    } catch {
+      return json({ ok: false, error: 'Expected a JSON body' }, 400);
     }
-  }
 
-  const prompt = String(body.prompt || '').trim();
-  if (!prompt) return json({ ok: false, error: 'Missing prompt' }, 400);
+    const saved = await loadSettings(env);
+    // An override is accepted so the admin panel can test a key that has been
+    // typed but not yet saved.
+    const settings: AISettings = { ...saved, ...(body.settings || {}) };
+    const provider: Provider = (body.provider || settings.activeProvider || 'cloudflare') as Provider;
+    const config: ProviderSettings = (settings as any)[provider] || {};
 
-  const system = body.system ? String(body.system) : undefined;
-  const maxTokens = Number.isFinite(body.maxTokens) ? Math.min(Number(body.maxTokens), 8000) : 4000;
-  const temperature = Number.isFinite(body.temperature) ? Number(body.temperature) : 0.85;
-  const image = body.imageBase64 ? String(body.imageBase64) : undefined;
-  const origin = new URL(request.url).origin;
-
-  const attempts: Attempt[] = [];
-
-  try {
-    let result: RunResult;
-    if (provider === 'gemini') {
-      result = await runGemini(config, prompt, system, maxTokens, temperature, image, attempts);
-    } else if (provider === 'openrouter') {
-      result = await runOpenRouter(config, prompt, system, maxTokens, temperature, image, origin, attempts);
-    } else {
-      result = await runCloudflare(env, config, prompt, system, maxTokens, temperature, attempts);
+    if (body.action === 'models') {
+      try {
+        return json({ ok: true, provider, models: await listModels(provider, config) });
+      } catch (error: any) {
+        // Not being able to LIST models is not a server fault and must not be
+        // reported as one: it is almost always a key that has not been pasted
+        // yet, and the panel opens before anyone pastes it.
+        return json({ ok: false, provider, models: [], error: String(error?.message || error) });
+      }
     }
-    return json({ ok: true, provider, model: result.model, text: result.text, attempts });
-  } catch (error: any) {
-    // The provider's own words, plus every model that was tried. This is the
-    // difference between "Failed to generate" and knowing the key is fine and
-    // the model name is dead.
-    const last = attempts[attempts.length - 1];
-    return json(
-      {
-        ok: false,
-        provider,
-        error: String(error?.message || error),
-        detail: last?.detail,
-        status: last?.status,
-        attempts,
-      },
-      502
+
+    // A caller can ask which providers this deployment could actually use,
+    // without spending a token on any of them.
+    if (body.action === 'status') {
+      return json({
+        ok: true,
+        activeProvider: provider,
+        binding: Boolean(env.AI),
+        providers: (['cloudflare', 'gemini', 'openrouter'] as Provider[]).map((name) => ({
+          provider: name,
+          usable: providerIsUsable(name, settings, env),
+          hasKey: Boolean(((settings as any)[name] as ProviderSettings)?.apiKey?.trim()),
+          model: ((settings as any)[name] as ProviderSettings)?.selectedModel || FALLBACK_MODELS[name][0],
+        })),
+      });
+    }
+
+    const prompt = String(body.prompt || '').trim();
+    if (!prompt) return json({ ok: false, error: 'Missing prompt' }, 400);
+
+    const system = body.system ? String(body.system) : undefined;
+    const maxTokens = Number.isFinite(body.maxTokens) ? Math.min(Number(body.maxTokens), 8000) : 4000;
+    const temperature = Number.isFinite(body.temperature) ? Number(body.temperature) : 0.85;
+    const image = body.imageBase64 ? String(body.imageBase64) : undefined;
+    const origin = new URL(request.url).origin;
+
+    const attempts: Attempt[] = [];
+
+    // ── The order providers are tried in.
+    //
+    //   The selected one first, always. Then anything else this deployment
+    //   could actually use, because a dead key on one provider is not a reason
+    //   to hand back nothing when another is sitting right there configured.
+    //   `allowFallback: false` turns this off for the diagnostics button,
+    //   which is asking about one provider specifically.
+    //
+    //   An image rules Cloudflare out as a stand-in: the text models behind
+    //   the binding cannot see one, and quietly dropping the picture would be
+    //   worse than saying so.
+    const fallbackAllowed = body.allowFallback !== false;
+    const others = (['cloudflare', 'gemini', 'openrouter'] as Provider[]).filter(
+      (name) =>
+        name !== provider &&
+        providerIsUsable(name, settings, env) &&
+        !(image && name === 'cloudflare')
     );
+    const order: Provider[] = fallbackAllowed ? [provider, ...others] : [provider];
+
+    const failures: { provider: Provider; error: string }[] = [];
+
+    for (const name of order) {
+      try {
+        const result = await runProvider(
+          name,
+          env,
+          settings,
+          prompt,
+          system,
+          maxTokens,
+          temperature,
+          image,
+          origin,
+          attempts
+        );
+        return json({
+          ok: true,
+          provider: name,
+          model: result.model,
+          text: result.text,
+          // Named only when it is not the provider that was asked for, so the
+          // panel can say so rather than quietly substituting one.
+          fellBackFrom: name === provider ? undefined : provider,
+          attempts,
+        });
+      } catch (error: any) {
+        const last = [...attempts].reverse().find((a) => a.provider === name);
+        failures.push({
+          provider: name,
+          error: explain(name, last?.status, last?.detail || String(error?.message || error)),
+        });
+      }
+    }
+
+    // ── Why this is a 200.
+    //
+    //   It used to be a 502, and that single number cost hours. Chrome prints
+    //   a 502 as "Bad Gateway", which reads as the site being down rather than
+    //   as an API key being wrong, and neither the operator nor anyone they
+    //   showed it to had reason to open the response body where the actual
+    //   sentence was. The request reached the Worker, the Worker did its job
+    //   and the Worker has a complete answer about what went wrong: that is a
+    //   200 carrying `ok: false`, and the panel reads `ok`.
+    const headline = failures[0]?.error || 'No AI provider is configured on this deployment.';
+    return json({
+      ok: false,
+      provider,
+      error: headline,
+      failures,
+      // The provider’s own words and every model tried, kept for the
+      // details pane. This is the difference between "Failed to generate" and
+      // knowing the key is fine and the model name is dead.
+      detail: attempts[attempts.length - 1]?.detail,
+      status: attempts[attempts.length - 1]?.status,
+      attempts,
+      binding: Boolean(env.AI),
+    });
+  } catch (error: any) {
+    // Nothing above may throw past here. An uncaught throw inside a Worker is
+    // what a real 502 looks like, and then the browser tells the truth about a
+    // bug we could have named.
+    return json({
+      ok: false,
+      error: `The AI endpoint itself failed: ${String(error?.message || error)}`,
+      unexpected: true,
+    });
   }
 }
