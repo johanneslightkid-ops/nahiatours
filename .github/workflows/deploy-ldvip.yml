@@ -221,6 +221,11 @@ jobs:
 
       # provision-kv → populate-local-data → sitemap → SEO → vite build.
       # provision-kv.mjs finds the namespace clone-kv just filled, by title.
+      - name: Inventory the KV namespaces
+        run: node scripts/kv-inventory.mjs
+        env:
+          KV_INVENTORY_TITLES: nahiatours-data,beautiful-tours-data,transporturist-data,ldvip-data,amigotours-data
+
       - name: Build
         run: npm run build
 
@@ -242,7 +247,10 @@ jobs:
           wranglerVersion: '4'
           # `npm run build` already ran above, and it is what writes the KV
           # binding into wrangler.toml — so deploy only, never rebuild here.
-          command: deploy
+          # Stamped so /api/health can report which commit is live.
+          # --var is merged with the [vars] already in wrangler.toml,
+          # not substituted for them.
+          command: deploy --var BUILD_COMMIT:${{ github.sha }} --var BUILD_TIME:${{ github.event.repository.updated_at }}
 
       - name: Report where it landed
         run: |
