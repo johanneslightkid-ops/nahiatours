@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useRef } from 'react';
+import { useRichDisplay } from '../lib/useMediaQuery';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { HiArrowDown, HiCheck, HiStar, HiShieldCheck } from 'react-icons/hi';
@@ -48,6 +49,7 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, backgroundVideo }) => {
+  const richDisplay = useRichDisplay();
   const { brandSettings } = useBrand();
   const budget = useMotionBudget();
   const reduced = useReducedMotion();
@@ -211,7 +213,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             <div className="relative mx-auto max-w-md -rotate-2">
               <div className="rounded-[30px_22px_28px_24px] border border-[rgba(150,112,31,0.45)] bg-canvas-lift p-4 shadow-oil-lg">
                 <div className="story-media-frame">
-                  {backgroundVideo ? (
+                  {backgroundVideo && richDisplay ? (
                     <video
                       className="photo-pop h-64 w-full object-cover"
                       src={backgroundVideo}

@@ -199,7 +199,7 @@ const ServiceDetails: React.FC = () => {
             <img
               src={currentImage}
               alt={service.title}
-              className="photo-pop h-[420px] w-full object-cover"
+              className="photo-pop h-[420px] w-full object-cover" loading="lazy" decoding="async"
             />
             <div
               aria-hidden
@@ -234,7 +234,7 @@ const ServiceDetails: React.FC = () => {
                 }`}
                 aria-label={`Show image ${index + 1}`}
               >
-                <img src={image} alt={`${service.title} ${index + 1}`} className="photo-pop h-24 w-full object-cover" />
+                <img src={image} alt={`${service.title} ${index + 1}`} className="photo-pop h-24 w-full object-cover" loading="lazy" decoding="async" />
               </button>
             ))}
           </div>

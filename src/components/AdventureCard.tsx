@@ -67,7 +67,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
         <img
           src={adventure.imageUrl}
           alt={adventure.title}
-          className="photo-pop h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="photo-pop h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" decoding="async"
         />
         {/* Ink wash on hover, so the play button has something to sit against */}
         <div className="absolute inset-0 bg-ink/45 opacity-0 transition-opacity group-hover:opacity-100" />

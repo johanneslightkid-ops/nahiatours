@@ -107,7 +107,7 @@ const TourCard: React.FC<TourCardProps> = ({
           <img
             src={image}
             alt={title}
-            className="photo-pop h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            className="photo-pop h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy" decoding="async"
           />
         </Link>
         <div className="artsy-brick-badge absolute left-4 top-4">
