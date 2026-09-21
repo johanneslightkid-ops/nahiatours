@@ -80,36 +80,78 @@ interface AiResponse {
   text?: string;
   provider?: string;
   model?: string;
+  /** Set when another provider answered because the selected one could not. */
+  fellBackFrom?: string;
   error?: string;
   detail?: string;
   status?: number;
+  /** One readable sentence per provider that was tried and failed. */
+  failures?: Array<{ provider: string; error: string }>;
   attempts?: Array<{ provider: string; model: string; status: number; detail: string }>;
+}
+
+/**
+ * Everything the endpoint knows about a failure, in a form the panel can show.
+ *
+ * `message` is a sentence naming what to change. `failures` is the same for
+ * each provider tried, because "Gemini's key is rejected AND Cloudflare has no
+ * binding" is a different problem from either one alone.
+ */
+export class AiGenerationError extends Error {
+  readonly failures: Array<{ provider: string; error: string }>;
+  readonly attempts: Array<{ provider: string; model: string; status: number; detail: string }>;
+
+  constructor(message: string, response?: AiResponse | null) {
+    super(message);
+    this.name = 'AiGenerationError';
+    this.failures = response?.failures ?? [];
+    this.attempts = response?.attempts ?? [];
+  }
 }
 
 /** One call to the Worker, with the provider's own error kept intact. */
 const callAi = async (
   body: Record<string, unknown>
-): Promise<{ text: string; provider: string; model: string }> => {
+): Promise<{ text: string; provider: string; model: string; fellBackFrom?: string }> => {
   let data: AiResponse;
   try {
     data = await apiPost<AiResponse>('ai', body);
   } catch (error) {
-    // ApiError carries the server's JSON, which is where the provider's own
-    // explanation lives — the model it tried, the status it got back and what
-    // Google or OpenRouter actually said about it.
+    // A non-2xx now means the request never got as far as a provider — a wrong
+    // admin password, a Worker that is not there. ApiError still carries the
+    // server's JSON, which is where anything it did manage to say lives.
     const payload = error instanceof ApiError ? (error.body as AiResponse | null) : null;
     if (payload?.error) {
-      throw new Error(`${payload.error}${payload.detail ? ` — ${payload.detail}` : ''}`);
+      throw new AiGenerationError(
+        `${payload.error}${payload.detail ? ` — ${payload.detail}` : ''}`,
+        payload
+      );
+    }
+    if (error instanceof ApiError && error.status === 401) {
+      throw new AiGenerationError(
+        'La contraseña de administrador no fue aceptada. Vuelve a entrar al panel e inténtalo otra vez.'
+      );
     }
     throw error;
   }
 
   if (!data?.ok || !data.text) {
-    const detail = data?.detail ? ` — ${data.detail}` : '';
-    throw new Error(`${data?.error || 'The AI provider returned nothing.'}${detail}`);
+    const extra = (data?.failures ?? [])
+      .slice(1)
+      .map((f) => `${f.provider}: ${f.error}`)
+      .join(' · ');
+    throw new AiGenerationError(
+      `${data?.error || 'El proveedor de IA no devolvió nada.'}${extra ? ` (${extra})` : ''}`,
+      data
+    );
   }
 
-  return { text: data.text, provider: data.provider || '', model: data.model || '' };
+  return {
+    text: data.text,
+    provider: data.provider || '',
+    model: data.model || '',
+    fellBackFrom: data.fellBackFrom,
+  };
 };
 
 /** Extract a `LABEL:` line, case-insensitively, anywhere in the output. */
@@ -429,4 +471,47 @@ export const probeProvider = async (
     maxTokens: 20,
     temperature: 0,
     settings,
+    // The point of a probe is to test THIS provider. Quietly succeeding on a
+    // different one would report the very thing being diagnosed as healthy.
+    allowFallback: false,
   });
+
+/** One provider, and whether this deployment could actually call it. */
+export interface ProviderStatus {
+  provider: 'cloudflare' | 'gemini' | 'openrouter';
+  usable: boolean;
+  hasKey: boolean;
+  model: string;
+}
+
+/**
+ * Ask what this deployment could generate with, before spending a token.
+ *
+ * "Generate" failing on a site where nothing was ever configured is a bad way
+ * to learn that nothing was ever configured. This costs one cheap request and
+ * lets the panel say so up front.
+ */
+export const providerStatus = async (): Promise<{
+  binding: boolean;
+  activeProvider: string;
+  providers: ProviderStatus[];
+} | null> => {
+  try {
+    const data = await apiPost<{
+      ok: boolean;
+      binding?: boolean;
+      activeProvider?: string;
+      providers?: ProviderStatus[];
+    }>('ai', { action: 'status' });
+    if (!data?.ok) return null;
+    return {
+      binding: Boolean(data.binding),
+      activeProvider: data.activeProvider || '',
+      providers: data.providers || [],
+    };
+  } catch {
+    // A deployment too old to know the action, or an admin session that has
+    // expired. Neither is worth an error on a panel that has not been used yet.
+    return null;
+  }
+};

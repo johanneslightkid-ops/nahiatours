@@ -1,20 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  FaMicrophone,
-  FaStop,
-  FaMagic,
-  FaCopy,
-  FaCheck,
-  FaShareAlt,
-  FaTrash,
-  FaImages,
-  FaSave,
-  FaRedo,
-  FaSearch,
-} from 'react-icons/fa';
+import { FaCheck, FaCopy, FaImages, FaMagic, FaMicrophone, FaRedo, FaSave, FaSearch, FaShareAlt, FaSpinner, FaStop, FaTrash } from 'react-icons/fa';
 import { getTours, Tour } from '../../services/toursService';
 import { getAISettings, AISettings } from '../../services/aiSettingsService';
-import { generateBlogPost, GeneratedPost, GeneratedArticle } from '../../services/aiGeneratorService';
+import { AiGenerationError, GeneratedArticle, GeneratedPost, generateBlogPost, providerStatus } from '../../services/aiGeneratorService';
 import { saveBlogArticle, BlogArticle } from '../../services/blogService';
 import { getSocialApiSettings } from '../../services/socialApiSettingsService';
 import { getSocialMediaData, SocialMediaAccount } from '../../services/socialMediaService';
@@ -116,6 +104,10 @@ const AIBlogGenAdmin: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState('');
   const [problem, setProblem] = useState('');
+  /** One sentence per provider that was tried, when more than one was. */
+  const [problemFailures, setProblemFailures] = useState<{ provider: string; error: string }[]>([]);
+  /** Null until the deployment has been asked; false means nothing can run. */
+  const [anyProviderUsable, setAnyProviderUsable] = useState<boolean | null>(null);
   const [posts, setPosts] = useState<PostState[]>([]);
   const [copied, setCopied] = useState('');
 
@@ -129,6 +121,10 @@ const AIBlogGenAdmin: React.FC = () => {
       setTours(await getTours('en'));
       setAiSettings(await getAISettings());
       setSocialApiSettings(await getSocialApiSettings());
+      // Asked once, so the panel can say "nothing is configured" before a
+      // click rather than after a wait.
+      const status = await providerStatus();
+      if (status) setAnyProviderUsable(status.providers.some((prov) => prov.usable));
       const social = await getSocialMediaData();
       setSocialAccounts((social.accounts || []).filter((a: SocialMediaAccount) => a.enabled));
     })();
@@ -290,6 +286,7 @@ const AIBlogGenAdmin: React.FC = () => {
     if (!aiSettings) return;
     setBusy(true);
     setProblem('');
+    setProblemFailures([]);
     const made: PostState[] = [];
 
     try {
@@ -336,6 +333,7 @@ const AIBlogGenAdmin: React.FC = () => {
     } catch (error) {
       // The provider's own words, carried all the way from the Worker.
       setProblem(error instanceof Error ? error.message : String(error));
+      setProblemFailures(error instanceof AiGenerationError ? error.failures : []);
     } finally {
       setBusy(false);
       setProgress('');
@@ -366,6 +364,37 @@ const AIBlogGenAdmin: React.FC = () => {
         : 'border-ink/20 bg-white text-ink-soft hover:border-lagoon'
     }`;
 
+  /**
+   * The same action, rendered at both ends of the page.
+   *
+   * The brief is long enough that by the time it is filled in the button that
+   * starts it is off-screen, and after a run the results push it further away
+   * still. One handler, one `busy`, two buttons: whichever is in view is the
+   * live one, and both show the same progress line so neither can look idle
+   * while the other is working.
+   */
+  const GenerateButton = ({ size }: { size: 'lead' | 'foot' }) => (
+    <button
+      type="button"
+      onClick={handleGenerate}
+      disabled={busy}
+      aria-busy={busy}
+      className={`inline-flex items-center justify-center gap-2 rounded-full bg-mango font-bold uppercase tracking-[0.1em] text-ink transition hover:brightness-95 disabled:opacity-60 ${
+        size === 'lead' ? 'px-7 py-3.5 text-sm' : 'w-full px-8 py-4 text-base sm:w-auto'
+      }`}
+    >
+      {busy ? (
+        <>
+          <FaSpinner className="animate-spin" /> {progress || 'Generando…'}
+        </>
+      ) : (
+        <>
+          <FaMagic /> Generar artículo
+        </>
+      )}
+    </button>
+  );
+
   const card = 'rounded-3xl border border-ink/12 bg-white p-5 shadow-sm sm:p-6';
   const step = 'mb-4 flex items-baseline gap-3';
   const stepNo =
@@ -385,24 +414,44 @@ const AIBlogGenAdmin: React.FC = () => {
             <strong className="text-ink">{providerLabel}</strong>
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleGenerate}
-          disabled={busy}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-mango px-7 py-3.5 text-sm font-bold uppercase tracking-[0.1em] text-ink transition hover:brightness-95 disabled:opacity-60"
-        >
-          {busy ? progress || 'Generando…' : (<><FaMagic /> Generar artículo</>)}
-        </button>
+        <GenerateButton size="lead" />
       </div>
+
+      {anyProviderUsable === false && !problem && (
+        <div className="rounded-2xl border border-sunset/50 bg-sunset/10 p-5">
+          <p className="text-sm font-bold text-ink">Ningún proveedor de IA está listo</p>
+          <p className="mt-1 text-sm text-ink-soft">
+            Esta instalación no tiene el binding de Workers AI ni una clave guardada. Abre
+            “Integraciones de IA” y pega una clave de Gemini o de OpenRouter — o vuelve a
+            desplegar el sitio, que es lo que concede el binding de Cloudflare y no necesita
+            ninguna clave.
+          </p>
+        </div>
+      )}
 
       {problem && (
         <div className="rounded-2xl border border-hibiscus/40 bg-hibiscus/10 p-5">
           <p className="text-sm font-bold text-hibiscus-dark">No se pudo generar</p>
-          {/* Whatever the provider actually said — the model it tried, the
-              status it returned, the reason it gave. */}
+          {/* What to change, not what broke. The Worker turns each provider's
+              own wording into one instruction, and when it tried more than one
+              provider each gets its own line — "la clave de Gemini fue
+              rechazada" and "Cloudflare no tiene el binding" are two different
+              repairs, and seeing only the first sends you to fix the wrong
+              thing. */}
           <p className="mt-1 whitespace-pre-wrap text-sm text-ink-soft">{problem}</p>
+          {problemFailures.length > 1 && (
+            <ul className="mt-3 space-y-1.5 border-t border-hibiscus/25 pt-3">
+              {problemFailures.map((f) => (
+                <li key={f.provider} className="text-xs text-ink-soft">
+                  <strong className="uppercase tracking-[0.08em] text-ink">{f.provider}</strong>{' '}
+                  — {f.error}
+                </li>
+              ))}
+            </ul>
+          )}
           <p className="mt-3 text-xs text-ink-light">
-            Prueba el proveedor en la pestaña de Integraciones de IA con el botón “Probar”.
+            Puedes probar cada proveedor por separado en “Integraciones de IA”, con el botón
+            “Probar”. Cloudflare Workers AI funciona sin clave en esta instalación.
           </p>
         </div>
       )}
@@ -845,6 +894,19 @@ const AIBlogGenAdmin: React.FC = () => {
           Los artículos generados aparecerán aquí, con vista previa real y botones para publicar.
         </p>
       )}
+
+      {/* ── The same action again, where the form ends ─────────────────── */}
+      <div className="flex flex-col items-center gap-3 rounded-3xl border border-ink/12 bg-white p-6 text-center shadow-sm">
+        <p className="text-sm text-ink-light">
+          {posts.length > 0
+            ? 'Genera otra versión con el mismo resumen, o cambia algo arriba y vuelve a intentarlo.'
+            : 'Cuando el resumen esté listo, genera el artículo desde aquí.'}
+        </p>
+        <GenerateButton size="foot" />
+        <p className="text-xs text-ink-light">
+          Proveedor activo: <strong className="text-ink-soft">{providerLabel}</strong>
+        </p>
+      </div>
     </div>
   );
 };
