@@ -26,6 +26,7 @@ import { onRequest as handleBlog } from '../functions/blog';
 import { onRequest as handleAdminAuth } from '../functions/api/admin-auth';
 import { onRequest as handleAi } from '../functions/api/ai';
 import { onRequest as handleHealth } from '../functions/api/health';
+import { onRequest as handleTestimonials } from '../functions/api/testimonials';
 import { onRequest as handleAdminPassword } from '../functions/api/admin-password';
 import { onRequest as handleStripeCheckout } from '../functions/api/stripe-checkout';
 import { onRequest as handleStripeSession } from '../functions/api/stripe-session';
@@ -50,6 +51,9 @@ const ROUTES: Record<string, RouteHandler> = {
   // Which branch built what is being served, and which bindings arrived with
   // it. Public, and carries no value that is worth keeping.
   '/api/health': handleHealth,
+  // A visitor leaving a review. The generic writer is admin-only and must
+  // stay that way, so this does one thing and appends unapproved.
+  '/api/testimonials': handleTestimonials,
   '/api/admin-auth': handleAdminAuth,
   // One endpoint for Gemini, OpenRouter and Workers AI. `/api/cf-ai` stays
   // routed below so an older client build keeps working after a deploy.

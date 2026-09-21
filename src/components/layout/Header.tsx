@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminNav from './AdminNav';
 import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
@@ -98,50 +99,11 @@ const Header: React.FC = () => {
         <nav
           className={`${
             isMenuOpen ? 'flex' : 'hidden'
-          } absolute left-3 right-3 top-[calc(100%+10px)] flex-col gap-2 rounded-[22px_17px_24px_16px/17px_24px_16px_22px] border border-ink/12 bg-paper p-4 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-1 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
+          } absolute left-3 right-3 top-[calc(100%+10px)] flex-col gap-2 rounded-[22px_17px_24px_16px/17px_24px_16px_22px] border border-ink/12 bg-paper p-4 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-1 md:border-0 md:bg-transparent md:p-0 ${isAdminRoute ? 'md:flex-wrap md:justify-end' : ''} md:shadow-none`}
         >
           {isAdminRoute ? (
             <>
-              <Link to="/admin?section=brand" onClick={handleNavClick} className={adminNavClass('brand')} title="Marca">
-                <MdSettings className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=story" onClick={handleNavClick} className={adminNavClass('story')} title="Historia">
-                <FaBook className="h-4 w-4" />
-              </Link>
-              <Link to="/admin?section=tours" onClick={handleNavClick} className={adminNavClass('tours')} title="Excursiones">
-                <MdTour className="h-5 w-5" />
-              </Link>
-              {/* Transport is its own route, not a section of this page. It used
-                  to point at `?section=transport`, which rendered a dead end
-                  telling you to navigate somewhere else. */}
-              <Link
-                to="/admin/transport"
-                onClick={handleNavClick}
-                className={adminRouteNavClass('/admin/transport')}
-                title="Transporte"
-              >
-                <MdLocalTaxi className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=tiktok" onClick={handleNavClick} className={adminNavClass('tiktok')} title="TikTok">
-                <FaTiktok className="h-4 w-4" />
-              </Link>
-              <Link to="/admin?section=social" onClick={handleNavClick} className={adminNavClass('social')} title="Redes sociales">
-                <FaShareAlt className="h-4 w-4" />
-              </Link>
-              <Link to="/admin?section=aiSettings" onClick={handleNavClick} className={adminNavClass('aiSettings')} title="Configuración de IA">
-                <FaRobot className="h-4 w-4" />
-              </Link>
-              <Link to="/admin?section=aiBlogGen" onClick={handleNavClick} className={adminNavClass('aiBlogGen')} title="Generador de blog">
-                <FaMagic className="h-4 w-4" />
-              </Link>
-              <span className="mx-1 hidden h-5 w-px bg-ink/20 md:block" />
-              <button
-                onClick={handleLogout}
-                className="nav-link-pill p-2.5 !rounded-full !text-coral-deep"
-                title="Cerrar sesión y volver al sitio"
-              >
-                <FaSignOutAlt className="h-4 w-4" />
-              </button>
+              <AdminNav onNavigate={handleNavClick} onLogout={handleLogout} />
             </>
           ) : (
             <>

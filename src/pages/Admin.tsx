@@ -9,6 +9,7 @@ import SocialMediaAdmin from '../components/admin/SocialMediaAdmin';
 import StoryAdmin from '../components/admin/StoryAdmin';
 import AIAssistantAdmin from '../components/admin/AIAssistantAdmin';
 import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
+import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
 import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
 import { FaVideo, FaShareAlt, FaBook, FaRobot, FaMagic } from 'react-icons/fa';
@@ -232,9 +233,18 @@ const Admin: React.FC = () => {
             setServices={setTours}
             loadServices={loadTours}
             saveServices={(services) => saveTours(services, locale)}
+            locale={locale === 'en' ? 'en' : 'es'}
+            saveTranslation={(services, to) => saveTours(services, to)}
             siblingAdminPath="/admin/transport"
             siblingAdminLabel="Ir a Transporte"
           />
+        )}
+
+        {/* Reviews Admin Section */}
+        {activeSection === 'testimonials' && (
+          <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
+            <TestimonialsAdmin />
+          </div>
         )}
 
         {/* TikTok Videos Admin Panel */}
