@@ -37,72 +37,72 @@ module.exports = {
         // Deep-sea navy rather than black: it is the colour of water read at
         // depth, and it is warmer and friendlier than neutral grey for type.
         ink: {
-          DEFAULT: '#0E2E3B',
-          soft: '#3D5A66',
-          light: '#7B95A1',
+          DEFAULT: '#16302A',
+          soft: '#40584F',
+          light: '#5E7369',
         },
         // Sand, in three weights, warmed by sun.
         paper: {
-          DEFAULT: '#FFFBF5',
-          warm: '#FFF3E4',
-          deep: '#FBE6CB',
+          DEFAULT: '#FDF9F1',
+          warm: '#F7EDDC',
+          deep: '#EBD9BE',
         },
         // THE action colour. Coral at golden hour — the complement of the sea,
         // so it never disappears against any photograph of one.
         mango: {
-          light: '#FF9B76',
-          DEFAULT: '#FF6B45',
-          dark: '#DC4A22',
+          light: '#F4A87C',
+          DEFAULT: '#E67C46',
+          dark: '#B85526',
         },
         // Shallow water over white sand: the brand's signature hue.
         lagoon: {
-          light: '#9CEDE6',
-          DEFAULT: '#14B8C4',
-          dark: '#0A7C93',
+          light: '#A9DED6',
+          DEFAULT: '#3FA79E',
+          dark: '#1F6F6C',
         },
         // Caribbean sky, from haze at the horizon to zenith.
         sky: {
-          light: '#D6F1FF',
-          DEFAULT: '#5EC5F5',
-          dark: '#2A7FB8',
+          light: '#DCEFF3',
+          DEFAULT: '#8CC3D6',
+          dark: '#3C7E96',
         },
         // Palm and sea-grape.
         jungle: {
-          light: '#93DCA9',
-          DEFAULT: '#2FA36B',
-          dark: '#186B48',
+          light: '#A8CE9A',
+          DEFAULT: '#5E9257',
+          dark: '#35603A',
         },
         // Hibiscus, for warmth that is not an action.
         hibiscus: {
-          light: '#FFA9B9',
-          DEFAULT: '#FF5F7E',
-          dark: '#D33A5C',
+          light: '#E9A5AE',
+          DEFAULT: '#CE6376',
+          dark: '#A44458',
         },
         // The sun itself, and the low light it throws.
         sunset: {
-          light: '#FFD68C',
-          DEFAULT: '#FFB703',
-          dark: '#E08700',
+          light: '#F5D79B',
+          DEFAULT: '#E3A73F',
+          dark: '#B97F22',
         },
         // Dusk, the one cool counterweight.
         grape: {
-          light: '#C9B6F0',
-          DEFAULT: '#7C5FD3',
-          dark: '#4F3A96',
+          light: '#C0B5DB',
+          DEFAULT: '#7C6DA6',
+          dark: '#55487A',
         },
         // Water read as depth, for deep surfaces and scrims over photography.
         abyss: {
-          light: '#0F5A73',
-          DEFAULT: '#08415C',
-          dark: '#052A3D',
+          light: '#1C5E62',
+          DEFAULT: '#14434A',
+          dark: '#0C2C31',
         },
         // Legacy aliases from earlier designs, kept live so no stray class
         // name falls out of the palette.
-        tropicalGreen: '#2FA36B',
-        tropicalBlue: '#14B8C4',
-        sandyBeige: '#FFF3E4',
-        sunsetOrange: '#FF6B45',
-        oceanWave: '#14B8C4',
+        tropicalGreen: '#5E9257',
+        tropicalBlue: '#3FA79E',
+        sandyBeige: '#F7EDDC',
+        sunsetOrange: '#E67C46',
+        oceanWave: '#3FA79E',
       },
       fontFamily: {
         // Fraunces: a soft, sunny serif with real character. Warm and
@@ -119,17 +119,17 @@ module.exports = {
       },
       backgroundImage: {
         // The sky, from horizon haze upward.
-        'sky-wash': 'linear-gradient(180deg, #5EC5F5 0%, #A5DFF9 45%, #D6F1FF 78%, #FFFBF5 100%)',
+        'sky-wash': 'linear-gradient(180deg, #8CC3D6 0%, #BBDCE6 45%, #DCEFF3 78%, #FDF9F1 100%)',
         // Shallow water over sand: the single most important gradient here.
-        'lagoon-wash': 'linear-gradient(180deg, #9CEDE6 0%, #35C9CE 45%, #0A7C93 100%)',
+        'lagoon-wash': 'linear-gradient(180deg, #A9DED6 0%, #5FBDB2 45%, #1F6F6C 100%)',
         // Golden hour, low and warm.
-        'sunset-wash': 'linear-gradient(180deg, #FFD68C 0%, #FF9B76 48%, #FF6B45 100%)',
-        'jungle-wash': 'linear-gradient(180deg, #93DCA9 0%, #2FA36B 55%, #186B48 100%)',
-        'paper-wash': 'linear-gradient(180deg, #FFFBF5 0%, #FFF3E4 100%)',
+        'sunset-wash': 'linear-gradient(180deg, #F5D79B 0%, #F4A87C 48%, #E67C46 100%)',
+        'jungle-wash': 'linear-gradient(180deg, #A8CE9A 0%, #5E9257 55%, #35603A 100%)',
+        'paper-wash': 'linear-gradient(180deg, #FDF9F1 0%, #F7EDDC 100%)',
         // Wet sand at the tideline, where the water has just pulled back.
-        'shore-wash': 'linear-gradient(180deg, #FFFBF5 0%, #FFF3E4 40%, #E9F6F2 100%)',
+        'shore-wash': 'linear-gradient(180deg, #FDF9F1 0%, #F7EDDC 40%, #EDF4EA 100%)',
         // Sun glare: the unpainted paper, as a radial.
-        'sun-glare': 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(255,214,140,0.45) 35%, transparent 70%)',
+        'sun-glare': 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(245, 215, 155,0.45) 35%, transparent 70%)',
         // Hockney's white squiggle, tiled. Light on a rippled surface.
         'caustics': 'repeating-linear-gradient(102deg, transparent 0 18px, rgba(255,255,255,0.30) 18px 21px, transparent 21px 30px), repeating-linear-gradient(78deg, transparent 0 26px, rgba(255,255,255,0.22) 26px 28px, transparent 28px 44px)',
       },
@@ -137,28 +137,28 @@ module.exports = {
         // Real light casts soft, layered shadows with a warm bounce. Every one
         // of these is two stops — a tight contact shadow and a wide ambient
         // one — tinted towards the sea rather than towards neutral grey.
-        'sm': '0 1px 2px rgba(14, 46, 59, 0.06), 0 2px 6px rgba(14, 46, 59, 0.05)',
-        DEFAULT: '0 2px 4px rgba(14, 46, 59, 0.06), 0 6px 14px rgba(14, 46, 59, 0.07)',
-        'md': '0 3px 6px rgba(14, 46, 59, 0.07), 0 10px 22px rgba(14, 46, 59, 0.08)',
-        'lg': '0 6px 12px rgba(14, 46, 59, 0.07), 0 18px 38px rgba(14, 46, 59, 0.10)',
-        'xl': '0 10px 20px rgba(14, 46, 59, 0.08), 0 30px 60px rgba(14, 46, 59, 0.12)',
-        '2xl': '0 16px 32px rgba(14, 46, 59, 0.10), 0 48px 90px rgba(14, 46, 59, 0.16)',
-        'inner': 'inset 0 2px 6px rgba(14, 46, 59, 0.08)',
+        'sm': '0 1px 2px rgba(22, 48, 42, 0.06), 0 2px 6px rgba(22, 48, 42, 0.05)',
+        DEFAULT: '0 2px 4px rgba(22, 48, 42, 0.06), 0 6px 14px rgba(22, 48, 42, 0.07)',
+        'md': '0 3px 6px rgba(22, 48, 42, 0.07), 0 10px 22px rgba(22, 48, 42, 0.08)',
+        'lg': '0 6px 12px rgba(22, 48, 42, 0.07), 0 18px 38px rgba(22, 48, 42, 0.10)',
+        'xl': '0 10px 20px rgba(22, 48, 42, 0.08), 0 30px 60px rgba(22, 48, 42, 0.12)',
+        '2xl': '0 16px 32px rgba(22, 48, 42, 0.10), 0 48px 90px rgba(22, 48, 42, 0.16)',
+        'inner': 'inset 0 2px 6px rgba(22, 48, 42, 0.08)',
         'none': '0 0 #0000',
         // Named lifts used through the markup.
-        'lift': '0 10px 20px -8px rgba(14, 46, 59, 0.18), 0 26px 50px -20px rgba(14, 46, 59, 0.22)',
-        'float': '0 24px 48px -18px rgba(10, 124, 147, 0.35)',
+        'lift': '0 10px 20px -8px rgba(22, 48, 42, 0.18), 0 26px 50px -20px rgba(22, 48, 42, 0.22)',
+        'float': '0 24px 48px -18px rgba(31, 111, 108, 0.35)',
         // A card resting on lit water picks up the water's colour underneath.
-        'lagoon': '0 12px 30px -10px rgba(20, 184, 196, 0.45)',
-        'sun': '0 12px 30px -10px rgba(255, 183, 3, 0.45)',
-        'coral': '0 10px 26px -8px rgba(255, 107, 69, 0.5)',
+        'lagoon': '0 12px 30px -10px rgba(63, 167, 158, 0.45)',
+        'sun': '0 12px 30px -10px rgba(227, 167, 63, 0.45)',
+        'coral': '0 10px 26px -8px rgba(230, 124, 70, 0.5)',
         // The old hard-offset names, softened so any leftover use still fits.
-        'ink-sm': '0 2px 5px rgba(14, 46, 59, 0.10)',
-        'ink': '0 6px 16px rgba(14, 46, 59, 0.12)',
-        'ink-lg': '0 14px 34px rgba(14, 46, 59, 0.16)',
-        'ink-xl': '0 22px 52px rgba(14, 46, 59, 0.20)',
+        'ink-sm': '0 2px 5px rgba(22, 48, 42, 0.10)',
+        'ink': '0 6px 16px rgba(22, 48, 42, 0.12)',
+        'ink-lg': '0 14px 34px rgba(22, 48, 42, 0.16)',
+        'ink-xl': '0 22px 52px rgba(22, 48, 42, 0.20)',
         // Sun glare blooming off a bright edge.
-        'glow': '0 0 0 1px rgba(255,255,255,0.6), 0 8px 30px rgba(255, 214, 140, 0.55)',
+        'glow': '0 0 0 1px rgba(255,255,255,0.6), 0 8px 30px rgba(245, 215, 155, 0.55)',
       },
       borderRadius: {
         // Generous and friendly. Nothing here should feel sharp: this is a

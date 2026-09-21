@@ -26,7 +26,7 @@ const IllustratedBackdrop: React.FC = () => (
       className="absolute inset-0"
       style={{
         background:
-          'linear-gradient(180deg, #7FD3F7 0%, #A5DFF9 22%, #D6F1FF 44%, #F2FBFF 56%, #FFFBF5 64%, #FFFBF5 100%)',
+          'linear-gradient(180deg, #7FD3F7 0%, #BBDCE6 22%, #DCEFF3 44%, #F2FBFF 56%, #FDF9F1 64%, #FDF9F1 100%)',
       }}
     />
 
@@ -62,7 +62,7 @@ const IllustratedBackdrop: React.FC = () => (
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(180deg, #BFEFEA 0%, #6FD9DC 26%, #21B4C4 58%, #0A7C93 100%)',
+            'linear-gradient(180deg, #BFEFEA 0%, #6FD9DC 26%, #21B4C4 58%, #1F6F6C 100%)',
         }}
       />
 

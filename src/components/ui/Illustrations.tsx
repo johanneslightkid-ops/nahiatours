@@ -25,27 +25,27 @@ import React, { useId } from 'react';
  * from the caller's className.
  */
 
-export const INK = '#0E2E3B';
+export const INK = '#16302A';
 
 const PALETTE = {
   ink: INK,
-  inkSoft: '#3D5A66',
-  lagoonLight: '#9CEDE6',
-  lagoon: '#14B8C4',
-  lagoonDark: '#0A7C93',
-  abyss: '#08415C',
-  skyLight: '#D6F1FF',
-  sky: '#5EC5F5',
-  skyDark: '#2A7FB8',
-  sand: '#FFF3E4',
-  sandDeep: '#FBE6CB',
-  coral: '#FF6B45',
-  coralLight: '#FF9B76',
-  gold: '#FFB703',
-  goldLight: '#FFD68C',
-  palm: '#2FA36B',
-  palmLight: '#93DCA9',
-  palmDark: '#186B48',
+  inkSoft: '#40584F',
+  lagoonLight: '#A9DED6',
+  lagoon: '#3FA79E',
+  lagoonDark: '#1F6F6C',
+  abyss: '#14434A',
+  skyLight: '#DCEFF3',
+  sky: '#8CC3D6',
+  skyDark: '#3C7E96',
+  sand: '#F7EDDC',
+  sandDeep: '#EBD9BE',
+  coral: '#E67C46',
+  coralLight: '#F4A87C',
+  gold: '#E3A73F',
+  goldLight: '#F5D79B',
+  palm: '#5E9257',
+  palmLight: '#A8CE9A',
+  palmDark: '#35603A',
   white: '#FFFFFF',
 };
 
@@ -245,7 +245,7 @@ export const Toucan: React.FC<IllustrationProps> = ({ className = '', style }) =
       <defs>
         <linearGradient id={`${id}-body`} x1="0.2" y1="0" x2="0.8" y2="1">
           <stop offset="0%" stopColor="#2B4250" />
-          <stop offset="100%" stopColor="#0E2E3B" />
+          <stop offset="100%" stopColor="#16302A" />
         </linearGradient>
         <linearGradient id={`${id}-beak`} x1="0" y1="0" x2="1" y2="0.6">
           <stop offset="0%" stopColor={PALETTE.gold} />
@@ -279,8 +279,8 @@ export const Hibiscus: React.FC<IllustrationProps> = ({ className = '', style })
       <defs>
         <radialGradient id={`${id}-petal`} cx="0.5" cy="0.85">
           <stop offset="0%" stopColor="#FFE0B8" />
-          <stop offset="45%" stopColor="#FFA9B9" />
-          <stop offset="100%" stopColor="#FF5F7E" />
+          <stop offset="45%" stopColor="#E9A5AE" />
+          <stop offset="100%" stopColor="#CE6376" />
         </radialGradient>
       </defs>
       {[0, 1, 2, 3, 4].map((i) => (

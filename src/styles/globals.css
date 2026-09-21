@@ -35,60 +35,60 @@
 
 :root {
   /* ── Depth: the colour of water, read downward ────────────────────────── */
-  --ink: #0e2e3b;
-  --ink-soft: #3d5a66;
-  --ink-light: #7b95a1;
+  --ink: #16302a;
+  --ink-soft: #40584f;
+  --ink-light: #5e7369;
 
   /* ── Sand ─────────────────────────────────────────────────────────────── */
-  --paper: #fffbf5;
-  --paper-warm: #fff3e4;
-  --paper-deep: #fbe6cb;
+  --paper: #fdf9f1;
+  --paper-warm: #f7eddc;
+  --paper-deep: #ebd9be;
   --white: #ffffff;
 
   /* ── The sea ──────────────────────────────────────────────────────────── */
-  --lagoon-light: #9cede6;
-  --lagoon: #14b8c4;
-  --lagoon-dark: #0a7c93;
-  --abyss: #08415c;
+  --lagoon-light: #a9ded6;
+  --lagoon: #3fa79e;
+  --lagoon-dark: #1f6f6c;
+  --abyss: #14434a;
 
   /* ── The sky ──────────────────────────────────────────────────────────── */
-  --sky-light: #d6f1ff;
-  --sky: #5ec5f5;
-  --sky-dark: #2a7fb8;
+  --sky-light: #dceff3;
+  --sky: #8cc3d6;
+  --sky-dark: #3c7e96;
 
   /* ── The sun, and the action it stands for ────────────────────────────── */
-  --coral-light: #ff9b76;
-  --coral: #ff6b45;
-  --coral-dark: #dc4a22;
-  --gold-light: #ffd68c;
-  --gold: #ffb703;
-  --gold-dark: #e08700;
+  --coral-light: #f4a87c;
+  --coral: #e67c46;
+  --coral-dark: #b85526;
+  --gold-light: #f5d79b;
+  --gold: #e3a73f;
+  --gold-dark: #b97f22;
 
   /* ── Growing things ───────────────────────────────────────────────────── */
-  --palm-light: #93dca9;
-  --palm: #2fa36b;
-  --palm-dark: #186b48;
+  --palm-light: #a8ce9a;
+  --palm: #5e9257;
+  --palm-dark: #35603a;
 
   /* Legacy token names, remapped so every stray utility in the markup lands
      inside this palette. */
   --mango: var(--coral);
   --mango-light: var(--coral-light);
   --mango-dark: var(--coral-dark);
-  --hibiscus: #ff5f7e;
-  --hibiscus-light: #ffa9b9;
+  --hibiscus: #ce6376;
+  --hibiscus-light: #e9a5ae;
   --jungle: var(--palm);
   --jungle-light: var(--palm-light);
   --jungle-dark: var(--palm-dark);
   --sunset: var(--gold);
-  --grape: #7c5fd3;
+  --grape: #7c6da6;
 
   /* Light is soft here, and it bounces off water. Every shadow is two stops:
      a tight contact shadow and a wide ambient one, tinted towards the sea. */
-  --shadow-sm: 0 1px 2px rgba(14, 46, 59, 0.06), 0 2px 6px rgba(14, 46, 59, 0.05);
-  --shadow-md: 0 3px 6px rgba(14, 46, 59, 0.07), 0 10px 22px rgba(14, 46, 59, 0.08);
-  --shadow-lg: 0 6px 12px rgba(14, 46, 59, 0.07), 0 18px 38px rgba(14, 46, 59, 0.1);
-  --shadow-xl: 0 10px 20px rgba(14, 46, 59, 0.08), 0 30px 60px rgba(14, 46, 59, 0.12);
-  --shadow-lift: 0 14px 26px -10px rgba(14, 46, 59, 0.2), 0 34px 60px -24px rgba(14, 46, 59, 0.26);
+  --shadow-sm: 0 1px 2px rgba(22, 48, 42, 0.06), 0 2px 6px rgba(22, 48, 42, 0.05);
+  --shadow-md: 0 3px 6px rgba(22, 48, 42, 0.07), 0 10px 22px rgba(22, 48, 42, 0.08);
+  --shadow-lg: 0 6px 12px rgba(22, 48, 42, 0.07), 0 18px 38px rgba(22, 48, 42, 0.1);
+  --shadow-xl: 0 10px 20px rgba(22, 48, 42, 0.08), 0 30px 60px rgba(22, 48, 42, 0.12);
+  --shadow-lift: 0 14px 26px -10px rgba(22, 48, 42, 0.2), 0 34px 60px -24px rgba(22, 48, 42, 0.26);
 
   --radius: 18px;
   --radius-lg: 24px;
@@ -237,8 +237,8 @@ a:hover {
   background: radial-gradient(
     circle at 50% 50%,
     rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 214, 140, 0.5) 32%,
-    rgba(255, 183, 3, 0.16) 52%,
+    rgba(245, 215, 155, 0.5) 32%,
+    rgba(227, 167, 63, 0.16) 52%,
     transparent 72%
   );
   animation: shimmer 7s ease-in-out infinite;
@@ -272,9 +272,9 @@ a:hover {
   background-image: linear-gradient(
     to bottom,
     transparent 48%,
-    rgba(255, 214, 140, 0.28) 62%,
-    rgba(255, 183, 3, 0.42) 82%,
-    rgba(255, 214, 140, 0.1) 96%,
+    rgba(245, 215, 155, 0.28) 62%,
+    rgba(227, 167, 63, 0.42) 82%,
+    rgba(245, 215, 155, 0.1) 96%,
     transparent 100%
   );
   -webkit-box-decoration-break: clone;
@@ -295,7 +295,7 @@ a:hover {
   right: 0;
   bottom: 0;
   height: 0.42rem;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2,7 C34,1 60,9 100,5 C140,1 168,9 198,3' stroke='%2314B8C4' stroke-width='4' stroke-linecap='round' fill='none' opacity='0.85'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2,7 C34,1 60,9 100,5 C140,1 168,9 198,3' stroke='%233FA79E' stroke-width='4' stroke-linecap='round' fill='none' opacity='0.85'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -326,8 +326,8 @@ a:hover {
 /* THE LAGOON. Shallow water over white sand — the brand's own colour, and
    the one band that carries live caustics. */
 .lagoon-section {
-  --band: #d9f6f4;
-  --band-texture: linear-gradient(180deg, #eafbf9 0%, #c3efec 55%, #9fe4e0 100%);
+  --band: #e4f1e8;
+  --band-texture: linear-gradient(180deg, #eef7f2 0%, #cfe7dc 55%, #b2d8c6 100%);
   --band-texture-size: 100% 100%;
 }
 
@@ -350,7 +350,7 @@ a:hover {
   position: relative;
   overflow: hidden;
   --band: var(--coral);
-  --band-texture: linear-gradient(170deg, #ffd68c 0%, #ff9b76 46%, #ff6b45 100%);
+  --band-texture: linear-gradient(170deg, #f5d79b 0%, #f4a87c 46%, #e67c46 100%);
   --band-texture-size: 100% 100%;
   color: #fff;
 }
@@ -370,7 +370,7 @@ a:hover {
     circle,
     rgba(255, 255, 255, 0.92) 0%,
     rgba(255, 236, 190, 0.6) 26%,
-    rgba(255, 183, 3, 0.25) 44%,
+    rgba(227, 167, 63, 0.25) 44%,
     transparent 66%
   );
   pointer-events: none;
@@ -382,7 +382,7 @@ a:hover {
   position: relative;
   overflow: hidden;
   --band: var(--abyss);
-  --band-texture: linear-gradient(180deg, #14b8c4 0%, #0a7c93 40%, #08415c 100%);
+  --band-texture: linear-gradient(180deg, #3fa79e 0%, #1f6f6c 40%, #14434a 100%);
   --band-texture-size: 100% 100%;
   color: #fff;
 }
@@ -412,7 +412,7 @@ a:hover {
 .reef-section h2,
 .reef-section h3 {
   color: #fff;
-  text-shadow: 0 2px 18px rgba(14, 46, 59, 0.28);
+  text-shadow: 0 2px 18px rgba(22, 48, 42, 0.28);
 }
 
 .sunset-section p,
@@ -431,7 +431,7 @@ a:hover {
 .reef-section .planner-cta {
   background: #fff;
   color: var(--coral-dark);
-  box-shadow: 0 10px 26px -8px rgba(14, 46, 59, 0.35);
+  box-shadow: 0 10px 26px -8px rgba(22, 48, 42, 0.35);
 }
 
 .sunset-section .tropical-button::before,
@@ -445,7 +445,7 @@ a:hover {
 .reef-section .planner-cta:hover {
   background: var(--paper);
   color: var(--coral-dark);
-  box-shadow: 0 16px 34px -10px rgba(14, 46, 59, 0.42);
+  box-shadow: 0 16px 34px -10px rgba(22, 48, 42, 0.42);
 }
 
 .sunset-section .tropical-button-outline,
@@ -558,7 +558,7 @@ a:hover {
 .glass-card {
   position: relative;
   background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  border: 1px solid rgba(22, 48, 42, 0.07);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
@@ -615,7 +615,7 @@ a:hover {
    in the card and reads as the single thing to do. */
 .booking-card {
   background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  border: 1px solid rgba(22, 48, 42, 0.07);
   box-shadow: var(--shadow-lg);
   transition: transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
 }
@@ -628,7 +628,7 @@ a:hover {
 .story-copy-card {
   border-radius: var(--radius-lg);
   background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  border: 1px solid rgba(22, 48, 42, 0.07);
   padding: 1.9rem;
   box-shadow: var(--shadow-md);
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
@@ -692,7 +692,7 @@ a:hover .photo-pop,
     rgba(255, 255, 255, 0.18) 0%,
     transparent 26%,
     transparent 62%,
-    rgba(14, 46, 59, 0.22) 100%
+    rgba(22, 48, 42, 0.22) 100%
   );
 }
 
@@ -704,7 +704,7 @@ a:hover .photo-pop,
   place-items: center;
   border-radius: 9999px;
   background: linear-gradient(160deg, #fff 0%, var(--gold-light) 62%, var(--gold) 100%);
-  box-shadow: 0 10px 26px -8px rgba(255, 183, 3, 0.6), 0 0 0 8px rgba(255, 255, 255, 0.55);
+  box-shadow: 0 10px 26px -8px rgba(227, 167, 63, 0.6), 0 0 0 8px rgba(255, 255, 255, 0.55);
   font-size: 2.3rem;
   line-height: 1;
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
@@ -712,7 +712,7 @@ a:hover .photo-pop,
 
 .section-icon:hover {
   transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 16px 34px -8px rgba(255, 183, 3, 0.7), 0 0 0 10px rgba(255, 255, 255, 0.7);
+  box-shadow: 0 16px 34px -8px rgba(227, 167, 63, 0.7), 0 0 0 10px rgba(255, 255, 255, 0.7);
 }
 
 /* Broad, soft colour washes — light pooling behind a section, not paint. */
@@ -757,7 +757,7 @@ button {
   letter-spacing: 0.01em;
   background: linear-gradient(140deg, var(--coral-light) 0%, var(--coral) 55%, var(--coral-dark) 100%);
   color: #fff;
-  box-shadow: 0 10px 26px -8px rgba(255, 107, 69, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 26px -8px rgba(230, 124, 70, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), filter 0.3s ease;
 }
 
@@ -781,13 +781,13 @@ button {
 
 .tropical-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 18px 36px -10px rgba(255, 107, 69, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: 0 18px 36px -10px rgba(230, 124, 70, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   filter: brightness(1.04);
 }
 
 .tropical-button:active {
   transform: translateY(0);
-  box-shadow: 0 6px 14px -6px rgba(255, 107, 69, 0.6);
+  box-shadow: 0 6px 14px -6px rgba(230, 124, 70, 0.6);
 }
 
 /* The quieter route: an outlined pill that fills with sea on hover. */
@@ -795,7 +795,7 @@ button {
   @apply relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold;
   background: rgba(255, 255, 255, 0.9);
   color: var(--ink);
-  border: 1.5px solid rgba(14, 46, 59, 0.14);
+  border: 1.5px solid rgba(22, 48, 42, 0.14);
   box-shadow: var(--shadow-sm);
   transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
@@ -805,7 +805,7 @@ button {
   background: #fff;
   border-color: var(--lagoon);
   color: var(--lagoon-dark);
-  box-shadow: 0 14px 30px -10px rgba(20, 184, 196, 0.45);
+  box-shadow: 0 14px 30px -10px rgba(63, 167, 158, 0.45);
 }
 
 .tropical-button-outline:active {
@@ -816,14 +816,14 @@ button {
   background: linear-gradient(140deg, var(--lagoon-light) 0%, var(--lagoon) 55%, var(--lagoon-dark) 100%);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 10px 26px -8px rgba(20, 184, 196, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 26px -8px rgba(63, 167, 158, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-lagoon:hover {
   background: linear-gradient(140deg, var(--lagoon-light) 0%, var(--lagoon) 45%, var(--lagoon-dark) 100%);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 18px 36px -10px rgba(20, 184, 196, 0.7);
+  box-shadow: 0 18px 36px -10px rgba(63, 167, 158, 0.7);
 }
 
 .btn-hibiscus {
@@ -866,7 +866,7 @@ input[type='search'],
 input[type='password'],
 textarea,
 select {
-  border: 1.5px solid rgba(14, 46, 59, 0.14);
+  border: 1.5px solid rgba(22, 48, 42, 0.14);
   border-radius: 14px;
   background: #fff;
   box-shadow: var(--shadow-sm);
@@ -884,7 +884,7 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: var(--lagoon);
-  box-shadow: 0 0 0 4px rgba(20, 184, 196, 0.16);
+  box-shadow: 0 0 0 4px rgba(63, 167, 158, 0.16);
 }
 
 ::placeholder {
@@ -897,11 +897,11 @@ select:focus {
    photography behind it is what you notice first. */
 
 .lobster-header {
-  background: rgba(255, 251, 245, 0.82);
+  background: rgba(253, 249, 241, 0.82);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   backdrop-filter: blur(16px) saturate(1.4);
-  border-bottom: 1px solid rgba(14, 46, 59, 0.07);
-  box-shadow: 0 2px 20px rgba(14, 46, 59, 0.05);
+  border-bottom: 1px solid rgba(22, 48, 42, 0.07);
+  box-shadow: 0 2px 20px rgba(22, 48, 42, 0.05);
 }
 
 .nav-link-pill {
@@ -910,19 +910,19 @@ select:focus {
 }
 
 .nav-link-pill:hover {
-  background: rgba(20, 184, 196, 0.1);
+  background: rgba(63, 167, 158, 0.1);
   color: var(--lagoon-dark);
   transform: translateY(-1px);
 }
 
 .nav-link-pill-active {
-  background: rgba(20, 184, 196, 0.14);
+  background: rgba(63, 167, 158, 0.14);
   color: var(--lagoon-dark);
 }
 
 .language-toggle {
   @apply inline-flex items-center rounded-full p-1;
-  background: rgba(14, 46, 59, 0.05);
+  background: rgba(22, 48, 42, 0.05);
 }
 
 .language-toggle-button {
@@ -973,7 +973,7 @@ select:focus {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  box-shadow: 0 8px 20px -6px rgba(20, 184, 196, 0.5);
+  box-shadow: 0 8px 20px -6px rgba(63, 167, 158, 0.5);
 }
 
 .artsy-title-card {
@@ -982,7 +982,7 @@ select:focus {
   border-radius: var(--radius);
   background: linear-gradient(135deg, var(--lagoon) 0%, var(--lagoon-dark) 100%);
   color: #fff;
-  box-shadow: 0 12px 28px -10px rgba(20, 184, 196, 0.55);
+  box-shadow: 0 12px 28px -10px rgba(63, 167, 158, 0.55);
 }
 
 .artsy-title-card-light {
@@ -1010,7 +1010,7 @@ select:focus {
   overflow: hidden;
   border-radius: var(--radius-xl);
   background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  border: 1px solid rgba(22, 48, 42, 0.07);
   box-shadow: var(--shadow-lg);
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
 }
@@ -1021,7 +1021,7 @@ select:focus {
 }
 
 .pathway-card-dark {
-  background: linear-gradient(160deg, #0f6a80 0%, #08415c 100%);
+  background: linear-gradient(160deg, #0f6a80 0%, #14434a 100%);
   color: #fff;
   border-color: transparent;
 }
@@ -1055,7 +1055,7 @@ select:focus {
 
 .planner-panel {
   border-radius: var(--radius-xl);
-  background: linear-gradient(165deg, #0f6a80 0%, #08415c 62%, #052a3d 100%);
+  background: linear-gradient(165deg, #0f6a80 0%, #14434a 62%, #0c2c31 100%);
   color: #fff;
   box-shadow: var(--shadow-xl);
 }
@@ -1066,7 +1066,7 @@ select:focus {
 .planner-card {
   border-radius: var(--radius-lg);
   background: #fff;
-  border: 1px solid rgba(14, 46, 59, 0.07);
+  border: 1px solid rgba(22, 48, 42, 0.07);
   box-shadow: var(--shadow-md);
 }
 
@@ -1104,13 +1104,13 @@ select:focus {
 .planner-option:hover {
   transform: translateY(-3px);
   background: #fff;
-  box-shadow: 0 14px 30px -10px rgba(20, 184, 196, 0.45);
+  box-shadow: 0 14px 30px -10px rgba(63, 167, 158, 0.45);
 }
 
 .planner-option[data-selected='true'] {
   background: linear-gradient(140deg, #fff 0%, #ffe9dd 100%);
   border-color: var(--coral);
-  box-shadow: 0 14px 30px -10px rgba(255, 107, 69, 0.5);
+  box-shadow: 0 14px 30px -10px rgba(230, 124, 70, 0.5);
 }
 
 /* The option markup carries light-on-dark utilities from the panel; the
@@ -1153,14 +1153,14 @@ select:focus {
   width: 100%;
   overflow: hidden;
   border-radius: 9999px;
-  background: rgba(14, 46, 59, 0.1);
+  background: rgba(22, 48, 42, 0.1);
 }
 
 .planner-rail-fill {
   height: 100%;
   border-radius: 9999px;
   background: linear-gradient(90deg, var(--lagoon) 0%, var(--gold) 60%, var(--coral) 100%);
-  box-shadow: 0 0 14px rgba(255, 183, 3, 0.5);
+  box-shadow: 0 0 14px rgba(227, 167, 63, 0.5);
   transition: width 0.55s var(--ease-out);
 }
 
@@ -1168,13 +1168,13 @@ select:focus {
   @apply inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold;
   background: linear-gradient(140deg, var(--coral-light) 0%, var(--coral) 55%, var(--coral-dark) 100%);
   color: #fff;
-  box-shadow: 0 12px 28px -8px rgba(255, 107, 69, 0.6);
+  box-shadow: 0 12px 28px -8px rgba(230, 124, 70, 0.6);
   transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
 }
 
 .planner-cta:hover {
   transform: translateY(-3px);
-  box-shadow: 0 20px 38px -10px rgba(255, 107, 69, 0.7);
+  box-shadow: 0 20px 38px -10px rgba(230, 124, 70, 0.7);
 }
 
 .planner-cta:active {
@@ -1200,7 +1200,7 @@ select:focus {
   min-width: 1.7rem;
   place-items: center;
   border-radius: 8px;
-  background: rgba(14, 46, 59, 0.08);
+  background: rgba(22, 48, 42, 0.08);
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
@@ -1247,8 +1247,8 @@ select:focus {
 
 /* The booking button breathes like something floating. */
 @keyframes fabPulse {
-  0%, 100% { box-shadow: 0 12px 30px -8px rgba(255, 107, 69, 0.6); }
-  50% { box-shadow: 0 12px 30px -8px rgba(255, 107, 69, 0.7), 0 0 0 12px rgba(255, 107, 69, 0.12); }
+  0%, 100% { box-shadow: 0 12px 30px -8px rgba(230, 124, 70, 0.6); }
+  50% { box-shadow: 0 12px 30px -8px rgba(230, 124, 70, 0.7), 0 0 0 12px rgba(230, 124, 70, 0.12); }
 }
 
 .animate-fab-glow-wave {

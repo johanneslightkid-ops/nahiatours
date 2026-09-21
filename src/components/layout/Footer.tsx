@@ -41,7 +41,7 @@ const Footer = () => {
       {/* The shoreline that hands the page over to the footer. */}
       <WaveBand tone="deep" className="-mb-px block h-14 w-full sm:h-20" />
 
-      <div className="relative overflow-hidden bg-gradient-to-b from-[#0a6a80] via-[#08415c] to-[#052a3d] pt-16 pb-10 text-paper">
+      <div className="relative overflow-hidden bg-gradient-to-b from-[#0a6a80] via-[#14434a] to-[#0c2c31] pt-16 pb-10 text-paper">
         {/* Light falling through deep water. */}
         <div
           className="pointer-events-none absolute inset-0 opacity-25"
