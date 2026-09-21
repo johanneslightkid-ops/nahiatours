@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import TranslateBar from './TranslateBar';
 import { Link } from 'react-router-dom';
 import { uploadImage, Tour, PricingOption } from '../../services/toursService';
 import MarkdownEditor from '../ui/MarkdownEditor';
@@ -6,6 +7,13 @@ import MarkdownEditor from '../ui/MarkdownEditor';
 type Category = 'tours' | 'transport';
 
 interface ServiceAdminPanelProps {
+  /**
+   * Which language the list on screen is in, and where to put a translation
+   * of it. Both optional: without them the translate strip is simply absent,
+   * which is what a panel that is not bilingual wants.
+   */
+  locale?: 'en' | 'es';
+  saveTranslation?: (services: Tour[], to: 'en' | 'es') => Promise<void>;
   title: string;
   category: Category;
   services: Tour[];
@@ -73,6 +81,8 @@ const buildPricingOption = (option: PricingOption): PricingOption => {
 const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   title,
   category,
+  locale,
+  saveTranslation,
   services,
   setServices,
   loadServices,
@@ -189,6 +199,8 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
     updateImage(index, uploaded);
   };
 
+  const other = locale === 'en' ? 'es' : 'en';
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between gap-4">
@@ -197,6 +209,31 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
           {siblingAdminLabel}
         </Link>
       </div>
+
+      {/* Only when this panel was told which language it is showing AND given
+          somewhere to put the other one. The strip hides itself again if no AI
+          provider on this deployment can answer. */}
+      {locale && saveTranslation && (
+        <TranslateBar
+          value={sortedServices}
+          from={locale}
+          what={category === 'transport' ? 'los servicios de transporte' : 'las excursiones'}
+          note={
+            category === 'transport'
+              ? `Traduce los servicios que ves aquí y los guarda en la ficha de ${
+                  other === 'en' ? 'inglés' : 'español'
+                }. Cambia el idioma arriba para revisarlos. Lo que ya haya ahí se reemplaza.`
+              : `Traduce las excursiones que ves aquí y las guarda en la ficha de ${
+                  other === 'en' ? 'inglés' : 'español'
+                }. Cambia el idioma arriba para revisarlas. Lo que ya haya ahí se reemplaza.`
+          }
+          disabled={sortedServices.length === 0}
+          onTranslated={async (translated) => {
+            await saveTranslation(translated as Tour[], other);
+            return `Guardado en ${other === 'en' ? 'inglés' : 'español'}. Cambia el idioma para revisarlo.`;
+          }}
+        />
+      )}
 
       <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold text-ink">

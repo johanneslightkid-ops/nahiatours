@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import TranslateBar from './TranslateBar';
 import {
   FaPlus,
   FaTrash,
@@ -106,7 +107,24 @@ const StoryAdmin: React.FC = () => {
   const [addingAfter, setAddingAfter] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
+  /**
+   * A translation waiting to be shown, held across the language switch.
+   *
+   * Switching language reloads from storage, which is right every other time
+   * and exactly wrong here: the whole point is to put the untranslated-yet
+   * version of the other language ON SCREEN for review. So the translation is
+   * parked here, the language flips, and this load hands it over instead of
+   * fetching — once. Nothing is saved until the operator presses save.
+   */
+  const pendingTranslation = useRef<StoryElementsData | null>(null);
+
   const loadStory = useCallback(async () => {
+    if (pendingTranslation.current) {
+      setStoryData(pendingTranslation.current);
+      pendingTranslation.current = null;
+      setEditing(null);
+      return;
+    }
     const data = await getStoryElements(locale);
     setStoryData(data ?? { storyTitle: '', storyTagline: '', elements: [] });
     setEditing(null);
@@ -342,6 +360,21 @@ const StoryAdmin: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Translate what is open into the other language and SHOW it there,
+          unsaved, so it can be read before it goes anywhere near the site. */}
+      <TranslateBar
+        value={storyData}
+        from={locale === 'en' ? 'en' : 'es'}
+        what="la página de inicio"
+        note="Traduce lo que tienes abierto y lo abre en el otro idioma para que lo revises. No se guarda hasta que pulses Guardar."
+        disabled={storyData.elements.length === 0 && !storyData.storyTitle}
+        onTranslated={(translated, to) => {
+          pendingTranslation.current = translated as StoryElementsData;
+          setLocale(to as JourneyLocale);
+          return `Abierto en ${to === 'en' ? 'inglés' : 'español'}. Revísalo y pulsa Guardar.`;
+        }}
+      />
+
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 rounded-3xl border border-ink/12 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
