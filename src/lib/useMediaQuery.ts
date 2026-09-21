@@ -31,4 +31,14 @@ export function useMediaQuery(query: string): boolean {
   return matches;
 }
 
+/**
+ * Is this a screen worth spending a megabyte of decoration on?
+ *
+ * Width alone is the wrong test — a phone in landscape is 900px across and
+ * still on a battery — so this asks for a fine pointer as well, which means a
+ * mouse or a trackpad.
+ */
+export const useRichDisplay = (): boolean =>
+  useMediaQuery('(min-width: 1024px) and (pointer: fine)');
+
 export default useMediaQuery;
