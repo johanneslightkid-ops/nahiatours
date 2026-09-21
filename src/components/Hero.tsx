@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRichDisplay } from '../lib/useMediaQuery';
+import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { HiArrowDown, HiCheck, HiStar, HiShieldCheck } from 'react-icons/hi';
@@ -24,7 +24,11 @@ interface HeroProps {
  * the background of the site.
  */
 const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, backgroundVideo }) => {
-  const richDisplay = useRichDisplay();
+  /* The footage plays on every screen, phones included. It is mounted once
+     the browser is idle rather than in the first pass, so a megabyte of
+     decoration never queues ahead of the stylesheet — and the poster it
+     replaces is its own first frame, so the swap is invisible. */
+  const showVideo = useDeferredVideo(Boolean(backgroundVideo));
   const { brandSettings } = useBrand();
 
   const desktopImage = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
@@ -125,7 +129,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             <div className="relative mx-auto max-w-md -rotate-2">
               <div className="rounded-[28px] border-[3px] border-ink bg-paper p-4 shadow-ink-xl">
                 <div className="overflow-hidden rounded-[18px] border-[3px] border-ink">
-                  {backgroundVideo && richDisplay ? (
+                  {backgroundVideo && showVideo ? (
                     <video
                       className="h-64 w-full object-cover photo-pop"
                       src={backgroundVideo}
@@ -185,12 +189,26 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
       {/* Mobile postcard: same souvenir, stacked under the copy. */}
       <div className="section-shell relative z-10 pb-12 lg:hidden">
         <div className="mx-auto max-w-sm -rotate-1 rounded-[24px] border-[3px] border-ink bg-paper p-3 shadow-ink-lg">
-          <img
-            src={mobileImage}
-            alt=""
-            aria-hidden="true"
-            className="h-44 w-full rounded-[14px] border-[3px] border-ink object-cover photo-pop"
-          />
+          {backgroundVideo && showVideo ? (
+            <video
+              className="h-44 w-full rounded-[14px] border-[3px] border-ink object-cover photo-pop"
+              src={backgroundVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster={mobileImage}
+              aria-hidden="true"
+            />
+          ) : (
+            <img
+              src={mobileImage}
+              alt=""
+              aria-hidden="true"
+              decoding="async"
+              className="h-44 w-full rounded-[14px] border-[3px] border-ink object-cover photo-pop"
+            />
+          )}
           <p className="mt-3 text-center font-accent text-xl text-mango-dark">
             Greetings from Bávaro
           </p>
