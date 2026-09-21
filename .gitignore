@@ -5,3 +5,7 @@ dist/
 .wrangler/
 # wrangler.toml is committed intentionally — KV namespace IDs are left empty
 # and set via Cloudflare dashboard or wrangler CLI.
+
+# vite writes these while loading a config file; they carry absolute paths from
+# whichever machine ran the build, so they must never be committed.
+vite.config.*.timestamp-*
