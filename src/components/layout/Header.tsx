@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminNav from './AdminNav';
 import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
@@ -93,38 +94,11 @@ const Header: React.FC = () => {
         </button>
 
         <nav
-          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+10px)] z-50 flex-col gap-1.5 rounded-3xl bg-white/95 px-4 py-4 shadow-xl ring-1 ring-ink/5 backdrop-blur-xl md:static md:flex md:flex-row md:items-center md:gap-1 md:bg-transparent md:p-0 md:shadow-none md:ring-0 md:backdrop-blur-none`}
+          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+10px)] z-50 flex-col gap-1.5 rounded-3xl bg-white/95 px-4 py-4 shadow-xl ring-1 ring-ink/5 backdrop-blur-xl md:static md:flex md:flex-row md:items-center md:gap-1 md:bg-transparent md:p-0 ${isAdminRoute ? 'md:flex-wrap md:justify-end' : ''} md:shadow-none md:ring-0 md:backdrop-blur-none`}
         >
           {isAdminRoute ? (
             <>
-              <Link to="/admin?section=brand" onClick={handleNavClick} className={adminNavClass('brand')} title="Brand Settings">
-                <MdSettings className="h-6 w-6" />
-              </Link>
-              <Link to="/admin?section=story" onClick={handleNavClick} className={adminNavClass('story')} title="Story">
-                <FaBook className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=tours" onClick={handleNavClick} className={adminNavClass('tours')} title="Tours">
-                <MdTour className="h-6 w-6" />
-              </Link>
-              <Link to="/admin/transport" onClick={handleNavClick} className={adminRouteNavClass('/admin/transport')} title="Transport">
-                <MdLocalTaxi className="h-6 w-6" />
-              </Link>
-              <Link to="/admin?section=tiktok" onClick={handleNavClick} className={adminNavClass('tiktok')} title="TikTok">
-                <FaTiktok className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=social" onClick={handleNavClick} className={adminNavClass('social')} title="Social">
-                <FaShareAlt className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=aiSettings" onClick={handleNavClick} className={adminNavClass('aiSettings')} title="AI Config">
-                <FaRobot className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=aiBlogGen" onClick={handleNavClick} className={adminNavClass('aiBlogGen')} title="AI Blog Gen">
-                <FaMagic className="h-5 w-5" />
-              </Link>
-              <div className="mx-1 hidden h-6 w-0.5 bg-ink/30 md:block"></div>
-              <button onClick={handleLogout} className="nav-link-pill p-3 !rounded-full !text-hibiscus-dark hover:!bg-hibiscus-light" title="Log Out & Return">
-                <FaSignOutAlt className="h-5 w-5" />
-              </button>
+              <AdminNav onNavigate={handleNavClick} onLogout={handleLogout} />
             </>
           ) : (
             <>
