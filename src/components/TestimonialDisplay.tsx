@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { FaStar } from 'react-icons/fa';
 import TestimonialForm from './TestimonialForm';
-import { getTestimonials, saveTestimonials, TestimonialRecord } from '../services/testimonialService';
+import { getPublishedTestimonials, submitTestimonial, TestimonialRecord } from '../services/testimonialService';
 
 interface TestimonialDisplayProps {
   locale: string;
@@ -11,32 +11,59 @@ interface TestimonialDisplayProps {
 const TestimonialDisplay: React.FC<TestimonialDisplayProps> = ({ locale }) => {
   const [testimonials, setTestimonials] = useState<TestimonialRecord[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  /** What to tell the visitor after they send one: kept, or not kept. */
+  const [notice, setNotice] = useState<{ tone: 'ok' | 'bad'; text: string } | null>(null);
 
   useEffect(() => {
     const loadTestimonials = async () => {
-      const remoteTestimonials = await getTestimonials();
+      const remoteTestimonials = await getPublishedTestimonials();
       setTestimonials(remoteTestimonials);
     };
     loadTestimonials();
   }, []);
 
-  const handleTestimonialSubmit = async (name: string, email: string, review: string, profileImage?: string) => {
+  /**
+   * Send the review, THEN show it.
+   *
+   * The old order was the other way round: the review went into React state
+   * first, so it appeared immediately, and the save that followed was allowed
+   * to fail in silence. It always did fail — the write it used is admin-only
+   * and a visitor has no password — so every review anyone ever left lasted
+   * until the next page load and was never stored. Nothing goes on screen now
+   * until the server has said it kept it.
+   */
+  const handleTestimonialSubmit = async (
+    name: string,
+    email: string,
+    review: string,
+    profileImage?: string
+  ) => {
     setIsSubmitting(true);
+    setNotice(null);
     try {
-      const newTestimonial: TestimonialRecord = {
-        id: Date.now().toString(),
+      const { testimonial, pending } = await submitTestimonial({
         name,
         email,
         review,
         rating: 5,
         profileImage,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-      const updated = [newTestimonial, ...testimonials];
-      setTestimonials(updated);
-      await saveTestimonials(updated);
+      });
+      // A pending review is not shown here — it is not published yet, and
+      // showing it to its author would suggest it is.
+      if (!pending) setTestimonials([testimonial, ...testimonials]);
+      setNotice({
+        tone: 'ok',
+        text: pending
+          ? '¡Gracias! Tu reseña quedó guardada y aparecerá en cuanto la revisemos.'
+          : '¡Gracias! Tu reseña ya está publicada.',
+      });
     } catch (error) {
-      console.error('Error submitting testimonial:', error);
+      setNotice({
+        tone: 'bad',
+        text: `No se pudo guardar tu reseña: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -57,6 +84,18 @@ const TestimonialDisplay: React.FC<TestimonialDisplayProps> = ({ locale }) => {
 
         {/* Form */}
         <div className="mb-16">
+          {notice && (
+            <p
+              className={`mx-auto mb-5 max-w-2xl rounded-2xl border px-5 py-4 text-center text-sm font-semibold ${
+                notice.tone === 'ok'
+                  ? 'border-jungle/40 bg-jungle/10 text-jungle-dark'
+                  : 'border-hibiscus/40 bg-hibiscus/10 text-hibiscus-dark'
+              }`}
+              role="status"
+            >
+              {notice.text}
+            </p>
+          )}
           <TestimonialForm onSubmit={handleTestimonialSubmit} isLoading={isSubmitting} />
         </div>
 

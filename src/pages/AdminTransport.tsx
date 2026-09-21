@@ -29,6 +29,8 @@ const AdminTransport: React.FC = () => {
           services={services}
           setServices={setServices}
           loadServices={loadServices}
+          locale={locale === 'en' ? 'en' : 'es'}
+          saveTranslation={(items, to) => saveTransportServices(items, to)}
           saveServices={(nextServices) => saveTransportServices(nextServices, locale)}
           siblingAdminPath="/admin"
           siblingAdminLabel="Ir a Excursiones"

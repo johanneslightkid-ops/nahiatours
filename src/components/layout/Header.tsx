@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
-import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks, MdSettings } from 'react-icons/md';
-import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaSignOutAlt } from 'react-icons/fa';
+import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks } from 'react-icons/md';
+import { FaSignOutAlt } from 'react-icons/fa';
+import { ADMIN_NAV, adminLabel } from '../../lib/adminNav';
 import LanguageSwitcher from '../LanguageSwitcher';
 import SoundToggle from '../SoundToggle';
 import { useBrand } from '../../contexts/BrandContext';
@@ -17,6 +18,7 @@ const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const intl = useIntl();
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAdminPassword());
 
   useEffect(() => {
@@ -32,14 +34,18 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
-  const adminNavClass = (section: string) => {
-    const currentSection = searchParams.get('section') || 'brand';
-    return `nav-link-pill p-3 !rounded-full ${currentSection === section ? 'nav-link-pill-active' : ''}`;
-  };
+  /**
+   * A menu entry is active when its section is the one showing — or, for the
+   * entries that are their own route, when that route is the one open.
+   *
+   * The pill is no longer a circle: it holds a name now as well as an icon.
+   */
+  const adminPillClass = (active: boolean) =>
+    `nav-link-pill flex items-center gap-2 !rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap ${
+      active ? 'nav-link-pill-active' : ''
+    }`;
 
-  /** Admin areas that are their own route, such as transport. */
-  const adminRouteNavClass = (path: string) =>
-    `nav-link-pill p-3 !rounded-full ${location.pathname === path ? 'nav-link-pill-active' : ''}`;
+  const currentSection = searchParams.get('section') || 'brand';
 
   const handleNavClick = () => {
     playClickFx();
@@ -83,37 +89,37 @@ const Header: React.FC = () => {
         </button>
 
         <nav
-          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+12px)] flex-col gap-3 rounded-[24px] border-[3px] border-ink bg-paper px-5 py-5 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-2 md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
+          className={`${isMenuOpen ? 'flex' : 'hidden'} absolute left-3 right-3 top-[calc(100%+12px)] flex-col gap-3 rounded-[24px] border-[3px] border-ink bg-paper px-5 py-5 shadow-ink-lg md:static md:flex md:flex-row md:items-center md:gap-2 md:border-0 md:bg-transparent md:p-0 md:shadow-none ${isAdminRoute ? 'md:flex-wrap md:justify-end' : ''}`}
         >
           {isAdminRoute ? (
             <>
-              <Link to="/admin?section=brand" onClick={handleNavClick} className={adminNavClass('brand')} title="Brand Settings">
-                <MdSettings className="h-6 w-6" />
-              </Link>
-              <Link to="/admin?section=story" onClick={handleNavClick} className={adminNavClass('story')} title="Story">
-                <FaBook className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=tours" onClick={handleNavClick} className={adminNavClass('tours')} title="Tours">
-                <MdTour className="h-6 w-6" />
-              </Link>
-              <Link to="/admin/transport" onClick={handleNavClick} className={adminRouteNavClass('/admin/transport')} title="Transport">
-                <MdLocalTaxi className="h-6 w-6" />
-              </Link>
-              <Link to="/admin?section=tiktok" onClick={handleNavClick} className={adminNavClass('tiktok')} title="TikTok">
-                <FaTiktok className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=social" onClick={handleNavClick} className={adminNavClass('social')} title="Social">
-                <FaShareAlt className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=aiSettings" onClick={handleNavClick} className={adminNavClass('aiSettings')} title="AI Config">
-                <FaRobot className="h-5 w-5" />
-              </Link>
-              <Link to="/admin?section=aiBlogGen" onClick={handleNavClick} className={adminNavClass('aiBlogGen')} title="AI Blog Gen">
-                <FaMagic className="h-5 w-5" />
-              </Link>
+              {ADMIN_NAV.map((item) => {
+                const Icon = item.icon;
+                const to = item.path ?? `/admin?section=${item.section}`;
+                const active = item.path
+                  ? location.pathname === item.path
+                  : location.pathname === '/admin' && currentSection === item.section;
+                const name = adminLabel(item, intl.locale);
+                return (
+                  <Link
+                    key={item.path ?? item.section}
+                    to={to}
+                    onClick={handleNavClick}
+                    className={adminPillClass(active)}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    <Icon className="h-5 w-5 shrink-0" />
+                    <span>{name}</span>
+                  </Link>
+                );
+              })}
               <div className="mx-1 hidden h-6 w-0.5 bg-ink/30 md:block"></div>
-              <button onClick={handleLogout} className="nav-link-pill p-3 !rounded-full !text-hibiscus-dark hover:!bg-hibiscus-light" title="Log Out & Return">
-                <FaSignOutAlt className="h-5 w-5" />
+              <button
+                onClick={handleLogout}
+                className="nav-link-pill flex items-center gap-2 !rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap !text-hibiscus-dark hover:!bg-hibiscus-light"
+              >
+                <FaSignOutAlt className="h-5 w-5 shrink-0" />
+                <span>{intl.locale.toLowerCase().startsWith('en') ? 'Log out' : 'Salir'}</span>
               </button>
             </>
           ) : (
