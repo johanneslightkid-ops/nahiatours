@@ -217,7 +217,7 @@ const StorySection: React.FC<StorySectionProps> = ({
                   <img
                     src={imageUrl}
                     alt={title || 'Story image'}
-                    className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] object-cover shadow-[0_25px_60px_rgba(4,19,29,0.3)] transition-transform duration-700 group-hover:scale-105 sm:h-96 md:h-[520px]"
+                    className="mt-6 relative h-[22rem] w-full rounded-[32px_14px_36px_20px] object-cover shadow-[0_25px_60px_rgba(4,19,29,0.3)] transition-transform duration-700 group-hover:scale-105 sm:h-96 md:h-[520px]" loading="lazy" decoding="async"
                   />
                 ) : isTikTok ? (
                   hasLoaded ? (

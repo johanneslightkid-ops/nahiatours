@@ -939,13 +939,34 @@ select:focus {
   animation-play-state: paused;
 }
 
-@keyframes fabPulse {
-  0%, 100% { box-shadow: 4px 4px 0 0 var(--ink); }
-  50% { box-shadow: 4px 4px 0 0 var(--ink), 0 0 0 10px rgba(47, 168, 79, 0.18); }
+/*
+ * The button breathed by animating `box-shadow` — a large blurred shadow
+ * re-rasterised every frame, on a control that is on screen the whole visit.
+ * The shadow is static now; the breathing is a ring that scales and fades,
+ * which the compositor handles without the main thread.
+ */
+@keyframes fabRing {
+  0%, 100% { transform: scale(0.9); opacity: 0; }
+  50% { transform: scale(1); opacity: 1; }
 }
 
 .animate-fab-glow-wave {
-  animation: fabPulse 3s ease-in-out infinite;
+  /* This site's shadow is a hard offset block, not a glow. It is the design's
+     signature and it stays exactly as it was — it just no longer redraws. */
+  box-shadow: 4px 4px 0 0 var(--ink);
+}
+
+/* No `position` here: the button is already fixed, and setting one would pull
+   it out of the corner it is pinned to. */
+.animate-fab-glow-wave::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 10px rgba(47, 168, 79, 0.18);
+  pointer-events: none;
+  animation: fabRing 3s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 /* Palm fronds and clouds in the backdrop breathe rather than sway hard. */

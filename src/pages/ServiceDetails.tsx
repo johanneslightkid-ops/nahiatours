@@ -192,7 +192,7 @@ const ServiceDetails: React.FC = () => {
 
         <article className="glass-card overflow-hidden rounded-[2rem]">
           <div className="relative bg-ink">
-            <img src={currentImage} alt={service.title} className="h-[420px] w-full object-cover" />
+            <img src={currentImage} alt={service.title} className="h-[420px] w-full object-cover" loading="lazy" decoding="async" />
             <div className="absolute inset-x-0 bottom-0 bg-ink/75 p-8 text-white">
               <h1 className="text-4xl font-bold md:text-5xl">{service.title}</h1>
               <div className="mt-3 max-w-3xl text-paper/85">
@@ -209,7 +209,7 @@ const ServiceDetails: React.FC = () => {
                 className={`overflow-hidden rounded-2xl border-2 transition ${index === activeIndex ? 'border-lagoon' : 'border-ink'}`}
                 aria-label={`Show image ${index + 1}`}
               >
-                <img src={image} alt={`${service.title} ${index + 1}`} className="h-24 w-full object-cover" />
+                <img src={image} alt={`${service.title} ${index + 1}`} className="h-24 w-full object-cover" loading="lazy" decoding="async" />
               </button>
             ))}
           </div>

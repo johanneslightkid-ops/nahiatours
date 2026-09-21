@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRichDisplay } from '../lib/useMediaQuery';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { HiArrowDown, HiCheck, HiStar, HiShieldCheck } from 'react-icons/hi';
@@ -23,6 +24,7 @@ interface HeroProps {
  * the background of the site.
  */
 const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, backgroundVideo }) => {
+  const richDisplay = useRichDisplay();
   const { brandSettings } = useBrand();
 
   const desktopImage = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
@@ -123,7 +125,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             <div className="relative mx-auto max-w-md -rotate-2">
               <div className="rounded-[28px] border-[3px] border-ink bg-paper p-4 shadow-ink-xl">
                 <div className="overflow-hidden rounded-[18px] border-[3px] border-ink">
-                  {backgroundVideo ? (
+                  {backgroundVideo && richDisplay ? (
                     <video
                       className="h-64 w-full object-cover photo-pop"
                       src={backgroundVideo}
