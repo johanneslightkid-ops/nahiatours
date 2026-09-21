@@ -191,20 +191,57 @@ a:hover {
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --caustic-web: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.013 0.019' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.4 0 0 0 -1.15'/%3E%3C/filter%3E%3Crect width='700' height='700' filter='url(%23c)'/%3E%3C/svg%3E");
+  --caustic-web: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.013 0.019' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.4 0 0 0 -1.15'/%3E%3CfeGaussianBlur stdDeviation='1.4'/%3E%3C/filter%3E%3Crect width='700' height='700' filter='url(%23c)'/%3E%3C/svg%3E");
 }
 
+/*
+ * THE CAUSTICS MOVE ON THE COMPOSITOR NOW.
+ *
+ * They used to animate `background-position` on this element, which is a
+ * paint-every-frame property: the browser re-rasterised a full-bleed layer
+ * sixty times a second, for the whole time the page was open, on every one of
+ * the ten places this appears. Measured on a throttled mid-range phone the
+ * page sat at 16 fps while the visitor was doing nothing but reading.
+ *
+ * The same drift is now two oversized children translating inside a clipping
+ * parent. `transform` is one of the two properties a compositor can animate
+ * without the main thread, so the work moves off the CPU entirely and the
+ * look does not change — two layers sliding against each other at different
+ * speeds is what made the interference in the first place.
+ *
+ * The blur went into the SVG. A `filter: blur()` on a moving full-bleed layer
+ * is re-run per frame; baked into the source image it is rasterised once.
+ */
 .caustics {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  overflow: hidden;
   mix-blend-mode: soft-light;
-  background-image: var(--caustic-web), var(--caustic-web);
-  background-size: 700px 700px, 460px 460px;
-  background-position: 0 0, 120px 80px;
-  /* Light through moving water has no hard edge. */
-  filter: blur(1.5px);
-  animation: causticDrift 26s ease-in-out infinite alternate;
+  opacity: 0.72;
+}
+
+.caustics::before,
+.caustics::after {
+  content: '';
+  position: absolute;
+  /* Oversized, so a translate never drags an edge into view. */
+  inset: -35%;
+  background-image: var(--caustic-web);
+  /* Promoted once, deliberately. Without this the layer is re-rasterised on
+     the first frame of every loop, which is a visible hitch every 26s. */
+  will-change: transform;
+}
+
+.caustics::before {
+  background-size: 700px 700px;
+  animation: causticDriftA 26s ease-in-out infinite alternate;
+}
+
+.caustics::after {
+  background-size: 460px 460px;
+  opacity: 0.85;
+  animation: causticDriftB 34s ease-in-out infinite alternate;
 }
 
 /* Over a photograph the web has to be fainter, or it reads as scratches on
@@ -212,21 +249,16 @@ a:hover {
 .caustics-soft {
   opacity: 0.45;
   mix-blend-mode: overlay;
-  filter: blur(2.5px);
 }
 
-@keyframes causticDrift {
-  0% {
-    background-position: 0 0, 120px 80px;
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 0.9;
-  }
-  100% {
-    background-position: 180px -120px, -140px 220px;
-    opacity: 0.62;
-  }
+@keyframes causticDriftA {
+  from { transform: translate3d(0, 0, 0); opacity: 0.8; }
+  to { transform: translate3d(180px, -120px, 0); opacity: 1; }
+}
+
+@keyframes causticDriftB {
+  from { transform: translate3d(0, 0, 0); opacity: 1; }
+  to { transform: translate3d(-140px, 220px, 0); opacity: 0.75; }
 }
 
 /* Sun glare. Pure white at the centre — principle one, as a light source. */
@@ -1245,14 +1277,43 @@ select:focus {
   animation-play-state: paused;
 }
 
-/* The booking button breathes like something floating. */
-@keyframes fabPulse {
-  0%, 100% { box-shadow: 0 12px 30px -8px rgba(230, 124, 70, 0.6); }
-  50% { box-shadow: 0 12px 30px -8px rgba(230, 124, 70, 0.7), 0 0 0 12px rgba(230, 124, 70, 0.12); }
+/*
+ * The booking button breathes like something floating.
+ *
+ * It used to do that by animating `box-shadow` — a 30px blurred shadow plus a
+ * 12px spread ring, re-rasterised every frame, on a button that is on screen
+ * the entire visit. The shadow is static now and the breathing is a separate
+ * ring that scales and fades: transform and opacity, both composited.
+ */
+/*
+ * NOTE: no `position` here, deliberately.
+ *
+ * The button carries Tailwind's `fixed bottom-6 right-6`, and a `position:
+ * relative` on this class beat it — both are one class and this stylesheet
+ * comes after the utilities — which pulled the floating booking button out of
+ * the bottom-right corner and left it sitting in the top-left of the page. It
+ * is already a positioned element, so the ring below has the containing block
+ * it needs without this class setting one. If this class is ever put on a
+ * static element, position THAT element.
+ */
+.animate-fab-glow-wave {
+  box-shadow: 0 12px 30px -8px rgba(230, 124, 70, 0.6);
 }
 
-.animate-fab-glow-wave {
-  animation: fabPulse 3.4s ease-in-out infinite;
+.animate-fab-glow-wave::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 12px rgba(230, 124, 70, 0.14);
+  pointer-events: none;
+  animation: fabRing 3.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes fabRing {
+  0%, 100% { transform: scale(0.9); opacity: 0; }
+  50% { transform: scale(1); opacity: 1; }
 }
 
 /* Palm fronds move in the trade wind — from the stem, not the middle. */
@@ -1302,6 +1363,95 @@ select:focus {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   THE PHONE BUDGET
+   ──────────────────────────────────────────────────────────────────────────
+   Everything above is composited, which makes it cheap on a laptop. Cheap is
+   not free: each animated layer is a texture the GPU holds and re-composites,
+   and a mid-range phone has a fraction of the memory bandwidth and is running
+   on a battery. Ten drifting cards, two caustic webs per section and six
+   blurred surfaces is a desktop's worth of decoration on a device that has to
+   last the afternoon.
+
+   So the effects are not deleted on small screens — the page would stop
+   looking like itself — they are reduced to what survives being glanced at on
+   a phone held in one hand. The caustics keep their texture and lose their
+   drift. The cards keep their shadow and lose their sway. The header keeps
+   its colour and loses its blur.
+
+   THE BLURS ARE THE IMPORTANT ONE. `backdrop-filter` makes the compositor
+   read back everything behind the element and blur it again whenever any of
+   it changes — and `.lobster-header` is sticky, so on a phone that was a
+   full-width readback on every single scroll frame. Each one below is
+   replaced by a more opaque background, which keeps the text contrast the
+   translucency was borrowing from the blur.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .caustics::before,
+  .caustics::after {
+    animation: none;
+    /* A promoted layer that never moves is memory spent on nothing. */
+    will-change: auto;
+  }
+
+  .caustics {
+    /* Blending is per-frame work against whatever is underneath. The texture
+       alone reads close enough at this size. */
+    mix-blend-mode: normal;
+    opacity: 0.32;
+  }
+
+  [class*='animate-wave-sway-'],
+  .animate-float,
+  .animate-bob,
+  .animate-cloud-drift {
+    animation: none;
+  }
+
+  .animate-fab-glow-wave::after {
+    animation: none;
+    opacity: 0.55;
+    transform: scale(1);
+    will-change: auto;
+  }
+
+  .hero-glass,
+  .home-feature-card,
+  .lobster-header,
+  .stamp-edge,
+  .planner-panel-soft,
+  /* And the Tailwind utilities used directly in the markup — the rating pip,
+     the price chips, the mobile nav sheet. Every one of them already sits on
+     a background between 85% and 95% opaque, so dropping the blur costs a
+     little depth and no legibility at all. */
+  [class*='backdrop-blur'] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .hero-glass { background: rgba(255, 255, 255, 0.95); }
+  .home-feature-card { background: rgba(255, 255, 255, 0.98); }
+  .lobster-header { background: rgba(253, 249, 241, 0.97); }
+  .stamp-edge { background: rgba(255, 255, 255, 0.88); }
+  .planner-panel-soft { background: rgba(255, 255, 255, 0.16); }
+}
+
+/* A coarse pointer with no hover is a phone or a tablet whatever its width —
+   a landscape phone is 900px wide and has the same battery. */
+@media (hover: none) and (pointer: coarse) {
+  .caustics::before,
+  .caustics::after {
+    animation: none;
+    will-change: auto;
+  }
+
+  .lobster-header {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(253, 249, 241, 0.97);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1310,5 +1460,7 @@ select:focus {
     transition-duration: 0.001ms !important;
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    /* Nothing is going to move, so nothing needs its own layer. */
+    will-change: auto !important;
   }
 }

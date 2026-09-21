@@ -63,9 +63,9 @@ const Footer = () => {
               <div className="mb-6 flex items-center gap-3">
                 <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full bg-white/95 shadow-lg">
                   {brandSettings.brandicon ? (
-                    <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
+                    <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" loading="lazy" decoding="async" />
                   ) : (
-                    <img src="/competitor-logo.svg" alt="Logo" className="h-10 w-10" />
+                    <img src="/competitor-logo.svg" alt="Logo" className="h-10 w-10" loading="lazy" decoding="async" />
                   )}
                 </div>
                 <h3 className="font-display text-2xl text-white">{brandSettings.brandName}</h3>

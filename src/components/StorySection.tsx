@@ -121,7 +121,7 @@ const StorySection: React.FC<StorySectionProps> = ({
     <img
       src={imageUrl}
       alt={title || 'Story image'}
-      className="photo-pop h-full w-full object-cover"
+      className="photo-pop h-full w-full object-cover" loading="lazy" decoding="async"
     />
   ) : isTikTok ? (
     hasLoaded ? (

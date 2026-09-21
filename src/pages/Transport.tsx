@@ -480,7 +480,7 @@ const Transport: React.FC = () => {
                     <p className="text-xs text-ink-light">{selectedVehicle.description}</p>
                     {selectedVehicle.image && (
                       <div className="mt-2 h-28 w-full overflow-hidden rounded-xl bg-paper-warm md:h-36">
-                        <img src={selectedVehicle.image} alt={selectedVehicle.label} className="h-full w-full object-cover" />
+                        <img src={selectedVehicle.image} alt={selectedVehicle.label} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                       </div>
                     )}
                     {needsTwoVehicles && (

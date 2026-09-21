@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRichDisplay } from '../lib/useMediaQuery';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { HiArrowDown, HiCheck, HiStar, HiShieldCheck } from 'react-icons/hi';
@@ -28,6 +29,7 @@ interface HeroProps {
  * And of everything on screen, only the booking button is warm.
  */
 const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, backgroundVideo }) => {
+  const richDisplay = useRichDisplay();
   const { brandSettings } = useBrand();
 
   const desktopImage = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
@@ -123,12 +125,18 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
           </ul>
         </motion.div>
 
-        {/* The window */}
+        {/* The window.
+            `hidden lg:block` is not styling, it is the fix for the hero being
+            built twice on a phone. There is a second, full-width copy of this
+            picture below for small screens — and this one had no breakpoint
+            on it, so both rendered: two photo frames, two caustic layers, two
+            rating pips, two testimonial cards, and the same image decoded
+            twice. Only one of them was ever meant to be on screen at a time. */}
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-          className="relative lg:col-span-6"
+          className="relative hidden lg:col-span-6 lg:block"
         >
           <div className="group relative mx-auto max-w-xl">
             {/* A toucan perched on the top edge of the frame, rather than
@@ -136,7 +144,16 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             <Toucan className="animate-bob pointer-events-none absolute -left-8 -top-9 z-20 hidden h-16 w-20 drop-shadow-lg lg:block" />
 
             <div className="photo-frame animate-float relative aspect-[4/3]">
-              {backgroundVideo ? (
+              {/* THE VIDEO IS A DESKTOP LUXURY.
+                  It is 955 KB, and on a phone it was 84% of everything the
+                  page downloaded — for a decorative loop behind a poster
+                  frame, on a metered connection, playing at a size where the
+                  still is indistinguishable. Hiding it in CSS would not have
+                  helped: a `<video>` inside a hidden wrapper is still
+                  fetched. So it is not rendered at all below a large screen
+                  with a mouse, and the poster it would have shown becomes the
+                  picture. */}
+              {backgroundVideo && richDisplay ? (
                 <video
                   className="photo-pop h-full w-full object-cover"
                   src={backgroundVideo}
@@ -202,6 +219,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
         <div className="photo-frame group relative aspect-[4/3]">
           <img
             src={mobileImage}
+            decoding="async"
             alt=""
             aria-hidden="true"
             className="photo-pop h-full w-full object-cover"
