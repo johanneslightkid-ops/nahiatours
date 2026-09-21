@@ -164,7 +164,7 @@ const PaymentReturn: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-ink/80 p-4">
-      <div className="relative w-full max-w-md rounded-[30px_22px_28px_24px] border border-[rgba(150,112,31,0.45)] bg-canvas-lift p-8 text-ink shadow-oil-lg">
+      <div className="relative w-full max-w-md rounded-[30px_22px_28px_24px] border border-[rgba(150,112,31,0.45)] bg-paper-warm p-8 text-ink shadow-ink-lg">
         <button
           onClick={dismiss}
           className="absolute right-5 top-5 text-ink-light transition hover:text-ink"
@@ -183,14 +183,14 @@ const PaymentReturn: React.FC = () => {
         {state === 'done' && result && (
           <>
             <div className="mb-4 flex items-center gap-3">
-              <FaCheckCircle className="h-9 w-9 text-palm" />
+              <FaCheckCircle className="h-9 w-9 text-jungle" />
               <div>
                 <h2 className="font-display text-2xl font-bold leading-tight">¡Pago recibido!</h2>
                 <p className="text-sm text-ink-light">Payment received</p>
               </div>
             </div>
 
-            <div className="rounded-[20px_14px_18px_16px] border border-[rgba(150,112,31,0.35)] bg-canvas-deep/60 p-4 text-sm">
+            <div className="rounded-[20px_14px_18px_16px] border border-[rgba(150,112,31,0.35)] bg-paper-deep/60 p-4 text-sm">
               <div className="flex justify-between py-1">
                 <span className="text-ink-soft">Total</span>
                 <span className="font-display text-lg font-bold">

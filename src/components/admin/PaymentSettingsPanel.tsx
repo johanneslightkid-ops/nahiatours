@@ -111,12 +111,12 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
 
   const field =
     'w-full rounded-2xl border border-ink/15 bg-paper-card px-4 py-3 text-ink outline-none ' +
-    'transition focus:border-sea-deep';
+    'transition focus:border-lagoon-dark';
 
   return (
     <div className="mt-6 rounded-3xl border border-ink/10 p-5">
       <div className="mb-1 flex items-center gap-2">
-        <FaCreditCard className="text-sea-deep" />
+        <FaCreditCard className="text-lagoon-dark" />
         <h3 className="text-lg font-semibold text-ink">Pagos</h3>
       </div>
       <p className="mb-5 max-w-2xl text-sm text-ink-soft">
@@ -136,7 +136,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
           <label className="inline-flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
-              className="h-5 w-5 accent-sea-deep"
+              className="h-5 w-5 accent-lagoon-dark"
               checked={brandSettings.stripeEnabled ?? false}
               onChange={(event) =>
                 setBrandSettings({ ...brandSettings, stripeEnabled: event.target.checked })
@@ -149,7 +149,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
         <div className="mb-4 flex flex-wrap items-center gap-3 text-sm">
           <span className="text-ink-soft">Clave secreta:</span>
           {status?.stripeSecretConfigured ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-sea-deep/10 px-3 py-1 font-semibold text-sea-deep">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-lagoon-dark/10 px-3 py-1 font-semibold text-lagoon-dark">
               <FaCheck /> guardada
               {status.stripeMode && (
                 <em className="not-italic opacity-70">
@@ -158,7 +158,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
               )}
             </span>
           ) : (
-            <span className="rounded-full bg-coral-deep/10 px-3 py-1 font-semibold text-coral-deep">
+            <span className="rounded-full bg-sunset-dark/10 px-3 py-1 font-semibold text-sunset-dark">
               sin configurar
             </span>
           )}
@@ -203,7 +203,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
           <button
             onClick={handleSaveStripe}
             disabled={saving || (!secretDraft.trim() && !currencyDraft.trim())}
-            className="rounded-full bg-sea-deep px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
             {saving ? 'Guardando…' : 'Guardar'}
           </button>
@@ -211,14 +211,14 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
             <button
               onClick={handleClearStripe}
               disabled={saving}
-              className="rounded-full border border-coral-deep/40 px-5 py-2 text-sm font-semibold text-coral-deep disabled:opacity-50"
+              className="rounded-full border border-sunset-dark/40 px-5 py-2 text-sm font-semibold text-sunset-dark disabled:opacity-50"
             >
               Borrar la clave
             </button>
           )}
           {message && (
             <span
-              className={`text-sm ${message.kind === 'ok' ? 'text-sea-deep' : 'text-coral-deep'}`}
+              className={`text-sm ${message.kind === 'ok' ? 'text-lagoon-dark' : 'text-sunset-dark'}`}
             >
               {message.text}
             </span>
@@ -226,7 +226,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
         </div>
 
         {status && !status.storageAvailable && (
-          <p className="mt-3 rounded-2xl bg-coral-deep/10 p-3 text-xs text-coral-deep">
+          <p className="mt-3 rounded-2xl bg-sunset-dark/10 p-3 text-xs text-sunset-dark">
             Esta instalación no tiene KV conectado, así que no se puede guardar nada aquí.
           </p>
         )}
@@ -254,7 +254,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
                   <div className="text-xs text-ink-light">
                     {state.configured ? (
                       state.visible ? (
-                        <span className="text-sea-deep">visible para los visitantes</span>
+                        <span className="text-lagoon-dark">visible para los visitantes</span>
                       ) : (
                         <span>configurada, pero apagada</span>
                       )
@@ -266,7 +266,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
                 <label className="inline-flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
-                    className="h-5 w-5 accent-sea-deep"
+                    className="h-5 w-5 accent-lagoon-dark"
                     checked={state.enabled}
                     disabled={!state.configured}
                     onChange={(event) => toggleVisibility(method, event.target.checked)}

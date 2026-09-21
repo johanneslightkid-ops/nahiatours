@@ -146,7 +146,15 @@ module.exports = {
         body: ['Figtree', 'system-ui', '-apple-system', 'sans-serif'],
       },
 
-      boxShadow: {
+            boxShadow: {
+        // The admin panels are shared with four other designs, which all spell
+        // their shadows `shadow-ink*`. This branch renamed them `oil` when it
+        // became an oil painting; these aliases point the shared names at the
+        // same values so a shared component keeps its depth here too.
+        'ink-sm': 'var(--tw-shadow-oil-sm, 0 2px 6px -2px rgba(23, 18, 12, 0.22))',
+        'ink': '0 12px 26px -18px rgba(23, 18, 12, 0.5), 0 2px 6px -3px rgba(23, 18, 12, 0.16)',
+        'ink-lg': '0 24px 44px -28px rgba(23, 18, 12, 0.55), 0 4px 10px -6px rgba(23, 18, 12, 0.16)',
+        'ink-xl': '0 34px 60px -38px rgba(23, 18, 12, 0.6), 0 6px 14px -8px rgba(23, 18, 12, 0.18)',
         // Paint lifting off the weave: warm close in, violet further out.
         // Never offset sideways — that reads as a sticker, which is the look
         // this design replaces.

@@ -195,7 +195,7 @@ const TikTokAdmin: React.FC<TikTokAdminProps> = ({ onSave }) => {
                   </a>
                   <button
                     onClick={() => handleDeleteVideo(video.id)}
-                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-coral-deep transition-colors"
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-sunset-dark transition-colors"
                   >
                     <FaTrash />
                   </button>

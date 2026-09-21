@@ -215,7 +215,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
           }
           setIsOpen(!isOpen);
         }}
-        className="inline-flex items-center justify-between gap-2.5 rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon px-6 py-3 font-extrabold text-white shadow-oil-sm transition hover:-translate-y-0.5 hover:bg-lagoon-light hover:text-ink active:translate-y-0"
+        className="inline-flex items-center justify-between gap-2.5 rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon px-6 py-3 font-extrabold text-white shadow-ink-sm transition hover:-translate-y-0.5 hover:bg-lagoon-light hover:text-ink active:translate-y-0"
       >
         <span className="flex items-center gap-2">
           <span>💳</span>
@@ -232,7 +232,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
         <div
           ref={dropdownRef}
           style={{ top: `${dropdownCoords.top}px`, left: `${dropdownCoords.left}px` }}
-          className="fixed z-[99999] w-72 rounded-2xl border border-[rgba(150,112,31,0.4)] bg-[#17313F] p-2 text-paper shadow-oil animate-in fade-in slide-in-from-top-2"
+          className="fixed z-[99999] w-72 rounded-2xl border border-[rgba(150,112,31,0.4)] bg-[#17313F] p-2 text-paper shadow-ink animate-in fade-in slide-in-from-top-2"
         >
           <div className="px-3 py-2 mb-1 border-b-2 border-paper/20 text-[0.65rem] font-extrabold uppercase tracking-[0.18em] text-mango-light">
             Choose Payment Method
@@ -276,7 +276,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
               onClick={handleWhatsApp}
               className="flex w-full items-center gap-3 rounded-xl p-3 text-left group transition hover:bg-paper/10"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-palm/25 text-jungle-light group-hover:scale-110 transition-transform">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-jungle/25 text-jungle-light group-hover:scale-110 transition-transform">
                 <FaWhatsapp className="h-4 w-4" />
               </div>
               <div>
@@ -291,7 +291,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
 
       {cardModalOpen && createPortal(
         <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 p-4">
-          <div className="relative w-full max-w-md rounded-[28px] border border-[rgba(150,112,31,0.4)] bg-[#17313F] p-7 text-paper shadow-oil-lg animate-in zoom-in-95">
+          <div className="relative w-full max-w-md rounded-[28px] border border-[rgba(150,112,31,0.4)] bg-[#17313F] p-7 text-paper shadow-ink-lg animate-in zoom-in-95">
             <button
               onClick={() => {
                 playClickFx();
@@ -347,7 +347,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
               <button
                 onClick={handleCardProceed}
                 disabled={starting}
-                className="w-full rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon-light py-3 text-xs font-extrabold uppercase tracking-wider text-ink shadow-oil-sm transition hover:bg-mango-light disabled:opacity-60"
+                className="w-full rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon-light py-3 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:bg-mango-light disabled:opacity-60"
               >
                 {starting
                   ? 'Opening secure checkout…'

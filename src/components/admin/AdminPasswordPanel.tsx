@@ -43,12 +43,12 @@ const AdminPasswordPanel: React.FC = () => {
 
   const field =
     'w-full rounded-2xl border border-ink/15 bg-paper-card px-4 py-3 text-ink ' +
-    'outline-none transition focus:border-sea-deep';
+    'outline-none transition focus:border-lagoon-dark';
 
   return (
     <div className="mt-6 rounded-3xl border border-ink/10 p-5">
       <div className="mb-1 flex items-center gap-2">
-        <FaKey className="text-sea-deep" />
+        <FaKey className="text-lagoon-dark" />
         <h3 className="text-lg font-semibold text-ink">Contraseña del panel</h3>
       </div>
       <p className="mb-4 max-w-2xl text-sm text-ink-soft">
@@ -86,20 +86,20 @@ const AdminPasswordPanel: React.FC = () => {
         <button
           onClick={handleSave}
           disabled={!canSave}
-          className="rounded-full bg-sea-deep px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           {saving ? 'Guardando…' : 'Cambiar contraseña'}
         </button>
 
         {tooShort && (
-          <span className="text-sm text-coral-deep">
+          <span className="text-sm text-sunset-dark">
             Al menos {ADMIN_PASSWORD_MIN_LENGTH} caracteres.
           </span>
         )}
-        {mismatch && <span className="text-sm text-coral-deep">Las dos no coinciden.</span>}
-        {status.kind === 'error' && <span className="text-sm text-coral-deep">{status.message}</span>}
+        {mismatch && <span className="text-sm text-sunset-dark">Las dos no coinciden.</span>}
+        {status.kind === 'error' && <span className="text-sm text-sunset-dark">{status.message}</span>}
         {status.kind === 'ok' && (
-          <span className="flex items-center gap-2 text-sm font-semibold text-sea-deep">
+          <span className="flex items-center gap-2 text-sm font-semibold text-lagoon-dark">
             <FaCheck /> Contraseña cambiada.
           </span>
         )}

@@ -114,7 +114,7 @@ const Admin: React.FC = () => {
                         type="button"
                         onClick={triggerBrandIconUpload}
                         disabled={uploadingIcon}
-                        className="inline-flex items-center justify-center rounded-full bg-sea-deep px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0f4f59] disabled:bg-sea"
+                        className="inline-flex items-center justify-center rounded-full bg-lagoon-dark px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0f4f59] disabled:bg-lagoon"
                       >
                         {uploadingIcon ? 'Subiendo…' : 'Subir logo'}
                       </button>
@@ -173,7 +173,7 @@ const Admin: React.FC = () => {
                       await saveBrandSettings(brandSettings);
                       setEditingBrand(false);
                     }}
-                    className="rounded-full bg-sea-deep px-5 py-2 font-semibold text-white"
+                    className="rounded-full bg-lagoon-dark px-5 py-2 font-semibold text-white"
                   >
                     Guardar
                   </button>
@@ -203,7 +203,7 @@ const Admin: React.FC = () => {
                 <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>
                 <p><strong>Verifone:</strong> {brandSettings.verifoneLink || '—'}</p>
-                <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-sea-deep px-5 py-2 font-semibold text-white">
+                <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-lagoon-dark px-5 py-2 font-semibold text-white">
                   Editar datos del negocio
                 </button>
               </div>

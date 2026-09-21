@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import PasswordModal from './PasswordModal';
+import PasswordModal from '../components/PasswordModal';
 
 interface ProtectedRouteProps {
   component: React.ComponentType;
 }
 
 /**
- * The gate in front of the admin.
+ * The admin gate.
  *
- * This used to `import Admin from '../pages/Admin'` at the top and never use
- * it, and it extended RouteProps for a `...rest` it also never used. The dead
- * import was not free: it pulled the admin panel — and the 300kB markdown
- * editor inside it — into the entry chunk, for every visitor, including the
- * ones who never open the admin. Both are gone; the component to render now
- * arrives as a prop, lazily, from App.
+ * This file used to `import Admin from '../pages/Admin'` without ever using
+ * it. The import alone was enough to drag the whole admin — and the markdown
+ * editor inside it — into the eager bundle, which cancelled out the route
+ * splitting in App.tsx. The component arrives as a prop; nothing else is
+ * needed here.
  */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
