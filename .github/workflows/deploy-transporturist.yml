@@ -60,8 +60,13 @@ on:
           newest namespace that is not transporturist-data.
         required: false
         default: ''
-      skip_kv_clone:
-        description: 'Deploy without copying KV data (the site falls back to /data/*.json)'
+      seed_kv_from_source:
+        description: >-
+          Copy keys this site is MISSING from the source namespace. This is the
+          one-time bootstrap for a brand-new site and is off by default: on an
+          established site it silently restores content that was deleted here
+          on purpose, and gives any newly-stored key the production site's
+          value. A key this site already has is never touched either way.
         required: false
         type: boolean
         default: false
@@ -188,7 +193,7 @@ jobs:
       # working site with different data in it.
       - name: Clone the KV data
         id: kv
-        if: inputs.skip_kv_clone != true
+        if: inputs.seed_kv_from_source == true
         continue-on-error: true
         run: node scripts/clone-kv.mjs
 
@@ -232,8 +237,8 @@ jobs:
             echo ""
             echo "Worker \`transporturist\`, from branch \`transporturist\` at \`${GITHUB_SHA::7}\`."
             echo ""
-            if [ "${{ inputs.skip_kv_clone }}" = "true" ]; then
-              echo "KV: not copied (\`skip_kv_clone\`) — reading the bundled \`/data/*.json\`."
+            if [ "${{ inputs.seed_kv_from_source }}" != "true" ]; then
+              echo "KV: nothing copied. This site reads its own namespace, and keys it does not have fall back to the bundled \`/data/*.json\`."
             elif [ "${{ steps.kv.outcome }}" != "success" ]; then
               echo "> [!WARNING]"
               echo "> **KV was not copied.** The deploy went ahead and the site is up, but it"
