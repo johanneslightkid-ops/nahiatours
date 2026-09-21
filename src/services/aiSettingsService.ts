@@ -1,4 +1,4 @@
-import { apiGet, apiPut } from './apiClient';
+import { ApiError, apiGet, apiPost, apiPut } from './apiClient';
 
 export interface AIProviderSettings {
   apiKey: string;
@@ -13,30 +13,53 @@ export interface AISettings {
   activeProvider: 'gemini' | 'cloudflare' | 'openrouter';
 }
 
+/**
+ * Cloudflare is the default provider, and the defaults below are models that
+ * exist.
+ *
+ * Both of those are corrections. The old defaults were `gemini-1.5-pro` and
+ * `google/gemini-pro-1.5`, which a key issued today cannot reach — so a fresh
+ * install failed on its first click and the panel said only "Failed to
+ * generate blog posts". And the old default provider was Gemini, which cannot
+ * write a word until somebody pastes a key; Cloudflare runs through the
+ * Worker's own `AI` binding with nothing configured at all.
+ *
+ * The server keeps a fallback chain behind these (functions/api/ai.ts), so a
+ * name that retires next year is stepped over rather than fatal.
+ */
 const defaultAISettings: AISettings = {
-  gemini: { apiKey: '', selectedModel: 'gemini-1.5-pro' },
+  gemini: { apiKey: '', selectedModel: 'gemini-2.5-flash' },
   cloudflare: { apiKey: '', accountId: '', selectedModel: '@cf/meta/llama-3.1-8b-instruct-fp8' },
-  openrouter: { apiKey: '', selectedModel: 'google/gemini-pro-1.5' },
-  activeProvider: 'gemini',
+  openrouter: { apiKey: '', selectedModel: 'meta-llama/llama-3.3-70b-instruct:free' },
+  activeProvider: 'cloudflare',
+};
+
+/** Model names that no longer resolve, mapped to their live equivalents. */
+const RETIRED_MODELS: Record<string, string> = {
+  'gemini-1.5-pro': 'gemini-2.5-flash',
+  'gemini-1.5-pro-latest': 'gemini-2.5-flash',
+  'gemini-pro': 'gemini-2.5-flash',
+  'google/gemini-pro-1.5': 'meta-llama/llama-3.3-70b-instruct:free',
+  '@cf/meta/llama-3-8b-instruct': '@cf/meta/llama-3.1-8b-instruct-fp8',
 };
 
 const normalizeAISettings = (input: unknown): AISettings => {
   const data = (input as Record<string, unknown>)?.record ?? input;
   if (!data || typeof data !== 'object') return defaultAISettings;
   
-  const normalizedCloudflare = { ...defaultAISettings.cloudflare, ...(data as any).cloudflare };
-  
-  // Auto-migrate deprecated models (410 Gone) to the new 3.1 equivalent
-  if (normalizedCloudflare.selectedModel === '@cf/meta/llama-3-8b-instruct') {
-    normalizedCloudflare.selectedModel = '@cf/meta/llama-3.1-8b-instruct-fp8';
-  }
-  
+  // A retired model saved months ago is silently upgraded rather than left to
+  // 404 on the next click.
+  const migrate = (provider: AIProviderSettings): AIProviderSettings => ({
+    ...provider,
+    selectedModel: RETIRED_MODELS[provider.selectedModel] || provider.selectedModel,
+  });
+
   return {
     ...defaultAISettings,
     ...(data as Partial<AISettings>),
-    gemini: { ...defaultAISettings.gemini, ...(data as any).gemini },
-    cloudflare: normalizedCloudflare,
-    openrouter: { ...defaultAISettings.openrouter, ...(data as any).openrouter },
+    gemini: migrate({ ...defaultAISettings.gemini, ...(data as any).gemini }),
+    cloudflare: migrate({ ...defaultAISettings.cloudflare, ...(data as any).cloudflare }),
+    openrouter: migrate({ ...defaultAISettings.openrouter, ...(data as any).openrouter }),
   };
 };
 
@@ -60,69 +83,38 @@ export const saveAISettings = async (settings: AISettings): Promise<AISettings> 
   }
 };
 
-// Model fetching services
+// Model fetching
 export interface AIModel {
   id: string;
   name: string;
 }
 
-export const fetchGeminiModels = async (apiKey: string): Promise<AIModel[]> => {
-  if (!apiKey) return [];
+/**
+ * Ask the Worker for the model list.
+ *
+ * These three calls used to run in the browser with the API token attached,
+ * which put the token in the network tab of anyone with the admin open, and
+ * which api.cloudflare.com will not answer cross-origin anyway. The same
+ * endpoint that generates text lists the models, so the credentials stay on
+ * the server.
+ *
+ * `settings` is passed so the panel can list models for a key that has been
+ * typed but not yet saved.
+ */
+export const fetchModels = async (
+  provider: 'gemini' | 'cloudflare' | 'openrouter',
+  settings?: AISettings
+): Promise<AIModel[]> => {
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-    if (!res.ok) throw new Error('Failed to fetch models');
-    const data = await res.json();
-    return data.models
-      .filter((m: any) => m.name.includes('gemini') && m.supportedGenerationMethods.includes('generateContent'))
-      .map((m: any) => ({
-        id: m.name.replace('models/', ''),
-        name: m.displayName || m.name.replace('models/', '')
-      }));
-  } catch (error) {
-    console.error('Gemini model fetch error:', error);
-    return [{ id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro (Default)' }];
-  }
-};
-
-export const fetchOpenRouterModels = async (apiKey: string): Promise<AIModel[]> => {
-  if (!apiKey) return [];
-  try {
-    const res = await fetch('https://openrouter.ai/api/v1/models', {
-      headers: { Authorization: `Bearer ${apiKey}` }
+    const data = await apiPost<{ ok: boolean; models?: AIModel[]; error?: string }>('ai', {
+      action: 'models',
+      provider,
+      settings,
     });
-    if (!res.ok) throw new Error('Failed to fetch models');
-    const data = await res.json();
-    return data.data
-      .filter((m: any) => m.pricing?.prompt === "0" && m.pricing?.completion === "0") // filter for free models
-      .map((m: any) => ({
-        id: m.id,
-        name: m.name
-      }));
+    return data.models ?? [];
   } catch (error) {
-    console.error('OpenRouter model fetch error:', error);
-    return [
-      { id: 'google/gemini-pro-1.5', name: 'Google: Gemini Pro 1.5 (Free Default)' },
-      { id: 'meta-llama/llama-3-8b-instruct', name: 'Meta: Llama 3 8B (Free)' }
-    ];
-  }
-};
-
-export const fetchCloudflareModels = async (accountId: string, apiToken: string): Promise<AIModel[]> => {
-  if (!accountId || !apiToken) return [];
-  try {
-    const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/models/search`, {
-      headers: { Authorization: `Bearer ${apiToken}` }
-    });
-    if (!res.ok) throw new Error('Failed to fetch models');
-    const data = await res.json();
-    return data.result
-      .filter((m: any) => m.task.name === 'Text Generation')
-      .map((m: any) => ({
-        id: m.name,
-        name: m.name
-      }));
-  } catch (error) {
-    console.error('Cloudflare model fetch error:', error);
-    return [{ id: '@cf/meta/llama-3.1-8b-instruct-fp8', name: 'Llama 3.1 8B Instruct (Default)' }];
+    const body = error instanceof ApiError ? (error.body as { error?: string } | null) : null;
+    console.warn(`[ai] could not list ${provider} models:`, body?.error || error);
+    return [];
   }
 };

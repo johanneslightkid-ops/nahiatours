@@ -13,6 +13,20 @@ export interface RawBlogArticle {
   slug?: string;
   tags?: string[];
   visible?: boolean;
+  /** Standfirst under the title, set larger than the body. */
+  caption?: string | { en?: string; es?: string };
+  /** The opening paragraph, set bold, before the body proper. */
+  prelude?: string | { en?: string; es?: string };
+  /** Photographs referenced from the body as [[IMAGE-1]] … in order. */
+  images?: string[];
+  /** Per-platform social cut, written alongside the article. */
+  social?: Array<{ platform: string; text: string; hashtags?: string[] }>;
+}
+
+export interface SocialCutRecord {
+  platform: string;
+  text: string;
+  hashtags: string[];
 }
 
 export interface BlogArticle {
@@ -25,6 +39,10 @@ export interface BlogArticle {
   locale: Locale;
   tags: string[];
   visible: boolean;
+  caption: string;
+  prelude: string;
+  images: string[];
+  social: SocialCutRecord[];
 }
 
 const getLocalizedValue = (value: unknown, locale: Locale): string => {
@@ -73,6 +91,21 @@ const normalizeBlogArticle = (rawArticle: RawBlogArticle, locale: Locale): BlogA
     locale,
     tags,
     visible,
+    // Every one of these is optional in storage, so an article written before
+    // the generator learned about structure still renders — it simply has no
+    // standfirst, no bold opening and no pictures.
+    caption: getLocalizedValue(rawArticle.caption, locale),
+    prelude: getLocalizedValue(rawArticle.prelude, locale),
+    images: Array.isArray(rawArticle.images) ? rawArticle.images.filter(Boolean) : [],
+    social: Array.isArray(rawArticle.social)
+      ? rawArticle.social
+          .filter((cut) => cut && cut.platform && cut.text)
+          .map((cut) => ({
+            platform: String(cut.platform),
+            text: String(cut.text),
+            hashtags: Array.isArray(cut.hashtags) ? cut.hashtags.map(String) : [],
+          }))
+      : [],
   };
 };
 
@@ -143,7 +176,11 @@ export const saveBlogArticle = async (article: BlogArticle, locale: Locale): Pro
       slug: article.slug,
       language: locale,
       tags: article.tags,
-      visible: article.visible
+      visible: article.visible,
+      caption: article.caption,
+      prelude: article.prelude,
+      images: article.images,
+      social: article.social,
     };
 
     if (existingIndex >= 0) {

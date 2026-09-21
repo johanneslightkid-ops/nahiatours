@@ -4,11 +4,10 @@ import {
   AISettings,
   getAISettings,
   saveAISettings,
-  fetchGeminiModels,
-  fetchCloudflareModels,
-  fetchOpenRouterModels,
+  fetchModels,
   AIModel
 } from '../../services/aiSettingsService';
+import { probeProvider } from '../../services/aiGeneratorService';
 
 const AIAssistantAdmin: React.FC = () => {
   const [settings, setSettings] = useState<AISettings | null>(null);
@@ -25,6 +24,13 @@ const AIAssistantAdmin: React.FC = () => {
   const [loadingCloudflare, setLoadingCloudflare] = useState(false);
   const [loadingOpenRouter, setLoadingOpenRouter] = useState(false);
 
+  /** Result of the last "test this provider" round trip. */
+  const [probe, setProbe] = useState<{
+    provider: string;
+    state: 'running' | 'ok' | 'fail';
+    message: string;
+  } | null>(null);
+
   useEffect(() => {
     loadSettings();
   }, []);
@@ -32,28 +38,48 @@ const AIAssistantAdmin: React.FC = () => {
   const loadSettings = async () => {
     const data = await getAISettings();
     setSettings(data);
-    if (data.gemini.apiKey) fetchModels('gemini', data.gemini.apiKey);
-    if (data.cloudflare.accountId && data.cloudflare.apiKey) fetchModels('cloudflare', data.cloudflare.apiKey, data.cloudflare.accountId);
-    if (data.openrouter.apiKey) fetchModels('openrouter', data.openrouter.apiKey);
+    // Cloudflare always lists: with the Workers AI binding it needs no key.
+    loadModels('cloudflare', data);
+    if (data.gemini.apiKey) loadModels('gemini', data);
+    if (data.openrouter.apiKey) loadModels('openrouter', data);
   };
 
-  const fetchModels = async (provider: 'gemini' | 'cloudflare' | 'openrouter', key: string, accountId?: string) => {
-    if (provider === 'gemini') {
-      setLoadingGemini(true);
-      const models = await fetchGeminiModels(key);
-      setGeminiModels(models);
-      setLoadingGemini(false);
-    } else if (provider === 'cloudflare') {
-      if (!accountId) return;
-      setLoadingCloudflare(true);
-      const models = await fetchCloudflareModels(accountId, key);
-      setCloudflareModels(models);
-      setLoadingCloudflare(false);
-    } else if (provider === 'openrouter') {
-      setLoadingOpenRouter(true);
-      const models = await fetchOpenRouterModels(key);
-      setOpenRouterModels(models);
-      setLoadingOpenRouter(false);
+  /**
+   * Load a provider's model list through the Worker.
+   *
+   * The three browser-side fetchers this replaces each sent the provider's API
+   * token from the page, which put it in the network tab and which
+   * api.cloudflare.com refuses cross-origin anyway. `settings` goes along so a
+   * key that has been typed but not yet saved can still list its models.
+   */
+  const loadModels = async (provider: 'gemini' | 'cloudflare' | 'openrouter', current?: AISettings) => {
+    const setLoading =
+      provider === 'gemini' ? setLoadingGemini : provider === 'cloudflare' ? setLoadingCloudflare : setLoadingOpenRouter;
+    const setList =
+      provider === 'gemini' ? setGeminiModels : provider === 'cloudflare' ? setCloudflareModels : setOpenRouterModels;
+
+    setLoading(true);
+    setList(await fetchModels(provider, current ?? settings ?? undefined));
+    setLoading(false);
+  };
+
+  /** Prove a provider answers, and show exactly why when it does not. */
+  const testProvider = async (provider: 'gemini' | 'cloudflare' | 'openrouter') => {
+    if (!settings) return;
+    setProbe({ provider, state: 'running', message: 'Probando…' });
+    try {
+      const result = await probeProvider(settings, provider);
+      setProbe({
+        provider,
+        state: 'ok',
+        message: `Responde correctamente — modelo ${result.model || 'predeterminado'}`,
+      });
+    } catch (error) {
+      setProbe({
+        provider,
+        state: 'fail',
+        message: error instanceof Error ? error.message : String(error),
+      });
     }
   };
 
@@ -66,10 +92,10 @@ const AIAssistantAdmin: React.FC = () => {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       
-      // Refresh models after save just in case keys changed
-      if (settings.gemini.apiKey) fetchModels('gemini', settings.gemini.apiKey);
-      if (settings.cloudflare.accountId && settings.cloudflare.apiKey) fetchModels('cloudflare', settings.cloudflare.apiKey, settings.cloudflare.accountId);
-      if (settings.openrouter.apiKey) fetchModels('openrouter', settings.openrouter.apiKey);
+      // Refresh models after save, in case the keys changed.
+      loadModels('cloudflare', settings);
+      if (settings.gemini.apiKey) loadModels('gemini', settings);
+      if (settings.openrouter.apiKey) loadModels('openrouter', settings);
     } catch (error) {
       console.error('No se pudo guardar', error);
     } finally {
@@ -95,6 +121,23 @@ const AIAssistantAdmin: React.FC = () => {
           {isSaving ? 'Guardando…' : saveSuccess ? <><FaCheck /> Guardado</> : <><FaSave /> Guardar configuración</>}
         </button>
       </div>
+
+      {probe && (
+        <div
+          className={`rounded-2xl border px-5 py-4 text-sm font-semibold ${
+            probe.state === 'ok'
+              ? 'border-jungle/40 bg-jungle/10 text-jungle-dark'
+              : probe.state === 'fail'
+              ? 'border-hibiscus/40 bg-hibiscus/10 text-hibiscus-dark'
+              : 'border-ink/15 bg-paper-warm text-ink-soft'
+          }`}
+        >
+          <span className="uppercase tracking-[0.14em] text-[0.7rem]">{probe.provider}</span>
+          {/* The provider's own words, including the model it tried. Before
+              this the panel could only say "Failed to generate". */}
+          <p className="mt-1 whitespace-pre-wrap font-medium">{probe.message}</p>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Active Provider Selection */}
@@ -135,6 +178,13 @@ const AIAssistantAdmin: React.FC = () => {
             <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-600 hover:underline bg-white px-3 py-1 rounded-full shadow-sm">
               Obtener clave gratis
             </a>
+            <button
+              type="button"
+              onClick={() => testProvider('gemini')}
+              className="rounded-full border border-ink/25 px-3 py-1 text-xs font-bold text-ink-soft transition hover:border-lagoon hover:text-ink"
+            >
+              Probar
+            </button>
           </div>
           <div className="space-y-4">
             <div>
@@ -174,6 +224,13 @@ const AIAssistantAdmin: React.FC = () => {
             <a href="https://dash.cloudflare.com/" target="_blank" rel="noreferrer" className="text-xs font-bold text-orange-600 hover:underline bg-white px-3 py-1 rounded-full shadow-sm">
               Obtener tokens
             </a>
+            <button
+              type="button"
+              onClick={() => testProvider('cloudflare')}
+              className="rounded-full border border-ink/25 px-3 py-1 text-xs font-bold text-ink-soft transition hover:border-lagoon hover:text-ink"
+            >
+              Probar
+            </button>
           </div>
           <div className="space-y-4">
             <div>
@@ -223,6 +280,13 @@ const AIAssistantAdmin: React.FC = () => {
             <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" className="text-xs font-bold text-purple-600 hover:underline bg-white px-3 py-1 rounded-full shadow-sm">
               Obtener clave gratis
             </a>
+            <button
+              type="button"
+              onClick={() => testProvider('openrouter')}
+              className="rounded-full border border-ink/25 px-3 py-1 text-xs font-bold text-ink-soft transition hover:border-lagoon hover:text-ink"
+            >
+              Probar
+            </button>
           </div>
           <div className="space-y-4">
             <div>

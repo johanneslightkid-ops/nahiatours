@@ -71,6 +71,14 @@ on:
         required: false
         type: boolean
         default: false
+      overwrite_existing:
+        description: >-
+          Re-copy the source over keys this site ALREADY has. This destroys
+          anything edited through this site's own admin panel. Off by default,
+          and there is no way to turn it on from a push — see scripts/clone-kv.mjs.
+        required: false
+        type: boolean
+        default: false
 
 # One deploy at a time; a newer run supersedes an in-flight one.
 concurrency:
@@ -95,6 +103,12 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID || 'd5272033401c64f8cc6ce650a8321cb2' }}
       KV_NAMESPACE_TITLE: ldvip-data
       SOURCE_KV_TITLE: ${{ inputs.source_kv_title || 'nahiatours-data' }}
+      # Seed, do not sync. clone-kv.mjs leaves every key the destination
+      # already has exactly as it is unless this says otherwise, so a redeploy
+      # cannot roll a site back to production's content. It used to be the
+      # other way round, and on 2026-09-17 that quietly replaced the Beautiful
+      # Tours site's brand, tours and story with nahia.tours' own.
+      OVERWRITE: ${{ inputs.overwrite_existing == true && 'true' || 'false' }}
       # So the sitemap, canonical URLs and OpenGraph tags point at this
       # deployment rather than at production's domain. Override it with a
       # repository variable once this design has a domain of its own.
@@ -245,7 +259,7 @@ jobs:
               echo "> is reading the seed data bundled at \`/data/*.json\`, not the live"
               echo "> catalogue. See the *Clone the KV data* step for the reason."
             else
-              echo "KV: ${{ steps.kv.outputs.keys_copied }} key(s) copied from \`${{ steps.kv.outputs.source_title }}\` into \`ldvip-data\` (\`${{ steps.kv.outputs.namespace_id }}\`)."
+              echo "KV: ${{ steps.kv.outputs.keys_copied }} missing key(s) seeded from \`${{ steps.kv.outputs.source_title }}\` into \`ldvip-data\` (\`${{ steps.kv.outputs.namespace_id }}\`)."
             fi
             echo ""
             echo "Live at ${SITE_URL}"

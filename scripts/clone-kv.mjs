@@ -19,11 +19,26 @@
  *   DEST_KV_TITLE         — find or create a namespace with this title.
  *                           Defaults to KV_NAMESPACE_TITLE.
  *
- * Set OVERWRITE=false to keep any key the destination already has; the default
- * is to make the destination match the source for every key the source holds.
- * Keys that exist only in the destination are never deleted — this is a copy,
- * not a mirror, so a namespace that already has hand-edited data cannot be
- * emptied by running it.
+ * THIS SEEDS. IT DOES NOT SYNC.
+ *
+ * A key that already exists in the destination is left exactly as it is. Only
+ * keys the destination is missing are copied, so running this against a site
+ * that has been edited through its admin panel is a no-op.
+ *
+ * It used to be the other way round — overwrite unless told otherwise — and
+ * that is not a subtle difference. This script runs on every deploy, so the
+ * old default meant every push to a design branch silently restored that
+ * site's brand, tours and story from production, discarding whatever the
+ * operator had changed since. It did exactly that to the Beautiful Tours site
+ * on 2026-09-17: five keys, `brand` among them, replaced with nahia.tours'
+ * values by a deploy whose only intended change was elsewhere.
+ *
+ * OVERWRITE=true restores the old behaviour for a run that genuinely wants to
+ * re-pull production. Nothing sets it by default, and the deploy workflows
+ * expose it only as a hand-thrown switch on a manual dispatch.
+ *
+ * Keys that exist only in the destination are never deleted either way — this
+ * is a copy, not a mirror.
  *
  * Unlike provision-kv.mjs, this one exits non-zero on failure. Deploying a
  * site that silently fell back to seed data would look like it worked.
@@ -37,7 +52,9 @@ const API = 'https://api.cloudflare.com/client/v4';
 // to 6111 "Invalid format for Authorization header"). That reads like a bad
 // token but is really a bad header, and costs an hour if you believe it.
 const token = (process.env.CLOUDFLARE_API_TOKEN || '').trim();
-const OVERWRITE = process.env.OVERWRITE !== 'false';
+// Opt in, never opt out. See the note at the top of this file for what the
+// other default cost.
+const OVERWRITE = process.env.OVERWRITE === 'true';
 const DEST_TITLE =
   process.env.DEST_KV_TITLE || process.env.KV_NAMESPACE_TITLE || 'ldvip-data';
 
@@ -245,7 +262,27 @@ const main = async () => {
     return;
   }
 
-  const existing = OVERWRITE ? new Set() : new Set(await listKeys(accountId, destination.id));
+  // Read the destination first, always — even when overwriting, because what
+  // is about to be replaced is worth saying out loud before it goes.
+  const destinationKeys = await listKeys(accountId, destination.id);
+
+  if (destinationKeys.length === 0) {
+    log('destination is empty — seeding it');
+  } else if (OVERWRITE) {
+    const clobbered = sourceKeys.filter((key) => destinationKeys.includes(key));
+    log(
+      `OVERWRITE=true: destination already holds ${destinationKeys.length} key(s), and ` +
+        `${clobbered.length} of them will be REPLACED from the source` +
+        (clobbered.length ? `: ${clobbered.join(', ')}` : '')
+    );
+  } else {
+    log(
+      `destination already holds ${destinationKeys.length} key(s) — those are left ` +
+        'alone; only keys it is missing get copied'
+    );
+  }
+
+  const existing = OVERWRITE ? new Set() : new Set(destinationKeys);
 
   let copied = 0;
   let skipped = 0;
@@ -260,7 +297,9 @@ const main = async () => {
     log(`  ${key} (${value.length} bytes)`);
   }
 
-  log(`done — ${copied} copied${skipped ? `, ${skipped} left alone` : ''}`);
+  log(
+    `done — ${copied} copied${skipped ? `, ${skipped} left alone (already in the destination)` : ''}`
+  );
   // Hand the id back so the deploy can bind exactly what was just filled.
   if (process.env.GITHUB_OUTPUT) {
     const { appendFileSync } = await import('node:fs');
