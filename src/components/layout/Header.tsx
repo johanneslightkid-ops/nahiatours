@@ -37,6 +37,10 @@ const Header: React.FC = () => {
     return `nav-link-pill p-3 !rounded-full ${currentSection === section ? 'nav-link-pill-active' : ''}`;
   };
 
+  /** Admin areas that are their own route, such as transport. */
+  const adminRouteNavClass = (path: string) =>
+    `nav-link-pill p-3 !rounded-full ${location.pathname === path ? 'nav-link-pill-active' : ''}`;
+
   const handleNavClick = () => {
     playClickFx();
     setIsMenuOpen(false);
@@ -92,7 +96,7 @@ const Header: React.FC = () => {
               <Link to="/admin?section=tours" onClick={handleNavClick} className={adminNavClass('tours')} title="Tours">
                 <MdTour className="h-6 w-6" />
               </Link>
-              <Link to="/admin?section=transport" onClick={handleNavClick} className={adminNavClass('transport')} title="Transport">
+              <Link to="/admin/transport" onClick={handleNavClick} className={adminRouteNavClass('/admin/transport')} title="Transport">
                 <MdLocalTaxi className="h-6 w-6" />
               </Link>
               <Link to="/admin?section=tiktok" onClick={handleNavClick} className={adminNavClass('tiktok')} title="TikTok">

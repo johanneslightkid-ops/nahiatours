@@ -1,0 +1,315 @@
+/**
+ * clone-kv.mjs
+ *
+ * Copies every key/value out of one Workers KV namespace and into another, so
+ * a new deployment starts life with the real catalogue — tours, transport,
+ * story, brand, testimonials — instead of the seed JSON bundled in /data.
+ *
+ * The source namespace has to be named. There is no guess: see resolveSource
+ * below for why an account with two dozen namespaces makes "pick the newest
+ * one" a way to seed a site from a stranger's data.
+ *
+ * Resolution:
+ *
+ *   SOURCE_KV_ID          — use this namespace, no lookup.
+ *   SOURCE_KV_TITLE       — find the namespace with this exact title.
+ *   (neither)             — refuse, and list what the token can see.
+ *
+ *   DEST_KV_ID            — write into this namespace, no lookup.
+ *   DEST_KV_TITLE         — find or create a namespace with this title.
+ *                           Defaults to KV_NAMESPACE_TITLE.
+ *
+ * THIS SEEDS. IT DOES NOT SYNC.
+ *
+ * A key that already exists in the destination is left exactly as it is. Only
+ * keys the destination is missing are copied, so running this against a site
+ * that has been edited through its admin panel is a no-op.
+ *
+ * It used to be the other way round — overwrite unless told otherwise — and
+ * that is not a subtle difference. This script runs on every deploy, so the
+ * old default meant every push to a design branch silently restored that
+ * site's brand, tours and story from production, discarding whatever the
+ * operator had changed since. It did exactly that to the Beautiful Tours site
+ * on 2026-09-17: five keys, `brand` among them, replaced with nahia.tours'
+ * values by a deploy whose only intended change was elsewhere.
+ *
+ * OVERWRITE=true restores the old behaviour for a run that genuinely wants to
+ * re-pull production. Nothing sets it by default, and the deploy workflows
+ * expose it only as a hand-thrown switch on a manual dispatch.
+ *
+ * Keys that exist only in the destination are never deleted either way — this
+ * is a copy, not a mirror.
+ *
+ * Unlike provision-kv.mjs, this one exits non-zero on failure. Deploying a
+ * site that silently fell back to seed data would look like it worked.
+ */
+
+const API = 'https://api.cloudflare.com/client/v4';
+
+// Trimmed, because this is the single most common way a working token fails:
+// pasted into a secret with a trailing newline, it produces an Authorization
+// header Cloudflare rejects outright (6003 "Invalid request headers", chained
+// to 6111 "Invalid format for Authorization header"). That reads like a bad
+// token but is really a bad header, and costs an hour if you believe it.
+const token = (process.env.CLOUDFLARE_API_TOKEN || '').trim();
+// Opt in, never opt out. See the note at the top of this file for what the
+// other default cost.
+const OVERWRITE = process.env.OVERWRITE === 'true';
+const DEST_TITLE =
+  process.env.DEST_KV_TITLE || process.env.KV_NAMESPACE_TITLE || 'ldvip-data';
+
+const log = (message) => console.log(`[clone-kv] ${message}`);
+
+/** Cloudflare hides the useful half of an error inside error_chain. */
+const describe = (errors) =>
+  (errors || [])
+    .map((e) => {
+      const chain = (e.error_chain || []).map((c) => `${c.code} ${c.message}`).join(' → ');
+      return chain ? `${e.code} ${e.message} (${chain})` : `${e.code} ${e.message}`;
+    })
+    .join('; ');
+
+const cf = async (path, init = {}) => {
+  const response = await fetch(`${API}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(init.body && !init.raw ? { 'Content-Type': 'application/json' } : {}),
+      ...(init.headers || {}),
+    },
+  });
+  const body = await response.json().catch(() => null);
+  if (!body || body.success !== true) {
+    throw new Error(describe(body?.errors) || `HTTP ${response.status} from ${path}`);
+  }
+  return body.result;
+};
+
+/**
+ * Ask Cloudflare what it thinks of the token before doing anything with it, so
+ * a rejected credential is reported as a rejected credential rather than as
+ * whichever call happened to run first.
+ */
+const verifyToken = async () => {
+  const response = await fetch(`${API}/user/tokens/verify`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const body = await response.json().catch(() => null);
+  if (body?.success === true) {
+    log(`token verified — status "${body.result?.status}"`);
+    return;
+  }
+  const detail = describe(body?.errors) || `HTTP ${response.status}`;
+  const shape =
+    `it is ${token.length} characters` +
+    (/^[A-Za-z0-9_.-]+$/.test(token) ? '' : ', and contains characters outside [A-Za-z0-9_.-]');
+  throw new Error(
+    `Cloudflare rejected the token: ${detail}. For reference ${shape}. ` +
+      'A 6003/6111 here means the Authorization header itself was malformed — ' +
+      'usually a newline or space captured when the secret was pasted, so re-adding ' +
+      'CLOUDFLARE_API_TOKEN with no trailing whitespace is the fix. Note also that ' +
+      'this endpoint only accepts an API token: an OAuth credential from `wrangler ' +
+      'login`, or a Global API Key, will not verify here.'
+  );
+};
+
+const resolveAccountId = async () => {
+  const fromEnv = (process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
+  if (fromEnv) {
+    log('using CLOUDFLARE_ACCOUNT_ID from the environment');
+    return fromEnv;
+  }
+  let accounts;
+  try {
+    accounts = await cf('/accounts?per_page=50');
+  } catch (error) {
+    // A token scoped to Workers alone is often not allowed to enumerate
+    // accounts. That is a fine token; it just cannot answer this question.
+    throw new Error(
+      `could not list accounts (${error.message}). Add a CLOUDFLARE_ACCOUNT_ID ` +
+        'repository secret — the id is on the right-hand side of any Cloudflare ' +
+        'dashboard page, and in the URL as dash.cloudflare.com/<account id>.'
+    );
+  }
+  if (accounts.length !== 1) {
+    throw new Error(
+      `token can see ${accounts.length} account(s) — set CLOUDFLARE_ACCOUNT_ID to pick one`
+    );
+  }
+  log(`resolved account "${accounts[0].name}"`);
+  return accounts[0].id;
+};
+
+const listNamespaces = async (accountId) => {
+  const all = [];
+  for (let page = 1; ; page += 1) {
+    const batch = await cf(
+      `/accounts/${accountId}/storage/kv/namespaces?per_page=100&page=${page}`
+    );
+    all.push(...batch);
+    if (batch.length < 100) return all;
+  }
+};
+
+/** Every key in a namespace, following Cloudflare's cursor pagination. */
+const listKeys = async (accountId, namespaceId) => {
+  const keys = [];
+  let cursor = '';
+  do {
+    const query = `limit=1000${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`;
+    const response = await fetch(
+      `${API}/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/keys?${query}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const body = await response.json();
+    if (body.success !== true) {
+      const detail = body.errors?.map((e) => `${e.code} ${e.message}`).join('; ');
+      throw new Error(detail || `HTTP ${response.status} listing keys`);
+    }
+    keys.push(...body.result.map((k) => k.name));
+    cursor = body.result_info?.cursor || '';
+  } while (cursor);
+  return keys;
+};
+
+/** Values are opaque here — read and written as raw bytes, never parsed. */
+const readValue = async (accountId, namespaceId, key) => {
+  const response = await fetch(
+    `${API}/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(key)}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (!response.ok) throw new Error(`HTTP ${response.status} reading "${key}"`);
+  return response.text();
+};
+
+const writeValue = async (accountId, namespaceId, key, value) => {
+  const form = new FormData();
+  form.append('value', value);
+  form.append('metadata', '{}');
+  const response = await fetch(
+    `${API}/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(key)}`,
+    { method: 'PUT', headers: { Authorization: `Bearer ${token}` }, body: form }
+  );
+  const body = await response.json().catch(() => null);
+  if (!body || body.success !== true) {
+    const detail = body?.errors?.map((e) => `${e.code} ${e.message}`).join('; ');
+    throw new Error(detail || `HTTP ${response.status} writing "${key}"`);
+  }
+};
+
+const resolveDestination = async (accountId, namespaces) => {
+  if (process.env.DEST_KV_ID) return { id: process.env.DEST_KV_ID, title: '(by id)' };
+  const match = namespaces.find((ns) => ns.title === DEST_TITLE);
+  if (match) return match;
+  const created = await cf(`/accounts/${accountId}/storage/kv/namespaces`, {
+    method: 'POST',
+    body: JSON.stringify({ title: DEST_TITLE }),
+  });
+  log(`created destination namespace "${DEST_TITLE}"`);
+  return created;
+};
+
+const resolveSource = (namespaces, destinationId) => {
+  if (process.env.SOURCE_KV_ID) {
+    return { id: process.env.SOURCE_KV_ID, title: '(by id)' };
+  }
+  if (process.env.SOURCE_KV_TITLE) {
+    const match = namespaces.find((ns) => ns.title === process.env.SOURCE_KV_TITLE);
+    if (!match) {
+      throw new Error(
+        `no namespace titled "${process.env.SOURCE_KV_TITLE}" — saw: ` +
+          namespaces.map((ns) => ns.title).join(', ')
+      );
+    }
+    return match;
+  }
+  // No blind fallback. This used to take "the newest namespace that is not the
+  // destination", which was reasonable on an account with two of them and
+  // actively dangerous on this one: it carries 27 namespaces belonging to a
+  // dozen unrelated projects, and the guess had drifted onto `slk-config` —
+  // quietly copying another business's documents into this site's data on
+  // every deploy. Seeding a site from a namespace nobody named is never what
+  // was wanted, so say so instead of picking one.
+  const candidates = namespaces.filter((ns) => ns.id !== destinationId);
+  throw new Error(
+    'refusing to guess a source namespace. Set SOURCE_KV_TITLE (or ' +
+      'SOURCE_KV_ID) to the one this site should be seeded from. ' +
+      `Available: ${candidates.map((ns) => ns.title).join(', ') || '(none)'}`
+  );
+};
+
+const main = async () => {
+  if (!token) throw new Error('CLOUDFLARE_API_TOKEN is required');
+
+  await verifyToken();
+  const accountId = await resolveAccountId();
+  const namespaces = await listNamespaces(accountId);
+  log(`token sees ${namespaces.length} namespace(s): ${namespaces.map((n) => n.title).join(', ')}`);
+
+  const destination = await resolveDestination(accountId, namespaces);
+  const source = resolveSource(namespaces, destination.id);
+
+  if (source.id === destination.id) {
+    throw new Error('source and destination are the same namespace');
+  }
+
+  log(`copying "${source.title}" (${source.id}) → "${destination.title}" (${destination.id})`);
+
+  const sourceKeys = await listKeys(accountId, source.id);
+  log(`${sourceKeys.length} key(s) in the source`);
+  if (sourceKeys.length === 0) {
+    log('nothing to copy — the source namespace is empty');
+    return;
+  }
+
+  // Read the destination first, always — even when overwriting, because what
+  // is about to be replaced is worth saying out loud before it goes.
+  const destinationKeys = await listKeys(accountId, destination.id);
+
+  if (destinationKeys.length === 0) {
+    log('destination is empty — seeding it');
+  } else if (OVERWRITE) {
+    const clobbered = sourceKeys.filter((key) => destinationKeys.includes(key));
+    log(
+      `OVERWRITE=true: destination already holds ${destinationKeys.length} key(s), and ` +
+        `${clobbered.length} of them will be REPLACED from the source` +
+        (clobbered.length ? `: ${clobbered.join(', ')}` : '')
+    );
+  } else {
+    log(
+      `destination already holds ${destinationKeys.length} key(s) — those are left ` +
+        'alone; only keys it is missing get copied'
+    );
+  }
+
+  const existing = OVERWRITE ? new Set() : new Set(destinationKeys);
+
+  let copied = 0;
+  let skipped = 0;
+  for (const key of sourceKeys) {
+    if (existing.has(key)) {
+      skipped += 1;
+      continue;
+    }
+    const value = await readValue(accountId, source.id, key);
+    await writeValue(accountId, destination.id, key, value);
+    copied += 1;
+    log(`  ${key} (${value.length} bytes)`);
+  }
+
+  log(
+    `done — ${copied} copied${skipped ? `, ${skipped} left alone (already in the destination)` : ''}`
+  );
+  // Hand the id back so the deploy can bind exactly what was just filled.
+  if (process.env.GITHUB_OUTPUT) {
+    const { appendFileSync } = await import('node:fs');
+    appendFileSync(process.env.GITHUB_OUTPUT, `namespace_id=${destination.id}\n`);
+    appendFileSync(process.env.GITHUB_OUTPUT, `source_title=${source.title}\n`);
+    appendFileSync(process.env.GITHUB_OUTPUT, `keys_copied=${copied}\n`);
+  }
+};
+
+main().catch((error) => {
+  console.error(`[clone-kv] ${error.message}`);
+  process.exit(1);
+});

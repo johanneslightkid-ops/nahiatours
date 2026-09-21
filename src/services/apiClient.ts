@@ -23,6 +23,36 @@ const buildApiUrl = (resource: string, params?: Record<string, string | number |
   return `${normalizedPath}${buildQueryString(query)}`;
 };
 
+/**
+ * An API error that still carries what the server said.
+ *
+ * Every failure used to be thrown as `API POST failed for x with status 502`,
+ * with the response body — the part naming the provider, the model and the
+ * actual reason — read and discarded. Callers had nothing to show the
+ * operator but a status code.
+ */
+export class ApiError extends Error {
+  readonly status: number;
+  readonly body: any;
+
+  constructor(message: string, status: number, body: any) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.body = body;
+  }
+}
+
+const readBody = async (response: Response): Promise<any> => {
+  const text = await response.text().catch(() => '');
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+};
+
 const parseJson = async <T>(response: Response): Promise<T> => {
   const body = await response.text();
   if (!body) {
@@ -48,8 +78,13 @@ const apiFetch = async <T>(resource: string, params?: Record<string, string | nu
   });
 
   if (!response.ok) {
-    const message = `API request failed for ${resource} with status ${response.status}`;
-    throw new Error(message);
+    const body = await readBody(response);
+    const detail = typeof body === 'string' ? body : body?.error || body?.message;
+    throw new ApiError(
+      `API request failed for ${resource} with status ${response.status}${detail ? `: ${detail}` : ''}`,
+      response.status,
+      body
+    );
   }
 
   return parseJson<T>(response);
@@ -145,8 +180,13 @@ export const apiPost = async <T>(resource: string, body: unknown, params?: Recor
   });
 
   if (!response.ok) {
-    const message = `API POST failed for ${resource} with status ${response.status}`;
-    throw new Error(message);
+    const body = await readBody(response);
+    const detail = typeof body === 'string' ? body : body?.error || body?.message;
+    throw new ApiError(
+      `API POST failed for ${resource} with status ${response.status}${detail ? `: ${detail}` : ''}`,
+      response.status,
+      body
+    );
   }
 
   const responseText = await response.text();

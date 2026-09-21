@@ -159,7 +159,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
             <button
               onClick={handleSaveApiSettings}
               disabled={savingApi}
-              className="flex items-center gap-2 px-6 py-2 bg-sea-deep text-white font-bold rounded-lg hover:bg-[#0f4f59] transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-lagoon-dark text-white font-bold rounded-lg hover:bg-[#0f4f59] transition-all disabled:opacity-50"
             >
               {savingApi ? 'Guardando…' : apiSaveSuccess ? <><FaCheck /> Guardado</> : <><FaSave /> Guardar configuración de API</>}
             </button>
@@ -327,7 +327,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
                     </a>
                     <button
                       onClick={() => handleRemoveAccount(account.platform)}
-                      className="px-4 py-2 bg-red-500 hover:bg-coral-deep rounded transition-all"
+                      className="px-4 py-2 bg-red-500 hover:bg-sunset-dark rounded transition-all"
                     >
                       <FaTrash />
                     </button>
@@ -434,13 +434,13 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
                         href={video.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 px-3 py-2 bg-sea-deep text-white text-sm font-bold rounded text-center hover:bg-[#0f4f59] transition-all"
+                        className="flex-1 px-3 py-2 bg-lagoon-dark text-white text-sm font-bold rounded text-center hover:bg-[#0f4f59] transition-all"
                       >
                         Ver
                       </a>
                       <button
                         onClick={() => handleRemoveVideo(video.id)}
-                        className="px-3 py-2 bg-coral-deep text-white rounded hover:bg-[#9d3d26] transition-all"
+                        className="px-3 py-2 bg-sunset-dark text-white rounded hover:bg-[#9d3d26] transition-all"
                       >
                         <FaTrash />
                       </button>

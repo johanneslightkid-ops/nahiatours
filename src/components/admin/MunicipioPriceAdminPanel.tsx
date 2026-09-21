@@ -88,7 +88,7 @@ const MunicipioPriceAdminPanel: React.FC = () => {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-full bg-sea-deep px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
             {saving ? 'Guardando…' : 'Guardar multiplicadores'}
           </button>

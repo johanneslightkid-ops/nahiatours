@@ -17,6 +17,17 @@ name = "nahiatours"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 
+# Pinned so wrangler never has to work out which account this is. Left unset it
+# calls /memberships to discover one, and a token scoped to Workers cannot read
+# that endpoint — the deploy then dies on `Authentication error [code: 10000]`
+# even though the token is perfectly able to do the deploy itself.
+#
+# An account id is an identifier, not a credential.
+account_id = "d5272033401c64f8cc6ce650a8321cb2"
+
+# A brand-new Worker is not guaranteed a workers.dev subdomain unless it asks.
+workers_dev = true
+
 # Static build output. `single-page-application` serves index.html for paths
 # with no matching file, which is what React Router needs for /tours, /plan and
 # the rest. API routes never reach this: worker/index.ts matches them first.
@@ -29,6 +40,21 @@ not_found_handling = "single-page-application"
 # to page loads. Pages ran _middleware.ts on every path (_routes.json includes
 # "/*"), and this keeps that true.
 run_worker_first = true
+
+# ==============================================================================
+# Workers AI
+# ==============================================================================
+#
+# The blog generator used to need an account id and an API token typed into the
+# admin panel before it would produce a sentence — on a fresh deployment that
+# meant the feature was present and dead. This binding is the account's own
+# Workers AI, granted to the Worker at deploy time, so /api/ai can run a model
+# with no credentials at all.
+#
+# Nothing to create and nothing to paste: the binding exists because this line
+# does.
+[ai]
+binding = "AI"
 
 # ==============================================================================
 # KV
