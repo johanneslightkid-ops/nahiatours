@@ -4,44 +4,55 @@ import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 
 /**
- * React itself is pinned into its own chunk: it is the one dependency every
- * page needs, it changes far less often than the app code, and keeping it
- * separate means a deploy does not evict it from anyone's cache.
+ * One config file, not two.
  *
- * Nothing else is grouped by hand. Forcing more of node_modules into named
- * chunks pulls lazily-loaded dependencies — the admin markdown editor, most
- * of all — back into the entry, and a group whose own dependencies land in a
- * different chunk can end up in a cycle that evaluates in the wrong order.
- * Rollup's own splitting handles the rest correctly.
+ * There used to be a `vite.config.js` alongside this one. Vite resolves `.js`
+ * before `.ts`, so the `.js` file was the real config and everything written
+ * here was dead — including the build options. They are merged now, the `.js`
+ * is gone, and the `allowedHosts` entry below is kept from it so the ngrok dev
+ * tunnel still works.
  */
-const vendorChunk = (id: string): string | undefined =>
-  /node_modules\/(react|react-dom|scheduler)\//.test(id) ? 'react' : undefined;
-
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+
   server: {
     open: true,
     allowedHosts: ['skies-stalemate-handclasp.ngrok-free.dev'],
   },
+
+  // `npm run serve` checks the production bundle, often in a container with no
+  // browser to open — and preview inherits `server.open`, so without this it
+  // dies on `xdg-open`.
+  preview: {
+    open: false,
+  },
+
   build: {
     outDir: 'dist',
-    // Every browser that can run this app has supported these for years, and
-    // not transpiling them keeps the bundle smaller and the parse cheaper.
+    // The site targets phones on hotel wifi; es2020 is supported by every
+    // browser in the analytics and saves the transpiler a lot of output.
     target: 'es2020',
-    cssCodeSplit: true,
     rollupOptions: {
       output: {
-        manualChunks: vendorChunk,
+        /**
+         * React and nothing else.
+         *
+         * A broader vendor chunk is tempting and wrong here: grouping the
+         * router, the markdown editor and the icon packs together pulls the
+         * lazy routes' dependencies back into the entry, which is the exact
+         * cost route splitting just removed. Keeping this to the three
+         * packages every route needs lets Rollup put everything else where it
+         * is actually used.
+         */
+        manualChunks: (id: string) =>
+          /node_modules\/(react|react-dom|scheduler)\//.test(id) ? 'react' : undefined,
       },
     },
   },
+
   css: {
     postcss: {
-      plugins: [
-        tailwindcss,
-        autoprefixer,
-      ],
+      plugins: [tailwindcss, autoprefixer],
     },
   },
 });

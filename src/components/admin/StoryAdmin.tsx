@@ -1,7 +1,96 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaPlus, FaTrash, FaEdit2, FaArrowUp, FaArrowDown, FaImage, FaVideo, FaHeading, FaParagraph, FaCloud, FaCheck, FaBullhorn, FaLink } from 'react-icons/fa';
-import { StoryElement, StoryElementType, StoryElementsData, VideoOrientation, VideoSource, CTAButton, getStoryElements, saveStoryElements, createNewElement, uploadImage } from '../../services/storyElementsService';
+import {
+  FaPlus,
+  FaTrash,
+  FaArrowUp,
+  FaArrowDown,
+  FaImage,
+  FaVideo,
+  FaHeading,
+  FaParagraph,
+  FaBullhorn,
+  FaCheck,
+  FaPen,
+  FaTimes,
+  FaUpload,
+} from 'react-icons/fa';
+import {
+  StoryElement,
+  StoryElementType,
+  StoryElementsData,
+  VideoOrientation,
+  VideoSource,
+  CTAButton,
+  getStoryElements,
+  saveStoryElements,
+  uploadImage,
+} from '../../services/storyElementsService';
 import { JourneyLocale } from '../../services/introStoryService';
+import MarkdownField from '../ui/MarkdownField';
+import MarkdownRenderer from '../ui/MarkdownRenderer';
+
+/**
+ * The welcome-page editor.
+ *
+ * The version this replaces showed each block as a row of bare icon buttons
+ * with a one-word label, and nothing else — so a page of six pictures was six
+ * identical grey rows and the only way to find out which one you were about to
+ * delete was to open it. Every button was an icon with no word next to it, and
+ * the text fields were single-line inputs inside a cramped column.
+ *
+ * Three rules here:
+ *   1. EVERY BLOCK SHOWS ITSELF. The image, the video still, the first lines
+ *      of the text, the actual CTA buttons. You operate on what you can see.
+ *   2. EVERY BUTTON SAYS WHAT IT DOES, in words as well as an icon.
+ *   3. TYPING IS FULL WIDTH. Markdown gets a real field with a toolbar and a
+ *      toggled preview, not a split pane on a 390px screen.
+ */
+
+const TYPE_META: Record<
+  StoryElementType,
+  { label: string; blurb: string; icon: React.ReactNode }
+> = {
+  title: {
+    label: 'Título',
+    blurb: 'Un encabezado con un texto de apoyo debajo.',
+    icon: <FaHeading />,
+  },
+  paragraph: {
+    label: 'Texto',
+    blurb: 'Un bloque de texto con formato Markdown.',
+    icon: <FaParagraph />,
+  },
+  picture: {
+    label: 'Imagen',
+    blurb: 'Una foto, subida o por enlace.',
+    icon: <FaImage />,
+  },
+  video: {
+    label: 'Video',
+    blurb: 'Vimeo, TikTok, YouTube o un enlace propio.',
+    icon: <FaVideo />,
+  },
+  cta: {
+    label: 'Llamado a la acción',
+    blurb: 'Un titular con botones que llevan a otra página.',
+    icon: <FaBullhorn />,
+  },
+};
+
+const ORDER: StoryElementType[] = ['title', 'paragraph', 'picture', 'video', 'cta'];
+
+/** Never index the table directly: stored data has carried other spellings. */
+const metaFor = (type: StoryElementType) => TYPE_META[type] ?? TYPE_META.paragraph;
+
+/** A still for the block preview, where the platform offers one. */
+const videoThumb = (url: string): string | null => {
+  const yt = /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([\w-]{6,})/.exec(url);
+  if (yt) return `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg`;
+  return null;
+};
+
+/** `element-${Date.now()}` collides when two blocks are added in one tick. */
+const newId = () => `element-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
 const StoryAdmin: React.FC = () => {
   const [locale, setLocale] = useState<JourneyLocale>('en');
@@ -10,664 +99,668 @@ const StoryAdmin: React.FC = () => {
     storyTagline: '',
     elements: [],
   });
-  const [editingElement, setEditingElement] = useState<string | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-  const [expandedElement, setExpandedElement] = useState<string | null>(null);
-  const [uploadingElements, setUploadingElements] = useState<Record<string, number>>({});
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [uploading, setUploading] = useState<Record<string, number>>({});
+  const [addingAfter, setAddingAfter] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const loadStory = useCallback(async () => {
     const data = await getStoryElements(locale);
-    if (data) {
-      setStoryData(data);
-    } else {
-      setStoryData({
-        storyTitle: '',
-        storyTagline: '',
-        elements: [],
-      });
-    }
-    setEditingElement(null);
+    setStoryData(data ?? { storyTitle: '', storyTagline: '', elements: [] });
+    setEditing(null);
   }, [locale]);
 
   useEffect(() => {
     loadStory();
   }, [loadStory]);
 
+  const flash = (type: 'success' | 'error', text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage(null), 3000);
+  };
+
   const saveStory = async () => {
     if (!storyData.storyTitle.trim()) {
-      setMessage({ type: 'error', text: 'Story title is required' });
+      flash('error', 'Hace falta el título de la historia');
       return;
     }
-
     setIsSaving(true);
     try {
-      const success = await saveStoryElements(storyData, locale);
-      if (success) {
-        setMessage({ type: 'success', text: 'Story saved successfully!' });
-      } else {
-        setMessage({ type: 'error', text: 'Failed to save story' });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Error saving story' });
+      const ok = await saveStoryElements(storyData, locale);
+      flash(ok ? 'success' : 'error', ok ? '¡Historia guardada!' : 'No se pudo guardar la historia');
+    } catch {
+      flash('error', 'Error al guardar la historia');
     } finally {
       setIsSaving(false);
-      setTimeout(() => setMessage(null), 3000);
     }
   };
 
-  const updateElement = (id: string, field: string, value: any) => {
+  const updateElement = (id: string, field: string, value: any) =>
     setStoryData((prev) => ({
       ...prev,
       elements: prev.elements.map((el) =>
-        el.id === id
-          ? { ...el, content: { ...el.content, [field]: value } }
-          : el
+        el.id === id ? { ...el, content: { ...el.content, [field]: value } } : el
       ),
     }));
-  };
 
-  const addElement = (type: StoryElementType, afterElementId?: string) => {
-    const insertIndex = afterElementId
-      ? storyData.elements.findIndex((el) => el.id === afterElementId) + 1
+  const addElement = (type: StoryElementType, afterId?: string) => {
+    const at = afterId
+      ? storyData.elements.findIndex((el) => el.id === afterId) + 1
       : storyData.elements.length;
+    const element: StoryElement = { id: newId(), type, order: at, content: {} };
+    const elements = [
+      ...storyData.elements.slice(0, at),
+      element,
+      ...storyData.elements.slice(at),
+    ].map((el, idx) => ({ ...el, order: idx }));
 
-    const newElement = createNewElement(type, insertIndex);
-    const newElements = [
-      ...storyData.elements.slice(0, insertIndex),
-      newElement,
-      ...storyData.elements.slice(insertIndex).map((el, idx) => ({
-        ...el,
-        order: insertIndex + 1 + idx,
-      })),
-    ];
-
-    setStoryData((prev) => ({ ...prev, elements: newElements }));
-    setEditingElement(newElement.id);
+    setStoryData((prev) => ({ ...prev, elements }));
+    setEditing(element.id);
+    setAddingAfter(null);
   };
 
   const deleteElement = (id: string) => {
-    const newElements = storyData.elements
-      .filter((el) => el.id !== id)
-      .map((el, idx) => ({ ...el, order: idx }));
-    setStoryData((prev) => ({ ...prev, elements: newElements }));
-    setEditingElement(null);
+    const element = storyData.elements.find((el) => el.id === id);
+    const name = element ? metaFor(element.type).label : 'bloque';
+    if (!window.confirm(`¿Eliminar este bloque de ${name.toLowerCase()}? No se puede deshacer.`)) {
+      return;
+    }
+    setStoryData((prev) => ({
+      ...prev,
+      elements: prev.elements.filter((el) => el.id !== id).map((el, idx) => ({ ...el, order: idx })),
+    }));
+    setEditing(null);
   };
 
   const moveElement = (id: string, direction: 'up' | 'down') => {
     const index = storyData.elements.findIndex((el) => el.id === id);
-    if (
-      (direction === 'up' && index === 0) ||
-      (direction === 'down' && index === storyData.elements.length - 1)
-    ) {
-      return;
-    }
+    const swap = direction === 'up' ? index - 1 : index + 1;
+    if (swap < 0 || swap >= storyData.elements.length) return;
 
-    const newElements = [...storyData.elements];
-    const swapIndex = direction === 'up' ? index - 1 : index + 1;
-    [newElements[index], newElements[swapIndex]] = [newElements[swapIndex], newElements[index]];
-
-    newElements.forEach((el, idx) => {
-      el.order = idx;
-    });
-
-    setStoryData((prev) => ({ ...prev, elements: newElements }));
+    const elements = [...storyData.elements];
+    [elements[index], elements[swap]] = [elements[swap], elements[index]];
+    setStoryData((prev) => ({
+      ...prev,
+      elements: elements.map((el, idx) => ({ ...el, order: idx })),
+    }));
   };
 
   const handleImageUpload = async (elementId: string, file: File) => {
-    setUploadingElements((prev) => ({ ...prev, [elementId]: 0 }));
-
+    setUploading((prev) => ({ ...prev, [elementId]: 0 }));
     try {
-      const url = await uploadImage(file, (percent) => {
-        setUploadingElements((prev) => ({ ...prev, [elementId]: percent }));
-      });
-
+      const url = await uploadImage(file, (percent) =>
+        setUploading((prev) => ({ ...prev, [elementId]: percent }))
+      );
       updateElement(elementId, 'imageUrl', url);
-      setMessage({ type: 'success', text: 'Image uploaded successfully!' });
-      setTimeout(() => setMessage(null), 2000);
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to upload image. Check Cloudinary settings.' });
-      console.error('Upload error:', error);
+      flash('success', '¡Imagen subida!');
+    } catch {
+      flash('error', 'No se pudo subir la imagen. Revisa la configuración de Cloudinary.');
     } finally {
-      setUploadingElements((prev) => {
-        const newState = { ...prev };
-        delete newState[elementId];
-        return newState;
+      setUploading((prev) => {
+        const next = { ...prev };
+        delete next[elementId];
+        return next;
       });
     }
   };
 
-  const triggerFileInput = (elementId: string) => {
-    fileInputRefs.current[elementId]?.click();
+  const updateButton = (elementId: string, buttonId: string, field: keyof CTAButton, value: string) => {
+    const element = storyData.elements.find((el) => el.id === elementId);
+    const buttons = (element?.content.buttons ?? []).map((b) =>
+      b.id === buttonId ? { ...b, [field]: value } : b
+    );
+    updateElement(elementId, 'buttons', buttons);
   };
 
-  const elementTypeIcon = (type: StoryElementType) => {
-    switch (type) {
-      case 'title':
-        return <FaHeading className="text-blue-600" />;
-      case 'paragraph':
-        return <FaParagraph className="text-green-600" />;
-      case 'picture':
-        return <FaImage className="text-purple-600" />;
-      case 'video':
-        return <FaVideo className="text-red-600" />;
-      case 'cta':
-        return <FaBullhorn className="text-orange-600" />;
-      default:
-        return null;
+  // ── Shared classes ───────────────────────────────────────────────────────
+  const action =
+    'inline-flex items-center gap-2 rounded-full border border-ink/20 bg-white px-3.5 py-2 text-xs font-bold text-ink-soft transition hover:border-lagoon hover:text-ink disabled:opacity-40';
+  const field =
+    'w-full rounded-2xl border border-ink/15 bg-white p-4 text-base leading-relaxed';
+  const fieldLabel = 'mb-2 block text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light';
+
+  /** What the block looks like, without opening it. */
+  const preview = (element: StoryElement) => {
+    const { content, type } = element;
+
+    if (type === 'picture') {
+      return content.imageUrl ? (
+        <img
+          src={content.imageUrl}
+          alt=""
+          loading="lazy"
+          className="h-24 w-32 rounded-xl border border-ink/12 object-cover"
+        />
+      ) : (
+        <div className="grid h-24 w-32 place-items-center rounded-xl border-2 border-dashed border-ink/20 text-center text-[0.65rem] font-bold text-ink-light">
+          Sin imagen
+        </div>
+      );
     }
-  };
 
-  const renderElementEditor = (element: StoryElement) => {
+    if (type === 'video') {
+      const thumb = content.videoUrl ? videoThumb(content.videoUrl) : null;
+      return thumb ? (
+        <img src={thumb} alt="" loading="lazy" className="h-24 w-32 rounded-xl border border-ink/12 object-cover" />
+      ) : (
+        <div className="grid h-24 w-32 place-items-center gap-1 rounded-xl border border-ink/12 bg-paper-warm text-ink-light">
+          <FaVideo />
+          <span className="text-[0.6rem] font-bold uppercase">
+            {content.videoSource || 'video'}
+          </span>
+        </div>
+      );
+    }
+
     return (
-      <div key={element.id} className="space-y-3">
-        {element.type === 'title' && (
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Title</label>
-            <input
-              type="text"
-              value={element.content.title || ''}
-              onChange={(e) => updateElement(element.id, 'title', e.target.value)}
-              placeholder="Enter title"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-        )}
-
-        {element.type === 'paragraph' && (
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Text</label>
-            <textarea
-              value={element.content.text || ''}
-              onChange={(e) => updateElement(element.id, 'text', e.target.value)}
-              placeholder="Enter paragraph text"
-              rows={4}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-        )}
-
-        {element.type === 'picture' && (
-          <div className="space-y-3">
-            {/* Hidden file input */}
-            <input
-              ref={(ref) => {
-                fileInputRefs.current[element.id] = ref;
-              }}
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleImageUpload(element.id, file);
-                }
-              }}
-              className="hidden"
-            />
-
-            {/* Upload button */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => triggerFileInput(element.id)}
-                disabled={uploadingElements[element.id] !== undefined}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-teal-600 hover:bg-teal-700 disabled:bg-teal-400 text-white rounded-lg text-sm font-semibold transition"
-              >
-                {uploadingElements[element.id] !== undefined ? (
-                  <>
-                    <FaCloud className="animate-pulse" />
-                    {Math.round(uploadingElements[element.id])}%
-                  </>
-                ) : (
-                  <>
-                    <FaCloud />
-                    Upload Image
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Image URL input */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Image URL {element.content.imageUrl && <FaCheck className="inline text-green-600 ml-1" />}
-              </label>
-              <input
-                type="text"
-                value={element.content.imageUrl || ''}
-                onChange={(e) => updateElement(element.id, 'imageUrl', e.target.value)}
-                placeholder="Enter image URL or upload above"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-
-            {/* Preview */}
-            {element.content.imageUrl && (
-              <div className="mt-2 rounded-lg overflow-hidden border border-slate-200">
-                <img
-                  src={element.content.imageUrl}
-                  alt="Preview"
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-40 object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        )}
-
-        {element.type === 'video' && (
-          <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Video Title</label>
-              <input
-                type="text"
-                value={element.content.title || ''}
-                onChange={(e) => updateElement(element.id, 'title', e.target.value)}
-                placeholder="Enter video title"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Video Source</label>
-              <select
-                value={element.content.videoSource || 'custom'}
-                onChange={(e) => updateElement(element.id, 'videoSource', e.target.value as VideoSource)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              >
-                <option value="custom">Custom URL</option>
-                <option value="vimeo">Vimeo</option>
-                <option value="youtube">YouTube</option>
-                <option value="tiktok">TikTok</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Video URL</label>
-              <input
-                type="text"
-                value={element.content.videoUrl || ''}
-                onChange={(e) => updateElement(element.id, 'videoUrl', e.target.value)}
-                placeholder={
-                  element.content.videoSource === 'vimeo'
-                    ? 'https://vimeo.com/...'
-                    : element.content.videoSource === 'youtube'
-                    ? 'https://youtube.com/...'
-                    : element.content.videoSource === 'tiktok'
-                    ? 'https://tiktok.com/...'
-                    : 'Enter video URL'
-                }
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Orientation</label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => updateElement(element.id, 'videoOrientation', 'vertical')}
-                  className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition ${
-                    element.content.videoOrientation === 'vertical'
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  Vertical
-                </button>
-                <button
-                  onClick={() => updateElement(element.id, 'videoOrientation', 'horizontal')}
-                  className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition ${
-                    element.content.videoOrientation === 'horizontal'
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  Horizontal
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {element.type === 'cta' && (
-          <div className="space-y-4">
-            {/* CTA Title */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">CTA Title</label>
-              <input
-                type="text"
-                value={element.content.title || ''}
-                onChange={(e) => updateElement(element.id, 'title', e.target.value)}
-                placeholder="e.g., Ready for Your Adventure?"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-
-            {/* CTA Emoji/Icon */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Emoji/Icon</label>
-              <input
-                type="text"
-                value={element.content.emoji || ''}
-                onChange={(e) => updateElement(element.id, 'emoji', e.target.value)}
-                placeholder="e.g., 🚀 or 🌴"
-                maxLength={2}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-
-            {/* CTA Description */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Description</label>
-              <textarea
-                value={element.content.description || ''}
-                onChange={(e) => updateElement(element.id, 'description', e.target.value)}
-                placeholder="Enter CTA description text"
-                rows={3}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="border-t border-slate-200 pt-4">
-              <div className="flex justify-between items-center mb-3">
-                <label className="block text-xs font-semibold text-slate-700">Action Buttons</label>
-                <button
-                  onClick={() => {
-                    const buttons = element.content.buttons || [];
-                    const newButton: CTAButton = {
-                      id: `btn-${Date.now()}`,
-                      text: 'New Button',
-                      link: '/tours',
-                      variant: 'primary'
-                    };
-                    updateElement(element.id, 'buttons', [...buttons, newButton]);
-                  }}
-                  className="px-2 py-1 bg-teal-500 hover:bg-teal-600 text-white rounded text-xs font-semibold transition"
-                >
-                  + Add Button
-                </button>
-              </div>
-
-              {element.content.buttons && element.content.buttons.length > 0 ? (
-                <div className="space-y-3">
-                  {element.content.buttons.map((button, btnIdx) => (
-                    <div key={button.id} className="bg-slate-50 p-3 rounded-lg space-y-2">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={button.text}
-                          onChange={(e) => {
-                            const buttons = [...(element.content.buttons || [])];
-                            buttons[btnIdx] = { ...button, text: e.target.value };
-                            updateElement(element.id, 'buttons', buttons);
-                          }}
-                          placeholder="Button text"
-                          className="flex-1 rounded border border-slate-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
-                        <button
-                          onClick={() => {
-                            const buttons = element.content.buttons?.filter((_, i) => i !== btnIdx) || [];
-                            updateElement(element.id, 'buttons', buttons);
-                          }}
-                          className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-semibold transition"
-                        >
-                          Delete
-                        </button>
-                      </div>
-
-                      <input
-                        type="text"
-                        value={button.link}
-                        onChange={(e) => {
-                          const buttons = [...(element.content.buttons || [])];
-                          buttons[btnIdx] = { ...button, link: e.target.value };
-                          updateElement(element.id, 'buttons', buttons);
-                        }}
-                        placeholder="Link (e.g., /tours or https://...)"
-                        className="w-full rounded border border-slate-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      />
-
-                      <div className="flex gap-2">
-                        {(['primary', 'secondary', 'outline'] as const).map((variant) => (
-                          <button
-                            key={variant}
-                            onClick={() => {
-                              const buttons = [...(element.content.buttons || [])];
-                              buttons[btnIdx] = { ...button, variant };
-                              updateElement(element.id, 'buttons', buttons);
-                            }}
-                            className={`flex-1 px-2 py-1 rounded text-xs font-semibold transition ${
-                              button.variant === variant
-                                ? `${
-                                    variant === 'primary'
-                                      ? 'bg-teal-600 text-white'
-                                      : variant === 'secondary'
-                                      ? 'bg-slate-600 text-white'
-                                      : 'bg-slate-300 text-slate-700'
-                                  }`
-                                : 'bg-slate-200 text-slate-600'
-                            }`}
-                          >
-                            {variant.charAt(0).toUpperCase() + variant.slice(1)}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500 italic">No buttons yet. Click "Add Button" to create one.</p>
-              )}
-            </div>
-          </div>
-        )}
+      <div className="grid h-24 w-32 shrink-0 place-items-center rounded-xl bg-paper-warm text-2xl text-ink-light">
+        {metaFor(type).icon}
       </div>
     );
   };
 
-  return (
-    <div className="min-h-screen bg-slate-100 py-6 px-4 md:py-8">
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white rounded-3xl p-4 md:p-6 shadow-lg">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Welcome Story Admin</h1>
-
-          {/* Language Toggle */}
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setLocale('en')}
-              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition ${
-                locale === 'en'
-                  ? 'bg-teal-600 text-white'
-                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-              }`}
+  const summary = (element: StoryElement) => {
+    const { content, type } = element;
+    if (type === 'title') {
+      return (
+        <>
+          <p className="font-display text-lg font-bold text-ink">
+            {content.title || <span className="text-ink-light">Sin título</span>}
+          </p>
+          {content.description && (
+            <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{content.description}</p>
+          )}
+        </>
+      );
+    }
+    if (type === 'paragraph') {
+      return content.text ? (
+        <div className="line-clamp-3 text-sm text-ink-soft">
+          <MarkdownRenderer content={content.text.slice(0, 280)} />
+        </div>
+      ) : (
+        <p className="text-sm text-ink-light">Sin texto</p>
+      );
+    }
+    if (type === 'picture') {
+      return (
+        <p className="break-all text-xs text-ink-light">
+          {content.imageUrl || 'Añade una imagen para verla aquí.'}
+        </p>
+      );
+    }
+    if (type === 'video') {
+      return (
+        <>
+          <p className="text-sm font-bold text-ink">{content.title || 'Video sin título'}</p>
+          <p className="mt-1 break-all text-xs text-ink-light">{content.videoUrl || 'Sin enlace'}</p>
+        </>
+      );
+    }
+    return (
+      <>
+        <p className="font-display text-lg font-bold text-ink">
+          {content.title || <span className="text-ink-light">Sin titular</span>}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {(content.buttons ?? []).map((b) => (
+            <span
+              key={b.id}
+              className="rounded-full border border-ink/20 bg-mango px-3 py-1 text-xs font-bold text-ink"
             >
-              English
-            </button>
-            <button
-              onClick={() => setLocale('es')}
-              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition ${
-                locale === 'es'
-                  ? 'bg-teal-600 text-white'
-                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-              }`}
-            >
-              Español
-            </button>
-          </div>
-
-          {/* Status Messages */}
-          {message && (
-            <div
-              className={`mb-4 px-4 py-3 rounded-lg text-sm font-semibold ${
-                message.type === 'success'
-                  ? 'bg-green-100 text-green-800 border border-green-300'
-                  : 'bg-red-100 text-red-800 border border-red-300'
-              }`}
-            >
-              {message.text}
-            </div>
+              {b.text || 'Botón sin texto'}
+            </span>
+          ))}
+          {(content.buttons ?? []).length === 0 && (
+            <span className="text-sm text-ink-light">Sin botones</span>
           )}
         </div>
+      </>
+    );
+  };
 
-        {/* Story Title & Tagline */}
-        <div className="bg-white rounded-3xl p-4 md:p-6 shadow-lg space-y-4">
-          <h2 className="text-xl font-bold text-slate-900">Story Header</h2>
+  /** The "add a block" row — labelled, not a row of mystery icons. */
+  const addBar = (afterId?: string) => (
+    <div className="flex flex-wrap gap-2">
+      {ORDER.map((type) => (
+        <button
+          key={type}
+          type="button"
+          onClick={() => addElement(type, afterId)}
+          className="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-white px-4 py-2.5 text-sm font-bold text-ink-soft transition hover:border-lagoon hover:text-ink"
+          title={TYPE_META[type].blurb}
+        >
+          <FaPlus className="h-3 w-3" />
+          {TYPE_META[type].icon}
+          {TYPE_META[type].label}
+        </button>
+      ))}
+    </div>
+  );
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Story Title</label>
-            <input
-              type="text"
-              value={storyData.storyTitle}
-              onChange={(e) => setStoryData({ ...storyData, storyTitle: e.target.value })}
-              placeholder="Enter main title"
-              className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Story Tagline</label>
-            <input
-              type="text"
-              value={storyData.storyTagline}
-              onChange={(e) => setStoryData({ ...storyData, storyTagline: e.target.value })}
-              placeholder="Enter tagline"
-              className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
+  return (
+    <div className="space-y-6">
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-4 rounded-3xl border border-ink/12 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div>
+          <h2 className="text-2xl font-bold text-ink sm:text-3xl">Página de bienvenida</h2>
+          <p className="mt-1 text-sm text-ink-light">
+            Los bloques se muestran en la portada, en este orden.
+          </p>
         </div>
-
-        {/* Add Element Buttons */}
-        <div className="bg-white rounded-3xl p-4 md:p-6 shadow-lg">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Add New Element</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
-            {(['title', 'paragraph', 'picture', 'video', 'cta'] as StoryElementType[]).map((type) => (
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="inline-flex rounded-full bg-paper-warm p-1">
+            {(['en', 'es'] as JourneyLocale[]).map((code) => (
               <button
-                key={type}
-                onClick={() => addElement(type)}
-                className="flex items-center justify-center gap-2 px-3 py-3 md:py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold text-xs md:text-sm transition"
+                key={code}
+                type="button"
+                onClick={() => setLocale(code)}
+                className={`rounded-full px-4 py-2 text-sm font-bold transition ${
+                  locale === code ? 'bg-white text-ink shadow-sm' : 'text-ink-light'
+                }`}
               >
-                <FaPlus className="text-lg md:text-base" />
-                <span className="hidden md:inline">{type === 'title' ? 'Title' : type === 'paragraph' ? 'Text' : type === 'picture' ? 'Image' : type === 'video' ? 'Video' : 'CTA'}</span>
-                <span className="md:hidden">{type.charAt(0).toUpperCase()}</span>
+                {code === 'en' ? 'Inglés' : 'Español'}
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            onClick={saveStory}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 rounded-full bg-jungle-dark px-6 py-3 text-sm font-bold uppercase tracking-[0.1em] text-white transition hover:brightness-110 disabled:opacity-60"
+          >
+            {isSaving ? 'Guardando…' : <><FaCheck /> Guardar historia</>}
+          </button>
+        </div>
+      </div>
+
+      {message && (
+        <div
+          className={`rounded-2xl border px-5 py-4 text-sm font-bold ${
+            message.type === 'success'
+              ? 'border-jungle/40 bg-jungle/10 text-jungle-dark'
+              : 'border-hibiscus/40 bg-hibiscus/10 text-hibiscus-dark'
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
+      {/* ── Story header ────────────────────────────────────────────────── */}
+      <section className="rounded-3xl border border-ink/12 bg-white p-5 shadow-sm sm:p-6">
+        <h3 className="mb-4 text-lg font-bold text-ink">Cabecera de la historia</h3>
+        <div className="grid gap-4">
+          <div>
+            <label className={fieldLabel}>Título de la historia</label>
+            <input
+              type="text"
+              value={storyData.storyTitle}
+              onChange={(event) => setStoryData((p) => ({ ...p, storyTitle: event.target.value }))}
+              placeholder="Escribe el título principal"
+              className={field}
+            />
+          </div>
+          <div>
+            <label className={fieldLabel}>Frase de la historia</label>
+            <input
+              type="text"
+              value={storyData.storyTagline}
+              onChange={(event) => setStoryData((p) => ({ ...p, storyTagline: event.target.value }))}
+              placeholder="Una línea que resuma el día"
+              className={field}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Blocks ──────────────────────────────────────────────────────── */}
+      <section className="rounded-3xl border border-ink/12 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mb-5">
+          <h3 className="text-lg font-bold text-ink">Bloques de la página</h3>
+          <p className="text-sm text-ink-light">
+            Elige qué añadir. Cada bloque se puede mover, editar o eliminar.
+          </p>
         </div>
 
-        {/* Story Elements */}
-        <div className="bg-white rounded-3xl p-4 md:p-6 shadow-lg space-y-3">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Story Elements ({storyData.elements.length})</h2>
+        {addBar()}
 
-          {storyData.elements.length === 0 ? (
-            <p className="text-slate-500 text-center py-8">No elements yet. Add one to get started!</p>
-          ) : (
-            <div className="space-y-3">
-              {storyData.elements.map((element, index) => (
-                <div key={element.id} className="border border-slate-200 rounded-lg overflow-hidden">
-                  {/* Element Header */}
-                  <button
-                    onClick={() =>
-                      setExpandedElement(expandedElement === element.id ? null : element.id)
-                    }
-                    className="w-full px-4 py-3 md:py-4 bg-slate-50 hover:bg-slate-100 transition flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <span className="text-xl">{elementTypeIcon(element.type)}</span>
-                      <div className="text-left min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-slate-500 font-semibold">
-                          #{index + 1} {element.type.toUpperCase()}
-                        </p>
-                        <p className="text-sm md:text-base font-semibold text-slate-900 truncate">
-                          {element.content.title ||
-                            element.content.text?.substring(0, 40) ||
-                            'Untitled'}
-                        </p>
-                      </div>
+        <div className="mt-6 space-y-4">
+          {storyData.elements.length === 0 && (
+            <p className="rounded-2xl border border-dashed border-ink/20 p-10 text-center text-sm text-ink-light">
+              Todavía no hay bloques. Usa los botones de arriba para añadir el primero.
+            </p>
+          )}
+
+          {storyData.elements.map((element, index) => {
+            const isEditing = editing === element.id;
+            const meta = metaFor(element.type);
+            const progress = uploading[element.id];
+
+            return (
+              <div key={element.id}>
+                <div
+                  className={`rounded-2xl border bg-white p-4 transition ${
+                    isEditing ? 'border-lagoon shadow-md' : 'border-ink/12'
+                  }`}
+                >
+                  {/* Summary row: what it is, what it looks like, what you can do. */}
+                  <div className="flex flex-col gap-4 sm:flex-row">
+                    {preview(element)}
+
+                    <div className="min-w-0 flex-1">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-paper-warm px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-ink-light">
+                        {index + 1} · {meta.icon} {meta.label}
+                      </span>
+                      <div className="mt-2">{summary(element)}</div>
                     </div>
-                    <span className="text-slate-400 text-lg ml-2 flex-shrink-0">
-                      {expandedElement === element.id ? '▼' : '▶'}
-                    </span>
-                  </button>
 
-                  {/* Expanded Content */}
-                  {expandedElement === element.id && (
-                    <div className="border-t border-slate-200 px-4 py-4 space-y-4 bg-white">
-                      {/* Element Editor */}
-                      {renderElementEditor(element)}
+                    <div className="flex flex-wrap gap-2 sm:flex-col">
+                      <button
+                        type="button"
+                        onClick={() => setEditing(isEditing ? null : element.id)}
+                        className={action}
+                      >
+                        {isEditing ? <><FaTimes /> Cerrar</> : <><FaPen /> Editar</>}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveElement(element.id, 'up')}
+                        disabled={index === 0}
+                        className={action}
+                      >
+                        <FaArrowUp /> Subir
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveElement(element.id, 'down')}
+                        disabled={index === storyData.elements.length - 1}
+                        className={action}
+                      >
+                        <FaArrowDown /> Bajar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteElement(element.id)}
+                        className={`${action} !text-hibiscus-dark hover:!border-hibiscus`}
+                      >
+                        <FaTrash /> Eliminar
+                      </button>
+                    </div>
+                  </div>
 
-                      {/* Actions */}
-                      <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
-                        <button
-                          onClick={() => moveElement(element.id, 'up')}
-                          disabled={index === 0}
-                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-100 hover:bg-blue-200 disabled:bg-slate-100 text-blue-700 disabled:text-slate-400 rounded-lg text-sm font-semibold transition"
-                        >
-                          <FaArrowUp /> Up
-                        </button>
-                        <button
-                          onClick={() => moveElement(element.id, 'down')}
-                          disabled={index === storyData.elements.length - 1}
-                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-100 hover:bg-blue-200 disabled:bg-slate-100 text-blue-700 disabled:text-slate-400 rounded-lg text-sm font-semibold transition"
-                        >
-                          <FaArrowDown /> Down
-                        </button>
-                        <button
-                          onClick={() => deleteElement(element.id)}
-                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-semibold transition"
-                        >
-                          <FaTrash /> Delete
-                        </button>
-                      </div>
+                  {/* Editor */}
+                  {isEditing && (
+                    <div className="mt-5 space-y-4 border-t border-ink/10 pt-5">
+                      {element.type === 'title' && (
+                        <>
+                          <div>
+                            <label className={fieldLabel}>Título</label>
+                            <input
+                              type="text"
+                              value={element.content.title || ''}
+                              onChange={(e) => updateElement(element.id, 'title', e.target.value)}
+                              placeholder="Escribe el título"
+                              className={field}
+                            />
+                          </div>
+                          <div>
+                            <label className={fieldLabel}>Texto de apoyo</label>
+                            <textarea
+                              value={element.content.description || ''}
+                              onChange={(e) => updateElement(element.id, 'description', e.target.value)}
+                              rows={3}
+                              placeholder="Una o dos frases debajo del título"
+                              className={field}
+                            />
+                          </div>
+                        </>
+                      )}
 
-                      {/* Add After */}
-                      <div className="pt-2 border-t border-slate-200">
-                        <p className="text-xs font-semibold text-slate-600 mb-2">Add element after this</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {(['title', 'paragraph', 'picture', 'video', 'cta'] as StoryElementType[]).map((type) => (
+                      {element.type === 'paragraph' && (
+                        <MarkdownField
+                          label="Texto"
+                          hint="Negrita, subtítulos, listas y enlaces. Toca “Vista previa” para verlo como quedará."
+                          value={element.content.text || ''}
+                          onChange={(value) => updateElement(element.id, 'text', value)}
+                          placeholder="Escribe el párrafo…"
+                          minRem={14}
+                        />
+                      )}
+
+                      {element.type === 'picture' && (
+                        <>
+                          <div className="flex flex-wrap items-center gap-3">
                             <button
-                              key={`${element.id}-${type}`}
-                              onClick={() => addElement(type, element.id)}
-                              className="px-2 py-2 bg-teal-100 hover:bg-teal-200 text-teal-700 rounded text-xs font-semibold transition"
+                              type="button"
+                              onClick={() => fileInputRefs.current[element.id]?.click()}
+                              disabled={progress !== undefined}
+                              className="inline-flex items-center gap-2 rounded-full bg-lagoon-dark px-5 py-3 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-60"
                             >
-                              + {type === 'cta' ? 'CTA' : type.charAt(0).toUpperCase() + type.slice(1)}
+                              <FaUpload />
+                              {progress !== undefined ? `Subiendo ${Math.round(progress)}%` : 'Subir imagen'}
                             </button>
-                          ))}
-                        </div>
-                      </div>
+                            <input
+                              ref={(ref) => {
+                                fileInputRefs.current[element.id] = ref;
+                              }}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleImageUpload(element.id, file);
+                                e.target.value = '';
+                              }}
+                            />
+                            {element.content.imageUrl && (
+                              <button
+                                type="button"
+                                onClick={() => updateElement(element.id, 'imageUrl', '')}
+                                className={action}
+                              >
+                                <FaTrash /> Quitar imagen
+                              </button>
+                            )}
+                          </div>
+                          <div>
+                            <label className={fieldLabel}>…o pega un enlace</label>
+                            <input
+                              type="text"
+                              value={element.content.imageUrl || ''}
+                              onChange={(e) => updateElement(element.id, 'imageUrl', e.target.value)}
+                              placeholder="https://…"
+                              className={field}
+                            />
+                          </div>
+                          {element.content.imageUrl && (
+                            <img
+                              src={element.content.imageUrl}
+                              alt=""
+                              className="max-h-72 w-full rounded-2xl border border-ink/12 object-cover"
+                            />
+                          )}
+                        </>
+                      )}
+
+                      {element.type === 'video' && (
+                        <>
+                          <div>
+                            <label className={fieldLabel}>Título del video</label>
+                            <input
+                              type="text"
+                              value={element.content.title || ''}
+                              onChange={(e) => updateElement(element.id, 'title', e.target.value)}
+                              className={field}
+                            />
+                          </div>
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                              <label className={fieldLabel}>Fuente</label>
+                              <select
+                                value={element.content.videoSource || 'vimeo'}
+                                onChange={(e) =>
+                                  updateElement(element.id, 'videoSource', e.target.value as VideoSource)
+                                }
+                                className={field}
+                              >
+                                <option value="vimeo">Vimeo</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="custom">Enlace propio</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className={fieldLabel}>Orientación</label>
+                              <select
+                                value={element.content.videoOrientation || 'horizontal'}
+                                onChange={(e) =>
+                                  updateElement(
+                                    element.id,
+                                    'videoOrientation',
+                                    e.target.value as VideoOrientation
+                                  )
+                                }
+                                className={field}
+                              >
+                                <option value="horizontal">Horizontal</option>
+                                <option value="vertical">Vertical</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div>
+                            <label className={fieldLabel}>Enlace del video</label>
+                            <input
+                              type="text"
+                              value={element.content.videoUrl || ''}
+                              onChange={(e) => updateElement(element.id, 'videoUrl', e.target.value)}
+                              placeholder="https://…"
+                              className={field}
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {element.type === 'cta' && (
+                        <>
+                          <div>
+                            <label className={fieldLabel}>Titular</label>
+                            <input
+                              type="text"
+                              value={element.content.title || ''}
+                              onChange={(e) => updateElement(element.id, 'title', e.target.value)}
+                              placeholder="ej.: ¿Listo para tu aventura?"
+                              className={field}
+                            />
+                          </div>
+                          <div>
+                            <label className={fieldLabel}>Texto</label>
+                            <textarea
+                              value={element.content.description || ''}
+                              onChange={(e) => updateElement(element.id, 'description', e.target.value)}
+                              rows={3}
+                              className={field}
+                            />
+                          </div>
+
+                          <div>
+                            <div className="mb-2 flex items-center justify-between">
+                              <span className={fieldLabel}>Botones</span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateElement(element.id, 'buttons', [
+                                    ...(element.content.buttons ?? []),
+                                    { id: newId(), text: '', link: '/tours', variant: 'primary' },
+                                  ])
+                                }
+                                className={action}
+                              >
+                                <FaPlus /> Añadir botón
+                              </button>
+                            </div>
+
+                            <div className="space-y-3">
+                              {(element.content.buttons ?? []).map((button) => (
+                                <div
+                                  key={button.id}
+                                  className="grid gap-3 rounded-2xl border border-ink/12 p-3 sm:grid-cols-[1fr,1fr,auto]"
+                                >
+                                  <input
+                                    type="text"
+                                    value={button.text}
+                                    onChange={(e) =>
+                                      updateButton(element.id, button.id, 'text', e.target.value)
+                                    }
+                                    placeholder="Texto del botón"
+                                    className={field}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={button.link}
+                                    onChange={(e) =>
+                                      updateButton(element.id, button.id, 'link', e.target.value)
+                                    }
+                                    placeholder="/tours o https://…"
+                                    className={field}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      updateElement(
+                                        element.id,
+                                        'buttons',
+                                        (element.content.buttons ?? []).filter((b) => b.id !== button.id)
+                                      )
+                                    }
+                                    className={`${action} !text-hibiscus-dark`}
+                                  >
+                                    <FaTrash /> Quitar
+                                  </button>
+                                </div>
+                              ))}
+                              {(element.content.buttons ?? []).length === 0 && (
+                                <p className="text-sm text-ink-light">
+                                  Sin botones todavía. Usa “Añadir botón”.
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Save Button */}
-        <button
-          onClick={saveStory}
-          disabled={isSaving}
-          className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-teal-400 text-white px-6 py-4 rounded-2xl font-bold text-lg transition shadow-lg"
-        >
-          {isSaving ? 'Saving...' : 'Save Story'}
-        </button>
-
-        {/* JSONBin Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-xs md:text-sm text-blue-900">
-          <p className="font-semibold mb-2">JSONBin Configuration Hint:</p>
-          <p className="mb-2">For {locale === 'en' ? 'English' : 'Spanish'} story elements, ensure these env vars are set:</p>
-          <code className="block bg-blue-100 p-2 rounded text-xs overflow-x-auto">
-            {locale === 'en'
-              ? 'VITE_JSONBIN_STORY_ELEMENTS_EN=your_bin_id'
-              : 'VITE_JSONBIN_STORY_ELEMENTS_ES=your_bin_id'}
-          </code>
+                {/* Insert a block right here, rather than only at the end. */}
+                <div className="mt-2 flex justify-center">
+                  {addingAfter === element.id ? (
+                    <div className="w-full rounded-2xl border border-dashed border-lagoon/60 p-3">
+                      {addBar(element.id)}
+                      <button
+                        type="button"
+                        onClick={() => setAddingAfter(null)}
+                        className="mt-2 text-xs font-bold text-ink-light hover:text-ink"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setAddingAfter(element.id)}
+                      className="rounded-full border border-dashed border-ink/25 px-4 py-1.5 text-xs font-bold text-ink-light transition hover:border-lagoon hover:text-ink"
+                    >
+                      + Insertar un bloque aquí
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

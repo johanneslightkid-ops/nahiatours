@@ -36,17 +36,17 @@ const MunicipioPriceAdminPanel: React.FC = () => {
       const updatedConfig = await updateMunicipioPriceMultipliers(config, draftMultipliers);
       setConfig(updatedConfig);
       setDraftMultipliers({ ...updatedConfig.modifiers?.municipioMultipliers ?? {} });
-      setMessage('Saved municipio price multipliers.');
+      setMessage('Multiplicadores por municipio guardados.');
     } catch (error) {
       console.error(error);
-      setMessage('Error saving municipio multipliers.');
+      setMessage('No se pudieron guardar los multiplicadores.');
     } finally {
       setSaving(false);
     }
   };
 
   const handleResetAll = () => {
-    if (confirm('Reset all municipio multipliers to defaults?')) {
+    if (confirm('¿Devolver todos los multiplicadores a sus valores originales?')) {
       const defaults = getAllMunicipios().reduce((acc, municipio) => {
         acc[municipio] = config?.modifiers?.municipioMultipliers?.[municipio] ?? 1.0;
         return acc;
@@ -57,8 +57,8 @@ const MunicipioPriceAdminPanel: React.FC = () => {
 
   if (!draftMultipliers) {
     return (
-      <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <p className="text-slate-600">Loading municipio pricing settings…</p>
+      <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
+        <p className="text-ink-soft">Cargando los multiplicadores por municipio…</p>
       </div>
     );
   }
@@ -69,12 +69,12 @@ const MunicipioPriceAdminPanel: React.FC = () => {
     : allMunicipios;
 
   return (
-    <div className="rounded-3xl bg-white p-6 shadow-lg">
+    <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
       <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Municipio Price Multipliers</h2>
-          <p className="mt-2 max-w-2xl text-sm text-slate-600">
-            Adjust price multipliers for each municipio. The price per km is multiplied by the average of the origin and destination multipliers.
+          <h2 className="text-2xl font-bold text-ink">Multiplicadores por municipio</h2>
+          <p className="mt-2 max-w-2xl text-sm text-ink-soft">
+            Ajusta el multiplicador de precio de cada municipio. El precio por km se multiplica por el promedio del multiplicador de origen y el de destino.
           </p>
         </div>
         <div className="flex gap-2">
@@ -83,14 +83,14 @@ const MunicipioPriceAdminPanel: React.FC = () => {
             disabled={saving}
             className="rounded-full bg-slate-400 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
-            Reset All
+            Restablecer todo
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-full bg-teal-600 px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {saving ? 'Saving…' : 'Save Multipliers'}
+            {saving ? 'Guardando…' : 'Guardar multiplicadores'}
           </button>
         </div>
       </div>
@@ -104,10 +104,10 @@ const MunicipioPriceAdminPanel: React.FC = () => {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search municipio…"
+          placeholder="Buscar municipio…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+          className="w-full rounded-2xl border border-ink/15 px-4 py-3 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
         />
       </div>
 
@@ -115,21 +115,21 @@ const MunicipioPriceAdminPanel: React.FC = () => {
         <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
           {filteredMunicipios.map((municipio) => (
             <label key={municipio} className="space-y-1">
-              <span className="text-xs font-semibold text-slate-700">{municipio}</span>
+              <span className="text-xs font-semibold text-ink-soft">{municipio}</span>
               <input
                 type="number"
                 min={0}
                 step={0.1}
                 value={draftMultipliers[municipio] ?? 1.0}
                 onChange={(e) => updateField(municipio, e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-ink/15 px-3 py-2 text-sm"
               />
             </label>
           ))}
         </div>
       </div>
 
-      <p className="mt-4 text-xs text-slate-500">
+      <p className="mt-4 text-xs text-ink-light">
         Total municipios: {filteredMunicipios.length} {searchTerm ? `(filtered from ${allMunicipios.length})` : `of ${allMunicipios.length}`}
       </p>
     </div>

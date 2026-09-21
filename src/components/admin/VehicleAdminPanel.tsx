@@ -69,7 +69,7 @@ const VehicleAdminPanel: React.FC = () => {
     if (!url) {
       // uploadVehicleImage swallows its own errors and returns '', so an empty
       // string is the only signal there is that something went wrong.
-      setMessage('Upload failed — check that you are still signed in, then try again.');
+      setMessage('No se pudo subir la imagen. Revisa que sigues con la sesión abierta e inténtalo otra vez.');
       return;
     }
     update(index, { image: url });
@@ -108,7 +108,7 @@ const VehicleAdminPanel: React.FC = () => {
       await saveTransferConfig({ ...config, vehicleTypes: keyed });
       setConfig({ ...config, vehicleTypes: keyed });
       setDraft(keyed.map((vt) => ({ ...vt })));
-      setMessage('Saved.');
+      setMessage('Guardado.');
     } catch (error) {
       setMessage(`Could not save: ${(error as Error).message}`);
     } finally {
@@ -119,7 +119,7 @@ const VehicleAdminPanel: React.FC = () => {
   if (!draft) {
     return (
       <section className="rounded-3xl bg-white p-6 shadow-sm">
-        <p className="text-slate-500">Loading the fleet…</p>
+        <p className="text-slate-500">Cargando la flota…</p>
       </section>
     );
   }
@@ -128,7 +128,7 @@ const VehicleAdminPanel: React.FC = () => {
     <section className="rounded-3xl bg-white p-6 shadow-sm">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Vehicles</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Vehículos</h2>
           <p className="mt-1 text-sm text-slate-500">
             The fleet shown on the Transport page. The picture here is what a visitor sees
             when they pick this vehicle.
@@ -138,7 +138,7 @@ const VehicleAdminPanel: React.FC = () => {
           {message && (
             <span
               className={`text-sm font-semibold ${
-                message === 'Saved.' ? 'text-emerald-600' : 'text-rose-600'
+                message === 'Guardado.' ? 'text-emerald-600' : 'text-rose-600'
               }`}
             >
               {message}
@@ -148,14 +148,14 @@ const VehicleAdminPanel: React.FC = () => {
             onClick={addVehicle}
             className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
-            Add vehicle
+            Agregar vehículo
           </button>
           <button
             onClick={save}
             disabled={saving}
             className="rounded-2xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {saving ? 'Saving…' : 'Save vehicles'}
+            {saving ? 'Guardando…' : 'Save vehicles'}
           </button>
         </div>
       </div>
@@ -177,7 +177,7 @@ const VehicleAdminPanel: React.FC = () => {
                     />
                   ) : (
                     <span className="px-2 text-center text-xs uppercase tracking-[0.18em] text-slate-400">
-                      No picture
+                      Sin foto
                     </span>
                   )}
                 </div>
@@ -194,13 +194,13 @@ const VehicleAdminPanel: React.FC = () => {
                   className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-xs"
                 />
                 {uploading === index && (
-                  <p className="text-xs font-semibold text-slate-500">Uploading…</p>
+                  <p className="text-xs font-semibold text-slate-500">Subiendo…</p>
                 )}
                 <input
                   type="text"
                   value={vehicle.image ?? ''}
                   onChange={(event) => update(index, { image: event.target.value })}
-                  placeholder="…or paste an image URL"
+                  placeholder="…o pega el enlace de una imagen"
                   className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-xs"
                 />
               </div>
@@ -210,13 +210,13 @@ const VehicleAdminPanel: React.FC = () => {
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <label className="space-y-1">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      Name
+                      Nombre
                     </span>
                     <input
                       type="text"
                       value={vehicle.label}
                       onChange={(event) => update(index, { label: event.target.value })}
-                      placeholder="SUV / Family"
+                      placeholder="SUV / Familiar"
                       className="w-full rounded-2xl border border-slate-200 px-4 py-2"
                     />
                   </label>
@@ -236,13 +236,13 @@ const VehicleAdminPanel: React.FC = () => {
 
                 <label className="block space-y-1">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Description
+                    Descripción
                   </span>
                   <textarea
                     value={vehicle.description}
                     onChange={(event) => update(index, { description: event.target.value })}
                     rows={2}
-                    placeholder="Spacious for families or groups up to 5"
+                    placeholder="Amplia para familias o grupos de hasta 5"
                     className="w-full rounded-2xl border border-slate-200 px-4 py-2"
                   />
                 </label>
@@ -250,7 +250,7 @@ const VehicleAdminPanel: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                   <label className="space-y-1">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      Max passengers
+                      Pasajeros máximos
                     </span>
                     <input
                       type="number"
@@ -264,7 +264,7 @@ const VehicleAdminPanel: React.FC = () => {
                   </label>
                   <label className="space-y-1">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      Price multiplier
+                      Multiplicador de precio
                     </span>
                     <input
                       type="number"
@@ -279,7 +279,7 @@ const VehicleAdminPanel: React.FC = () => {
                   </label>
                   <label className="space-y-1">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      Per-km multiplier
+                      Multiplicador por km
                     </span>
                     <input
                       type="number"
@@ -299,7 +299,7 @@ const VehicleAdminPanel: React.FC = () => {
                       onClick={() => removeVehicle(index)}
                       className="w-full rounded-2xl border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
                     >
-                      Remove
+                      Quitar
                     </button>
                   </div>
                 </div>
@@ -311,7 +311,7 @@ const VehicleAdminPanel: React.FC = () => {
 
       {draft.length === 0 && (
         <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">
-          No vehicles. Add one, or save an empty fleet to fall back to the built-in defaults.
+          No hay vehículos. Agrega uno, o guarda la flota vacía para volver a los valores por defecto.
         </p>
       )}
     </section>

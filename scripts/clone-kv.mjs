@@ -5,29 +5,40 @@
  * a new deployment starts life with the real catalogue — tours, transport,
  * story, brand, testimonials — instead of the seed JSON bundled in /data.
  *
- * It picks the source namespace itself: of all the namespaces the token can
- * see, it takes the newest one that is not the destination. "Newest" is the
- * namespace with the highest id-ordering under Cloudflare's own listing, so
- * SOURCE_KV_TITLE is there to override the guess whenever it matters.
+ * The source namespace has to be named. There is no guess: see resolveSource
+ * below for why an account with two dozen namespaces makes "pick the newest
+ * one" a way to seed a site from a stranger's data.
  *
  * Resolution:
  *
  *   SOURCE_KV_ID          — use this namespace, no lookup.
  *   SOURCE_KV_TITLE       — find the namespace with this exact title.
- *   (neither)             — newest namespace that is not the destination.
+ *   (neither)             — refuse, and list what the token can see.
  *
  *   DEST_KV_ID            — write into this namespace, no lookup.
  *   DEST_KV_TITLE         — find or create a namespace with this title.
- *                           Defaults to KV_NAMESPACE_TITLE, then
- *                           "transporturist-data" — this branch's own
- *                           namespace, so a manual run here cannot write
- *                           into another design's data.
+ *                           Defaults to KV_NAMESPACE_TITLE.
  *
- * Set OVERWRITE=false to keep any key the destination already has; the default
- * is to make the destination match the source for every key the source holds.
- * Keys that exist only in the destination are never deleted — this is a copy,
- * not a mirror, so a namespace that already has hand-edited data cannot be
- * emptied by running it.
+ * THIS SEEDS. IT DOES NOT SYNC.
+ *
+ * A key that already exists in the destination is left exactly as it is. Only
+ * keys the destination is missing are copied, so running this against a site
+ * that has been edited through its admin panel is a no-op.
+ *
+ * It used to be the other way round — overwrite unless told otherwise — and
+ * that is not a subtle difference. This script runs on every deploy, so the
+ * old default meant every push to a design branch silently restored that
+ * site's brand, tours and story from production, discarding whatever the
+ * operator had changed since. It did exactly that to the Beautiful Tours site
+ * on 2026-09-17: five keys, `brand` among them, replaced with nahia.tours'
+ * values by a deploy whose only intended change was elsewhere.
+ *
+ * OVERWRITE=true restores the old behaviour for a run that genuinely wants to
+ * re-pull production. Nothing sets it by default, and the deploy workflows
+ * expose it only as a hand-thrown switch on a manual dispatch.
+ *
+ * Keys that exist only in the destination are never deleted either way — this
+ * is a copy, not a mirror.
  *
  * Unlike provision-kv.mjs, this one exits non-zero on failure. Deploying a
  * site that silently fell back to seed data would look like it worked.
@@ -41,9 +52,11 @@ const API = 'https://api.cloudflare.com/client/v4';
 // to 6111 "Invalid format for Authorization header"). That reads like a bad
 // token but is really a bad header, and costs an hour if you believe it.
 const token = (process.env.CLOUDFLARE_API_TOKEN || '').trim();
-const OVERWRITE = process.env.OVERWRITE !== 'false';
+// Opt in, never opt out. See the note at the top of this file for what the
+// other default cost.
+const OVERWRITE = process.env.OVERWRITE === 'true';
 const DEST_TITLE =
-  process.env.DEST_KV_TITLE || process.env.KV_NAMESPACE_TITLE || 'transporturist-data';
+  process.env.DEST_KV_TITLE || process.env.KV_NAMESPACE_TITLE || 'ldvip-data';
 
 const log = (message) => console.log(`[clone-kv] ${message}`);
 
@@ -186,47 +199,14 @@ const writeValue = async (accountId, namespaceId, key, value) => {
 
 const resolveDestination = async (accountId, namespaces) => {
   if (process.env.DEST_KV_ID) return { id: process.env.DEST_KV_ID, title: '(by id)' };
-
   const match = namespaces.find((ns) => ns.title === DEST_TITLE);
   if (match) return match;
-
-  try {
-    const created = await cf(`/accounts/${accountId}/storage/kv/namespaces`, {
-      method: 'POST',
-      body: JSON.stringify({ title: DEST_TITLE }),
-    });
-    log(`created destination namespace "${DEST_TITLE}"`);
-    return created;
-  } catch (error) {
-    // 10014 is "a namespace with this account ID and title already exists" —
-    // which contradicts the listing we just read. Two things cause that, and
-    // they need different answers, so find out which before giving up.
-    if (!/10014|already exists/i.test(error.message)) throw error;
-
-    // Listings can lag a create by a moment, so ask once more before
-    // concluding anything.
-    const fresh = await listNamespaces(accountId);
-    const late = fresh.find((ns) => ns.title === DEST_TITLE);
-    if (late) {
-      log(`destination "${DEST_TITLE}" existed after all — using it`);
-      return late;
-    }
-
-    // It is real, and this token cannot see it. Cloudflare checks the title
-    // against the whole account when creating, but a token scoped to a list
-    // of namespaces only lists the ones in its scope — so a namespace can be
-    // simultaneously "already exists" and invisible here. Nothing this script
-    // can do resolves that; say exactly what would.
-    throw new Error(
-      `Cloudflare says a namespace titled "${DEST_TITLE}" already exists on this ` +
-        `account, but the token cannot see it — it listed ${fresh.length} ` +
-        `namespace(s) and that was not among them. The token is most likely ` +
-        `scoped to specific namespaces rather than to the whole account. ` +
-        `Either re-issue it with Workers KV Storage: Edit at account scope, or ` +
-        `set DEST_KV_ID to the namespace id from the Cloudflare dashboard ` +
-        `(Workers & Pages → KV) and re-run.`
-    );
-  }
+  const created = await cf(`/accounts/${accountId}/storage/kv/namespaces`, {
+    method: 'POST',
+    body: JSON.stringify({ title: DEST_TITLE }),
+  });
+  log(`created destination namespace "${DEST_TITLE}"`);
+  return created;
 };
 
 const resolveSource = (namespaces, destinationId) => {
@@ -243,12 +223,19 @@ const resolveSource = (namespaces, destinationId) => {
     }
     return match;
   }
+  // No blind fallback. This used to take "the newest namespace that is not the
+  // destination", which was reasonable on an account with two of them and
+  // actively dangerous on this one: it carries 27 namespaces belonging to a
+  // dozen unrelated projects, and the guess had drifted onto `slk-config` —
+  // quietly copying another business's documents into this site's data on
+  // every deploy. Seeding a site from a namespace nobody named is never what
+  // was wanted, so say so instead of picking one.
   const candidates = namespaces.filter((ns) => ns.id !== destinationId);
-  if (candidates.length === 0) {
-    throw new Error('no other namespace to copy from — set SOURCE_KV_TITLE');
-  }
-  // Cloudflare returns namespaces oldest-first, so the last is the newest.
-  return candidates[candidates.length - 1];
+  throw new Error(
+    'refusing to guess a source namespace. Set SOURCE_KV_TITLE (or ' +
+      'SOURCE_KV_ID) to the one this site should be seeded from. ' +
+      `Available: ${candidates.map((ns) => ns.title).join(', ') || '(none)'}`
+  );
 };
 
 const main = async () => {
@@ -275,7 +262,27 @@ const main = async () => {
     return;
   }
 
-  const existing = OVERWRITE ? new Set() : new Set(await listKeys(accountId, destination.id));
+  // Read the destination first, always — even when overwriting, because what
+  // is about to be replaced is worth saying out loud before it goes.
+  const destinationKeys = await listKeys(accountId, destination.id);
+
+  if (destinationKeys.length === 0) {
+    log('destination is empty — seeding it');
+  } else if (OVERWRITE) {
+    const clobbered = sourceKeys.filter((key) => destinationKeys.includes(key));
+    log(
+      `OVERWRITE=true: destination already holds ${destinationKeys.length} key(s), and ` +
+        `${clobbered.length} of them will be REPLACED from the source` +
+        (clobbered.length ? `: ${clobbered.join(', ')}` : '')
+    );
+  } else {
+    log(
+      `destination already holds ${destinationKeys.length} key(s) — those are left ` +
+        'alone; only keys it is missing get copied'
+    );
+  }
+
+  const existing = OVERWRITE ? new Set() : new Set(destinationKeys);
 
   let copied = 0;
   let skipped = 0;
@@ -290,7 +297,9 @@ const main = async () => {
     log(`  ${key} (${value.length} bytes)`);
   }
 
-  log(`done — ${copied} copied${skipped ? `, ${skipped} left alone` : ''}`);
+  log(
+    `done — ${copied} copied${skipped ? `, ${skipped} left alone (already in the destination)` : ''}`
+  );
   // Hand the id back so the deploy can bind exactly what was just filled.
   if (process.env.GITHUB_OUTPUT) {
     const { appendFileSync } = await import('node:fs');

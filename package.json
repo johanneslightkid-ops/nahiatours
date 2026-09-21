@@ -18,7 +18,6 @@
     "apply-seo": "node scripts/apply-seo.mjs"
   },
   "dependencies": {
-    "@uiw/react-md-editor": "^4.1.1",
     "framer-motion": "^12.43.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
