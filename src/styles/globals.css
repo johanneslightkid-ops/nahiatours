@@ -29,34 +29,34 @@
 
 :root {
   /* ── Ink & paper ─────────────────────────────────────────────────────── */
-  --ink: #0c0c0d;
-  --ink-soft: #3b3b3f;
-  --ink-light: #6f6f76;
+  --ink: #14100e;
+  --ink-soft: #3b342f;
+  --ink-light: #6e645c;
 
-  --paper: #efe9dd;
-  --paper-warm: #e5ddcd;
-  --paper-deep: #d5cab4;
+  --paper: #ede4d3;
+  --paper-warm: #e3d7c0;
+  --paper-deep: #cebda0;
   --bone: #f5f1e8;
 
   /* ── The one red ─────────────────────────────────────────────────────── */
   --blood: #c1121f;
-  --blood-light: #e63946;
-  --blood-dark: #8b0a15;
-  --oxblood: #6a040f;
+  --blood-light: #e23a3a;
+  --blood-dark: #7a0a14;
+  --oxblood: #560711;
 
   /* Legacy token names, remapped. Anything in the markup still reaching for
      a tropical hue lands on ink, bone or red. */
   --mango: var(--blood);
   --mango-light: var(--blood-light);
   --mango-dark: var(--blood-dark);
-  --hibiscus: #a4161a;
+  --hibiscus: #8e0f1e;
   --hibiscus-light: var(--blood-light);
-  --lagoon: #4a4a4e;
-  --lagoon-light: #cfc7b7;
-  --lagoon-dark: #151517;
-  --sky: #8a8a90;
-  --sky-light: #ded7c9;
-  --sky-dark: #26262a;
+  --lagoon: #2e7d4f;
+  --lagoon-light: #a9c9a0;
+  --lagoon-dark: #14532D;
+  --sky: #16787a;
+  --sky-light: #bfd9d4;
+  --sky-dark: #0b4548;
   --jungle: #3e4a38;
   --jungle-light: #8a8f79;
   --jungle-dark: #1f261c;
@@ -126,7 +126,7 @@ body::after {
   z-index: -2;
   pointer-events: none;
   opacity: 0.16;
-  background-image: radial-gradient(circle at 50% 50%, rgba(12, 12, 13, 0.55) 1px, transparent 1.4px);
+  background-image: radial-gradient(circle at 50% 50%, rgba(20, 16, 14, 0.55) 1px, transparent 1.4px);
   background-size: 5px 5px;
 }
 
@@ -307,7 +307,7 @@ a:hover {
 /* Halftone screen, coarse. */
 .cove-section {
   --band: var(--paper-deep);
-  --band-texture: radial-gradient(circle at 50% 50%, rgba(12, 12, 13, 0.16) 1.4px, transparent 1.8px);
+  --band-texture: radial-gradient(circle at 50% 50%, rgba(20, 16, 14, 0.16) 1.4px, transparent 1.8px);
   --band-texture-size: 9px 9px;
 }
 
@@ -315,7 +315,7 @@ a:hover {
    margin in the layers above it. */
 .lagoon-section {
   --band: #f5f1e8;
-  --band-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cg stroke='%230C0C0D' stroke-width='0.9' opacity='0.16'%3E%3Cpath d='M-4 4 L4 -4 M0 16 L16 0 M12 20 L20 12'/%3E%3Cpath d='M-4 12 L4 20 M0 0 L16 16 M12 -4 L20 4'/%3E%3C/g%3E%3C/svg%3E");
+  --band-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cg stroke='%2314100E' stroke-width='0.9' opacity='0.16'%3E%3Cpath d='M-4 4 L4 -4 M0 16 L16 0 M12 20 L20 12'/%3E%3Cpath d='M-4 12 L4 20 M0 0 L16 16 M12 -4 L20 4'/%3E%3C/g%3E%3C/svg%3E");
   --band-texture-size: 16px 16px;
 }
 
@@ -390,7 +390,7 @@ a:hover {
   position: relative;
   overflow: hidden;
   --band: var(--oxblood);
-  --band-texture: linear-gradient(170deg, #a4161a 0%, #6a040f 55%, #0c0c0d 100%);
+  --band-texture: linear-gradient(170deg, #8e0f1e 0%, #560711 55%, #14100e 100%);
   --band-texture-size: 100% 100%;
   color: var(--bone);
 }
@@ -403,7 +403,7 @@ a:hover {
   z-index: -1;
   pointer-events: none;
   opacity: 0.55;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='300' viewBox='0 0 420 300'%3E%3Cg fill='%230C0C0D'%3E%3Cpath d='M40 40 c26 -30 68 -14 58 18 c-8 26 -50 34 -66 16 c-10 -12 -6 -24 8 -34 z'/%3E%3Ccircle cx='128' cy='24' r='7'/%3E%3Ccircle cx='16' cy='96' r='5'/%3E%3Ccircle cx='150' cy='72' r='3.5'/%3E%3Cpath d='M330 236 c22 -22 56 -8 46 18 c-8 22 -44 26 -54 10 c-6 -10 -2 -20 8 -28 z'/%3E%3Ccircle cx='396' cy='210' r='6'/%3E%3Ccircle cx='300' cy='282' r='4'/%3E%3Ccircle cx='224' cy='150' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='300' viewBox='0 0 420 300'%3E%3Cg fill='%2314100E'%3E%3Cpath d='M40 40 c26 -30 68 -14 58 18 c-8 26 -50 34 -66 16 c-10 -12 -6 -24 8 -34 z'/%3E%3Ccircle cx='128' cy='24' r='7'/%3E%3Ccircle cx='16' cy='96' r='5'/%3E%3Ccircle cx='150' cy='72' r='3.5'/%3E%3Cpath d='M330 236 c22 -22 56 -8 46 18 c-8 22 -44 26 -54 10 c-6 -10 -2 -20 8 -28 z'/%3E%3Ccircle cx='396' cy='210' r='6'/%3E%3Ccircle cx='300' cy='282' r='4'/%3E%3Ccircle cx='224' cy='150' r='3'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 420px 300px;
 }
@@ -578,15 +578,15 @@ a:hover {
 
 .home-feature-card:nth-child(3n + 2) {
   background: var(--paper-warm);
-  background-image: radial-gradient(circle at 50% 50%, rgba(12, 12, 13, 0.14) 1.2px, transparent 1.6px);
+  background-image: radial-gradient(circle at 50% 50%, rgba(20, 16, 14, 0.14) 1.2px, transparent 1.6px);
   background-size: 8px 8px;
 }
 
 .home-feature-card:nth-child(3n + 3) {
   background: var(--paper);
   background-image:
-    repeating-linear-gradient(45deg, rgba(12, 12, 13, 0.07) 0 1px, transparent 1px 7px),
-    repeating-linear-gradient(-45deg, rgba(12, 12, 13, 0.07) 0 1px, transparent 1px 7px);
+    repeating-linear-gradient(45deg, rgba(20, 16, 14, 0.07) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-45deg, rgba(20, 16, 14, 0.07) 0 1px, transparent 1px 7px);
 }
 
 /* The markup carries light-on-dark text utilities from the band above; the
@@ -960,7 +960,7 @@ select:focus {
   }
 
   .nav-sheet .language-toggle-button:not(.active):hover {
-    background: rgba(12, 12, 13, 0.12);
+    background: rgba(20, 16, 14, 0.12);
     color: var(--ink);
   }
 }
@@ -1175,7 +1175,7 @@ select:focus {
   position: absolute;
   width: 108px;
   height: 26px;
-  background: rgba(12, 12, 13, 0.82);
+  background: rgba(20, 16, 14, 0.82);
   opacity: 0.9;
   -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4px, #000 calc(100% - 4px), transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0, #000 4px, #000 calc(100% - 4px), transparent 100%);
@@ -1198,7 +1198,7 @@ select:focus {
   inset: 0;
   pointer-events: none;
   opacity: 0.22;
-  background-image: radial-gradient(circle at 50% 50%, rgba(12, 12, 13, 0.7) 1.2px, transparent 1.6px);
+  background-image: radial-gradient(circle at 50% 50%, rgba(20, 16, 14, 0.7) 1.2px, transparent 1.6px);
   background-size: 6px 6px;
 }
 
@@ -1353,7 +1353,7 @@ select:focus {
   background-color: var(--blood);
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(12, 12, 13, 0.55) 0 6px,
+    rgba(20, 16, 14, 0.55) 0 6px,
     transparent 6px 12px
   );
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);

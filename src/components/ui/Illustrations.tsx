@@ -17,20 +17,20 @@ import React from 'react';
  * size from the caller's className.
  */
 
-export const INK = '#0C0C0D';
+export const INK = '#14100E';
 export const BLOOD = '#C1121F';
 
 const PALETTE = {
   ink: INK,
-  inkSoft: '#3B3B3F',
+  inkSoft: '#3B342F',
   blood: BLOOD,
-  bloodLight: '#E63946',
-  bloodDark: '#8B0A15',
-  oxblood: '#6A040F',
+  bloodLight: '#E23A3A',
+  bloodDark: '#7A0A14',
+  oxblood: '#560711',
   bone: '#F5F1E8',
-  paper: '#EFE9DD',
-  paperWarm: '#E5DDCD',
-  grey: '#8A8A90',
+  paper: '#EDE4D3',
+  paperWarm: '#E3D7C0',
+  grey: '#16787A',
 };
 
 export interface IllustrationProps {
