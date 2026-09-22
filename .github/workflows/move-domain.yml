@@ -19,10 +19,20 @@ on:
         required: true
       worker:
         description: 'The Worker to attach it to. Must already be deployed.'
-        required: true
+        required: false
+        default: ''
       confirm:
         description: 'Repeat the hostname exactly. This takes a live site off that domain.'
-        required: true
+        required: false
+        default: ''
+      restore_to_pages:
+        description: >-
+          UNDO. Name a Pages project and this puts the hostname straight back
+          on it and does nothing else — for a domain an earlier run released
+          but could not re-attach. No confirmation needed: this direction only
+          ever puts a site back up.
+        required: false
+        default: ''
 
 concurrency:
   group: move-domain-${{ inputs.hostname }}
@@ -36,6 +46,7 @@ jobs:
       MOVE_HOST: ${{ inputs.hostname }}
       MOVE_TO_WORKER: ${{ inputs.worker }}
       MOVE_CONFIRM: ${{ inputs.confirm }}
+      MOVE_RESTORE_TO_PAGES: ${{ inputs.restore_to_pages }}
     steps:
       - uses: actions/checkout@v4
       - name: Move the domain

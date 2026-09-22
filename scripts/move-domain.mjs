@@ -14,6 +14,17 @@
  * It is written to be safe to run twice. Each step checks the current state
  * first, so a re-run after a half-finished move finishes the job instead of
  * failing on the part that already succeeded.
+ *
+ * AND IT IS WRITTEN TO UNDO ITSELF. Releasing the hostname is the easy half;
+ * attaching it can still be refused afterwards, by a permission the token
+ * turns out not to have. A move that stops there does not leave a "partial
+ * state", it leaves a domain serving nothing. So if every way of attaching
+ * fails, the hostname goes straight back on the Pages project it came from
+ * before the error is reported: either the move happened or nothing did.
+ *
+ * MOVE_RESTORE_TO_PAGES=<project> skips the move entirely and only puts the
+ * hostname back on that project — the manual handle for a domain already left
+ * stranded by an earlier run.
  */
 
 const API = 'https://api.cloudflare.com/client/v4';
@@ -21,6 +32,7 @@ const TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const HOST = (process.env.MOVE_HOST || '').trim();
 const WORKER = (process.env.MOVE_TO_WORKER || '').trim();
 const CONFIRM = (process.env.MOVE_CONFIRM || '').trim();
+const RESTORE_TO = (process.env.MOVE_RESTORE_TO_PAGES || '').trim();
 
 const cf = async (path, init = {}) => {
   const res = await fetch(`${API}${path}`, {
@@ -44,8 +56,9 @@ const cf = async (path, init = {}) => {
 
 const main = async () => {
   if (!TOKEN) throw new Error('no CLOUDFLARE_API_TOKEN');
-  if (!HOST || !WORKER) throw new Error('set MOVE_HOST and MOVE_TO_WORKER');
-  if (CONFIRM !== HOST) {
+  if (!HOST) throw new Error('set MOVE_HOST');
+  if (!RESTORE_TO && !WORKER) throw new Error('set MOVE_TO_WORKER');
+  if (!RESTORE_TO && CONFIRM !== HOST) {
     throw new Error(
       `refusing to move "${HOST}": the confirmation input must repeat the hostname exactly. ` +
         `This call takes a live site off a domain, so it does not run on a typo.`
@@ -55,6 +68,24 @@ const main = async () => {
   const accountId =
     process.env.CLOUDFLARE_ACCOUNT_ID ||
     (await cf('/accounts?per_page=50').then((a) => a[0]?.id));
+
+  /** Put the hostname back on a Pages project. Used to undo a failed move. */
+  const giveBackToPages = async (project) => {
+    await cf(`/accounts/${accountId}/pages/projects/${project}/domains`, {
+      method: 'POST',
+      body: JSON.stringify({ name: HOST }),
+    });
+  };
+
+  if (RESTORE_TO) {
+    console.log(`[move] restoring ${HOST} to the Pages project "${RESTORE_TO}"\n`);
+    await giveBackToPages(RESTORE_TO);
+    const back = await cf(`/accounts/${accountId}/pages/projects/${RESTORE_TO}`);
+    console.log(`  ✓ "${RESTORE_TO}" domains: ${(back.domains || []).join(', ') || '(none)'}`);
+    console.log(`\n  Cloudflare re-issues the certificate; give it a minute.`);
+    return;
+  }
+
   console.log(`[move] ${HOST}  →  Worker "${WORKER}"  (account ${accountId})\n`);
 
   // ── 0. The Worker has to exist first. Attaching a domain to a Worker that
@@ -141,6 +172,49 @@ const main = async () => {
   };
 
   // ── 4. Attach it to the Worker.
+  //
+  //       Two ways, tried in that order. A CUSTOM DOMAIN is the tidy one: it
+  //       owns its DNS record and reads correctly in the dashboard. A ROUTE
+  //       needs no DNS write at all — the record already on this hostname is
+  //       proxied, so requests already arrive at Cloudflare's edge, and a
+  //       route just says which Worker answers them. The second is what is
+  //       reachable with a token that has no zone permissions, and a working
+  //       domain beats a tidy one.
+  const attachAsCustomDomain = async () => {
+    try {
+      await attach();
+    } catch (error) {
+      if (!(error.codes || []).includes(100117)) throw error;
+      // Pages left its record behind; clear it and try once more.
+      console.log(`\n  a DNS record is still claiming ${HOST}:`);
+      const removed = await clearAddressRecords();
+      if (!removed) throw error;
+      await attach();
+    }
+    console.log(`  ✓ attached to Worker "${WORKER}" as a custom domain`);
+  };
+
+  const attachAsRoute = async () => {
+    const pattern = `${HOST}/*`;
+    const routes = await cf(`/zones/${zone.id}/workers/routes`);
+    const mine = (routes || []).find((r) => r.pattern === pattern);
+    if (mine && mine.script === WORKER) {
+      console.log(`  ✓ route ${pattern} already runs "${WORKER}"`);
+    } else if (mine) {
+      await cf(`/zones/${zone.id}/workers/routes/${mine.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ pattern, script: WORKER }),
+      });
+      console.log(`  ✓ route ${pattern} moved from "${mine.script}" to "${WORKER}"`);
+    } else {
+      await cf(`/zones/${zone.id}/workers/routes`, {
+        method: 'POST',
+        body: JSON.stringify({ pattern, script: WORKER }),
+      });
+      console.log(`  ✓ route ${pattern} → "${WORKER}"`);
+    }
+  };
+
   const existing = await cf(`/accounts/${accountId}/workers/domains?hostname=${HOST}`).catch(
     () => []
   );
@@ -148,50 +222,32 @@ const main = async () => {
     console.log(`  ✓ already attached to "${WORKER}"`);
   } else {
     try {
-      await attach();
-      console.log(`  ✓ attached to Worker "${WORKER}" as a custom domain`);
-    } catch (error) {
-      if (!(error.codes || []).includes(100117)) throw error;
-      console.log(`\n  a DNS record is still claiming ${HOST}:`);
+      await attachAsCustomDomain();
+    } catch (domainError) {
+      console.log(`  · custom domain refused: ${domainError.message}`);
+      console.log(`  · falling back to a Worker ROUTE, which needs no DNS write`);
       try {
-        const removed = await clearAddressRecords();
-        if (!removed) throw error;
-        await attach();
-        console.log(`  ✓ attached to Worker "${WORKER}" as a custom domain`);
-      } catch (dnsError) {
-        // No DNS permission on this token. A custom domain is not the only
-        // way to put a Worker on a hostname, and the other way needs no DNS
-        // write at all: a ROUTE on the zone. The record already there is
-        // proxied through Cloudflare, so every request for this hostname
-        // already arrives at Cloudflare's edge — a route says which Worker
-        // answers it, and the Worker serves its own assets, so the address
-        // the record points at stops being consulted.
-        //
-        // A custom domain is still the tidier end state, because it owns its
-        // record and says so in the dashboard. This is the one that can be
-        // done from here, and a working domain beats a tidy one.
-        console.log(
-          `  · cannot rewrite DNS with this token (${dnsError.message})`
-        );
-        console.log(`  · falling back to a Worker ROUTE, which needs no DNS write`);
-        const pattern = `${HOST}/*`;
-        const routes = await cf(`/zones/${zone.id}/workers/routes`);
-        const mine = (routes || []).find((r) => r.pattern === pattern);
-        if (mine && mine.script === WORKER) {
-          console.log(`  ✓ route ${pattern} already runs "${WORKER}"`);
-        } else if (mine) {
-          await cf(`/zones/${zone.id}/workers/routes/${mine.id}`, {
-            method: 'PUT',
-            body: JSON.stringify({ pattern, script: WORKER }),
-          });
-          console.log(`  ✓ route ${pattern} moved from "${mine.script}" to "${WORKER}"`);
+        await attachAsRoute();
+      } catch (routeError) {
+        // Neither way worked and the hostname is already off Pages. Leaving
+        // it there is not an unfinished job, it is a domain serving nothing,
+        // so hand it back before reporting.
+        console.log(`\n  !! could not attach ${HOST} to "${WORKER}": ${routeError.message}`);
+        if (owner) {
+          console.log(`  restoring it to the Pages project "${owner.name}" so it keeps serving…`);
+          try {
+            await giveBackToPages(owner.name);
+            console.log(`  ✓ ${HOST} is back on "${owner.name}" — nothing was left broken.`);
+          } catch (restoreError) {
+            console.log(`  !! THE RESTORE ALSO FAILED: ${restoreError.message}`);
+            console.log(`  !! ${HOST} is attached to NOTHING right now. Re-run this`);
+            console.log(`  !! workflow with restore_to_pages=${owner.name}.`);
+          }
         } else {
-          await cf(`/zones/${zone.id}/workers/routes`, {
-            method: 'POST',
-            body: JSON.stringify({ pattern, script: WORKER }),
-          });
-          console.log(`  ✓ route ${pattern} → "${WORKER}"`);
+          console.log(`  !! this run did not release ${HOST} from anywhere, so there is`);
+          console.log(`  !! nothing to undo — but it is not attached to anything either.`);
         }
+        throw routeError;
       }
     }
   }
