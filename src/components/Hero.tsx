@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useRef } from 'react';
+import { useMediaQuery } from '../lib/useMediaQuery';
 import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
@@ -54,6 +55,10 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
      decoration never queues ahead of the stylesheet — and the poster it
      replaces is its own first frame, so the swap is invisible. */
   const showVideo = useDeferredVideo(Boolean(backgroundVideo));
+  /* Which of the two hero windows is actually on screen. `hidden lg:block`
+     and `lg:hidden` take care of what is SEEN; this takes care of what is
+     FETCHED, which CSS cannot. */
+  const isWideHero = useMediaQuery('(min-width: 1024px)');
   const { brandSettings } = useBrand();
   const budget = useMotionBudget();
   const reduced = useReducedMotion();
@@ -217,7 +222,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             <div className="relative mx-auto max-w-md -rotate-2">
               <div className="rounded-[30px_22px_28px_24px] border border-[rgba(150,112,31,0.45)] bg-canvas-lift p-4 shadow-oil-lg">
                 <div className="story-media-frame">
-                  {backgroundVideo && showVideo ? (
+                  {backgroundVideo && showVideo && isWideHero ? (
                     <video
                       className="photo-pop h-64 w-full object-cover"
                       src={backgroundVideo}
@@ -278,7 +283,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
       {/* Mobile souvenir: same object, stacked under the copy. */}
       <div className="section-shell relative z-10 pb-14 lg:hidden">
         <div className="mx-auto max-w-sm -rotate-1 rounded-[26px_18px_24px_20px] border border-[rgba(150,112,31,0.4)] bg-canvas-lift p-3 shadow-oil">
-          {backgroundVideo && showVideo ? (
+          {backgroundVideo && showVideo && !isWideHero ? (
             <video
               className="photo-pop h-44 w-full rounded-[18px] object-cover"
               src={backgroundVideo}
