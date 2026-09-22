@@ -1,4 +1,5 @@
 import React from 'react';
+import { useMediaQuery } from '../lib/useMediaQuery';
 import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
@@ -29,6 +30,10 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
      decoration never queues ahead of the stylesheet — and the poster it
      replaces is its own first frame, so the swap is invisible. */
   const showVideo = useDeferredVideo(Boolean(backgroundVideo));
+  /* Which of the two hero windows is actually on screen. `hidden lg:block`
+     and `lg:hidden` take care of what is SEEN; this takes care of what is
+     FETCHED, which CSS cannot. */
+  const isWideHero = useMediaQuery('(min-width: 1024px)');
   const { brandSettings } = useBrand();
 
   const desktopImage = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
@@ -129,7 +134,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             <div className="relative mx-auto max-w-md -rotate-2">
               <div className="rounded-[28px] border-[3px] border-ink bg-paper p-4 shadow-ink-xl">
                 <div className="overflow-hidden rounded-[18px] border-[3px] border-ink">
-                  {backgroundVideo && showVideo ? (
+                  {backgroundVideo && showVideo && isWideHero ? (
                     <video
                       className="h-64 w-full object-cover photo-pop"
                       src={backgroundVideo}
@@ -189,7 +194,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
       {/* Mobile postcard: same souvenir, stacked under the copy. */}
       <div className="section-shell relative z-10 pb-12 lg:hidden">
         <div className="mx-auto max-w-sm -rotate-1 rounded-[24px] border-[3px] border-ink bg-paper p-3 shadow-ink-lg">
-          {backgroundVideo && showVideo ? (
+          {backgroundVideo && showVideo && !isWideHero ? (
             <video
               className="h-44 w-full rounded-[14px] border-[3px] border-ink object-cover photo-pop"
               src={backgroundVideo}
