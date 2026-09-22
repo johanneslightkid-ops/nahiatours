@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRichDisplay } from '../lib/useMediaQuery';
+import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { HiArrowDown, HiCheck, HiStar, HiShieldCheck } from 'react-icons/hi';
@@ -29,7 +29,11 @@ interface HeroProps {
  * And of everything on screen, only the booking button is warm.
  */
 const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, backgroundVideo }) => {
-  const richDisplay = useRichDisplay();
+  /* The footage plays on every screen, phones included. It is mounted once
+     the browser is idle rather than in the first pass, so a megabyte of
+     decoration never queues ahead of the stylesheet — and the poster it
+     replaces is its own first frame, so the swap is invisible. */
+  const showVideo = useDeferredVideo(Boolean(backgroundVideo));
   const { brandSettings } = useBrand();
 
   const desktopImage = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
@@ -153,7 +157,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
                   fetched. So it is not rendered at all below a large screen
                   with a mouse, and the poster it would have shown becomes the
                   picture. */}
-              {backgroundVideo && richDisplay ? (
+              {backgroundVideo && showVideo ? (
                 <video
                   className="photo-pop h-full w-full object-cover"
                   src={backgroundVideo}
@@ -217,13 +221,26 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
       {/* Mobile window: the same picture, full width. */}
       <div className="section-shell relative z-10 pb-12 lg:hidden">
         <div className="photo-frame group relative aspect-[4/3]">
-          <img
-            src={mobileImage}
-            decoding="async"
-            alt=""
-            aria-hidden="true"
-            className="photo-pop h-full w-full object-cover"
-          />
+          {backgroundVideo && showVideo ? (
+            <video
+              className="photo-pop h-full w-full object-cover"
+              src={backgroundVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster={mobileImage}
+              aria-hidden="true"
+            />
+          ) : (
+            <img
+              src={mobileImage}
+              decoding="async"
+              alt=""
+              aria-hidden="true"
+              className="photo-pop h-full w-full object-cover"
+            />
+          )}
           <Caustics soft className="z-10" />
           <p className="absolute inset-x-0 bottom-0 z-20 p-4 text-center font-accent text-xl text-white drop-shadow-md">
             Greetings from Bávaro
