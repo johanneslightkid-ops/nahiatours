@@ -13,7 +13,16 @@
 # now Workers-shaped. worker/index.ts dispatches to the same functions/*
 # handlers the Pages deployment used, so no endpoint logic is duplicated.
 
-name = "nahiatours"
+# BÁVARO TOURS deploys as its own Worker. `wrangler deploy` addresses a Worker
+# BY NAME, so this line is the only thing standing between this branch and
+# somebody else's live site — it must never be edited to match another branch.
+#
+# NOTE ON THE DOMAIN. bavaro.tours is not attached to this Worker. It belongs
+# to a Cloudflare PAGES project called `mariotours`, built from a different
+# repository (joehannes-fun/mariotours). Pointing the domain here means
+# releasing it there first, which is a dashboard decision about somebody's
+# live site rather than something a deploy should do on its own.
+name = "bavarotours"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 
@@ -102,8 +111,8 @@ binding = "AI"
 # serving another's pages there is otherwise nothing to read: these two lines
 # make a wrongly-routed domain say so in one request. They are labels, not
 # settings — nothing reads them but the health endpoint.
-SITE = "nahiatours"
-SITE_BRANCH = "main"
+SITE = "bavarotours"
+SITE_BRANCH = "bavaro-tours"
 
 ADMIN_PASSWORD = "admin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"

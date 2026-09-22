@@ -43,14 +43,14 @@ const Header: React.FC = () => {
 
   return (
     <header className="lobster-header sticky top-0 z-50 overflow-visible">
-      <div className="section-shell flex items-center justify-between py-3.5 pl-[10.5rem] sm:pl-[11.25rem] lg:pl-8">
+      <div className="section-shell flex items-center justify-between py-3.5 pl-[5rem] sm:pl-[11.25rem] lg:pl-8">
         <Link
           to="/#top"
           className="group flex items-center gap-3"
           onClick={() => playClickFx()}
           onMouseEnter={() => playHoverFx()}
         >
-          <div className="menu-logo-icon fixed left-4 top-2 flex h-[9.1875rem] w-[9.1875rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
+          <div className="menu-logo-icon fixed left-3 top-1.5 flex h-16 w-16 items-center justify-center overflow-hidden border-[3px] border-ink bg-mango-light shadow-ink transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105 sm:left-6 sm:top-2 sm:h-[9.1875rem] sm:w-[9.1875rem] lg:left-[max(2rem,calc((100vw-80rem)/2+2rem))]">
             {brandSettings.brandicon ? (
               <img src={brandSettings.brandicon} alt="Logo" className="h-full w-full object-cover" />
             ) : (

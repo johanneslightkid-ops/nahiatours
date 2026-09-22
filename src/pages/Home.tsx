@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CarnivalTicker from '../components/ui/CarnivalTicker';
 import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import Hero from '../components/Hero';
@@ -79,6 +80,23 @@ const Home: React.FC = () => {
 
       {/* Hero Section */}
       <Hero backgroundImage={HERO_BACKGROUND_IMAGE} backgroundVideo={HERO_BACKGROUND_VIDEO} />
+
+      {/* The banner over the stand. Its phrases are what this operator sells,
+          said the way a pregonero would say it — short, in both languages,
+          and without a single claim that is not already on the site. */}
+      <CarnivalTicker
+        className="relative z-20"
+        phrases={[
+          'Saona',
+          'Catalina',
+          'Bávaro',
+          'Hoyo Azul',
+          'Montaña Redonda',
+          'Isla Saona',
+          'Punta Cana',
+          'Macao',
+        ]}
+      />
 
       {/* Hard facts, straight from the live catalogue */}
       <QuickFacts />

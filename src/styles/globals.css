@@ -44,6 +44,44 @@
   --blood-dark: #7a0a14;
   --oxblood: #560711;
 
+  /* ══════════════════════════════════════════════════════════════════════
+     THE CARNIVAL PLATES
+     ────────────────────────────────────────────────────────────────────────
+     A poster like this is printed in passes, and each of these is one pass:
+     a flat plate that goes down whole. They are SVG data URIs rather than
+     files because every one of them is a handful of paths — as a request
+     each would cost more in latency than it does in bytes, and as a
+     background-image the browser rasterises it once and composites it
+     forever after.
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* GOLD. The sun as a carnival mask: rays cut with a knife, not drawn. */
+  --gold: #f2a413;
+  --gold-light: #ffd24a;
+  --gold-dark: #b36f00;
+
+  /* Adinkra-derived stamp field. Not any single symbol — a repeating mark in
+     that family, used the way a textile uses one: quietly, everywhere, as
+     ground rather than as ornament. */
+  --stamp-field: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='none' stroke='%2314100E' stroke-width='1.1' opacity='0.14'%3E%3Cpath d='M12 4 L12 20 M4 12 L20 12 M7 7 L17 17 M17 7 L7 17'/%3E%3Ccircle cx='36' cy='12' r='5'/%3E%3Cpath d='M36 4 L36 20'/%3E%3Cpath d='M28 36 L36 28 L44 36 L36 44 Z'/%3E%3Cpath d='M4 36 Q12 28 20 36 Q12 44 4 36 Z'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* Mola stripe. Appliqué worked in bands, which is what a Kuna panel and a
+     drum skin and a beach towel all have in common. */
+  --mola-stripe: repeating-linear-gradient(
+    90deg,
+    rgba(193, 18, 31, 0.9) 0 14px,
+    rgba(242, 164, 19, 0.9) 14px 28px,
+    rgba(46, 125, 79, 0.9) 28px 42px,
+    rgba(20, 16, 14, 0.9) 42px 56px
+  );
+
+  /* Petroglyph scratch — the Taíno line, which is always a single stroke
+     that doubles back on itself. Used as a rule under headings. */
+  --petroglyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 12' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q12 1 24 7 T48 7 T72 7 T96 7 T120 7 T144 7 T168 7 T192 7 T216 7 T240 7' fill='none' stroke='%2314100E' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+
+  /* Halftone. The dot a cheap press leaves, big enough to see. */
+  --halftone: radial-gradient(circle at 50% 50%, rgba(20, 16, 14, 0.22) 1.1px, transparent 1.5px);
+
   /* Legacy token names, remapped. Anything in the markup still reaching for
      a tropical hue lands on ink, bone or red. */
   --mango: var(--blood);
@@ -51,10 +89,10 @@
   --mango-dark: var(--blood-dark);
   --hibiscus: #8e0f1e;
   --hibiscus-light: var(--blood-light);
-  --lagoon: #2e7d4f;
-  --lagoon-light: #a9c9a0;
-  --lagoon-dark: #14532D;
-  --sky: #16787a;
+  --lagoon: #16787a;
+  --lagoon-light: #8fc9c2;
+  --lagoon-dark: #0b4548;
+  --sky: #8a8076;
   --sky-light: #bfd9d4;
   --sky-dark: #0b4548;
   --jungle: #3e4a38;
@@ -247,22 +285,24 @@ a:hover {
    `box-decoration-break: clone`, so a wrapping headline gets one stroke per
    line rather than a single smear. The mask ragged-edges it. */
 .marker-highlight {
-  display: inline;
-  padding: 0 0.14em;
-  color: var(--bone);
-  background-image: linear-gradient(
-    to bottom,
-    transparent 4%,
-    var(--blood) 4%,
-    var(--blood) 96%,
-    transparent 96%
-  );
-  -webkit-box-decoration-break: clone;
+  /* THE GOLD SLAB. The display face sits on a flat gilt bar knocked out of
+     square, carrying ink — never white, because ink on this gold is 9:1 and
+     white on it is 2:1. It is drawn as a background rather than a box so it
+     wraps line by line like a highlighter, and `box-decoration-break: clone`
+     keeps the padding on every line instead of only the first and last. */
+  background-image: linear-gradient(var(--gold), var(--gold));
+  background-repeat: no-repeat;
+  background-size: 100% 0.86em;
+  background-position: 0 0.3em;
   box-decoration-break: clone;
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100' preserveAspectRatio='none'%3E%3Cpath d='M2,14 C60,4 120,18 190,8 C260,-2 330,16 398,6 L399,92 C330,100 268,84 196,94 C124,104 62,88 3,96 Z' fill='%23000'/%3E%3C/svg%3E");
-  -webkit-mask-size: 100% 100%;
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100' preserveAspectRatio='none'%3E%3Cpath d='M2,14 C60,4 120,18 190,8 C260,-2 330,16 398,6 L399,92 C330,100 268,84 196,94 C124,104 62,88 3,96 Z' fill='%23000'/%3E%3C/svg%3E");
-  mask-size: 100% 100%;
+  -webkit-box-decoration-break: clone;
+  padding: 0 0.16em;
+  color: var(--ink);
+  /* Out of register: a red ghost one way, a green ghost the other. Two
+     static text-shadows — the glyphs rasterise once and never again. */
+  text-shadow:
+    0.045em 0.035em 0 rgba(193, 18, 31, 0.9),
+    -0.04em -0.028em 0 rgba(46, 125, 79, 0.65);
 }
 
 /* A dry-brush swipe dragged under a title. */
@@ -903,7 +943,11 @@ select:focus {
   right: 0;
   bottom: -6px;
   height: 6px;
-  background-image: repeating-linear-gradient(45deg, var(--blood) 0 8px, var(--ink) 8px 16px);
+  /* Appliqué, not hazard tape. Four flat bands in the carnival order —
+     red, gold, green, ink — which is the mola panel, the gagá drum wrap and
+     the ribbon on a Cojuelo costume all at once. */
+  background-image: var(--mola-stripe);
+  background-size: 56px 100%;
 }
 
 .lobster-header h1 {
@@ -1455,13 +1499,31 @@ select:focus {
 }
 
 /* The booking button pulses its red plate, not a glow. */
-@keyframes fabPulse {
-  0%, 100% { box-shadow: 5px 5px 0 0 var(--ink); }
-  50% { box-shadow: 5px 5px 0 0 var(--ink), 0 0 0 8px rgba(193, 18, 31, 0.28); }
+/*
+ * The booking button breathed by animating `box-shadow`, which is redrawn
+ * every frame on a control that is on screen for the whole visit. The shadow
+ * is static now and the breathing is a ring that scales and fades — transform
+ * and opacity, both handled by the compositor.
+ */
+@keyframes fabRing {
+  0%, 100% { transform: scale(0.9); opacity: 0; }
+  50% { transform: scale(1); opacity: 1; }
 }
 
 .animate-fab-glow-wave {
-  animation: fabPulse 3s steps(12, end) infinite;
+  
+}
+
+/* No `position` here: the button is already fixed, and setting one would
+   pull it out of the corner it is pinned to. */
+.animate-fab-glow-wave::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 0 0 10px rgba(193, 18, 31, 0.28);
+  pointer-events: none;
+  animation: fabRing 3s steps(12, end) infinite;
+  will-change: transform, opacity;
 }
 
 /* Fronds became linework, so they no longer sway — they hang. Kept as a very
@@ -1534,5 +1596,242 @@ select:focus {
     transition-duration: 0.001ms !important;
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BÁVARO — THE CARNIVAL PRESS LAYER
+   ──────────────────────────────────────────────────────────────────────────
+   Everything below is additive: it sits on top of the trash-polka sheet this
+   branch started from and gives it the Afro-Latin carnival voice. Nothing
+   here repaints. Every animated property is `transform` or `opacity`, which
+   is the only reason a page this loud can hold sixty frames on a phone.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── OUT OF REGISTER ───────────────────────────────────────────────────────
+   A three-colour press that is slightly misaligned prints a red ghost to one
+   side and a green ghost to the other. It is the single most recognisable
+   thing about cheap carnival printing, it costs two text-shadows, and it is
+   completely static — the browser rasterises the glyphs once.
+
+   It goes on DISPLAY type only. On body copy a misregistered edge is not a
+   style, it is an accessibility problem. */
+.misregister {
+  text-shadow:
+    0.055em 0.045em 0 rgba(193, 18, 31, 0.85),
+    -0.05em -0.035em 0 rgba(46, 125, 79, 0.7);
+}
+
+.misregister-gold {
+  text-shadow:
+    0.05em 0.04em 0 rgba(242, 164, 19, 0.95),
+    -0.045em -0.03em 0 rgba(193, 18, 31, 0.6);
+}
+
+/* ── THE GOLD SLAB ─────────────────────────────────────────────────────────
+   Display type sits ON a flat gold bar, knocked slightly out of square. Ink
+   on gold is 9:1; white on gold is 2:1, so the text colour is not a choice. */
+.slab-gold,
+.slab-red,
+.slab-ink {
+  display: inline-block;
+  padding: 0.08em 0.34em 0.16em;
+  transform: rotate(-1.15deg);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.slab-gold {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.slab-red {
+  background: var(--blood);
+  color: #fff;
+}
+
+.slab-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* Alternating tilt, so a stack of slabs reads as pasted up by hand rather
+   than as a list with a rotation applied to it. */
+.slab-gold:nth-of-type(even),
+.slab-red:nth-of-type(even),
+.slab-ink:nth-of-type(even) {
+  transform: rotate(0.9deg);
+}
+
+/* ── STAMPS AND PAPERWORK ──────────────────────────────────────────────────
+   The documentary layer: serials, coordinates, rubber stamps. It is what
+   makes a collage look found rather than composed. */
+.stamp {
+  font-family: 'Special Elite', ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+}
+
+.stamp-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.7rem;
+  border: 2px solid currentColor;
+  transform: rotate(-2.4deg);
+  opacity: 0.82;
+}
+
+.stamp-box--red {
+  color: var(--blood);
+  border-style: double;
+  border-width: 4px;
+}
+
+/* ── THE PLATES AS SURFACES ────────────────────────────────────────────────*/
+.field-stamp {
+  background-image: var(--stamp-field);
+  background-size: 48px 48px;
+}
+
+.field-halftone {
+  background-image: var(--halftone);
+  background-size: 7px 7px;
+}
+
+/* A rule that is a scratched line rather than a border. */
+.rule-petroglyph {
+  height: 12px;
+  background: var(--petroglyph) repeat-x center / 240px 12px;
+  opacity: 0.55;
+}
+
+/* The banded appliqué, used as a thin edge on bands and cards. */
+.edge-mola {
+  background: var(--mola-stripe);
+  background-size: 56px 100%;
+}
+
+/* ── MOTION ────────────────────────────────────────────────────────────────
+   Heavy, and free. Each of these moves a layer the compositor already owns.
+   Nothing animates a colour, a shadow, a size or a position. */
+
+/* The ticker: a carnival banner pulled across the page. The track holds the
+   content twice and slides exactly half its width, so the loop has no seam. */
+@keyframes bannerPull {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.banner-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: bannerPull 32s linear infinite;
+  will-change: transform;
+}
+
+.banner-track:hover {
+  animation-play-state: paused;
+}
+
+/* The sun turns. One element, one transform, forever. */
+@keyframes sunTurn {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin-sun {
+  animation: sunTurn 70s linear infinite;
+  will-change: transform;
+}
+
+/* A drum hit: a quick swell on the beat, not a pulse. Scale only. */
+@keyframes drumHit {
+  0%, 62%, 100% { transform: scale(1); }
+  68% { transform: scale(1.055); }
+  74% { transform: scale(0.985); }
+  80% { transform: scale(1.02); }
+}
+
+.beat-drum {
+  animation: drumHit 2.6s cubic-bezier(0.2, 0.8, 0.3, 1) infinite;
+  will-change: transform;
+}
+
+/* Paper caught by the wind — a torn corner lifting. Rotation about a corner
+   so it hinges rather than wobbles. */
+@keyframes cornerLift {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50% { transform: rotate(1.1deg); }
+}
+
+.lift-corner {
+  transform-origin: 12% 92%;
+  animation: cornerLift 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* The press slipping a frame: the misregistered ghosts jump apart and snap
+   back. Opacity and transform on two pseudo-layers, never the text-shadow —
+   animating a shadow would repaint the glyphs every frame. */
+@keyframes plateSlip {
+  0%, 92%, 100% { transform: translate3d(0, 0, 0); opacity: 0; }
+  94% { transform: translate3d(-3px, 1px, 0); opacity: 0.55; }
+  97% { transform: translate3d(2px, -1px, 0); opacity: 0.4; }
+}
+
+.plate-slip {
+  position: relative;
+  isolation: isolate;
+}
+
+.plate-slip::after {
+  content: attr(data-echo);
+  position: absolute;
+  inset: 0;
+  color: var(--blood);
+  pointer-events: none;
+  animation: plateSlip 7s steps(1, end) infinite;
+  will-change: transform, opacity;
+  z-index: -1;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   THE PHONE BUDGET
+   ──────────────────────────────────────────────────────────────────────────
+   Composited is cheap, not free: every promoted layer is a texture the GPU
+   holds and re-composites, and a mid-range phone is doing that on a battery.
+   The loud things stay — the slabs, the misregistration, the stamps, all of
+   which are static — and the things that MOVE are thinned out.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .plate-slip::after,
+  .lift-corner,
+  .beat-drum {
+    animation: none;
+    will-change: auto;
+  }
+
+  /* The ticker survives, because it is the one piece of motion that is doing
+     a job — it is carrying words — but slower, so it is readable in a glance
+     rather than demanding to be followed. */
+  .banner-track {
+    animation-duration: 46s;
+  }
+
+  /* The sun keeps turning; one composited rotation is not what costs. */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner-track,
+  .spin-sun,
+  .beat-drum,
+  .lift-corner,
+  .plate-slip::after {
+    animation: none !important;
+    will-change: auto;
   }
 }

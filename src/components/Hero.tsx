@@ -1,11 +1,13 @@
 import React from 'react';
+import { useMediaQuery } from '../lib/useMediaQuery';
+import { AdinkraStamp, Barcode, CojueloMask, GagaDrum, StencilPalm } from './ui/CarnivalMarks';
 import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { HiArrowDown, HiCheck, HiStar, HiShieldCheck } from 'react-icons/hi';
 import { motion } from 'framer-motion';
 import { useBrand } from '../contexts/BrandContext';
-import { PalmTree, Toucan, Starfish, Hibiscus, WaveBand } from './ui/Illustrations';
+import { Starfish, WaveBand } from './ui/Illustrations';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
 
 interface HeroProps {
@@ -29,6 +31,10 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
      decoration never queues ahead of the stylesheet — and the poster it
      replaces is its own first frame, so the swap is invisible. */
   const showVideo = useDeferredVideo(Boolean(backgroundVideo));
+  /* Which of the two hero windows is actually on screen. `hidden lg:block`
+     and `lg:hidden` take care of what is SEEN; this takes care of what is
+     FETCHED, which CSS cannot. */
+  const isWideHero = useMediaQuery('(min-width: 1024px)');
   const { brandSettings } = useBrand();
 
   const desktopImage = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
@@ -43,10 +49,15 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
   return (
     <section className="relative isolate z-0 w-full overflow-hidden">
       {/* Scenery. Everything here is decorative and sits behind the copy. */}
-      <PalmTree className="pointer-events-none absolute -left-10 bottom-0 h-64 w-48 opacity-95 sm:h-80 sm:w-60 lg:h-[26rem] lg:w-80" />
-      <Toucan className="animate-bob pointer-events-none absolute right-[40%] top-6 hidden h-20 w-24 xl:block" />
+      {/* Cut, not drawn — five strokes and a trunk, in the land green. */}
+      <StencilPalm className="pointer-events-none absolute -left-12 bottom-0 h-64 w-48 text-jungle-dark/30 sm:h-72 sm:w-52 lg:h-[22rem] lg:w-64" />
+      {/* The Diablo Cojuelo, pinned up where the toucan used to float. A
+          carnival mask is the one image that carries both halves of this
+          brief — Afro-Latin and Caribbean — in a single silhouette. */}
+      <CojueloMask className="lift-corner pointer-events-none absolute right-[38%] top-4 hidden h-24 w-24 text-ink/90 xl:block" />
       <Starfish className="pointer-events-none absolute bottom-16 right-[8%] hidden h-16 w-16 rotate-12 lg:block" />
-      <Hibiscus className="animate-sway pointer-events-none absolute left-[42%] top-10 hidden h-16 w-16 xl:block" />
+      {/* The gagá drum, beating. Scale only, so it costs a composite. */}
+      <GagaDrum className="beat-drum pointer-events-none absolute left-[42%] top-8 hidden h-20 w-16 text-mango xl:block" />
 
       <div className="section-shell relative z-10 flex min-h-[calc(100vh-6rem)] items-center py-16 lg:py-24">
         <div className="grid w-full gap-12 lg:grid-cols-12 lg:items-center">
@@ -57,18 +68,25 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-7"
           >
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border-[2.5px] border-ink bg-lagoon-light px-4 py-1.5 shadow-ink-sm">
-              <span className="h-2.5 w-2.5 rounded-full bg-jungle" />
-              <span className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink">
-                Saona · Catalina · Bávaro Coast
+            {/* A stamped docket rather than a pill — this design has no
+                rounded shapes, and the typewriter face is the paperwork
+                layer that makes a collage read as found. */}
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <span className="stamp-box stamp-box--red">
+                <AdinkraStamp className="h-3.5 w-3.5" />
+                <span className="stamp !text-[0.66rem] !text-mango">
+                  Saona · Catalina · Bávaro
+                </span>
               </span>
+              <span className="stamp hidden sm:inline">18°41&apos;N / 68°26&apos;W</span>
+              <Barcode className="hidden h-5 w-16 text-ink/70 sm:block" />
             </div>
 
             <div className="mb-2">
-              <span className="hand-note">¡Hola, traveller!</span>
+              <span className="hand-note text-mango">¡Hola, traveller!</span>
             </div>
 
-            <h1 className="mb-6 font-display text-5xl font-extrabold leading-[1.02] text-ink sm:text-6xl lg:text-7xl">
+            <h1 className="mb-6 font-display text-5xl uppercase leading-[0.94] tracking-[-0.01em] text-ink sm:text-6xl lg:text-[5.2rem]">
               <span className="marker-highlight">
                 <FormattedMessage id="hero.title" values={{ brand: brandSettings.brandName }} />
               </span>
@@ -129,7 +147,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             <div className="relative mx-auto max-w-md -rotate-2">
               <div className="rounded-[28px] border-[3px] border-ink bg-paper p-4 shadow-ink-xl">
                 <div className="overflow-hidden rounded-[18px] border-[3px] border-ink">
-                  {backgroundVideo && showVideo ? (
+                  {backgroundVideo && showVideo && isWideHero ? (
                     <video
                       className="h-64 w-full object-cover photo-pop"
                       src={backgroundVideo}
@@ -189,7 +207,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
       {/* Mobile postcard: same souvenir, stacked under the copy. */}
       <div className="section-shell relative z-10 pb-12 lg:hidden">
         <div className="mx-auto max-w-sm -rotate-1 rounded-[24px] border-[3px] border-ink bg-paper p-3 shadow-ink-lg">
-          {backgroundVideo && showVideo ? (
+          {backgroundVideo && showVideo && !isWideHero ? (
             <video
               className="h-44 w-full rounded-[14px] border-[3px] border-ink object-cover photo-pop"
               src={backgroundVideo}
