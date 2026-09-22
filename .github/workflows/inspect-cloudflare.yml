@@ -24,6 +24,13 @@ on:
         required: false
         type: boolean
         default: false
+      kv_titles:
+        description: >-
+          Comma-separated KV namespace titles to inventory — prints each
+          namespace's key NAMES (never a value). Use it to see what a
+          namespace holds before binding a site to it.
+        required: false
+        default: ''
 
 jobs:
   inspect:
@@ -44,3 +51,12 @@ jobs:
       - name: Read the deployment history
         if: inputs.lookup_host == ''
         run: node scripts/worker-deployments.mjs
+
+      # Which keys a namespace actually holds. Binding a site to somebody
+      # else's namespace is a decision that should be made with the key list
+      # in front of you, not after the site is live on it.
+      - name: Inventory the KV namespaces
+        if: inputs.kv_titles != ''
+        run: node scripts/kv-inventory.mjs
+        env:
+          KV_INVENTORY_TITLES: ${{ inputs.kv_titles }}
