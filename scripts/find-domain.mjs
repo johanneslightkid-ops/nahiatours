@@ -64,6 +64,35 @@ const main = async () => {
   }
   if (!pages?.length) console.log('  (none)');
 
+  // ── The matching Pages project in full: what it is bound to.
+  //
+  // "Keep the existing data" is only actionable if you know WHICH namespace
+  // holds it, and a Pages project keeps its bindings in its deployment
+  // configs rather than anywhere this repository can see.
+  const owner = (pages || []).find((p) =>
+    (p.domains || []).some((d) => d === HOST || HOST.endsWith(`.${d}`))
+  );
+  if (owner) {
+    console.log(`\n── ${owner.name}: what it is bound to`);
+    const full = await try_('project', () =>
+      cf(`/accounts/${accountId}/pages/projects/${owner.name}`)
+    );
+    for (const env of ['production', 'preview']) {
+      const config = full?.deployment_configs?.[env];
+      if (!config) continue;
+      const kv = Object.entries(config.kv_namespaces || {}).map(
+        ([binding, v]) => `${binding}=${v?.namespace_id}`
+      );
+      const vars = Object.keys(config.env_vars || {});
+      console.log(`  ${env}:`);
+      console.log(`    kv:   ${kv.join(', ') || '(none)'}`);
+      // Names only. A Pages env var can hold a credential.
+      console.log(`    vars: ${vars.join(', ') || '(none)'}`);
+      console.log(`    build: ${full?.build_config?.build_command || '(none)'} -> ${full?.build_config?.destination_dir || '?'}`);
+    }
+    console.log(`  latest deployment: ${full?.latest_deployment?.created_on || '?'} from ${full?.latest_deployment?.deployment_trigger?.metadata?.branch || '?'}`);
+  }
+
   // ── Zones on the account, and any Worker routes defined on the matching one.
   console.log('\n── Zones and Worker routes');
   const zones = await try_('zones', () => cf('/zones?per_page=100'));
