@@ -39,13 +39,33 @@ const main = async () => {
     process.env.CLOUDFLARE_ACCOUNT_ID ||
     (await cf('/accounts?per_page=50').then((a) => a[0]?.id));
 
-  const scripts = (process.env.WORKER_NAMES || 'nahiatours,beautifull,transporturist,ldvip,amigotours')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  // `WORKER_NAMES=*` asks the account what it has, rather than being told.
+  // A domain can be attached to a Worker this repository has never heard of —
+  // a fork, an older project — and then no list written here would find it.
+  let scripts;
+  if ((process.env.WORKER_NAMES || '').trim() === '*') {
+    const all = await cf(`/accounts/${accountId}/workers/scripts`);
+    scripts = (all || []).map((w) => w.id).sort();
+    console.log(`[deployments] ${scripts.length} Worker(s) on this account`);
+  } else {
+    scripts = (process.env.WORKER_NAMES || 'nahiatours,beautifull,transporturist,ldvip,amigotours')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
 
   for (const name of scripts) {
     console.log(`\n═══ ${name} ═══  (newest first)`);
+    if (process.env.DOMAINS_ONLY === 'true') {
+      try {
+        const domains = await cf(`/accounts/${accountId}/workers/domains?service=${name}`);
+        const names = (domains || []).map((d) => d.hostname);
+        console.log(`  custom domains: ${names.length ? names.join(', ') : '(none)'}`);
+      } catch (error) {
+        console.log(`  custom domains: unreadable (${error.message})`);
+      }
+      continue;
+    }
     try {
       const result = await cf(`/accounts/${accountId}/workers/scripts/${name}/deployments`);
       // Cloudflare returns these newest-first, but do not rely on it: sort by

@@ -12,9 +12,14 @@ on:
   workflow_dispatch:
     inputs:
       workers:
-        description: 'Comma-separated Worker names to inspect.'
+        description: 'Comma-separated Worker names, or * for every Worker on the account.'
         required: false
         default: 'nahiatours,beautifull,transporturist,ldvip,amigotours'
+      domains_only:
+        description: 'Skip the deployment history and list only which Worker owns which hostname.'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   inspect:
@@ -23,6 +28,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
       WORKER_NAMES: ${{ inputs.workers }}
+      DOMAINS_ONLY: ${{ inputs.domains_only == true && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
       - name: Read the deployment history
