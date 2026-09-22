@@ -79,9 +79,33 @@ const main = async () => {
 
   if (RESTORE_TO) {
     console.log(`[move] restoring ${HOST} to the Pages project "${RESTORE_TO}"\n`);
-    await giveBackToPages(RESTORE_TO);
-    const back = await cf(`/accounts/${accountId}/pages/projects/${RESTORE_TO}`);
-    console.log(`  ✓ "${RESTORE_TO}" domains: ${(back.domains || []).join(', ') || '(none)'}`);
+    try {
+      await giveBackToPages(RESTORE_TO);
+      console.log('  · add accepted');
+    } catch (error) {
+      // Already there is success, not failure.
+      console.log(`  · add returned: ${error.message}`);
+    }
+
+    // Read the DOMAINS endpoint, not the project's `domains` array. That
+    // array lists only domains Cloudflare considers live; one still
+    // verifying or still waiting on a certificate is simply absent from it,
+    // which reads identically to "the add did nothing". This endpoint
+    // returns every domain with its status, so the difference is visible.
+    const domains = await cf(`/accounts/${accountId}/pages/projects/${RESTORE_TO}/domains`);
+    for (const d of domains || []) {
+      const flags = [d.status, d.certificate_authority, d.validation_data?.status]
+        .filter(Boolean)
+        .join(' · ');
+      console.log(`  ${d.name === HOST ? '→' : ' '} ${d.name.padEnd(28)} ${flags}`);
+    }
+    if (!(domains || []).some((d) => d.name === HOST)) {
+      throw new Error(
+        `${HOST} is still not on "${RESTORE_TO}" after the add. It is attached to ` +
+          'nothing right now — add it in the dashboard under Workers & Pages → ' +
+          `${RESTORE_TO} → Custom domains.`
+      );
+    }
     console.log(`\n  Cloudflare re-issues the certificate; give it a minute.`);
     return;
   }
