@@ -15,6 +15,10 @@ on:
         description: 'Comma-separated Worker names, or * for every Worker on the account.'
         required: false
         default: 'nahiatours,beautifull,transporturist,ldvip,amigotours'
+      lookup_host:
+        description: 'A hostname to trace — checks Pages projects, zone routes and Workers, and lists the KV namespaces.'
+        required: false
+        default: ''
       domains_only:
         description: 'Skip the deployment history and list only which Worker owns which hostname.'
         required: false
@@ -31,5 +35,12 @@ jobs:
       DOMAINS_ONLY: ${{ inputs.domains_only == true && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
+      - name: Trace a hostname
+        if: inputs.lookup_host != ''
+        run: node scripts/find-domain.mjs
+        env:
+          LOOKUP_HOST: ${{ inputs.lookup_host }}
+
       - name: Read the deployment history
+        if: inputs.lookup_host == ''
         run: node scripts/worker-deployments.mjs
