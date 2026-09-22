@@ -89,14 +89,23 @@ const main = async () => {
     console.log(`\n  no Pages project currently claims ${HOST} — nothing to release`);
   }
 
-  // ── 3. Attach it to the Worker.
-  const existing = await cf(`/accounts/${accountId}/workers/domains?hostname=${HOST}`).catch(
-    () => []
-  );
-  if ((existing || []).some((d) => d.hostname === HOST && d.service === WORKER)) {
-    console.log(`  ✓ already attached to "${WORKER}"`);
-  } else {
-    await cf(`/accounts/${accountId}/workers/domains`, {
+  // ── 3. Clear the address record the old owner left behind.
+  //
+  //       Releasing a hostname from Pages does NOT remove the DNS record Pages
+  //       created for it. Cloudflare then refuses to attach the hostname to a
+  //       Worker — "already has externally managed DNS records", error 100117 —
+  //       because a Workers custom domain manages the record itself and will
+  //       not fight one it did not write.
+  //
+  //       So the leftover has to go, and it is the record that still points at
+  //       the site we have just disconnected: leaving it is not "safe", it is
+  //       the domain resolving to a Pages project that no longer answers for
+  //       it. Only A, AAAA and CNAME for this exact name are touched. MX, TXT,
+  //       SPF, DKIM, CAA and every record for any other name are left alone —
+  //       mail and verification must not be collateral damage of a site move.
+  const ADDRESS_TYPES = new Set(['A', 'AAAA', 'CNAME']);
+  const attach = () =>
+    cf(`/accounts/${accountId}/workers/domains`, {
       method: 'PUT',
       body: JSON.stringify({
         zone_id: zone.id,
@@ -105,10 +114,53 @@ const main = async () => {
         environment: 'production',
       }),
     });
-    console.log(`  ✓ attached to Worker "${WORKER}"`);
+
+  const clearAddressRecords = async () => {
+    const records = await cf(
+      `/zones/${zone.id}/dns_records?name=${encodeURIComponent(HOST)}&per_page=100`
+    );
+    const stale = (records || []).filter(
+      (r) => r.name === HOST && ADDRESS_TYPES.has(r.type)
+    );
+    const kept = (records || []).filter((r) => !ADDRESS_TYPES.has(r.type));
+    if (kept.length) {
+      console.log(
+        `  · leaving ${kept.length} non-address record(s) alone: ` +
+          kept.map((r) => r.type).join(', ')
+      );
+    }
+    if (!stale.length) {
+      console.log('  · no address record on this hostname to clear');
+      return 0;
+    }
+    for (const record of stale) {
+      console.log(`  · removing ${record.type} ${record.name} → ${record.content}`);
+      await cf(`/zones/${zone.id}/dns_records/${record.id}`, { method: 'DELETE' });
+    }
+    return stale.length;
+  };
+
+  // ── 4. Attach it to the Worker.
+  const existing = await cf(`/accounts/${accountId}/workers/domains?hostname=${HOST}`).catch(
+    () => []
+  );
+  if ((existing || []).some((d) => d.hostname === HOST && d.service === WORKER)) {
+    console.log(`  ✓ already attached to "${WORKER}"`);
+  } else {
+    try {
+      await attach();
+      console.log(`  ✓ attached to Worker "${WORKER}"`);
+    } catch (error) {
+      if (!(error.codes || []).includes(100117)) throw error;
+      console.log(`\n  a DNS record is still claiming ${HOST}:`);
+      const removed = await clearAddressRecords();
+      if (!removed) throw error;
+      await attach();
+      console.log(`  ✓ attached to Worker "${WORKER}"`);
+    }
   }
 
-  // ── 4. Say what is true now, read back from Cloudflare rather than assumed.
+  // ── 5. Say what is true now, read back from Cloudflare rather than assumed.
   const after = await cf(`/accounts/${accountId}/workers/domains?service=${WORKER}`);
   console.log(`\n  ${WORKER} now serves: ${(after || []).map((d) => d.hostname).join(', ') || '(none)'}`);
   const pagesAfter = await cf(`/accounts/${accountId}/pages/projects`);
