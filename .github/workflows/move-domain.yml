@@ -1,0 +1,42 @@
+# Move a hostname from a Cloudflare Pages project onto a Worker.
+#
+# MANUAL, AND DELIBERATELY AWKWARD. This takes a live site off a domain:
+# Cloudflare will not let two things claim one hostname, so the domain has to
+# be released from the Pages project before it can be attached to the Worker,
+# and in between it resolves to nothing. The confirmation input must repeat
+# the hostname exactly or the script refuses to run.
+#
+# It does not delete the Pages project or touch its builds. The old site stays
+# reachable on its own *.pages.dev the whole time.
+
+name: Move a domain to a Worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      hostname:
+        description: 'The hostname to move, e.g. bavaro.tours'
+        required: true
+      worker:
+        description: 'The Worker to attach it to. Must already be deployed.'
+        required: true
+      confirm:
+        description: 'Repeat the hostname exactly. This takes a live site off that domain.'
+        required: true
+
+concurrency:
+  group: move-domain-${{ inputs.hostname }}
+
+jobs:
+  move:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      MOVE_HOST: ${{ inputs.hostname }}
+      MOVE_TO_WORKER: ${{ inputs.worker }}
+      MOVE_CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Move the domain
+        run: node scripts/move-domain.mjs
