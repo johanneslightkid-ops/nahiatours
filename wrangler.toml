@@ -17,11 +17,13 @@
 # BY NAME, so this line is the only thing standing between this branch and
 # somebody else's live site — it must never be edited to match another branch.
 #
-# NOTE ON THE DOMAIN. bavaro.tours is not attached to this Worker. It belongs
-# to a Cloudflare PAGES project called `mariotours`, built from a different
-# repository (joehannes-fun/mariotours). Pointing the domain here means
-# releasing it there first, which is a dashboard decision about somebody's
-# live site rather than something a deploy should do on its own.
+# NOTE ON THE DOMAIN. bavaro.tours is attached to this Worker. It used to
+# belong to a Cloudflare PAGES project called `mariotours`, built from a
+# different repository; the move was made on purpose by
+# .github/workflows/move-domain.yml, which releases the hostname there and
+# attaches it here in one run. Nothing in this file has to name the domain —
+# a custom domain is a property of the Worker, not of its configuration — so
+# this note exists only so the next reader knows where the site went.
 name = "bavarotours"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
@@ -69,23 +71,29 @@ binding = "AI"
 # KV
 # ==============================================================================
 #
-# Uncomment once the namespace exists and paste its id. Create it with either:
+# This site inherits the namespace the bavaro.tours Pages project was reading,
+# `DATA_KV_M` — brand, tours-en, tours-es, social-media, story-elements-en,
+# story-elements-es and transfer-config. The design is new; the content is the
+# one that was already there, and this is what keeps it.
 #
-#   npx wrangler kv namespace create nahiatours-data
-#   ./scripts/deploy-cloudflare.sh      (creates, binds and deploys in one go)
+# The id is PINNED here rather than resolved by title at deploy time, and that
+# is the point. scripts/provision-kv.mjs resolves a title only when it has a
+# Cloudflare API token; a build without one skips silently and the deploy then
+# ships a Worker with NO KV binding — the site falls back to the JSON bundled
+# at /data/*.json and looks, from the outside, exactly like a site whose
+# content was wiped. That has happened on this account. A literal id needs no
+# token and cannot be skipped.
 #
-# The handlers read DATA_KV_F first and fall back to DATA_KV
-# (functions/api/data.ts), so binding either name is enough.
-#
-# Until then the site still works: reads fall back to the JSON bundled at
-# /data/*.json. Only admin writes and /api/init-data need KV.
+# The binding NAME is this repository's own (`DATA_KV_F`, with `DATA_KV` as the
+# fallback in functions/api/data.ts). The name is how this code finds the
+# namespace; the id is which namespace it finds. Only the id has to match what
+# the Pages project used.
 #
 # Note this is a Worker, so wrangler.toml is the source of truth for bindings —
 # a binding added in the dashboard is overwritten by the next deploy.
-#
-# [[kv_namespaces]]
-# binding = "DATA_KV_F"
-# id = "<namespace id>"
+[[kv_namespaces]]
+binding = "DATA_KV_F"
+id = "341c4ac0817a40bbb87c94dcb1525114"
 
 # ==============================================================================
 # Environment variables

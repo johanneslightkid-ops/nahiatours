@@ -1,18 +1,20 @@
 # Deploys the Bávaro Tours carnival-press design to its own Worker.
 #
-# THE DOMAIN IS NOT HERE YET, deliberately. bavaro.tours is attached to a
-# Cloudflare PAGES project called `mariotours`, built from a different
-# repository. Moving it means releasing it from that project first, which
-# takes somebody's live site down for as long as it takes to re-attach — a
-# decision to make on purpose in the dashboard, not a side effect of a push.
+# THE DOMAIN. bavaro.tours is attached to this Worker. It used to belong to a
+# Cloudflare PAGES project called `mariotours`; releasing it there and
+# attaching it here is a deliberate, separate act, and it lives in
+# .github/workflows/move-domain.yml so that a push can never do it by
+# accident. Nothing in this file names the domain: a custom domain is a
+# property of the Worker, and deploying a new version of the script does not
+# disturb it.
 #
-# Until then this deploys to bavarotours.<subdomain>.workers.dev, where the
-# design can be seen and signed off. Once the domain is attached to this
-# Worker, nothing in this file has to change.
-#
-# KV: this site gets its OWN namespace, `bavarotours-data`, resolved by title
-# at deploy time. It is not seeded from anywhere — see CLAUDE.md for why that
-# default is off.
+# KV: this site READS THE NAMESPACE THE OLD SITE READ — `DATA_KV_M`, pinned by
+# id in wrangler.toml, holding the brand, the tours in both languages, the
+# social accounts, the story elements and the transfer config. The design is
+# new; the content is the one that was already live. Nothing is seeded over it
+# — see CLAUDE.md for why that default is off. Keys this design adds and that
+# namespace has never held fall back to the JSON bundled at /data/*.json until
+# somebody saves them from the admin panel.
 name: Deploy Bávaro Tours
 
 # `push` is the trigger that matters. GitHub registers a `workflow_dispatch`
@@ -76,7 +78,16 @@ jobs:
       # by listing /accounts and wrangler by reading /memberships — an endpoint
       # a Workers-scoped token cannot read.
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID || 'd5272033401c64f8cc6ce650a8321cb2' }}
-      KV_NAMESPACE_TITLE: bavarotours-data
+      # No namespace TITLE to resolve: wrangler.toml pins the id literally, and
+      # provision-kv.mjs leaves a hand-pinned binding alone. A pinned id binds
+      # KV even on a build that has no API token to resolve a title with,
+      # which is the failure this account has actually had.
+      #
+      # clone-kv.mjs, though, resolves its DESTINATION separately, and with no
+      # title to go on it falls back to a default that belongs to a different
+      # site. Naming the id here is not decoration: it is what stops an
+      # opt-in seeding run from writing into somebody else's namespace.
+      DEST_KV_ID: 341c4ac0817a40bbb87c94dcb1525114
       SOURCE_KV_TITLE: ${{ inputs.source_kv_title || 'nahiatours-data' }}
       # Seed, do not sync. clone-kv.mjs leaves every key the destination
       # already has exactly as it is unless this says otherwise, so a redeploy
@@ -86,7 +97,7 @@ jobs:
       OVERWRITE: ${{ inputs.overwrite_existing == true && 'true' || 'false' }}
       # So the sitemap, canonical URLs and OpenGraph tags point at this
       # deployment rather than at production's domain.
-      SITE_URL: ${{ vars.AMIGOTOURS_SITE_URL || 'https://bavarotours.johannes-neugschwentner.workers.dev' }}
+      SITE_URL: ${{ vars.BAVARO_SITE_URL || 'https://bavaro.tours' }}
 
     steps:
       # First thing in the job, before the token can reach any other output: a
@@ -158,11 +169,10 @@ jobs:
       # .npmrc pins legacy-peer-deps, so a plain `npm ci` is enough.
       - run: npm ci
 
-      # Create bavarotours-data if needed and fill it from the source. This runs
-      # BEFORE the build, because `npm run build` invokes provision-kv.mjs,
-      # which resolves the same namespace title and writes the binding into
-      # wrangler.toml — so by deploy time the binding points at a namespace
-      # that already has the data in it.
+      # Fill in keys the inherited namespace does not have. Off unless asked
+      # for: this namespace is not empty, it is the live content of the site
+      # that was here before, and a key it already holds is never touched
+      # either way.
       #
       # Copying the data is a convenience, not the ship. If it fails the site
       # still serves — reads fall back to the JSON bundled at /data/*.json — so
@@ -181,15 +191,29 @@ jobs:
       - name: Inventory the KV namespaces
         run: node scripts/kv-inventory.mjs
         env:
-          KV_INVENTORY_TITLES: nahiatours-data,beautiful-tours-data,transporturist-data,ldvip-data,bavarotours-data
+          KV_INVENTORY_TITLES: nahiatours-data,beautiful-tours-data,transporturist-data,ldvip-data,DATA_KV_M
 
       - name: Build
         run: npm run build
 
-      - name: Show the resolved KV binding
+      # A deploy REPLACES a Worker's bindings with exactly what the config
+      # declares, so a missing binding here is not a missing feature — it is
+      # this site silently losing the content it inherited. Fail instead.
+      - name: Check KV is actually bound
         run: |
-          echo "wrangler.toml KV binding after the build:"
-          sed -n '/managed by scripts\/provision-kv/,/<<< managed/p' wrangler.toml
+          echo "wrangler.toml KV binding going into the deploy:"
+          grep -A3 '^\[\[kv_namespaces\]\]' wrangler.toml || true
+          if ! grep -q '^\[\[kv_namespaces\]\]' wrangler.toml; then
+            echo "::error::No KV binding in wrangler.toml. Deploying now would"
+            echo "unbind this site's data. Refusing."
+            exit 1
+          fi
+          if ! grep -q '341c4ac0817a40bbb87c94dcb1525114' wrangler.toml; then
+            echo "::error::The KV binding does not point at DATA_KV_M"
+            echo "(341c4ac0817a40bbb87c94dcb1525114), the namespace this site"
+            echo "inherited from the Pages project. Refusing to deploy."
+            exit 1
+          fi
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
@@ -211,21 +235,23 @@ jobs:
       - name: Report where it landed
         run: |
           {
-            echo "### Amigo Tours deployed"
+            echo "### Bávaro Tours deployed"
             echo ""
-            echo "<https://bavarotours.johannes-neugschwentner.workers.dev>"
+            echo "<https://bavaro.tours> · <https://bavarotours.johannes-neugschwentner.workers.dev>"
             echo ""
-            echo "Worker \`bavarotours\`, from branch \`bavarotours\` at \`${GITHUB_SHA::7}\`."
+            echo "Worker \`bavarotours\`, from branch \`bavaro-tours\` at \`${GITHUB_SHA::7}\`."
+            echo ""
+            echo "KV \`DATA_KV_M\` (\`341c4ac0817a40bbb87c94dcb1525114\`) — the namespace this site inherited, pinned by id in wrangler.toml."
             echo ""
             if [ "${{ inputs.seed_kv_from_source }}" != "true" ]; then
-              echo "KV: nothing copied. This site reads its own namespace, and keys it does not have fall back to the bundled \`/data/*.json\`."
+              echo "KV: nothing copied. This site reads \`DATA_KV_M\`, the namespace the bavaro.tours Pages project was reading — its brand, tours, social accounts, story elements and transfer config are intact. Keys that namespace has never held fall back to the bundled \`/data/*.json\` until the admin panel saves them."
             elif [ "${{ steps.kv.outcome }}" != "success" ]; then
               echo "> [!WARNING]"
               echo "> **KV was not copied.** The deploy went ahead and the site is up, but it"
               echo "> is reading the seed data bundled at \`/data/*.json\`, not the live"
               echo "> catalogue. See the *Clone the KV data* step for the reason."
             else
-              echo "KV: ${{ steps.kv.outputs.keys_copied }} missing key(s) seeded from \`${{ steps.kv.outputs.source_title }}\` into \`bavarotours-data\` (\`${{ steps.kv.outputs.namespace_id }}\`)."
+              echo "KV: ${{ steps.kv.outputs.keys_copied }} missing key(s) seeded from \`${{ steps.kv.outputs.source_title }}\` into \`DATA_KV_M\` (\`${{ steps.kv.outputs.namespace_id }}\`). Keys it already held were left alone."
             fi
             echo ""
             echo "Workers AI is bound as \`AI\` in wrangler.toml, so the blog generator"

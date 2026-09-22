@@ -2,7 +2,7 @@
 
 ## Branches are sites, not proposals
 
-Five branches of this repository are five live websites. They are permanent
+Six branches of this repository are six live websites. They are permanent
 and parallel: none of them is ever meant to be merged into another, and `main`
 is not "the truth" the others are drafts of — it is just the branch that
 happens to be nahia.tours.
@@ -14,6 +14,7 @@ happens to be nahia.tours.
 | `transporturist`  | `transporturist`  | (workers.dev only)    |
 | `ldvip`           | `ldvip`           | (workers.dev only)    |
 | `amigotours`      | `amigotours`      | amigotours.vip        |
+| `bavaro-tours`    | `bavarotours`     | bavaro.tours          |
 
 **Commit and push straight to the site branch. Never open a pull request.**
 There is nothing to review a site branch *into* — a PR against `main` would
@@ -73,6 +74,26 @@ one-time bootstrap for a new site and it is **opt-in** on every workflow now.
 Do not switch it back on by default: even seeding only the keys a site is
 missing will restore content that was deleted on purpose, and hand any newly
 stored key production's value.
+
+### This branch inherited its namespace
+
+`bavaro-tours` is the one branch that does not read a namespace of its own
+making. bavaro.tours was a Cloudflare **Pages** project (`mariotours`) built
+from a different repository, and this branch replaced it. The design is new;
+the content is the one that was already live, in `DATA_KV_M`
+(`341c4ac0817a40bbb87c94dcb1525114`) — `brand`, `tours-en`, `tours-es`,
+`social-media`, `story-elements-en`, `story-elements-es`, `transfer-config`.
+
+Two consequences worth knowing before touching anything here:
+
+* **The id is pinned literally in `wrangler.toml`**, not resolved by title.
+  `provision-kv.mjs` now leaves a hand-pinned binding alone, so the pin
+  survives a build that has no API token — which is exactly the build that
+  otherwise ships a Worker with no KV at all. Do not replace it with a title.
+* **Keys this design added are simply absent there**, and that is fine: reads
+  fall back to the JSON bundled at `/data/*.json` until the admin panel saves
+  one. Do not "fix" it by seeding — the namespace is not empty, it is
+  somebody's live content.
 
 ## Answering "which build is this?"
 
