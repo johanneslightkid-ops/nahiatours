@@ -1,4 +1,5 @@
 import React from 'react';
+import { useMediaQuery } from '../lib/useMediaQuery';
 import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
@@ -34,6 +35,10 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
      decoration never queues ahead of the stylesheet — and the poster it
      replaces is its own first frame, so the swap is invisible. */
   const showVideo = useDeferredVideo(Boolean(backgroundVideo));
+  /* Which of the two hero windows is actually on screen. `hidden lg:block`
+     and `lg:hidden` take care of what is SEEN; this takes care of what is
+     FETCHED, which CSS cannot. */
+  const isWideHero = useMediaQuery('(min-width: 1024px)');
   const { brandSettings } = useBrand();
 
   const desktopImage = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
@@ -157,7 +162,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
                   fetched. So it is not rendered at all below a large screen
                   with a mouse, and the poster it would have shown becomes the
                   picture. */}
-              {backgroundVideo && showVideo ? (
+              {backgroundVideo && showVideo && isWideHero ? (
                 <video
                   className="photo-pop h-full w-full object-cover"
                   src={backgroundVideo}
@@ -221,7 +226,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
       {/* Mobile window: the same picture, full width. */}
       <div className="section-shell relative z-10 pb-12 lg:hidden">
         <div className="photo-frame group relative aspect-[4/3]">
-          {backgroundVideo && showVideo ? (
+          {backgroundVideo && showVideo && !isWideHero ? (
             <video
               className="photo-pop h-full w-full object-cover"
               src={backgroundVideo}
