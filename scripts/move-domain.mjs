@@ -149,20 +149,67 @@ const main = async () => {
   } else {
     try {
       await attach();
-      console.log(`  ✓ attached to Worker "${WORKER}"`);
+      console.log(`  ✓ attached to Worker "${WORKER}" as a custom domain`);
     } catch (error) {
       if (!(error.codes || []).includes(100117)) throw error;
       console.log(`\n  a DNS record is still claiming ${HOST}:`);
-      const removed = await clearAddressRecords();
-      if (!removed) throw error;
-      await attach();
-      console.log(`  ✓ attached to Worker "${WORKER}"`);
+      try {
+        const removed = await clearAddressRecords();
+        if (!removed) throw error;
+        await attach();
+        console.log(`  ✓ attached to Worker "${WORKER}" as a custom domain`);
+      } catch (dnsError) {
+        // No DNS permission on this token. A custom domain is not the only
+        // way to put a Worker on a hostname, and the other way needs no DNS
+        // write at all: a ROUTE on the zone. The record already there is
+        // proxied through Cloudflare, so every request for this hostname
+        // already arrives at Cloudflare's edge — a route says which Worker
+        // answers it, and the Worker serves its own assets, so the address
+        // the record points at stops being consulted.
+        //
+        // A custom domain is still the tidier end state, because it owns its
+        // record and says so in the dashboard. This is the one that can be
+        // done from here, and a working domain beats a tidy one.
+        console.log(
+          `  · cannot rewrite DNS with this token (${dnsError.message})`
+        );
+        console.log(`  · falling back to a Worker ROUTE, which needs no DNS write`);
+        const pattern = `${HOST}/*`;
+        const routes = await cf(`/zones/${zone.id}/workers/routes`);
+        const mine = (routes || []).find((r) => r.pattern === pattern);
+        if (mine && mine.script === WORKER) {
+          console.log(`  ✓ route ${pattern} already runs "${WORKER}"`);
+        } else if (mine) {
+          await cf(`/zones/${zone.id}/workers/routes/${mine.id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ pattern, script: WORKER }),
+          });
+          console.log(`  ✓ route ${pattern} moved from "${mine.script}" to "${WORKER}"`);
+        } else {
+          await cf(`/zones/${zone.id}/workers/routes`, {
+            method: 'POST',
+            body: JSON.stringify({ pattern, script: WORKER }),
+          });
+          console.log(`  ✓ route ${pattern} → "${WORKER}"`);
+        }
+      }
     }
   }
 
   // ── 5. Say what is true now, read back from Cloudflare rather than assumed.
-  const after = await cf(`/accounts/${accountId}/workers/domains?service=${WORKER}`);
-  console.log(`\n  ${WORKER} now serves: ${(after || []).map((d) => d.hostname).join(', ') || '(none)'}`);
+  const after = await cf(`/accounts/${accountId}/workers/domains?service=${WORKER}`).catch(
+    () => []
+  );
+  console.log(
+    `\n  ${WORKER} custom domains: ${(after || []).map((d) => d.hostname).join(', ') || '(none)'}`
+  );
+  const routesAfter = await cf(`/zones/${zone.id}/workers/routes`).catch(() => null);
+  if (routesAfter) {
+    const ours = routesAfter.filter((r) => r.script === WORKER);
+    console.log(
+      `  ${WORKER} routes on ${zone.name}: ${ours.map((r) => r.pattern).join(', ') || '(none)'}`
+    );
+  }
   const pagesAfter = await cf(`/accounts/${accountId}/pages/projects`);
   const stillOwner = (pagesAfter || []).find((p) => (p.domains || []).includes(HOST));
   console.log(
