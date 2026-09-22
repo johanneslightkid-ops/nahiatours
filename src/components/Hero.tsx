@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useRef } from 'react';
-import { useRichDisplay } from '../lib/useMediaQuery';
+import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { HiArrowDown, HiCheck, HiStar, HiShieldCheck } from 'react-icons/hi';
@@ -49,7 +49,11 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, backgroundVideo }) => {
-  const richDisplay = useRichDisplay();
+  /* The footage plays on every screen, phones included. It is mounted once
+     the browser is idle rather than in the first pass, so a megabyte of
+     decoration never queues ahead of the stylesheet — and the poster it
+     replaces is its own first frame, so the swap is invisible. */
+  const showVideo = useDeferredVideo(Boolean(backgroundVideo));
   const { brandSettings } = useBrand();
   const budget = useMotionBudget();
   const reduced = useReducedMotion();
@@ -213,7 +217,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
             <div className="relative mx-auto max-w-md -rotate-2">
               <div className="rounded-[30px_22px_28px_24px] border border-[rgba(150,112,31,0.45)] bg-canvas-lift p-4 shadow-oil-lg">
                 <div className="story-media-frame">
-                  {backgroundVideo && richDisplay ? (
+                  {backgroundVideo && showVideo ? (
                     <video
                       className="photo-pop h-64 w-full object-cover"
                       src={backgroundVideo}
@@ -274,14 +278,26 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundImageMobile, bac
       {/* Mobile souvenir: same object, stacked under the copy. */}
       <div className="section-shell relative z-10 pb-14 lg:hidden">
         <div className="mx-auto max-w-sm -rotate-1 rounded-[26px_18px_24px_20px] border border-[rgba(150,112,31,0.4)] bg-canvas-lift p-3 shadow-oil">
-          <img
-            src={mobileImage}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            className="photo-pop h-44 w-full rounded-[18px] object-cover"
-          />
+          {backgroundVideo && showVideo ? (
+            <video
+              className="photo-pop h-44 w-full rounded-[18px] object-cover"
+              src={backgroundVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster={mobileImage}
+              aria-hidden="true"
+            />
+          ) : (
+            <img
+              src={mobileImage}
+              alt=""
+              aria-hidden="true"
+              decoding="async"
+              className="photo-pop h-44 w-full rounded-[18px] object-cover"
+            />
+          )}
           <p className="mt-3 text-center font-display text-xl italic text-ochre-dark">
             Saludos desde Bávaro
           </p>
