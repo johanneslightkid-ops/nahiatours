@@ -10,7 +10,7 @@ const DIRECTIONS: Array<{ code: Locale; short: string; name: string; direction: 
 ];
 
 const FLAG_BACKGROUNDS: Record<Locale, string> = {
-  en: 'linear-gradient(135deg, rgba(1,33,105,0.9) 0 24%, rgba(255,255,255,0.9) 24% 42%, rgba(1,33,105,0.9) 42% 58%, rgba(255,255,255,0.9) 58% 76%, rgba(200,16,46,0.82) 76% 100%)',
+  en: 'linear-gradient(90deg, rgba(11,36,105,0.9) 0 38%, rgba(255,255,255,0.95) 38% 46%, rgba(179,20,42,0.9) 46% 54%, rgba(255,255,255,0.95) 54% 62%, rgba(11,36,105,0.9) 62% 100%), linear-gradient(180deg, rgba(11,36,105,0.9) 0 38%, rgba(255,255,255,0.95) 38% 46%, rgba(179,20,42,0.9) 46% 54%, rgba(255,255,255,0.95) 54% 62%, rgba(11,36,105,0.9) 62% 100%)',
   de: 'linear-gradient(180deg, rgba(0,0,0,0.95) 0 33%, rgba(221,0,0,0.82) 33% 66%, rgba(255,206,0,0.86) 66% 100%)',
   es: 'linear-gradient(180deg, rgba(198,11,30,0.82) 0 20%, rgba(255,196,0,0.9) 20% 80%, rgba(198,11,30,0.82) 80% 100%)',
   fr: 'linear-gradient(135deg, rgba(0,85,164,0.88) 0 33%, rgba(255,255,255,0.92) 33% 66%, rgba(239,65,53,0.82) 66% 100%)',

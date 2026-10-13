@@ -1,0 +1,170 @@
+{
+  "storyTitle": "A Caribbean Day You Will Never Forget",
+  "storyTagline": "Sunrise peace, tropical discovery, and unforgettable moments in Bavaro",
+  "elements": [
+    {
+      "id": "element-1001",
+      "type": "title",
+      "order": 0,
+      "content": {
+        "title": "Morning Light Over Bavaro"
+      }
+    },
+    {
+      "id": "element-1002",
+      "type": "image",
+      "order": 1,
+      "content": {
+        "imageUrl": "/imgs/tours/tour_saona_island_detail_12.jpg"
+      }
+    },
+    {
+      "id": "element-1003",
+      "type": "text",
+      "order": 2,
+      "content": {
+        "text": "The Caribbean morning begins slowly. Gentle waves roll onto the shore while warm sunlight paints the sea in shades of gold and turquoise. After days of relaxing at the resort, you start feeling the pull of something more: open roads, hidden beaches, jungle trails, and experiences that feel truly alive."
+      }
+    },
+    {
+      "id": "element-1004",
+      "type": "title",
+      "order": 3,
+      "content": {
+        "title": "A Day Worth Exploring"
+      }
+    },
+    {
+      "id": "element-1005",
+      "type": "image",
+      "order": 4,
+      "content": {
+        "imageUrl": "/imgs/tours/tour_montaa_redonda_detail_7.jpg"
+      }
+    },
+    {
+      "id": "element-1006",
+      "type": "text",
+      "order": 5,
+      "content": {
+        "text": "Maybe you want a romantic escape beyond the hotel. Maybe your group is searching for excitement, music, and stories to remember long after the vacation ends. Bavaro offers both comfort and adventure together — peaceful mornings followed by unforgettable afternoons."
+      }
+    },
+    {
+      "id": "element-1007",
+      "type": "title",
+      "order": 6,
+      "content": {
+        "title": "Ride Into The Tropical Wild"
+      }
+    },
+    {
+      "id": "element-1008",
+      "type": "image",
+      "order": 7,
+      "content": {
+        "imageUrl": "/imgs/tours/tour_buggies_detail_15.jpg"
+      }
+    },
+    {
+      "id": "element-1009",
+      "type": "text",
+      "order": 8,
+      "content": {
+        "text": "Your buggy powers through muddy jungle paths surrounded by palm trees and tropical scenery. Hidden cenotes and local countryside trails turn every minute into pure freedom. You return covered in dust, laughing, energized, and already wanting another ride."
+      }
+    },
+    {
+      "id": "element-1011",
+      "type": "title",
+      "order": 9,
+      "content": {
+        "title": "Music, Ocean & Party Boat Energy"
+      }
+    },
+    {
+      "id": "element-1012",
+      "type": "image",
+      "order": 10,
+      "content": {
+        "imageUrl": "/imgs/tours/tour_party_boat_detail_11.jpg"
+      }
+    },
+    {
+      "id": "element-1013",
+      "type": "text",
+      "order": 11,
+      "content": {
+        "text": "The catamaran cuts across crystal-clear Caribbean waters while music, dancing, and laughter fill the air. Fresh drinks, tropical sunshine, snorkeling stops, and white-sand beaches create the kind of day that feels effortless and unforgettable at the same time."
+      }
+    },
+    {
+      "id": "element-1014",
+      "type": "video",
+      "order": 12,
+      "content": {
+        "videoUrl": "https://www.tiktok.com/@yohan.tours.punta/video/7638277118144630024?is_from_webapp=1&sender_device=pc&web_id=7635779197034219015",
+        "videoOrientation": "vertical",
+        "videoSource": "tiktok",
+        "title": "Party Boat Vibes"
+      }
+    },
+    {
+      "id": "element-1015",
+      "type": "title",
+      "order": 13,
+      "content": {
+        "title": "Hidden Waterfalls & Jungle Calm"
+      }
+    },
+    {
+      "id": "element-1016",
+      "type": "image",
+      "order": 14,
+      "content": {
+        "imageUrl": "/imgs/tours/tour_saman_detail_9.jpg"
+      }
+    },
+    {
+      "id": "element-1017",
+      "type": "text",
+      "order": 15,
+      "content": {
+        "text": "Deep inside the tropical jungle, waterfalls pour into cool natural pools surrounded by lush greenery. The sound of flowing water replaces the noise of the world. Every step feels peaceful, refreshing, and deeply connected to the natural beauty of the Dominican Republic."
+      }
+    },
+    {
+      "id": "element-1019",
+      "type": "title",
+      "order": 16,
+      "content": {
+        "title": "Back To Paradise"
+      }
+    },
+    {
+      "id": "element-1020",
+      "type": "image",
+      "order": 17,
+      "content": {
+        "imageUrl": "/imgs/tours/tour_isla_saona_vip_detail_8.jpg"
+      }
+    },
+    {
+      "id": "element-1021",
+      "type": "text",
+      "order": 18,
+      "content": {
+        "text": "As the afternoon sun begins to soften, you return to the resort feeling completely renewed. The ocean breeze feels warmer, the drinks taste colder, and the memories already feel legendary. Bavaro is not only a place to stay — it becomes part of your story."
+      }
+    },
+    {
+      "id": "element-1022",
+      "type": "cta",
+      "order": 19,
+      "content": {
+        "text": "Book Your Bavaro Adventure",
+        "action": "contact"
+      }
+    }
+  ]
+}

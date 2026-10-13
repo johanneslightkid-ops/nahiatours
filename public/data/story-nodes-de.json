@@ -1,0 +1,160 @@
+[
+  {
+    "id": "welcome",
+    "hostTitle": "Hola! Welcome to {{brand}} 👋",
+    "subtitle": "Welcome to Bávaro & Punta Cana",
+    "narrative": "Whether you are planning your trip from home or already relaxing on the beaches of Bávaro, let me guide you to the perfect Dominican adventure tailored specifically to who you are traveling with and what you crave most.",
+    "mediaImage": "https://cdn.pixabay.com/photo/2016/11/19/14/00/beach-1836467_1280.jpg",
+    "question": "Ready to design your ideal Caribbean experience?",
+    "options": [
+      {
+        "id": "start",
+        "label": "Start My Personal Journey 🌴",
+        "description": "3 quick questions to unlock your custom tour & transport package",
+        "nextNodeId": "party_type",
+        "theme": "ocean_blue"
+      },
+      {
+        "id": "direct_catalogue",
+        "label": "Browse Full Catalogue 🛍️",
+        "description": "Skip story and see all tours, pricing, and transfers directly",
+        "action": "switch_catalogue"
+      }
+    ]
+  },
+  {
+    "id": "party_type",
+    "hostTitle": "Who is joining your journey?",
+    "subtitle": "Step 1 of 3: Travel Party",
+    "narrative": "Every group brings a different energy to paradise. Tell me who is coming along so I can match the right pace and atmosphere for your day.",
+    "question": "Select your travel crew:",
+    "options": [
+      {
+        "id": "solo",
+        "label": "Solo Explorer 🧳",
+        "description": "Seeking freedom, thrill, and friendly social vibes with fellow travelers",
+        "nextNodeId": "vibe_check",
+        "answerKey": "partyType",
+        "answerValue": "solo"
+      },
+      {
+        "id": "couple",
+        "label": "Romantic Couple ❤️",
+        "description": "Celebrating romance, anniversaries, or intimate luxury on crystal waters",
+        "nextNodeId": "vibe_check",
+        "answerKey": "partyType",
+        "answerValue": "couple"
+      },
+      {
+        "id": "family",
+        "label": "Family with Kids 👨‍👩‍👧‍👦",
+        "description": "Safety, engaging fun, screen-free memories, and kids & parents delight",
+        "nextNodeId": "vibe_check",
+        "answerKey": "partyType",
+        "answerValue": "family"
+      },
+      {
+        "id": "friends",
+        "label": "Friends / Squad 🍹",
+        "description": "High-energy party, epic photos, dancing, and unforgettable nightlife",
+        "nextNodeId": "vibe_check",
+        "answerKey": "partyType",
+        "answerValue": "friends"
+      },
+      {
+        "id": "vip_private",
+        "label": "Exclusive VIP Group 💎",
+        "description": "Private yachts, luxury SUV transfers, zero crowds, and custom service",
+        "nextNodeId": "vibe_check",
+        "answerKey": "partyType",
+        "answerValue": "vip_private"
+      }
+    ]
+  },
+  {
+    "id": "vibe_check",
+    "hostTitle": "What's your primary vibe?",
+    "subtitle": "Step 2 of 3: Mood & Rhythm",
+    "narrative": "From serene sapphire lagoons to jungle adrenaline and party boats, Bávaro has it all. What does your perfect day feel like?",
+    "question": "Choose your dream mood:",
+    "options": [
+      {
+        "id": "water_chill",
+        "label": "Turquoise Waters & Relaxing Reefs 🌊",
+        "description": "Saona island beaches, natural pools, floating bars, and marine life",
+        "nextNodeId": "transport_needs",
+        "answerKey": "vibe",
+        "answerValue": "water_chill",
+        "theme": "ocean_blue"
+      },
+      {
+        "id": "jungle_thrill",
+        "label": "Jungle Adrenaline & Off-Road 🚜",
+        "description": "Muddy buggies, ziplining canopy, cenote swims, and mountain views",
+        "nextNodeId": "transport_needs",
+        "answerKey": "vibe",
+        "answerValue": "jungle_thrill",
+        "theme": "jungle_green"
+      },
+      {
+        "id": "party_nightlife",
+        "label": "Fiesta, Music & Sunset Beats 💃",
+        "description": "Party catamarans, sunset cocktails, Coco Bongo shows, and cave clubs",
+        "nextNodeId": "transport_needs",
+        "answerKey": "vibe",
+        "answerValue": "party_nightlife",
+        "theme": "sunset_gold"
+      },
+      {
+        "id": "culture_history",
+        "label": "Dominican Culture & Heritage 🏛️",
+        "description": "Colonial Santo Domingo history, cacao farms, coffee, and local villages",
+        "nextNodeId": "transport_needs",
+        "answerKey": "vibe",
+        "answerValue": "culture_history",
+        "theme": "sunset_gold"
+      },
+      {
+        "id": "vip_luxury",
+        "label": "Ultra-VIP Luxury & Private Yacht 🥂",
+        "description": "Lobster feast, private catamaran, quiet beaches, and dedicated host",
+        "nextNodeId": "transport_needs",
+        "answerKey": "vibe",
+        "answerValue": "vip_luxury",
+        "theme": "vip_obsidian"
+      }
+    ]
+  },
+  {
+    "id": "transport_needs",
+    "hostTitle": "Need seamless private transport in the Dominican Republic?",
+    "subtitle": "Step 3 of 3: Logistics & Car + Driver",
+    "narrative": "I offer private air-conditioned SUV and van transfers with professional drivers anywhere in the Dominican Republic — single or return trips between Santo Domingo, Bávaro, Bayahibe, La Romana, or Puerto Plata.",
+    "question": "How would you like to handle your transportation?",
+    "options": [
+      {
+        "id": "combo_transport",
+        "label": "Include Private Car + Driver Service 🚗",
+        "description": "Door-to-door private transfer from your resort/airport with flexible pickup",
+        "nextNodeId": "recommendation",
+        "answerKey": "transportNeeded",
+        "answerValue": true
+      },
+      {
+        "id": "excursion_only",
+        "label": "Excursion Shared Pick-Up Only 🚌",
+        "description": "Standard excursion shuttle pick-up from your resort lobby included",
+        "nextNodeId": "recommendation",
+        "answerKey": "transportNeeded",
+        "answerValue": false
+      }
+    ]
+  },
+  {
+    "id": "recommendation",
+    "hostTitle": "Your Personalized Dominican Journey is Ready! ✨",
+    "subtitle": "Tailored Excursion & Transport Bundle",
+    "narrative": "Based on your preferences, I've curated a special package for you with exclusive pricing, seamless logistics, and direct WhatsApp support.",
+    "isRecommendation": true
+  }
+]

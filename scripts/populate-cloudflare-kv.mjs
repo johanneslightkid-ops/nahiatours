@@ -17,6 +17,7 @@ const API_PATH = '/api/data';
 const RESOURCES_WITH_LOCALE = [
   'intro-story',
   'story-elements',
+  'story-nodes',
   'translations',
   'blog',
   'tours',
@@ -29,6 +30,7 @@ const RESOURCES_SINGLE = [
   'social-media',
   'brand',
   'transfer-config',
+  'story-quiz-rules',
 ];
 
 async function main() {
