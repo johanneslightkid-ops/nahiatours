@@ -42,7 +42,7 @@ const Blog = () => {
   }, [locale, brandSettings.brandName, articles]);
 
   return (
-    <div className="bg-paper pb-16 md:pb-24">
+    <div className="page-top bg-paper pb-16 md:pb-24">
       <PageHeader
         kicker="Stories from the coast"
         title={<FormattedMessage id="blog.title" defaultMessage="Blog" />}

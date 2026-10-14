@@ -257,7 +257,7 @@ const Transport: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-paper pb-16">
+    <div className="page-top min-h-screen bg-paper pb-16">
       <PageHeader
         tone="lagoon"
         kicker="Door to door"

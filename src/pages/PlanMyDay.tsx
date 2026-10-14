@@ -37,7 +37,7 @@ const PlanMyDay: React.FC = () => {
   }, [stage, stepIndex]);
 
   return (
-    <div className="planner relative min-h-screen px-4 py-12 sm:py-16 md:px-8">
+    <div className="planner page-top relative min-h-screen px-4 pb-12 sm:pb-16 md:px-8">
       <FABWhatsApp phoneNumber={brandSettings.phoneNumber} />
 
       {/* Painted washes behind the panels. They deliberately bleed past the

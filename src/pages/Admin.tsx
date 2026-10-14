@@ -3,7 +3,7 @@ import { getBrandSettings, saveBrandSettings, BrandSettings, uploadBrandIcon } f
 import BrandIconEditor from '../components/admin/BrandIconEditor';
 import HeroMediaAdmin from '../components/admin/HeroMediaAdmin';
 import { getTours, saveTours, Tour } from '../services/toursService';
-import { getContentLocale, useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../contexts/I18nContext';
 import ServiceAdminPanel from '../components/admin/ServiceAdminPanel';
 import TikTokAdmin from '../components/admin/TikTokAdmin';
 import SocialMediaAdmin from '../components/admin/SocialMediaAdmin';
@@ -61,7 +61,7 @@ const Admin: React.FC = () => {
   const triggerBrandIconUpload = () => fileInputRef.current?.click();
 
   const loadTours = useCallback(async () => {
-    const fetchedTours = await getTours(getContentLocale(locale));
+    const fetchedTours = await getTours(locale);
     setTours(fetchedTours);
   }, [locale]);
 
@@ -243,8 +243,8 @@ const Admin: React.FC = () => {
             services={tours}
             setServices={setTours}
             loadServices={loadTours}
-            saveServices={(services) => saveTours(services, getContentLocale(locale))}
-            locale={getContentLocale(locale)}
+            saveServices={(services) => saveTours(services, locale)}
+            locale={locale}
             saveTranslation={(services, to) => saveTours(services, to)}
             siblingAdminPath="/admin/transport"
             siblingAdminLabel="Ir a Transporte"

@@ -699,7 +699,37 @@ select:focus {
   background: var(--lagoon-light);
 }
 
-/* A luggage tag hanging off the vine. The string is the ::before. */
+/* ── Rope string that holds nav tags to the vine ────────────────────────── */
+
+/*
+ * Thick twisted rope — two overlapping linear gradients give the dark/light
+ * strand effect. The rope runs from the very top of the header element to
+ * the top of each luggage tag, so its container must start at y=0.
+ */
+.rope-string {
+  width: 7px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(
+      160deg,
+      #7a4e2a 0px,
+      #c4894f 3px,
+      #8a5e3b 6px,
+      #5a3518 9px,
+      #a06c3a 12px,
+      #7a4e2a 15px
+    );
+  box-shadow: inset 1px 0 2px rgb(255 220 170 / 0.35), inset -1px 0 2px rgb(30 10 0 / 0.3);
+}
+
+/* ── A luggage tag hanging off the vine ─────────────────────────────────── */
+
+/*
+ * The fishernet overlay is a repeating SVG diamond grid — just enough to add
+ * subtle texture without overwhelming the warm cream background. A second
+ * layer handles the actual gradient fill so neither fights the other.
+ */
 .vine-tag {
   position: relative;
   display: inline-flex;
@@ -709,13 +739,18 @@ select:focus {
   padding: 0.95rem 1.05rem 0.7rem;
   min-width: 5.6rem;
   border-radius: 16px 16px 22px 22px / 26px 26px 18px 18px;
-  background: linear-gradient(180deg, #fffdf8 0%, #f8eedb 100%);
-  box-shadow: 0 10px 20px -12px rgb(14 59 54 / 0.55), inset 0 -2px 0 rgb(14 59 54 / 0.06);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cpath d='M0 9 L9 0 L18 9 L9 18 Z' fill='none' stroke='%230e3b36' stroke-width='0.7' stroke-opacity='0.09'/%3E%3Cpath d='M0 9 L9 18 M9 0 L18 9' fill='none' stroke='%230e3b36' stroke-width='0.5' stroke-opacity='0.05'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #fffdf8 0%, #f8eedb 100%);
+  /* drop shadow for depth */
+  filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2));
   color: var(--ink);
   font-weight: 800;
   font-size: 0.86rem;
   line-height: 1;
   text-decoration: none;
+  /* default glow animation — overridden per-item below */
+  animation: nav-breeze 5.8s ease-in-out infinite, vine-glow-0 3.4s ease-in-out infinite;
 }
 
 .vine-tag:hover {
@@ -723,10 +758,42 @@ select:focus {
   animation-play-state: paused;
 }
 
-.vine-tag { animation: nav-breeze 5.8s ease-in-out infinite; }
-.vine-tag:nth-child(2n) { animation-delay: -1.6s; }
-.vine-tag:nth-child(3n) { animation-delay: -3.2s; }
 @keyframes nav-breeze { 0%,100% { translate: 0 0; rotate: -.35deg; } 50% { translate: 0 -3px; rotate: .35deg; } }
+
+/* Pulsating outer glow — each tag beats in a different rhythm that still
+   feels like one living colony: periods share a common factor of ~0.9s. */
+@keyframes vine-glow-0 {
+  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(147 236 225 / 0)); }
+  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 12px rgb(147 236 225 / 0.55)); }
+}
+@keyframes vine-glow-1 {
+  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(247 178 59 / 0)); }
+  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 14px rgb(247 178 59 / 0.6)); }
+}
+@keyframes vine-glow-2 {
+  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(23 181 172 / 0)); }
+  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 16px rgb(23 181 172 / 0.55)); }
+}
+@keyframes vine-glow-3 {
+  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(242 103 92 / 0)); }
+  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 13px rgb(242 103 92 / 0.5)); }
+}
+@keyframes vine-glow-4 {
+  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(62 155 80 / 0)); }
+  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 15px rgb(62 155 80 / 0.55)); }
+}
+@keyframes vine-glow-5 {
+  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(77 182 229 / 0)); }
+  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 14px rgb(77 182 229 / 0.55)); }
+}
+
+/* Assign glows + breeze per item index — periods are related but never sync. */
+.vine-tag-item-0 { animation: nav-breeze 5.4s ease-in-out infinite, vine-glow-0 3.1s ease-in-out infinite; animation-delay: 0s, 0s; }
+.vine-tag-item-1 { animation: nav-breeze 6.2s ease-in-out infinite, vine-glow-1 4.3s ease-in-out infinite; animation-delay: -1.8s, -0.9s; }
+.vine-tag-item-2 { animation: nav-breeze 5.8s ease-in-out infinite, vine-glow-2 3.7s ease-in-out infinite; animation-delay: -3.1s, -1.6s; }
+.vine-tag-item-3 { animation: nav-breeze 6.6s ease-in-out infinite, vine-glow-3 5.1s ease-in-out infinite; animation-delay: -0.7s, -2.4s; }
+.vine-tag-item-4 { animation: nav-breeze 5.1s ease-in-out infinite, vine-glow-4 4.8s ease-in-out infinite; animation-delay: -4.2s, -0.4s; }
+.vine-tag-item-5 { animation: nav-breeze 6.9s ease-in-out infinite, vine-glow-5 3.9s ease-in-out infinite; animation-delay: -2.0s, -3.2s; }
 
 /* The eyelet the string goes through. */
 .vine-tag::after {
@@ -825,6 +892,25 @@ select:focus {
 @keyframes logo-edge-pulse { 0%, 100% { box-shadow: 0 0 0 3px rgb(255 255 255 / 0.8), 0 10px 18px rgb(5 63 80 / 0.28); } 50% { box-shadow: 0 0 0 4px rgb(180 255 250 / 0.9), 0 0 20px rgb(45 214 217 / 0.72), 0 12px 23px rgb(30 99 196 / 0.32); } }
 @keyframes logo-aura { 0%, 100% { opacity: 0.42; transform: scale(0.94) rotate(0deg); } 50% { opacity: 0.85; transform: scale(1.08) rotate(18deg); } }
 
+/* ── Language compass — 3-D wobble animation ────────────────────────────── */
+
+/*
+ * The compass tilts and turns in cheap 3-D space — like a real compass
+ * bobbing on a wrist strap. perspective() lives on the *parent* in a real DOM
+ * context, but because we apply it via transform it still gives depth.
+ * will-change keeps it on the GPU so it does not cause layout jitter on phones.
+ */
+@keyframes compass-wobble-3d {
+  0%   { transform: rotate(-4deg) perspective(220px) rotateX(6deg) rotateY(-5deg) rotateZ(-2deg); }
+  14%  { transform: rotate(-1deg) perspective(220px) rotateX(-4deg) rotateY(7deg) rotateZ(1deg); }
+  28%  { transform: rotate(3deg) perspective(220px) rotateX(5deg) rotateY(3deg) rotateZ(-3deg); }
+  42%  { transform: rotate(-2deg) perspective(220px) rotateX(-6deg) rotateY(-4deg) rotateZ(2deg); }
+  57%  { transform: rotate(4deg) perspective(220px) rotateX(3deg) rotateY(8deg) rotateZ(-1deg); }
+  71%  { transform: rotate(-3deg) perspective(220px) rotateX(-5deg) rotateY(-6deg) rotateZ(3deg); }
+  85%  { transform: rotate(1deg) perspective(220px) rotateX(7deg) rotateY(2deg) rotateZ(-2deg); }
+  100% { transform: rotate(-4deg) perspective(220px) rotateX(6deg) rotateY(-5deg) rotateZ(-2deg); }
+}
+
 /* Water-colour Trash Polka: rough ink edges, overspray and a bright sea core. */
 .language-compass {
   position: relative;
@@ -835,7 +921,8 @@ select:focus {
   border-radius: 47% 53% 44% 56% / 54% 44% 56% 46%;
   background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18) 0%, rgba(36,221,208,0.24) 18%, rgba(20,126,197,0.72) 42%, rgba(6,62,99,0.96) 100%);
   box-shadow: 5px 4px 0 #052e43, -3px -2px 0 rgb(126 255 247 / .8), 0 0 18px rgb(27 189 225 / .55);
-  transform: rotate(-4deg);
+  will-change: transform;
+  animation: compass-wobble-3d 7.4s ease-in-out infinite;
   overflow: hidden;
 }
 .language-compass::before,
@@ -861,7 +948,8 @@ select:focus {
 .compass-sound { position:absolute; z-index:4; display:grid; left:50%; top:50%; width:2.15rem; height:2.15rem; place-items:center; border:2px solid #052e43; border-radius:42% 58% 48% 52%; background:linear-gradient(135deg,#ecfffd,#9efff7); box-shadow:2px 2px 0 #052e43; transform:translate(-50%,-50%) rotate(6deg); }
 .compass-sound button { width:1.7rem !important; height:1.7rem !important; border:0 !important; background:transparent !important; box-shadow:none !important; }
 
-@media (prefers-reduced-motion: reduce) { .brand-name-crystal,.brand-logo,.brand-logo::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .brand-name-crystal,.brand-logo,.brand-logo::before,.language-compass { animation: none; } .language-compass { transform: rotate(-4deg); }
+[class*='vine-tag-item-'] { animation: none; } }
 
 @media (max-width: 1023px) { .desktop-brand-name { font-size: 2rem; } }
 
@@ -1339,6 +1427,22 @@ select:focus {
   .tropical-button,
   .tropical-button-outline {
     @apply px-6 py-3;
+  }
+}
+
+/* ── Page top clearance — enough room below the fixed header ────────────── */
+
+/*
+ * Mobile header is ~80px (5rem). Desktop vine is ~144px (9rem).
+ * A bit of breathing room is added so content is not glued to the header.
+ */
+.page-top {
+  padding-top: 5.5rem;
+}
+
+@media (min-width: 1024px) {
+  .page-top {
+    padding-top: 9.75rem;
   }
 }
 

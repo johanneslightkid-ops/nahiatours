@@ -3,6 +3,7 @@ import TranslateBar from './TranslateBar';
 import { Link } from 'react-router-dom';
 import { uploadImage, Tour, PricingOption } from '../../services/toursService';
 import MarkdownEditor from '../ui/MarkdownEditor';
+import { Lang } from '../../lib/autoTranslate';
 
 type Category = 'tours' | 'transport';
 
@@ -12,8 +13,8 @@ interface ServiceAdminPanelProps {
    * of it. Both optional: without them the translate strip is simply absent,
    * which is what a panel that is not bilingual wants.
    */
-  locale?: 'en' | 'es';
-  saveTranslation?: (services: Tour[], to: 'en' | 'es') => Promise<void>;
+  locale?: Lang;
+  saveTranslation?: (services: Tour[], to: Lang) => Promise<void>;
   title: string;
   category: Category;
   services: Tour[];
@@ -211,26 +212,22 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
       </div>
 
       {/* Only when this panel was told which language it is showing AND given
-          somewhere to put the other one. The strip hides itself again if no AI
+          somewhere to put translations. The strip hides itself when no AI
           provider on this deployment can answer. */}
       {locale && saveTranslation && (
         <TranslateBar
           value={sortedServices}
           from={locale}
-          what={category === 'transport' ? 'los servicios de transporte' : 'las excursiones'}
+          what={category === 'transport' ? 'the transport services' : 'the tours'}
           note={
             category === 'transport'
-              ? `Traduce los servicios que ves aquí y los guarda en la ficha de ${
-                  other === 'en' ? 'inglés' : 'español'
-                }. Cambia el idioma arriba para revisarlos. Lo que ya haya ahí se reemplaza.`
-              : `Traduce las excursiones que ves aquí y las guarda en la ficha de ${
-                  other === 'en' ? 'inglés' : 'español'
-                }. Cambia el idioma arriba para revisarlas. Lo que ya haya ahí se reemplaza.`
+              ? 'Translates all transport services shown here into all other languages and saves them. Switch the language above to review them.'
+              : 'Translates all tours shown here into all other languages and saves them. Switch the language above to review them.'
           }
           disabled={sortedServices.length === 0}
-          onTranslated={async (translated) => {
-            await saveTranslation(translated as Tour[], other);
-            return `Guardado en ${other === 'en' ? 'inglés' : 'español'}. Cambia el idioma para revisarlo.`;
+          onTranslated={async (translated, to) => {
+            await saveTranslation(translated as Tour[], to);
+            return `Saved in ${to.toUpperCase()}. Switch the language above to review.`;
           }}
         />
       )}

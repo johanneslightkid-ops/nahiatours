@@ -104,12 +104,20 @@ const collect = (node: any, slots: Slot[], key?: string): void => {
   }
 };
 
-export type Lang = 'en' | 'es';
+export type Lang = 'en' | 'es' | 'de' | 'fr';
 
-const LANGUAGE = {
+export const LANG_NAME: Record<Lang, string> = {
   en: 'English',
-  es: 'Latin American Spanish, as spoken in the Dominican Republic',
+  es: 'Spanish (Latin American, Dominican Republic)',
+  de: 'German',
+  fr: 'French',
 };
+
+const LANGUAGE = LANG_NAME;
+
+/** All other languages that should receive a translation. */
+export const getTargetLanguages = (from: Lang): Lang[] =>
+  (['en', 'es', 'de', 'fr'] as Lang[]).filter((l) => l !== from);
 
 /**
  * Batched, because one call per string is both slow and expensive — and

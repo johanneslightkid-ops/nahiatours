@@ -58,9 +58,9 @@ const unwrapTestimonialPayload = (payload: unknown): TestimonialRecord[] => {
 };
 
 /** Everything stored, approved or not. The admin panel wants this one. */
-export const getTestimonials = async (): Promise<TestimonialRecord[]> => {
+export const getTestimonials = async (locale?: string): Promise<TestimonialRecord[]> => {
   try {
-    const data = await apiGet<unknown>('testimonials');
+    const data = await apiGet<unknown>('testimonials', locale ? { locale } : undefined);
     return unwrapTestimonialPayload(data);
   } catch (error) {
     console.warn('Error loading testimonials:', error);
@@ -69,8 +69,8 @@ export const getTestimonials = async (): Promise<TestimonialRecord[]> => {
 };
 
 /** What a visitor should see: everything except what is waiting for approval. */
-export const getPublishedTestimonials = async (): Promise<TestimonialRecord[]> =>
-  (await getTestimonials()).filter((t) => t.approved !== false);
+export const getPublishedTestimonials = async (locale?: string): Promise<TestimonialRecord[]> =>
+  (await getTestimonials(locale)).filter((t) => t.approved !== false);
 
 /**
  * Replace the whole list. Admin only — it needs the password header.
@@ -80,9 +80,10 @@ export const getPublishedTestimonials = async (): Promise<TestimonialRecord[]> =
  * that did not happen has to be able to say so.
  */
 export const saveTestimonials = async (
-  testimonials: TestimonialRecord[]
+  testimonials: TestimonialRecord[],
+  locale?: string
 ): Promise<TestimonialRecord[]> => {
-  await apiPut<unknown>('testimonials', { testimonials });
+  await apiPut<unknown>('testimonials', { testimonials }, locale ? { locale } : undefined);
   return testimonials;
 };
 

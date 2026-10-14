@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { FaCheck, FaExchangeAlt, FaLanguage, FaSpinner } from 'react-icons/fa';
 import { providerStatus } from '../../services/aiGeneratorService';
-import { Lang, translateRecord } from '../../lib/autoTranslate';
+import { Lang, LANG_NAME, getTargetLanguages, translateRecord } from '../../lib/autoTranslate';
 
 /**
- * The strip at the top of every bilingual editor.
+ * The strip at the top of every bilingual (now: multilingual) editor.
  *
- * It appears only when an AI provider on this deployment can actually answer —
- * a button that fails when pressed is worse than no button, and on a site with
- * no key and no binding this one is simply not there.
+ * It appears only when an AI provider on this deployment can actually answer.
  *
- * It translates and hands the result to the panel; the panel says what happens
- * next, in `note`, before the operator presses anything. Two shapes are in use:
- * the welcome-page editor loads the translation into the open editor so it can
- * be read before saving, and the tour and transport panels write it into the
- * other language's record, because those show one language at a time and there
- * is no second editor to load it into.
+ * It now translates the current record into ALL remaining languages in one go
+ * (en → es, de, fr; es → en, de, fr; etc.) and hands each result back through
+ * `onTranslated` so the panel can save them where it likes.
  */
 
 interface TranslateBarProps<T> {
@@ -24,9 +19,8 @@ interface TranslateBarProps<T> {
   /** Which language that record is in. */
   from: Lang;
   /**
-   * Handed the translated copy. The panel decides what happens to it — some
-   * open it for review, some write it straight into the other language's
-   * record — and whatever it returns is what the operator is told.
+   * Called once per target language with the translated copy.
+   * Return a string to override the default success message, or void.
    */
   onTranslated: (translated: T, to: Lang) => string | void | Promise<string | void>;
   /** The sentence under the heading. Say what this button will actually do. */
@@ -37,8 +31,7 @@ interface TranslateBarProps<T> {
   disabled?: boolean;
 }
 
-const OTHER: Record<Lang, Lang> = { en: 'es', es: 'en' };
-const NAME: Record<Lang, string> = { en: 'inglés', es: 'español' };
+const SHORT: Record<Lang, string> = { en: 'EN', es: 'ES', de: 'DE', fr: 'FR' };
 
 function TranslateBar<T>({ value, from, onTranslated, what, note, disabled }: TranslateBarProps<T>) {
   const [available, setAvailable] = useState<boolean | null>(null);
@@ -54,33 +47,33 @@ function TranslateBar<T>({ value, from, onTranslated, what, note, disabled }: Tr
     })();
   }, []);
 
-  // Nothing to offer, so nothing is shown. No disabled control, no
-  // explanation nobody asked for.
   if (available !== true) return null;
 
-  const to = OTHER[from];
+  const targets = getTargetLanguages(from);
 
   const run = async () => {
     setBusy(true);
     setProblem('');
     setDone('');
+    const results: string[] = [];
     try {
-      const result = await translateRecord(value, from, to, (n, total) =>
-        setProgress(`Traduciendo ${n} de ${total}…`)
-      );
-      if (result.total === 0) {
-        setProblem('No hay texto que traducir en lo que está abierto.');
-        return;
+      for (let i = 0; i < targets.length; i++) {
+        const to = targets[i];
+        setProgress(
+          `Translating to ${LANG_NAME[to]}… (${i + 1}/${targets.length})`
+        );
+        const result = await translateRecord(value, from, to, (n, total) =>
+          setProgress(`${LANG_NAME[to]}: ${n}/${total} strings…`)
+        );
+        if (result.total === 0) continue;
+        const said = await onTranslated(result.value, to);
+        if (typeof said === 'string') results.push(said);
+        else results.push(`${result.translated} string(s) → ${LANG_NAME[to]}`);
       }
-      const said = await onTranslated(result.value, to);
-      setDone(
-        typeof said === 'string'
-          ? said
-          : `${result.translated} texto(s) traducidos al ${NAME[to]}.`
-      );
+      setDone(results.length ? results.join(' · ') : 'Nothing new to translate.');
     } catch (error) {
       setProblem(
-        `No se pudo traducir: ${error instanceof Error ? error.message : String(error)}`
+        `Translation failed: ${error instanceof Error ? error.message : String(error)}`
       );
     } finally {
       setBusy(false);
@@ -94,10 +87,21 @@ function TranslateBar<T>({ value, from, onTranslated, what, note, disabled }: Tr
         <div className="flex items-start gap-3">
           <FaLanguage className="mt-0.5 h-6 w-6 shrink-0 text-lagoon-dark" />
           <div>
-            <p className="text-sm font-bold text-ink">Traducir automáticamente</p>
+            <p className="text-sm font-bold text-ink">Auto-translate to all languages</p>
             <p className="text-sm text-ink-soft">
               {note ||
-                `Pasa ${what} de ${NAME[from]} a ${NAME[to]} con la IA configurada.`}
+                `Translates ${what} from ${LANG_NAME[from]} to ${targets.map((t) => LANG_NAME[t]).join(', ')} using the configured AI.`}
+            </p>
+            <p className="mt-1 flex gap-1.5 text-xs text-ink-light">
+              <span className="rounded-full bg-lagoon/20 px-2 py-0.5 font-bold text-lagoon-dark">
+                {SHORT[from]}
+              </span>
+              <span className="self-center">→</span>
+              {targets.map((t) => (
+                <span key={t} className="rounded-full bg-paper-deep px-2 py-0.5 font-bold text-ink-soft">
+                  {SHORT[t]}
+                </span>
+              ))}
             </p>
           </div>
         </div>
@@ -108,9 +112,9 @@ function TranslateBar<T>({ value, from, onTranslated, what, note, disabled }: Tr
           className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-lagoon-dark px-6 py-3 text-sm font-bold uppercase tracking-[0.08em] text-white transition hover:brightness-110 disabled:opacity-60"
         >
           {busy ? (
-            <><FaSpinner className="animate-spin" /> {progress || 'Traduciendo…'}</>
+            <><FaSpinner className="animate-spin" /> {progress || 'Translating…'}</>
           ) : (
-            <><FaExchangeAlt /> {NAME[from]} → {NAME[to]}</>
+            <><FaExchangeAlt /> Translate all</>
           )}
         </button>
       </div>

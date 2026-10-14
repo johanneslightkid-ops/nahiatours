@@ -14,6 +14,9 @@ import {
   saveTestimonials,
   TestimonialRecord,
 } from '../../services/testimonialService';
+import TranslateBar from './TranslateBar';
+import { useI18n } from '../../contexts/I18nContext';
+import { Lang } from '../../lib/autoTranslate';
 
 /**
  * Reseñas — the panel that did not exist.
@@ -53,6 +56,7 @@ const Stars: React.FC<{ value: number; onChange?: (v: number) => void }> = ({ va
 );
 
 const TestimonialsAdmin: React.FC = () => {
+  const { locale } = useI18n();
   const [items, setItems] = useState<TestimonialRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -63,12 +67,13 @@ const TestimonialsAdmin: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const loaded = await getTestimonials();
+      setLoading(true);
+      const loaded = await getTestimonials(locale);
       setItems(loaded);
       setOriginal(loaded);
       setLoading(false);
     })();
-  }, []);
+  }, [locale]);
 
   const dirty = useMemo(
     () => JSON.stringify(items) !== JSON.stringify(original),
@@ -89,7 +94,7 @@ const TestimonialsAdmin: React.FC = () => {
       // Empty rows are the cost of an "add" button; they are dropped rather
       // than written, so a half-finished entry cannot reach the site.
       const cleaned = items.filter((t) => t.name.trim() && t.review.trim());
-      await saveTestimonials(cleaned);
+      await saveTestimonials(cleaned, locale);
       setItems(cleaned);
       setOriginal(cleaned);
       setSaved(true);
@@ -115,6 +120,18 @@ const TestimonialsAdmin: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <TranslateBar
+        value={items}
+        from={locale as Lang}
+        what="las reseñas"
+        note="Traduce las reseñas que ves aquí a todos los demás idiomas y las guarda."
+        disabled={items.length === 0}
+        onTranslated={async (translated, to) => {
+          await saveTestimonials(translated as TestimonialRecord[], to);
+          return `Guardadas en ${to.toUpperCase()}. Cambia el idioma arriba para revisarlas.`;
+        }}
+      />
+
       <div className="flex flex-col gap-4 rounded-3xl border border-ink/12 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
           <h2 className="text-2xl font-bold text-ink sm:text-3xl">Reseñas</h2>

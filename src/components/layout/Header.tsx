@@ -166,14 +166,15 @@ const Signpost: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         onClick={onClose}
       />
       <div className="pointer-events-none absolute right-[12%] top-[8%] h-24 w-24 rounded-full bg-[radial-gradient(circle,#fff4c9_0%,#ffd47e_45%,transparent_70%)]" />
-      <div className="relative z-20 flex justify-center pt-4">
+      {/* Compass: left-aligned on mobile */}
+      <div className="relative z-20 flex justify-start pl-5 pt-3">
         <LanguageSwitcher />
       </div>
 
-      <div className="relative mx-auto flex min-h-full max-w-md flex-col items-center px-6 pb-6 pt-2">
+      <div className="relative mx-auto flex min-h-full max-w-md flex-col items-center px-6 pb-6 pt-0">
         {/* The post */}
         <motion.div
-          className="absolute bottom-0 left-1/2 top-20 w-5 -translate-x-1/2 rounded-t-lg bg-gradient-to-r from-[#B58A5E] via-[#9A6E45] to-[#7A5434] shadow-ink"
+          className="absolute bottom-0 left-1/2 top-16 w-5 -translate-x-1/2 rounded-t-lg bg-gradient-to-r from-[#B58A5E] via-[#9A6E45] to-[#7A5434] shadow-ink"
           initial={reduced ? false : { scaleY: 0 }}
           animate={{ scaleY: 1 }}
           exit={{ scaleY: 0 }}
@@ -300,7 +301,7 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Wide screens: the vine. */}
-        <div className="absolute inset-x-0 top-0 hidden h-[8.5rem] overflow-visible lg:block">
+        <div className="absolute inset-x-0 top-0 hidden lg:block" style={{ height: '9rem', overflow: 'visible' }}>
           <Vine />
           <div className="section-shell relative flex h-full items-start justify-between">
             <Link
@@ -317,7 +318,8 @@ const Header: React.FC = () => {
                 whileHover={{ rotate: [0, -6, 4, -2, 0], transition: { duration: 1.4 } }}
                 transition={{ type: 'spring', stiffness: 90, damping: 11 }}
               >
-                <span className="h-5 w-0.5 bg-[#8A5E3B]" />
+                {/* Logo rope — anchored to y=0 of the vine container */}
+                <span className="rope-string" style={{ height: '1.4rem' }} />
                 <Logo className="h-24 w-24" />
               </motion.div>
               <span className="desktop-brand-name brand-name-crystal mt-10">
@@ -343,7 +345,8 @@ const Header: React.FC = () => {
                       whileHover={reduced ? undefined : { rotate: [0, 9, -7, 4, -2, 0], transition: { duration: 1.6 } }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span className="w-px bg-[#8A5E3B]" style={{ height: `${STRINGS[i % STRINGS.length]}px` }} />
+                      {/* Rope runs from top-0 of the header wrapper */}
+                      <span className="rope-string" style={{ height: `${STRINGS[i % STRINGS.length]}px` }} />
                       <Link
                         to={item.to}
                         onClick={() => playClickFx()}
@@ -351,7 +354,7 @@ const Header: React.FC = () => {
                         aria-current={active ? 'page' : undefined}
                         data-active={active}
                         data-accent={item.accent}
-                        className="vine-tag"
+                        className={`vine-tag vine-tag-item-${i % 6}`}
                       >
                         <span className="vine-tag-icon">{item.icon}</span>
                         <FormattedMessage id={item.id} defaultMessage={item.fallback} />

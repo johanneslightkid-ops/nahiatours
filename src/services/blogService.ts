@@ -1,6 +1,6 @@
 import { apiGet, apiPut } from './apiClient';
 
-type Locale = 'en' | 'es';
+export type Locale = 'en' | 'es' | 'de' | 'fr';
 
 export interface RawBlogArticle {
   id?: string | number;

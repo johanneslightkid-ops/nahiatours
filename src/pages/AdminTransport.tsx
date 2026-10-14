@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { getContentLocale, useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../contexts/I18nContext';
 import ServiceAdminPanel from '../components/admin/ServiceAdminPanel';
 import TransferConfigAdminPanel from '../components/admin/TransferConfigAdminPanel';
 import VehicleAdminPanel from '../components/admin/VehicleAdminPanel';
@@ -11,7 +11,7 @@ const AdminTransport: React.FC = () => {
   const [services, setServices] = useState<Tour[]>([]);
 
   const loadServices = useCallback(async () => {
-    const fetchedServices = await getTransportServices(getContentLocale(locale));
+    const fetchedServices = await getTransportServices(locale);
     setServices(fetchedServices);
   }, [locale]);
 
@@ -29,9 +29,9 @@ const AdminTransport: React.FC = () => {
           services={services}
           setServices={setServices}
           loadServices={loadServices}
-          locale={getContentLocale(locale)}
+          locale={locale}
           saveTranslation={(items, to) => saveTransportServices(items, to)}
-          saveServices={(nextServices) => saveTransportServices(nextServices, getContentLocale(locale))}
+          saveServices={(nextServices) => saveTransportServices(nextServices, locale)}
           siblingAdminPath="/admin"
           siblingAdminLabel="Ir a Excursiones"
         />

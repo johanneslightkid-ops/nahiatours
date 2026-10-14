@@ -4,6 +4,8 @@ import { getTours, Tour } from '../../services/toursService';
 import { getAISettings, AISettings } from '../../services/aiSettingsService';
 import { AiGenerationError, GeneratedArticle, GeneratedPost, generateBlogPost, providerStatus } from '../../services/aiGeneratorService';
 import { saveBlogArticle, BlogArticle } from '../../services/blogService';
+import TranslateBar from './TranslateBar';
+import { Lang } from '../../lib/autoTranslate';
 import { getSocialApiSettings } from '../../services/socialApiSettingsService';
 import { getSocialMediaData, SocialMediaAccount } from '../../services/socialMediaService';
 import { apiPost } from '../../services/apiClient';
@@ -220,7 +222,7 @@ const AIBlogGenAdmin: React.FC = () => {
   const buildArticleRecord = (
     article: GeneratedArticle,
     post: GeneratedPost,
-    locale: 'en' | 'es',
+    locale: Lang,
     id: string
   ): BlogArticle => ({
     id,
@@ -805,6 +807,18 @@ const AIBlogGenAdmin: React.FC = () => {
                 </button>
               </div>
             </div>
+
+            <TranslateBar
+              value={article}
+              from={entry.view}
+              what="este artículo"
+              note="Traduce este artículo a todos los demás idiomas y los guarda en el blog."
+              onTranslated={async (translated, to) => {
+                const record = buildArticleRecord(translated as GeneratedArticle, entry.post, to, entry.id);
+                await saveBlogArticle(record, to);
+                return `Guardado en ${to.toUpperCase()}`;
+              }}
+            />
 
             {/* The preview is the real thing: same component as the blog. */}
             <article className="mx-auto max-w-3xl">

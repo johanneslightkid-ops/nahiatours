@@ -2,6 +2,9 @@ import { apiGet, apiPut } from './apiClient';
 import { JourneyLocale } from './introStoryService';
 import { getAdminPassword } from './authStore';
 
+export type Locale = JourneyLocale;
+export type StoryLocale = JourneyLocale;
+
 export type StoryElementType = 'title' | 'paragraph' | 'picture' | 'video' | 'cta';
 export type VideoOrientation = 'vertical' | 'horizontal';
 export type VideoSource = 'vimeo' | 'tiktok' | 'youtube' | 'custom';

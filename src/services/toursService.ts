@@ -4,7 +4,7 @@ import type { TransferRoute } from '../types/transport';
 import { apiGet, apiPut } from './apiClient';
 import { getAdminPassword } from './authStore';
 
-type Locale = 'en' | 'es';
+export type Locale = 'en' | 'es' | 'de' | 'fr';
 export type ServiceCategory = 'tours' | 'transport';
 
 interface RawPricingTier {
@@ -90,7 +90,12 @@ const slugify = (value: string) =>
     .replace(/(^-|-$)/g, '');
 
 /** The single per-person label, in the reader's language. */
-export const perPersonTier = (locale: Locale) => (locale === 'es' ? 'Personas' : 'Persons');
+export const perPersonTier = (locale: Locale): string => {
+  if (locale === 'es') return 'Personas';
+  if (locale === 'de') return 'Personen';
+  if (locale === 'fr') return 'Personnes';
+  return 'Persons';
+};
 
 /**
  * Every service is priced at one rate per person.

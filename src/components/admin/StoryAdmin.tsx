@@ -364,14 +364,13 @@ const StoryAdmin: React.FC = () => {
           unsaved, so it can be read before it goes anywhere near the site. */}
       <TranslateBar
         value={storyData}
-        from={locale === 'en' ? 'en' : 'es'}
+        from={locale as Lang}
         what="la página de inicio"
-        note="Traduce lo que tienes abierto y lo abre en el otro idioma para que lo revises. No se guarda hasta que pulses Guardar."
+        note="Traduce la página de inicio a los demás idiomas y los guarda."
         disabled={storyData.elements.length === 0 && !storyData.storyTitle}
-        onTranslated={(translated, to) => {
-          pendingTranslation.current = translated as StoryElementsData;
-          setLocale(to as JourneyLocale);
-          return `Abierto en ${to === 'en' ? 'inglés' : 'español'}. Revísalo y pulsa Guardar.`;
+        onTranslated={async (translated, to) => {
+          await saveStoryElements(translated as StoryElementsData, to as JourneyLocale);
+          return `Guardado en ${to.toUpperCase()}.`;
         }}
       />
 
@@ -385,7 +384,7 @@ const StoryAdmin: React.FC = () => {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="inline-flex rounded-full bg-paper-warm p-1">
-            {(['en', 'es'] as JourneyLocale[]).map((code) => (
+            {(['en', 'es', 'de', 'fr'] as JourneyLocale[]).map((code) => (
               <button
                 key={code}
                 type="button"
@@ -394,7 +393,7 @@ const StoryAdmin: React.FC = () => {
                   locale === code ? 'bg-white text-ink shadow-sm' : 'text-ink-light'
                 }`}
               >
-                {code === 'en' ? 'Inglés' : 'Español'}
+                {code === 'en' ? 'Inglés' : code === 'es' ? 'Español' : code === 'de' ? 'Alemán' : 'Francés'}
               </button>
             ))}
           </div>

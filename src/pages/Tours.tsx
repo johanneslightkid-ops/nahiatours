@@ -33,7 +33,7 @@ const Tours: React.FC = () => {
   }
 
   return (
-    <div className="pb-20">
+    <div className="page-top pb-20">
       <PageHeader
         tone="lagoon"
         kicker="Pick your day"

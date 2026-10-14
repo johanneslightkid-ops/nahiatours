@@ -145,7 +145,7 @@ const ServiceDetails: React.FC = () => {
 
   if (!service) {
     return (
-      <div className="section-shell py-20 text-center">
+      <div className="section-shell page-top pb-20 text-center">
         <p className="text-lg text-ink-soft">
           <FormattedMessage id="details.notFound" defaultMessage="Service details could not be found." />
         </p>
@@ -182,7 +182,7 @@ const ServiceDetails: React.FC = () => {
   };
 
   return (
-    <div className="bg-paper py-16">
+    <div className="page-top bg-paper pb-16">
       <div className="section-shell space-y-8">
         <div className="flex items-center justify-between gap-4">
           <Link to={category === 'transport' ? '/transport' : '/tours'} className="text-sm font-semibold text-lagoon-dark hover:text-lagoon-dark">
