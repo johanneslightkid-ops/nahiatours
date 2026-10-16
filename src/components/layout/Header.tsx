@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminNav from './AdminNav';
+import { showsBrandName } from '../../lib/brandDisplay';
 import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
@@ -79,9 +80,13 @@ const Header: React.FC = () => {
               <img src="/competitor-logo.svg" alt="" className="h-9 w-9" />
             )}
           </span>
-          <span className="font-display text-xl font-semibold tracking-tight text-ink transition group-hover:text-coral-deep sm:text-2xl">
-            {brandSettings.brandName}
-          </span>
+          {showsBrandName(brandSettings) ? (
+            <span className="font-display text-xl font-semibold tracking-tight text-ink transition group-hover:text-coral-deep sm:text-2xl">
+              {brandSettings.brandName}
+            </span>
+          ) : (
+            <span className="sr-only">{brandSettings.brandName}</span>
+          )}
         </Link>
 
         <button
