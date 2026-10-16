@@ -17,6 +17,7 @@ const API_PATH = '/api/data';
 const RESOURCES_WITH_LOCALE = [
   'intro-story',
   'story-elements',
+  'story-nodes',
   'translations',
   'blog',
   'tours',
@@ -29,6 +30,7 @@ const RESOURCES_SINGLE = [
   'social-media',
   'brand',
   'transfer-config',
+  'story-quiz-rules',
 ];
 
 async function main() {
@@ -49,9 +51,9 @@ async function main() {
     }
   }
 
-  // Populate localized resources (en, es)
+  // Populate localized resources (en, es, fr, de)
   for (const resource of RESOURCES_WITH_LOCALE) {
-    for (const locale of ['en', 'es']) {
+    for (const locale of ['en', 'es', 'fr', 'de']) {
       try {
         const data = await import(`../functions/data/${resource}-${locale}.json`, { assert: { type: 'json' } });
         const url = `${API_BASE}${API_PATH}?resource=${resource}&locale=${locale}`;

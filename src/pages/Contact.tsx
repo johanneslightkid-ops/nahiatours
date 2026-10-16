@@ -2,11 +2,16 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import ContactForm from '../components/ContactForm';
 import { useBrand } from '../contexts/BrandContext';
+import { getCardPaymentLink } from '../utils/paymentMethods';
 import PageHeader from '../components/layout/PageHeader';
 import { Toucan, Hibiscus } from '../components/ui/Illustrations';
 
 const Contact = () => {
   const { brandSettings } = useBrand();
+  // The bank's own payment link, whichever one the admin set. A link that
+  // expects an amount filled in is for a booking, not for an open deposit.
+  const cardLink = getCardPaymentLink(brandSettings);
+  const cardDepositLink = cardLink && !/\{(amount|monto|currency|ref)\}/i.test(cardLink) ? cardLink : '';
 
   return (
     <div className="pb-20">
@@ -32,9 +37,9 @@ const Contact = () => {
                   <FormattedMessage id="payment.paypalContact" defaultMessage="Pay deposit with PayPal" />
                 </a>
               )}
-              {brandSettings.verifoneLink && (
-                <a href={brandSettings.verifoneLink} target="_blank" rel="noreferrer" className="tropical-button-outline w-full sm:w-auto">
-                  <FormattedMessage id="payment.verifoneContact" defaultMessage="Pay deposit with Verifone" />
+              {cardDepositLink && (
+                <a href={cardDepositLink} target="_blank" rel="noreferrer" className="tropical-button-outline w-full sm:w-auto">
+                  <FormattedMessage id="payment.cardDeposit" defaultMessage="Pay a deposit by card" />
                 </a>
               )}
             </div>

@@ -1,12 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useI18n } from '../../contexts/I18nContext';
-import { BlogArticle, getBlogArticles, deleteBlogArticle, toggleBlogArticleVisibility } from '../../services/blogService';
+import { BlogArticle, getBlogArticles, deleteBlogArticle, toggleBlogArticleVisibility, saveBlogArticle } from '../../services/blogService';
 import { FaTrash, FaEye, FaEyeSlash } from 'react-icons/fa';
+import TranslateBar from './TranslateBar';
+import { useTranslationSync } from './useTranslationSync';
+import { Lang, sameProse, translateRecord } from '../../lib/autoTranslate';
 
 const BlogAdminPanel: React.FC = () => {
   const { locale } = useI18n();
   const [articles, setArticles] = useState<BlogArticle[]>([]);
   const [loading, setLoading] = useState(true);
+  const sync = useTranslationSync(locale as Lang);
+
+  /**
+   * Translate only the posts another language does not have — or has only as
+   * an untranslated copy. A post it already has in its own words is left as
+   * it is, however old.
+   */
+  const fillMissing = async (to: Lang, report: (line: string) => void): Promise<string | null> => {
+    const theirs = new Map((await getBlogArticles(to, true)).map((article) => [article.id, article]));
+    const missing = articles.filter((article) => {
+      const copy = theirs.get(article.id);
+      return !copy || sameProse(copy, article);
+    });
+    let done = 0;
+    for (const article of missing) {
+      report(`${done + 1}/${missing.length}`);
+      const { value } = await translateRecord(article, locale as Lang, to);
+      if (!(await saveBlogArticle({ ...value, locale: to }, to))) throw new Error('no se pudo guardar');
+      done += 1;
+    }
+    return done ? `${done} entrada(s) traducida(s)` : null;
+  };
 
   const fetchArticles = async () => {
     setLoading(true);
@@ -48,6 +73,14 @@ const BlogAdminPanel: React.FC = () => {
         <h2 className="text-3xl font-bold text-ink">Blog</h2>
         <div className="text-sm text-ink-light font-medium">Entradas en total: {articles.length}</div>
       </div>
+
+      <TranslateBar
+        sync={sync}
+        what="las entradas"
+        onSave={false}
+        fillMissing={fillMissing}
+        disabled={articles.length === 0}
+      />
 
       <div className="bg-white rounded-2xl shadow-sm border border-ink/15 overflow-hidden">
         <div className="overflow-x-auto">
