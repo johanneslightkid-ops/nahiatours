@@ -3,11 +3,7 @@ import { FaCheck, FaCopy, FaImages, FaMagic, FaMicrophone, FaRedo, FaSave, FaSea
 import { getTours, Tour } from '../../services/toursService';
 import { getAISettings, AISettings } from '../../services/aiSettingsService';
 import { AiGenerationError, GeneratedArticle, GeneratedPost, generateBlogPost, providerStatus } from '../../services/aiGeneratorService';
-import { saveBlogArticle, getBlogArticles, BlogArticle } from '../../services/blogService';
-import TranslateBar from './TranslateBar';
-import { useTranslationSync } from './useTranslationSync';
-import { Lang, translateRecord } from '../../lib/autoTranslate';
-import { SUPPORTED_LOCALES } from '../../contexts/I18nContext';
+import { saveBlogArticle, BlogArticle } from '../../services/blogService';
 import { getSocialApiSettings } from '../../services/socialApiSettingsService';
 import { getSocialMediaData, SocialMediaAccount } from '../../services/socialMediaService';
 import { apiPost } from '../../services/apiClient';
@@ -65,9 +61,6 @@ interface PostState {
   view: 'en' | 'es';
 }
 
-/** The generator writes English and Spanish itself; any other site language is translated from the English. */
-const EXTRA_LANGUAGES = SUPPORTED_LOCALES.filter((l) => l !== 'en' && l !== 'es') as Lang[];
-
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -117,7 +110,6 @@ const AIBlogGenAdmin: React.FC = () => {
   const [anyProviderUsable, setAnyProviderUsable] = useState<boolean | null>(null);
   const [posts, setPosts] = useState<PostState[]>([]);
   const [copied, setCopied] = useState('');
-  const sync = useTranslationSync('en');
 
   // ── Dictation ────────────────────────────────────────────────────────────
   const [recording, setRecording] = useState(false);
@@ -228,7 +220,7 @@ const AIBlogGenAdmin: React.FC = () => {
   const buildArticleRecord = (
     article: GeneratedArticle,
     post: GeneratedPost,
-    locale: Lang,
+    locale: 'en' | 'es',
     id: string
   ): BlogArticle => ({
     id,
@@ -246,33 +238,10 @@ const AIBlogGenAdmin: React.FC = () => {
     social: post.social,
   });
 
-  /** This one article, in a language the generator did not write. */
-  const translatePost = async (entry: PostState, to: Lang, report: (line: string) => void) => {
-    const { value } = await translateRecord(entry.post.en, 'en', to, (n, total) => report(`${n}/${total}`));
-    if (!(await saveBlogArticle(buildArticleRecord(value, entry.post, to, entry.id), to))) {
-      throw new Error('no se pudo guardar');
-    }
-    return '1 artículo traducido';
-  };
-
   const savePost = async (entry: PostState) => {
     await saveBlogArticle(buildArticleRecord(entry.post.en, entry.post, 'en', entry.id), 'en');
     await saveBlogArticle(buildArticleRecord(entry.post.es, entry.post, 'es', entry.id), 'es');
     setPosts((prev) => prev.map((p) => (p.id === entry.id ? { ...p, saved: true } : p)));
-    if (EXTRA_LANGUAGES.length > 0) {
-      void sync.afterSave((to, report) => translatePost(entry, to, report), EXTRA_LANGUAGES);
-    }
-  };
-
-  /** The published articles of this session that a language does not have yet. */
-  const fillMissingPosts = async (to: Lang, report: (line: string) => void): Promise<string | null> => {
-    const theirs = new Set((await getBlogArticles(to, true)).map((article) => article.id));
-    const missing = posts.filter((entry) => entry.saved && !theirs.has(entry.id));
-    for (const [i, entry] of missing.entries()) {
-      report(`${i + 1}/${missing.length}`);
-      await translatePost(entry, to, () => undefined);
-    }
-    return missing.length ? `${missing.length} artículo(s) traducido(s)` : null;
   };
 
   /** Publish through the configured Graph API token, when there is one. */
@@ -777,15 +746,6 @@ const AIBlogGenAdmin: React.FC = () => {
       </section>
 
       {/* ── The result ──────────────────────────────────────────────────── */}
-      {posts.length > 0 && (
-        <TranslateBar
-          sync={sync}
-          what="el artículo publicado"
-          languages={EXTRA_LANGUAGES}
-          fillMissing={fillMissingPosts}
-          disabled={!posts.some((entry) => entry.saved)}
-        />
-      )}
       {posts.map((entry) => {
         const article = entry.post[entry.view];
         const plain = `${article.title}\n\n${article.caption}\n\n${article.prelude}\n\n${article.body}`;

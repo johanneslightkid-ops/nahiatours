@@ -4,7 +4,7 @@ import type { TransferRoute } from '../types/transport';
 import { apiGet, apiPut } from './apiClient';
 import { getAdminPassword } from './authStore';
 
-export type Locale = 'en' | 'es' | 'de' | 'fr';
+type Locale = 'en' | 'es';
 export type ServiceCategory = 'tours' | 'transport';
 
 interface RawPricingTier {
@@ -90,12 +90,7 @@ const slugify = (value: string) =>
     .replace(/(^-|-$)/g, '');
 
 /** The single per-person label, in the reader's language. */
-export const perPersonTier = (locale: Locale): string => {
-  if (locale === 'es') return 'Personas';
-  if (locale === 'de') return 'Personen';
-  if (locale === 'fr') return 'Personnes';
-  return 'Persons';
-};
+export const perPersonTier = (locale: Locale) => (locale === 'es' ? 'Personas' : 'Persons');
 
 /**
  * Every service is priced at one rate per person.
@@ -182,16 +177,12 @@ const fetchServices = async (
   fallback: Tour[],
   category: ServiceCategory,
   locale: Locale,
-  allowFallback: boolean,
-  strict = false
+  allowFallback: boolean
 ): Promise<Tour[]> => {
   try {
     const data = await apiGet<unknown>(resource, { locale });
     return normalizeServices((data as Record<string, unknown>)?.record ?? data, fallback, category, locale);
   } catch (error) {
-    // A list that is about to be written back must not be an empty stand-in
-    // for one that failed to load, or the save would wipe the real one.
-    if (strict) throw error;
     console.error(`Failed to fetch services for ${resource}:`, error);
     return allowFallback ? fallback : [];
   }
@@ -200,12 +191,11 @@ const fetchServices = async (
 export const getExampleTours = async (locale: Locale): Promise<Tour[]> =>
   fetchServices('example-tours', staticTours, 'tours', locale, true);
 
-/** `strict`: throw when the list cannot be read, for callers that write it back. */
-export const getTours = async (locale: Locale, strict = false): Promise<Tour[]> =>
-  fetchServices('tours', [], 'tours', locale, false, strict);
+export const getTours = async (locale: Locale): Promise<Tour[]> =>
+  fetchServices('tours', [], 'tours', locale, false);
 
-export const getTransportServices = async (locale: Locale, strict = false): Promise<Tour[]> =>
-  fetchServices('transport-services', [], 'transport', locale, false, strict);
+export const getTransportServices = async (locale: Locale): Promise<Tour[]> =>
+  fetchServices('transport-services', [], 'transport', locale, false);
 
 export const getServicesByCategory = async (
   category: ServiceCategory,

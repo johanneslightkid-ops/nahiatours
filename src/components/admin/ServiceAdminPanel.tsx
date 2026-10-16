@@ -1,22 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import TranslateBar from './TranslateBar';
-import { useTranslationSync } from './useTranslationSync';
 import { Link } from 'react-router-dom';
 import { uploadImage, Tour, PricingOption } from '../../services/toursService';
 import MarkdownEditor from '../ui/MarkdownEditor';
-import { Lang, describeSync, fillMissingList, syncList, ListSyncOptions } from '../../lib/autoTranslate';
 
 type Category = 'tours' | 'transport';
 
 interface ServiceAdminPanelProps {
   /**
-   * Which language the list on screen is in, and how to read and write the
-   * other languages' lists. All optional: without them the translate strip is
-   * simply absent, which is what a panel that is not multilingual wants.
+   * Which language the list on screen is in, and where to put a translation
+   * of it. Both optional: without them the translate strip is simply absent,
+   * which is what a panel that is not bilingual wants.
    */
-  locale?: Lang;
-  loadTranslation?: (to: Lang) => Promise<Tour[]>;
-  saveTranslation?: (services: Tour[], to: Lang) => Promise<void>;
+  locale?: 'en' | 'es';
+  saveTranslation?: (services: Tour[], to: 'en' | 'es') => Promise<void>;
   title: string;
   category: Category;
   services: Tour[];
@@ -81,17 +78,10 @@ const buildPricingOption = (option: PricingOption): PricingOption => {
   };
 };
 
-/**
- * The languages' lists are paired by position — the third tour in German is
- * the third tour in Spanish — so that is how a change is found in them.
- */
-const PAIRING: ListSyncOptions<Tour> = { keyOf: (service) => String(service.id), match: 'position' };
-
 const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   title,
   category,
   locale,
-  loadTranslation,
   saveTranslation,
   services,
   setServices,
@@ -103,8 +93,6 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [draft, setDraft] = useState<Tour>(createEmptyService());
   const isEditing = editingId !== null;
-  const sync = useTranslationSync(locale ?? 'es');
-  const translatable = Boolean(locale && loadTranslation && saveTranslation);
 
   useEffect(() => {
     loadServices();
@@ -189,57 +177,29 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
     };
   };
 
-  /**
-   * Carry one save into the other languages: the edited, added or deleted
-   * service only. Runs after the save, in the background of the strip.
-   */
-  const translateChange = (before: Tour[], after: Tour[]) => {
-    if (!translatable || !locale || !loadTranslation || !saveTranslation) return;
-    void sync.afterSave(async (to, report) => {
-      const target = await loadTranslation(to);
-      const result = await syncList(target, before, after, locale, to, { ...PAIRING, onProgress: report });
-      if (!result.changed) return null;
-      await saveTranslation(result.list, to);
-      return describeSync(result);
-    });
-  };
-
-  const fillMissing = async (to: Lang, report: (line: string) => void) => {
-    if (!locale || !loadTranslation || !saveTranslation) return null;
-    const result = await fillMissingList(await loadTranslation(to), services, locale, to, {
-      ...PAIRING,
-      onProgress: report,
-    });
-    if (!result.changed) return null;
-    await saveTranslation(result.list, to);
-    return describeSync(result);
-  };
-
   const handleSave = async () => {
     const nextDraft = buildDraft();
     const nextServices = isEditing
       ? services.map((service) => (service.id === editingId ? nextDraft : service))
       : [...services, { ...nextDraft, id: Math.max(0, ...services.map((service) => service.id)) + 1 }];
 
-    const before = services;
     setServices(nextServices);
     await saveServices(nextServices);
     resetDraft();
-    translateChange(before, nextServices);
   };
 
   const handleDelete = async (id: number) => {
-    const before = services;
     const nextServices = services.filter((service) => service.id !== id);
     setServices(nextServices);
     await saveServices(nextServices);
-    translateChange(before, nextServices);
   };
 
   const handleImageUpload = async (index: number, file: File) => {
     const uploaded = await uploadImage(file);
     updateImage(index, uploaded);
   };
+
+  const other = locale === 'en' ? 'es' : 'en';
 
   return (
     <div className="space-y-8">
@@ -250,15 +210,28 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
         </Link>
       </div>
 
-      {/* Only when this panel was told which language it is showing AND how
-          to reach the others. The strip hides itself when no AI provider on
-          this deployment can answer. */}
-      {translatable && (
+      {/* Only when this panel was told which language it is showing AND given
+          somewhere to put the other one. The strip hides itself again if no AI
+          provider on this deployment can answer. */}
+      {locale && saveTranslation && (
         <TranslateBar
-          sync={sync}
-          what={category === 'transport' ? 'el servicio de transporte editado' : 'la excursión editada'}
-          fillMissing={fillMissing}
-          disabled={services.length === 0}
+          value={sortedServices}
+          from={locale}
+          what={category === 'transport' ? 'los servicios de transporte' : 'las excursiones'}
+          note={
+            category === 'transport'
+              ? `Traduce los servicios que ves aquí y los guarda en la ficha de ${
+                  other === 'en' ? 'inglés' : 'español'
+                }. Cambia el idioma arriba para revisarlos. Lo que ya haya ahí se reemplaza.`
+              : `Traduce las excursiones que ves aquí y las guarda en la ficha de ${
+                  other === 'en' ? 'inglés' : 'español'
+                }. Cambia el idioma arriba para revisarlas. Lo que ya haya ahí se reemplaza.`
+          }
+          disabled={sortedServices.length === 0}
+          onTranslated={async (translated) => {
+            await saveTranslation(translated as Tour[], other);
+            return `Guardado en ${other === 'en' ? 'inglés' : 'español'}. Cambia el idioma para revisarlo.`;
+          }}
         />
       )}
 

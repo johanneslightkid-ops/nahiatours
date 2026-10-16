@@ -1,9 +1,5 @@
-import { buildGermanCopy } from './copy.de';
-import { buildFrenchCopy } from './copy.fr';
-
 /**
- * Copy for the "Plan My Day" experience. English and Spanish live here; German
- * and French are in copy.de.ts and copy.fr.ts, typed against the same shape.
+ * Bilingual copy for the "Plan My Day" experience.
  *
  * Kept in one typed module (rather than the remote-editable react-intl bundle)
  * because the planner needs dozens of tightly-coupled strings — questions,
@@ -600,40 +596,9 @@ const es: CopyShape = {
   },
 };
 
+export const plannerCopy = { en, es } as const;
+
 export type PlannerCopy = CopyShape;
 
-const de: PlannerCopy = buildGermanCopy(en.whatsapp);
-const fr: PlannerCopy = buildFrenchCopy(en.whatsapp);
-
-export const plannerCopy = { en, es, de, fr } as const;
-
-const DEFAULT_CONTACT: Record<keyof typeof plannerCopy, string> = {
-  en: 'our team',
-  es: 'nuestro equipo',
-  de: 'unser Team',
-  fr: 'notre équipe',
-};
-
-/** Replace the former hardcoded representative name throughout planner copy. */
-const personaliseCopy = <T,>(value: T, name: string): T => {
-  if (typeof value === 'string') return value.replaceAll('Francisco', name) as T;
-  if (typeof value === 'function') {
-    return ((...args: unknown[]) => {
-      const result = (value as (...input: unknown[]) => unknown)(...args);
-      return typeof result === 'string' ? result.replaceAll('Francisco', name) : result;
-    }) as T;
-  }
-  if (Array.isArray(value)) return value.map((item) => personaliseCopy(item, name)) as T;
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, personaliseCopy(item, name)])
-    ) as T;
-  }
-  return value;
-};
-
-export const getPlannerCopy = (locale: string, contactName = ''): PlannerCopy => {
-  const key = (['es', 'de', 'fr'] as const).find((code) => locale.startsWith(code)) ?? 'en';
-  const name = contactName.trim() || DEFAULT_CONTACT[key];
-  return personaliseCopy(plannerCopy[key] as PlannerCopy, name);
-};
+export const getPlannerCopy = (locale: string): PlannerCopy =>
+  locale.startsWith('es') ? es : en;

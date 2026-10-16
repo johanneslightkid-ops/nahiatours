@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import TranslateBar from './TranslateBar';
-import { useTranslationSync } from './useTranslationSync';
 import {
   FaPlus,
   FaTrash,
@@ -28,15 +27,6 @@ import {
   uploadImage,
 } from '../../services/storyElementsService';
 import { JourneyLocale } from '../../services/introStoryService';
-import {
-  Lang,
-  ListSyncOptions,
-  describeSync,
-  fillMissingList,
-  syncList,
-  syncRecord,
-  translateRecord,
-} from '../../lib/autoTranslate';
 import MarkdownField from '../ui/MarkdownField';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
 
@@ -103,16 +93,6 @@ const videoThumb = (url: string): string | null => {
 /** `element-${Date.now()}` collides when two blocks are added in one tick. */
 const newId = () => `element-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
-/**
- * Blocks keep their id across languages — except where a language was written
- * apart and numbered its own, so the block at the same place stands in.
- */
-const STORY_PAIRING: ListSyncOptions<StoryElement> = {
-  keyOf: (element) => element.id,
-  match: 'key',
-  positionalFallback: true,
-};
-
 const StoryAdmin: React.FC = () => {
   const [locale, setLocale] = useState<JourneyLocale>('en');
   const [storyData, setStoryData] = useState<StoryElementsData>({
@@ -127,15 +107,26 @@ const StoryAdmin: React.FC = () => {
   const [addingAfter, setAddingAfter] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  /** The story as loaded or last saved, so a save knows what it changed. */
-  const original = useRef<StoryElementsData>({ storyTitle: '', storyTagline: '', elements: [] });
-  const sync = useTranslationSync(locale as Lang);
+  /**
+   * A translation waiting to be shown, held across the language switch.
+   *
+   * Switching language reloads from storage, which is right every other time
+   * and exactly wrong here: the whole point is to put the untranslated-yet
+   * version of the other language ON SCREEN for review. So the translation is
+   * parked here, the language flips, and this load hands it over instead of
+   * fetching — once. Nothing is saved until the operator presses save.
+   */
+  const pendingTranslation = useRef<StoryElementsData | null>(null);
 
   const loadStory = useCallback(async () => {
+    if (pendingTranslation.current) {
+      setStoryData(pendingTranslation.current);
+      pendingTranslation.current = null;
+      setEditing(null);
+      return;
+    }
     const data = await getStoryElements(locale);
-    const loaded = data ?? { storyTitle: '', storyTagline: '', elements: [] };
-    original.current = loaded;
-    setStoryData(loaded);
+    setStoryData(data ?? { storyTitle: '', storyTagline: '', elements: [] });
     setEditing(null);
   }, [locale]);
 
@@ -157,70 +148,11 @@ const StoryAdmin: React.FC = () => {
     try {
       const ok = await saveStoryElements(storyData, locale);
       flash(ok ? 'success' : 'error', ok ? '¡Historia guardada!' : 'No se pudo guardar la historia');
-      if (ok) {
-        const before = original.current;
-        const after = storyData;
-        original.current = after;
-        void sync.afterSave((to, report) => carryStory(to, report, before, after));
-      }
     } catch {
       flash('error', 'Error al guardar la historia');
     } finally {
       setIsSaving(false);
     }
-  };
-
-  /**
-   * One save, carried into another language: the blocks that were added,
-   * edited, moved or deleted, and the title only if it changed. A language
-   * with no story at all is the one case translated whole.
-   */
-  const carryStory = async (
-    to: Lang,
-    report: (line: string) => void,
-    before: StoryElementsData,
-    after: StoryElementsData
-  ): Promise<string | null> => {
-    const target = await getStoryElements(to as JourneyLocale, true);
-    let next: StoryElementsData;
-    let said: string | null;
-    if (!target || (!target.storyTitle.trim() && target.elements.length === 0)) {
-      next = (await translateRecord(after, locale as Lang, to, (n, total) => report(`${n}/${total}`))).value;
-      said = 'historia completa traducida';
-    } else {
-      const head = (d: StoryElementsData) => ({ storyTitle: d.storyTitle, storyTagline: d.storyTagline });
-      const headChanged = JSON.stringify(head(before)) !== JSON.stringify(head(after));
-      const header = headChanged
-        ? await syncRecord(head(before), head(after), head(target), locale as Lang, to)
-        : { value: head(target), translated: false };
-      const blocks = await syncList(target.elements, before.elements, after.elements, locale as Lang, to, {
-        ...STORY_PAIRING,
-        onProgress: report,
-      });
-      next = { ...target, ...header.value, elements: blocks.list };
-      said = [header.translated ? 'título traducido' : null, describeSync(blocks)].filter(Boolean).join(', ') || null;
-    }
-    if (JSON.stringify(next) === JSON.stringify(target)) return null;
-    if (!(await saveStoryElements(next, to as JourneyLocale))) throw new Error('no se pudo guardar');
-    return said ?? 'actualizado';
-  };
-
-  /** Only the blocks a language does not have yet. */
-  const fillMissingStory = async (to: Lang, report: (line: string) => void): Promise<string | null> => {
-    const source = original.current;
-    const target = await getStoryElements(to as JourneyLocale, true);
-    if (!target || (!target.storyTitle.trim() && target.elements.length === 0)) {
-      return carryStory(to, report, { storyTitle: '', storyTagline: '', elements: [] }, source);
-    }
-    const blocks = await fillMissingList(target.elements, source.elements, locale as Lang, to, {
-      ...STORY_PAIRING,
-      onProgress: report,
-    });
-    if (!blocks.changed) return null;
-    if (!(await saveStoryElements({ ...target, elements: blocks.list }, to as JourneyLocale))) {
-      throw new Error('no se pudo guardar');
-    }
-    return describeSync(blocks);
   };
 
   const updateElement = (id: string, field: string, value: any) =>
@@ -428,12 +360,19 @@ const StoryAdmin: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Saving carries the changed blocks into the other languages. */}
+      {/* Translate what is open into the other language and SHOW it there,
+          unsaved, so it can be read before it goes anywhere near the site. */}
       <TranslateBar
-        sync={sync}
-        what="lo que cambiaste (bloques añadidos, editados, movidos o quitados)"
-        fillMissing={fillMissingStory}
+        value={storyData}
+        from={locale === 'en' ? 'en' : 'es'}
+        what="la página de inicio"
+        note="Traduce lo que tienes abierto y lo abre en el otro idioma para que lo revises. No se guarda hasta que pulses Guardar."
         disabled={storyData.elements.length === 0 && !storyData.storyTitle}
+        onTranslated={(translated, to) => {
+          pendingTranslation.current = translated as StoryElementsData;
+          setLocale(to as JourneyLocale);
+          return `Abierto en ${to === 'en' ? 'inglés' : 'español'}. Revísalo y pulsa Guardar.`;
+        }}
       />
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
@@ -446,7 +385,7 @@ const StoryAdmin: React.FC = () => {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="inline-flex rounded-full bg-paper-warm p-1">
-            {(['en', 'es', 'de', 'fr'] as JourneyLocale[]).map((code) => (
+            {(['en', 'es'] as JourneyLocale[]).map((code) => (
               <button
                 key={code}
                 type="button"
@@ -455,7 +394,7 @@ const StoryAdmin: React.FC = () => {
                   locale === code ? 'bg-white text-ink shadow-sm' : 'text-ink-light'
                 }`}
               >
-                {code === 'en' ? 'Inglés' : code === 'es' ? 'Español' : code === 'de' ? 'Alemán' : 'Francés'}
+                {code === 'en' ? 'Inglés' : 'Español'}
               </button>
             ))}
           </div>

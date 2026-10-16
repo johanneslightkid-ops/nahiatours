@@ -3,11 +3,11 @@ import { BrandSettings } from '../services/brandService';
 /**
  * Which payment methods a guest is actually offered.
  *
- * A guest sees three ways to pay — by CARD, by PayPal, or in person through
- * the concierge — and nothing about who processes the card. Stripe, AZUL
- * (Banco Popular) and CardNET are the operator's choice, made in the admin;
- * the server picks the configured one when a card payment starts. So "card"
- * is one method here however many processors are set up behind it.
+ * Ported from the kinglobstertours fork, which is where this model was worked
+ * out, with one change: Stripe counts as configured when the SERVER says a
+ * secret key is on file, not when a key sits in the brand record. The browser
+ * is never told what that key is, so `stripeReady` has to be passed in from
+ * the payment-config status rather than read off brandSettings.
  *
  * Two independent facts decide whether a method appears:
  *
@@ -17,15 +17,11 @@ import { BrandSettings } from '../services/brandService';
  * Only both together make it visible. A method that is switched on but not
  * configured stays hidden, because the alternative is a button that takes a
  * guest to a dead end.
- *
- * Card counts as configured when the master switch ("Aceptar tarjetas") is on
- * AND either the server reports a processor ready, or the operator pasted a
- * payment link from a processor's portal.
  */
 
-export type PaymentMethodId = 'card' | 'paypal' | 'cash';
+export type PaymentMethodId = 'stripe' | 'paypal' | 'cash';
 
-export const PAYMENT_METHOD_IDS: PaymentMethodId[] = ['card', 'paypal', 'cash'];
+export const PAYMENT_METHOD_IDS: PaymentMethodId[] = ['stripe', 'paypal', 'cash'];
 
 export interface PaymentMethodState {
   /** The method has everything it needs to actually take a payment. */
@@ -42,31 +38,21 @@ const hasValue = (value?: string | null): boolean =>
   typeof value === 'string' && value.trim().length > 0;
 
 /**
- * A payment link pasted from a processor's portal — an AZUL "Link de Pagos",
- * a CardNET "Enlace de Pago", a Stripe Payment Link or similar — used when no
- * processor is configured with credentials. Empty when there is none.
- */
-export const getCardPaymentLink = (brandSettings: BrandSettings): string =>
-  [brandSettings.azulLink, brandSettings.cardnetLink, brandSettings.verifoneLink]
-    .find((link) => hasValue(link))
-    ?.trim() ?? '';
-
-/** Kept for callers of the old name: the hosted card page, when there is one. */
-export const getCardCheckoutLink = getCardPaymentLink;
-
-/**
- * @param cardReady whether the server reports a card processor configured.
+ * @param stripeReady whether /api/payment-config reports a secret key on file.
  *        Unknown (the storefront has not asked, or the call failed) is treated
  *        as false, so a card button is never shown on a guess.
  */
 export const isPaymentMethodConfigured = (
   brandSettings: BrandSettings,
   method: PaymentMethodId,
-  cardReady = false
+  stripeReady = false
 ): boolean => {
   switch (method) {
-    case 'card':
-      return Boolean(brandSettings.stripeEnabled) && (cardReady || hasValue(getCardPaymentLink(brandSettings)));
+    case 'stripe':
+      // A hosted link the operator pasted in is a valid way to take a card
+      // even with no API key, so either one counts.
+      return Boolean(brandSettings.stripeEnabled) &&
+        (stripeReady || hasValue(brandSettings.verifoneLink));
     case 'paypal':
       return hasValue(brandSettings.paypalMeLink);
     case 'cash':
@@ -76,29 +62,18 @@ export const isPaymentMethodConfigured = (
   }
 };
 
-/**
- * Visibility toggles default to on, so a freshly configured method shows up
- * right away. Card's switch is stored under `stripe` — the name it had when
- * Stripe was the only card processor — so existing settings carry over.
- */
-const visibilityKey = (method: PaymentMethodId) => (method === 'card' ? 'stripe' : method);
-
-export const isPaymentMethodEnabled = (brandSettings: BrandSettings, method: PaymentMethodId): boolean =>
-  brandSettings.paymentVisibility?.[visibilityKey(method)] ?? true;
-
-/** The brand-record patch that switches a method on or off. */
-export const withPaymentMethodEnabled = (
+/** Visibility toggles default to on, so a freshly configured method shows up right away. */
+export const isPaymentMethodEnabled = (
   brandSettings: BrandSettings,
-  method: PaymentMethodId,
-  enabled: boolean
-): BrandSettings => ({
-  ...brandSettings,
-  paymentVisibility: { ...brandSettings.paymentVisibility, [visibilityKey(method)]: enabled },
-});
+  method: PaymentMethodId
+): boolean => brandSettings.paymentVisibility?.[method] ?? true;
 
-export const getPaymentMethodStates = (brandSettings: BrandSettings, cardReady = false): PaymentMethodStates =>
+export const getPaymentMethodStates = (
+  brandSettings: BrandSettings,
+  stripeReady = false
+): PaymentMethodStates =>
   PAYMENT_METHOD_IDS.reduce((states, method) => {
-    const configured = isPaymentMethodConfigured(brandSettings, method, cardReady);
+    const configured = isPaymentMethodConfigured(brandSettings, method, stripeReady);
     const enabled = isPaymentMethodEnabled(brandSettings, method);
     states[method] = { configured, enabled, visible: configured && enabled };
     return states;
@@ -107,10 +82,22 @@ export const getPaymentMethodStates = (brandSettings: BrandSettings, cardReady =
 export const isPaymentMethodVisible = (
   brandSettings: BrandSettings,
   method: PaymentMethodId,
-  cardReady = false
+  stripeReady = false
 ): boolean =>
-  isPaymentMethodConfigured(brandSettings, method, cardReady) && isPaymentMethodEnabled(brandSettings, method);
+  isPaymentMethodConfigured(brandSettings, method, stripeReady) &&
+  isPaymentMethodEnabled(brandSettings, method);
 
 /** False when every method is unconfigured or hidden — the storefront then offers WhatsApp only. */
-export const hasVisiblePaymentMethod = (brandSettings: BrandSettings, cardReady = false): boolean =>
-  PAYMENT_METHOD_IDS.some((method) => isPaymentMethodVisible(brandSettings, method, cardReady));
+export const hasVisiblePaymentMethod = (
+  brandSettings: BrandSettings,
+  stripeReady = false
+): boolean =>
+  PAYMENT_METHOD_IDS.some((method) => isPaymentMethodVisible(brandSettings, method, stripeReady));
+
+/**
+ * The hosted page a card payment should open when there is no API key — the
+ * operator's own Stripe Payment Link, Verifone portal or similar. Empty when
+ * the API is doing the work instead.
+ */
+export const getCardCheckoutLink = (brandSettings: BrandSettings): string =>
+  hasValue(brandSettings.verifoneLink) ? brandSettings.verifoneLink.trim() : '';

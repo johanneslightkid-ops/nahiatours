@@ -1,99 +1,63 @@
-import React, { useEffect, useState } from 'react';
-import { localeText } from '../../lib/localeText';
-import { motion } from 'framer-motion';
+import React from 'react';
 import { usePlanner } from '../../contexts/PlannerContext';
 import { useI18n } from '../../contexts/I18nContext';
-import { useBrand } from '../../contexts/BrandContext';
-import { getPublishedTestimonials, getRatingVisibility } from '../../services/testimonialService';
 import { Sailboat, Starfish, Hibiscus, Cocktail } from '../ui/Illustrations';
 
 /**
- * Four pebbles washed up on the sand, each holding one hard fact. The
- * excursion count comes from the live catalogue the planner already loaded,
- * so it can never drift from the truth.
+ * A slim band of hard facts under the hero. The excursion count comes from the
+ * live catalogue the planner already loaded, so it can never drift from truth.
+ * Each fact is a drawn ticket: illustration, number, label.
  */
-const SHAPES = [
-  'rounded-[58%_42%_55%_45%/48%_56%_44%_52%]',
-  'rounded-[44%_56%_46%_54%/56%_44%_56%_44%]',
-  'rounded-[52%_48%_40%_60%/46%_58%_42%_54%]',
-  'rounded-[46%_54%_58%_42%/54%_46%_52%_48%]',
-];
-
 const QuickFacts: React.FC = () => {
   const { catalogue } = usePlanner();
   const { locale } = useI18n();
-  const { brandSettings } = useBrand();
   const isEs = locale === 'es';
-  const say = (texts: { en: string; es: string; de: string; fr: string }) => localeText(locale, texts);
-  const [ratingValue, setRatingValue] = useState<string>('—');
-
-  useEffect(() => {
-    let active = true;
-
-    const load = async () => {
-      const testimonials = await getPublishedTestimonials();
-      if (!active) return;
-      const range = brandSettings.heroRatingRange ?? { min: 3, max: 5 };
-      const result = getRatingVisibility(testimonials, {
-        enabled: brandSettings.heroRatingEnabled,
-        min: range.min,
-        max: range.max,
-      });
-      setRatingValue(result.visible && result.average !== null ? result.average.toFixed(2) : '—');
-    };
-
-    void load();
-    return () => { active = false; };
-  }, [brandSettings.heroRatingEnabled, brandSettings.heroRatingRange]);
-
-  const ratingFact = {
-    value: ratingValue,
-    label: say({ en: 'average guest rating', es: 'valoración media', de: 'durchschnittliche Gästebewertung', fr: 'note moyenne des voyageurs' }),
-    art: <Starfish className="h-11 w-11" />,
-    tone: 'from-[#E3FBF7] to-[#93ECE1]',
-  };
 
   const facts = [
     {
       value: catalogue.length > 0 ? String(catalogue.length) : '—',
-      label: say({ en: 'curated excursions', es: 'excursiones seleccionadas', de: 'ausgewählte Ausflüge', fr: 'excursions sélectionnées' }),
-      art: <Sailboat className="h-12 w-12" />,
-      tone: 'from-[#FFF1CF] to-[#FFD47E]',
+      label: isEs ? 'excursiones seleccionadas' : 'curated excursions',
+      art: <Sailboat className="h-10 w-10" />,
+      tone: 'bg-mango-light',
     },
-    ...(ratingValue !== '—' ? [ratingFact] : []),
+    {
+      value: '4.99',
+      label: isEs ? 'valoración media' : 'average guest rating',
+      art: <Starfish className="h-10 w-10" />,
+      tone: 'bg-lagoon-light',
+    },
     {
       value: '24/7',
-      label: say({ en: 'WhatsApp response', es: 'respuesta por WhatsApp', de: 'Antwort per WhatsApp', fr: 'réponse sur WhatsApp' }),
-      art: <Cocktail className="h-11 w-11" />,
-      tone: 'from-[#FFE9E4] to-[#FFB1A6]',
+      label: isEs ? 'respuesta por WhatsApp' : 'WhatsApp response',
+      art: <Cocktail className="h-10 w-10" />,
+      tone: 'bg-hibiscus-light',
     },
     {
-      value: say({ en: 'Included', es: 'Incluido', de: 'Inklusive', fr: 'Inclus' }),
-      label: say({ en: 'hotel pick-up & drop-off', es: 'recogida en el hotel', de: 'Abholung & Rückfahrt zum Hotel', fr: 'aller-retour depuis l’hôtel' }),
-      art: <Hibiscus className="h-11 w-11" />,
-      tone: 'from-[#EDF8E6] to-[#A3DB93]',
+      value: isEs ? 'Incluido' : 'Included',
+      label: isEs ? 'recogida en el hotel' : 'hotel pick-up & drop-off',
+      art: <Hibiscus className="h-10 w-10" />,
+      tone: 'bg-jungle-light',
     },
   ];
 
   return (
-    <section className="relative z-10 bg-paper">
-      <div className="section-shell grid grid-cols-2 gap-x-5 gap-y-7 pb-14 pt-8 sm:gap-8 md:grid-cols-4">
+    <section className="wavy-band relative z-10 bg-paper">
+      <div className="section-shell grid grid-cols-2 gap-5 py-16 sm:gap-6 md:grid-cols-4">
         {facts.map((fact, index) => (
-          <motion.div
+          <div
             key={fact.label}
-            initial={{ opacity: 0, y: 24, rotate: index % 2 ? 4 : -4 }}
-            whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ type: 'spring', stiffness: 120, damping: 14, delay: index * 0.08 }}
-            whileHover={{ y: -6, rotate: index % 2 ? 2 : -2 }}
-            className={`flex aspect-[1.15] flex-col items-center justify-center bg-gradient-to-br ${fact.tone} ${SHAPES[index]} px-3 text-center shadow-ink`}
+            className={`flex flex-col items-center rounded-[22px] border-[2.5px] border-ink ${fact.tone} px-3 py-5 text-center shadow-ink-sm transition-transform duration-300 hover:-translate-y-1.5 ${
+              index % 2 === 0 ? '-rotate-1 hover:rotate-1' : 'rotate-1 hover:-rotate-1'
+            }`}
           >
-            <span className="mb-1.5">{fact.art}</span>
-            <div className="font-display text-2xl font-bold leading-none text-ink sm:text-3xl">{fact.value}</div>
-            <div className="mt-1.5 max-w-[9rem] text-[0.64rem] font-extrabold uppercase tracking-[0.12em] text-ink-soft">
+            <span className="mb-2">{fact.art}</span>
+            <div className="font-display text-2xl font-extrabold leading-none text-ink sm:text-3xl">
+              {fact.value}
+            </div>
+            <div className="mt-1.5 text-[0.66rem] font-extrabold uppercase tracking-[0.12em] text-ink-soft">
               {fact.label}
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </section>

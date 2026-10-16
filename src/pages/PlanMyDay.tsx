@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { localeText } from '../lib/localeText';
 import { motion } from 'framer-motion';
 import { usePlanner } from '../contexts/PlannerContext';
 import { usePlannerCopy } from '../planner/usePlannerCopy';
@@ -19,28 +18,24 @@ const PlanMyDay: React.FC = () => {
 
   useEffect(() => {
     const previous = document.title;
-    document.title = localeText(locale, {
-      en: 'Plan My Day · Punta Cana Excursions',
-      es: 'Planea mi Día · Excursiones en Punta Cana',
-      de: 'Meinen Tag planen · Ausflüge in Punta Cana',
-      fr: 'Planifier ma journée · Excursions à Punta Cana',
-    });
+    document.title =
+      locale === 'es'
+        ? 'Planea mi Día · Excursiones en Punta Cana'
+        : 'Plan My Day · Punta Cana Excursions';
     return () => {
       document.title = previous;
     };
   }, [locale]);
 
-  // Every new planner state is placed at the viewport origin immediately.
-  // A smooth scroll leaves the preceding question in view while a timed
-  // auto-advance is already showing the next one, which makes the guided flow
-  // feel as though it stalled.
+  // Every step — and the finished plan — starts at the top. Without this a
+  // guest who pressed the button near the bottom of a long card sees nothing
+  // move and assumes it did not work.
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }));
-    return () => window.cancelAnimationFrame(frame);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [stage, stepIndex]);
 
   return (
-    <div className="planner page-top relative min-h-screen px-4 pb-12 sm:pb-16 md:px-8">
+    <div className="planner relative min-h-screen px-4 py-12 sm:py-16 md:px-8">
       <FABWhatsApp phoneNumber={brandSettings.phoneNumber} />
 
       {/* Painted washes behind the panels. They deliberately bleed past the

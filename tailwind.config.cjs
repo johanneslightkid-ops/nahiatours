@@ -1,15 +1,11 @@
 /**
- * El Cortecito — the living-water design system.
+ * Illustrated tropical design system.
  *
- * Where the other sites are posters or paintings, this one is a naturalist's
- * field book laid open on the sand at El Cortecito: botanical leaves, reef
- * fish, birds of the Hispaniolan coast, and real moving water underneath it
- * all (src/components/water/*, WebGL). Shapes are organic — leaves, pebbles,
- * currents — never boxes with hard offset shadows.
- *
- * The nine colour families every branch defines are all here, under the same
- * names, so the shared admin and planner code keeps resolving. Only their
- * values are this site's own.
+ * The site used to be a dark "luxury" theme leaning on photography, glass and
+ * blur. It is now drawn rather than photographed: flat poster colours, ink
+ * outlines, hard offset shadows and rounded sticker shapes. Everything here is
+ * intentionally opaque — no translucent surfaces — so the illustration reads
+ * cleanly at any size.
  */
 module.exports = {
   content: [
@@ -18,119 +14,107 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Mangrove ink: a deep green-teal that reads as near-black on sand.
+        // Poster palette. Each hue is flat and saturated enough to hold its own
+        // next to a black ink outline.
         ink: {
-          DEFAULT: '#0E3B36',
-          soft: '#3E615B',
-          light: '#7D9A94',
+          DEFAULT: '#1E2A3A',
+          soft: '#42566B',
+          light: '#7C8FA3',
         },
-        // Sand, from dry dune to wet shoreline.
         paper: {
-          DEFAULT: '#FBF5E8',
-          warm: '#F5EAD3',
-          deep: '#E9D8B6',
-          card: '#FFFDF8',
+          DEFAULT: '#FFF6E5',
+          warm: '#FFEFD6',
+          deep: '#F7E3C2',
+          // The surface an admin card sits on: lighter than the page so forms
+          // read as sheets laid on the ground.
+          card: '#FFFDF7',
         },
-        // Papaya and morning sun.
         mango: {
-          light: '#FFD47E',
-          DEFAULT: '#F7B23B',
-          dark: '#D98612',
+          light: '#FFC861',
+          DEFAULT: '#FFA62B',
+          dark: '#F07E13',
         },
-        // Hibiscus and coral reef.
         hibiscus: {
-          light: '#FFB1A6',
-          DEFAULT: '#F2675C',
-          dark: '#CF453E',
+          light: '#FF9AA8',
+          DEFAULT: '#FF5D73',
+          dark: '#E03B57',
         },
-        // Caribbean turquoise.
         lagoon: {
-          light: '#93ECE1',
-          DEFAULT: '#17B5AC',
-          dark: '#0A7C76',
+          light: '#7FE3DA',
+          DEFAULT: '#21C0B7',
+          dark: '#128C8A',
         },
         sky: {
-          light: '#BDE9FA',
-          DEFAULT: '#4DB6E5',
-          dark: '#197DB1',
+          light: '#A5E4FF',
+          DEFAULT: '#4CC3F0',
+          dark: '#1C86BE',
         },
-        // Leaf greens, from new fern to old palm.
         jungle: {
-          light: '#A3DB93',
-          DEFAULT: '#3E9B50',
-          dark: '#1E6A3B',
+          light: '#7BD389',
+          DEFAULT: '#2FA84F',
+          dark: '#1B7A3C',
         },
-        // Flamboyán blossom.
         sunset: {
-          light: '#FFB592',
-          DEFAULT: '#F2723C',
-          dark: '#C7491C',
+          light: '#FFB38A',
+          DEFAULT: '#FF7A45',
+          dark: '#DD4F1E',
         },
-        // Wild orchid.
         grape: {
-          light: '#D9BAF2',
-          DEFAULT: '#9C6CD0',
-          dark: '#6E45A3',
+          light: '#C9A7F5',
+          DEFAULT: '#9163DE',
+          dark: '#6B3FB5',
         },
-        // Roles the admin panel is written against.
+        // Semantic surface and accent names used by the admin panel. The admin
+        // is written against roles rather than hues — a card is `paper-card`,
+        // a primary action is `sea-deep` — so a redesign can repoint the whole
+        // back office by redefining these three, without touching its markup.
+        // Here they resolve into the poster palette above.
         coral: {
-          deep: '#CF453E',
+          deep: '#E03B57',
         },
         sea: {
-          deep: '#0A7C76',
-        },
-        // Deep water, for the footer and the reef.
-        abyss: {
-          DEFAULT: '#06323D',
-          light: '#0B4F5C',
+          deep: '#128C8A',
         },
 
-        tropicalGreen: '#3E9B50',
-        tropicalBlue: '#4DB6E5',
-        sandyBeige: '#F5EAD3',
-        sunsetOrange: '#F2723C',
-        oceanWave: '#17B5AC',
-      },
-      // `border-ink` is everywhere in the shared markup. Here it is a soft
-      // hairline the colour of wet leaves rather than a black pen outline —
-      // the field-book page has pencil edges, not sticker outlines.
-      borderColor: {
-        ink: {
-          DEFAULT: 'rgb(14 59 54 / 0.16)',
-          soft: 'rgb(14 59 54 / 0.24)',
-          light: 'rgb(14 59 54 / 0.1)',
-        },
+        // Legacy aliases kept so any stray class name still resolves to a
+        // colour inside the new palette instead of disappearing.
+        tropicalGreen: '#2FA84F',
+        tropicalBlue: '#4CC3F0',
+        sandyBeige: '#FFEFD6',
+        sunsetOrange: '#FF7A45',
+        oceanWave: '#21C0B7',
       },
       fontFamily: {
-        heading: ['Fraunces', 'Georgia', 'serif'],
-        display: ['Fraunces', 'Georgia', 'serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        body: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        accent: ['Caveat', 'cursive'],
+        // Rounded poster display + a friendly humanist body face.
+        heading: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
+        display: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
+        // `font-serif` is still sprinkled through the markup; point it at the
+        // display face so nothing falls back to Times.
+        serif: ['"Baloo 2"', '"Nunito"', 'system-ui', 'sans-serif'],
+        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        body: ['Nunito', 'system-ui', 'sans-serif'],
+        accent: ['Caveat', '"Baloo 2"', 'cursive'],
         script: ['Caveat', 'cursive'],
       },
       backgroundImage: {
-        'sun-rays': 'radial-gradient(circle at 50% 50%, rgba(255,212,126,0.55) 0%, transparent 60%)',
-        'sky-wash': 'linear-gradient(180deg, #BDE9FA 0%, #E3F6FB 50%, #FBF5E8 100%)',
-        'sunset-wash': 'linear-gradient(180deg, #FFD47E 0%, #F7965C 55%, #F2675C 100%)',
-        'lagoon-wash': 'linear-gradient(180deg, #93ECE1 0%, #17B5AC 60%, #0A7C76 100%)',
-        'jungle-wash': 'linear-gradient(180deg, #A3DB93 0%, #3E9B50 60%, #1E6A3B 100%)',
-        'paper-wash': 'linear-gradient(180deg, #FBF5E8 0%, #F5EAD3 100%)',
-        'abyss-wash': 'linear-gradient(180deg, #0B4F5C 0%, #06323D 100%)',
+        'sun-rays': 'repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,200,97,0.35) 0deg 9deg, transparent 9deg 18deg)',
+        'sky-wash': 'linear-gradient(180deg, #A5E4FF 0%, #CFF1FF 45%, #FFF6E5 100%)',
+        'sunset-wash': 'linear-gradient(180deg, #FFC861 0%, #FF9A5B 55%, #FF5D73 100%)',
+        'lagoon-wash': 'linear-gradient(180deg, #7FE3DA 0%, #21C0B7 60%, #128C8A 100%)',
+        'jungle-wash': 'linear-gradient(180deg, #7BD389 0%, #2FA84F 60%, #1B7A3C 100%)',
+        'paper-wash': 'linear-gradient(180deg, #FFF6E5 0%, #FFEFD6 100%)',
       },
       boxShadow: {
-        // Soft, green-tinted daylight shadows. The names are kept because the
-        // shared markup asks for them; the look is leaf-shade, not ink.
-        'ink-sm': '0 3px 10px -4px rgba(14, 59, 54, 0.22)',
-        'ink': '0 10px 26px -12px rgba(14, 59, 54, 0.32)',
-        'ink-lg': '0 18px 42px -16px rgba(14, 59, 54, 0.36)',
-        'ink-xl': '0 30px 60px -22px rgba(14, 59, 54, 0.42)',
-        'mango': '0 12px 28px -12px rgba(217, 134, 18, 0.55)',
-        'lagoon': '0 12px 28px -12px rgba(10, 124, 118, 0.55)',
-        'hibiscus': '0 12px 28px -12px rgba(207, 69, 62, 0.5)',
-        'lift': '0 14px 30px -14px rgba(14, 59, 54, 0.45)',
-        'glow': '0 0 0 6px rgba(147, 236, 225, 0.35)',
+        // Hard, un-blurred drop shadows: the sticker look.
+        'ink-sm': '2px 2px 0 0 #1E2A3A',
+        'ink': '4px 4px 0 0 #1E2A3A',
+        'ink-lg': '7px 7px 0 0 #1E2A3A',
+        'ink-xl': '10px 10px 0 0 #1E2A3A',
+        'mango': '4px 4px 0 0 #F07E13',
+        'lagoon': '4px 4px 0 0 #128C8A',
+        'hibiscus': '4px 4px 0 0 #E03B57',
+        // A very soft lift used sparingly under floating elements.
+        'lift': '0 12px 24px -12px rgba(30, 42, 58, 0.45)',
       },
       borderRadius: {
         'sm': '10px',
@@ -140,9 +124,6 @@ module.exports = {
         '2xl': '32px',
         '3xl': '40px',
         'blob': '46% 54% 52% 48% / 52% 46% 54% 48%',
-        // A leaf lying on its side, and a pebble.
-        'leaf': '72% 12% 72% 12% / 72% 12% 72% 12%',
-        'pebble': '58% 42% 55% 45% / 48% 56% 44% 52%',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -152,7 +133,6 @@ module.exports = {
         'fade-in': 'fadeIn 0.7s ease-out forwards',
         'slide-up': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'drift': 'drift 60s linear infinite',
-        'flutter': 'flutter 0.18s ease-in-out infinite alternate',
       },
       keyframes: {
         float: {
@@ -160,12 +140,12 @@ module.exports = {
           '50%': { transform: 'translateY(-10px)' },
         },
         sway: {
-          '0%, 100%': { transform: 'rotate(-3deg)' },
-          '50%': { transform: 'rotate(3deg)' },
+          '0%, 100%': { transform: 'rotate(-2deg)' },
+          '50%': { transform: 'rotate(2deg)' },
         },
         bob: {
-          '0%, 100%': { transform: 'translateY(0) rotate(-1.5deg)' },
-          '50%': { transform: 'translateY(-9px) rotate(1.5deg)' },
+          '0%, 100%': { transform: 'translateY(0) rotate(-1deg)' },
+          '50%': { transform: 'translateY(-8px) rotate(1deg)' },
         },
         fadeIn: {
           '0%': { opacity: '0' },
@@ -178,10 +158,6 @@ module.exports = {
         drift: {
           from: { transform: 'translate3d(0, 0, 0)' },
           to: { transform: 'translate3d(-50%, 0, 0)' },
-        },
-        flutter: {
-          from: { transform: 'scaleY(1)' },
-          to: { transform: 'scaleY(0.35)' },
         },
       },
       maxWidth: {

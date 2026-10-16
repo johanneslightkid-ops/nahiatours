@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
-import { localeText } from '../lib/localeText';
 import { FormattedMessage } from 'react-intl';
 import { MdTour, MdEvent } from 'react-icons/md';
 import { useBrand } from '../contexts/BrandContext';
 import PageHeader from '../components/layout/PageHeader';
 import { Toucan, PalmFrond } from '../components/ui/Illustrations';
-import { getContentLocale, useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../contexts/I18nContext';
 import { useBlog } from '../contexts/BlogContext';
 import { generateBlogPageMeta, generateBlogListStructuredData } from '../utils/seoHelpers';
 import ArticleBody from '../components/ui/ArticleBody';
@@ -14,22 +13,20 @@ const Blog = () => {
   const { locale } = useI18n();
   const { brandSettings } = useBrand();
   const { blogArticles, loading, error } = useBlog();
-  const articles = blogArticles[getContentLocale(locale)] ?? [];
+  const articles = blogArticles[locale] ?? [];
 
   useEffect(() => {
     const pageTitle = `${locale === 'es' ? 'Blog' : 'Blog'} | ${brandSettings.brandName}`;
-    const pageDescription = localeText(locale, {
-      en: 'Travel and tour blog in Punta Cana. Discover travel stories, tips, and guides about excursions in the Dominican Republic.',
-      es: 'Blog de viajes y tours en Punta Cana. Descubre historias, tips de viaje y guías sobre excursiones en República Dominicana.',
-      de: 'Reise- und Ausflugsblog aus Punta Cana: Geschichten, Reisetipps und Ratgeber zu Ausflügen in der Dominikanischen Republik.',
-      fr: 'Blog voyage et excursions à Punta Cana : récits, conseils et guides pour vos excursions en République dominicaine.',
-    });
+    const pageDescription =
+      locale === 'es'
+        ? 'Blog de viajes y tours en Punta Cana. Descubre historias, tips de viaje y guías sobre excursiones en República Dominicana.'
+        : 'Travel and tour blog in Punta Cana. Discover travel stories, tips, and guides about excursions in the Dominican Republic.';
 
     generateBlogPageMeta(pageTitle, pageDescription, window.location.href);
 
     if (articles.length > 0) {
       generateBlogListStructuredData(
-        localeText(locale, { en: 'Blog', es: 'Blog de Tours', de: 'Reiseblog', fr: 'Blog voyage' }),
+        locale === 'es' ? 'Blog de Tours' : 'Blog',
         pageDescription,
         articles
       );
@@ -45,7 +42,7 @@ const Blog = () => {
   }, [locale, brandSettings.brandName, articles]);
 
   return (
-    <div className="page-top bg-paper pb-16 md:pb-24">
+    <div className="bg-paper pb-16 md:pb-24">
       <PageHeader
         kicker="Stories from the coast"
         title={<FormattedMessage id="blog.title" defaultMessage="Blog" />}

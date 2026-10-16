@@ -4,10 +4,10 @@ import { useBrand } from './BrandContext';
 import { BlogArticle, getBlogArticles } from '../services/blogService';
 import { applyBrandTokensDeep } from '../utils/brandText';
 
-type Locale = 'en' | 'es' | 'de' | 'fr';
+type Locale = 'en' | 'es';
 
 interface BlogContextType {
-  blogArticles: Partial<Record<Locale, BlogArticle[]>>;
+  blogArticles: Record<Locale, BlogArticle[]>;
   loading: boolean;
   error: boolean;
 }
@@ -31,7 +31,7 @@ export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
   // Articles carry {{brand}} rather than a hardcoded company name.
   const { brandSettings } = useBrand();
   const brandName = brandSettings.brandName;
-  const [blogArticles, setBlogArticles] = useState<Partial<Record<Locale, BlogArticle[]>>>({ en: [], es: [] });
+  const [blogArticles, setBlogArticles] = useState<Record<Locale, BlogArticle[]>>({ en: [], es: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -42,19 +42,9 @@ export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
 
       try {
         console.log('[BlogContext] Starting blog content load...');
-        // English and Spanish always (the home page cross-links them), plus the
-        // reader's own language when it is German or French.
-        const extra: Locale | null = locale === 'de' || locale === 'fr' ? locale : null;
-        const [enArticles, esArticles, extraArticles] = await Promise.all([
-          getBlogArticles('en'),
-          getBlogArticles('es'),
-          extra ? getBlogArticles(extra) : Promise.resolve(null),
-        ]);
-        setBlogArticles({
-          en: enArticles,
-          es: esArticles,
-          ...(extra && extraArticles ? { [extra]: extraArticles.length ? extraArticles : enArticles } : {}),
-        });
+        const [enArticles, esArticles] = await Promise.all([getBlogArticles('en'), getBlogArticles('es')]);
+        console.log('[BlogContext] Blog content loaded. EN articles:', enArticles.length, 'ES articles:', esArticles.length);
+        setBlogArticles({ en: enArticles, es: esArticles });
       } catch (err) {
         console.error('[BlogContext] Blog loading error:', err);
         setError(true);

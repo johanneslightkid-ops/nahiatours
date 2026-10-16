@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import PageHeader from '../components/layout/PageHeader';
-import { Sailboat, Starfish, PalmTree, Pelican } from '../components/ui/Illustrations';
-import { Reveal } from '../components/nature/Nature';
-import { getTransferConfig, vehicleText } from '../services/transferConfigService';
+import { Sailboat, Starfish } from '../components/ui/Illustrations';
+import { getTransferConfig } from '../services/transferConfigService';
 import { calculateDistancePrice } from '../services/transferPricingEngine';
 import { getRouteBetweenPoints } from '../services/routingService';
 import { detectMunicipio } from '../services/municipioService';
@@ -15,26 +14,6 @@ import PlaceAutocomplete from '../components/PlaceAutocomplete';
 import DateTimePicker from '../components/ui/DateTimePicker';
 import MobileNumberPicker from '../components/ui/MobileNumberPicker';
 import RouteMap from '../components/RouteMap';
-import PaymentDropdown from '../components/ui/PaymentDropdown';
-
-/**
- * Airport transfers — El Cortecito's own page.
- *
- * The form is a short journey in the field book: where, when, who, extras,
- * details, each a numbered page. Vehicles are picked from cards with their
- * photo instead of a dropdown, and the quote is written onto a boarding pass
- * that follows the reader down the page on wide screens. On a phone the pass
- * sits after the form, so a slim price bar at the foot of the screen carries
- * the total and jumps to it.
- *
- * The quote can be paid there and then, by card: the amount is computed from
- * the route, and the card is charged exactly that on a secure payment page by
- * whichever processor the operator configured (see PaymentDropdown). WhatsApp
- * booking stays beside it for anyone who would rather talk first.
- *
- * Every word on the page comes from the `transport.*` texts, so it reads in all
- * four languages and can be reworded from the admin's "Textos del sitio".
- */
 
 type TripType = 'one-way' | 'round-trip';
 
@@ -51,22 +30,10 @@ function digitsOnly(value: string): string {
   return value.replace(/\D/g, '');
 }
 
-/** Shorter place names for the pass and the payment line: "Iberostar Selection, Bávaro, …" → "Iberostar Selection". */
-const shortPlace = (value: string) => value.split(',')[0].trim() || value;
-
-const STEP_ICONS = ['📍', '📅', '🚐', '✨', '🧳'];
-
 const Transport: React.FC = () => {
-  const intl = useIntl();
   const { locale } = useI18n();
   const { brandSettings } = useBrand();
   const { available: mapsAvailable } = useMap();
-
-  const t = useCallback(
-    (id: string, defaultMessage: string, values?: Record<string, string | number>) =>
-      intl.formatMessage({ id: `transport.${id}`, defaultMessage }, values),
-    [intl]
-  );
 
   const [config, setConfig] = useState<TransferConfig | null>(null);
   const [loading, setLoading] = useState(true);
@@ -89,10 +56,6 @@ const Transport: React.FC = () => {
   const [hotelName, setHotelName] = useState('');
   const [streetAddress, setStreetAddress] = useState('');
   const [notes, setNotes] = useState('');
-  /** Vehicle photos that failed to load fall back to the drawing instead of an empty frame. */
-  const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
-  /** The phone price bar steps aside while the pass itself is on screen. */
-  const [passInView, setPassInView] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -116,14 +79,6 @@ const Transport: React.FC = () => {
   }, [tripType]);
 
   useEffect(() => {
-    const pass = document.getElementById('transfer-pass');
-    if (!pass || typeof IntersectionObserver === 'undefined') return;
-    const observer = new IntersectionObserver(([entry]) => setPassInView(entry.isIntersecting), { threshold: 0.15 });
-    observer.observe(pass);
-    return () => observer.disconnect();
-  }, [config]);
-
-  useEffect(() => {
     let cancelled = false;
 
     (async () => {
@@ -136,6 +91,8 @@ const Transport: React.FC = () => {
       try {
         let distanceKm: number | null = null;
         let durationMinutes = 0;
+        const originLabel = originAddress || '';
+        const destinationLabel = destAddress || '';
         setRouteGeometry(null);
 
         if (originLatLng && destLatLng) {
@@ -148,19 +105,11 @@ const Transport: React.FC = () => {
 
         if (distanceKm == null) {
           setPriceResult(null);
-          // Not an error yet: nothing has been picked. The pass says so itself.
-          setPriceError(originLatLng || destLatLng ? 'needBoth' : null);
+          setPriceError('Please select both pickup and drop-off (precise locations preferred)');
           return;
         }
 
-        const result = calculateDistancePrice(
-          config,
-          distanceKm,
-          durationMinutes,
-          originAddress || 'Origin',
-          destAddress || 'Destination',
-          form
-        );
+        const result = calculateDistancePrice(config, distanceKm, durationMinutes, originLabel || 'Origin', destinationLabel || 'Destination', form);
         if (cancelled) return;
         setPriceResult(result);
         setPriceError(null);
@@ -180,373 +129,387 @@ const Transport: React.FC = () => {
     () => config?.vehicleTypes.find((v) => v.key === form.vehicleKey),
     [config, form.vehicleKey]
   );
-  const selectedVehicleText = selectedVehicle ? vehicleText(selectedVehicle, locale) : null;
 
-  const handlePassengerChange = useCallback((value: number | null) => {
-    setForm((prev) => ({ ...prev, passengers: Math.max(1, Math.min(100, value ?? 1)) }));
+  const handlePassengerChange = useCallback((value: number) => {
+    setForm((prev) => ({ ...prev, passengers: Math.max(1, Math.min(100, value)) }));
   }, []);
 
   const needsTwoVehicles = useMemo(() => {
     if (!selectedVehicle) return false;
-    const threshold = selectedVehicle.passengerThreshold ?? selectedVehicle.maxPassengers + 1;
+    const threshold = selectedVehicle.passengerThreshold ?? (selectedVehicle.maxPassengers + 1);
     return form.passengers > threshold;
   }, [selectedVehicle, form.passengers]);
 
-  const waPhone = useMemo(() => digitsOnly(brandSettings.phoneNumber || ''), [brandSettings.phoneNumber]);
+  const waPhone = useMemo(() => {
+    const raw = brandSettings.phoneNumber || '+18299999999';
+    return digitsOnly(raw);
+  }, [brandSettings.phoneNumber]);
 
-  const money = (price: number) =>
-    `US$ ${new Intl.NumberFormat(locale === 'en' ? 'en-US' : locale, { maximumFractionDigits: 2 }).format(price)}`;
+  const formatPrice = (price: number) => `USD ${price}`;
   const formatDuration = (minutes: number) => {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
-    return `${h > 0 ? `${h} h ` : ''}${m} min`;
+    return `${h > 0 ? `${h}h ` : ''}${m}m`;
   };
-  const nightPercent = Math.round(((config?.modifiers.nightFeeMultiplier ?? 1.15) - 1) * 100);
-  const vehicleLabel = selectedVehicleText?.label ?? priceResult?.vehicleLabel ?? '';
-  const when = `${departureDate}${departureTime ? ` ${departureTime}` : ''}`.trim();
 
-  /** The operator reads Spanish; everyone else writes in English. */
   const buildWhatsAppMessage = useCallback(() => {
     if (!priceResult) return '';
-    const es = locale === 'es';
-    const details = [
-      `${es ? 'Desde' : 'From'}: ${priceResult.originLabel}`,
-      ...(priceResult.originMunicipio ? [`${es ? 'Municipio origen' : 'Origin municipio'}: ${priceResult.originMunicipio}`] : []),
-      `${es ? 'Hasta' : 'To'}: ${priceResult.destinationLabel}`,
-      ...(priceResult.destinationMunicipio ? [`${es ? 'Municipio destino' : 'Destination municipio'}: ${priceResult.destinationMunicipio}`] : []),
-      `${es ? 'Vehículo' : 'Vehicle'}: ${priceResult.vehicleLabel}`,
-      `${es ? 'Pasajeros' : 'Passengers'}: ${form.passengers}`,
-      `${es ? 'Tipo' : 'Trip'}: ${tripType === 'round-trip' ? (es ? 'Ida y vuelta' : 'Round trip') : es ? 'Solo ida' : 'One way'}`,
-      `${es ? 'Salida' : 'Departure'}: ${when || '—'}`,
-    ];
-    if (tripType === 'round-trip' && returnDate) {
-      details.push(`${es ? 'Regreso' : 'Return'}: ${returnDate}${returnTime ? ` ${returnTime}` : ''}`);
-    }
-    if (flightNumber) details.push(`${es ? 'Vuelo' : 'Flight'}: ${flightNumber}`);
-    if (hotelName) details.push(`Hotel: ${hotelName}`);
-    if (streetAddress) details.push(`${es ? 'Dirección' : 'Address'}: ${streetAddress}`);
-    if (form.childSeats > 0) details.push(`${es ? 'Sillas infantiles' : 'Child seats'}: ${form.childSeats}`);
-    if (form.waitingHours > 0) details.push(`${es ? 'Espera' : 'Waiting'}: ${form.waitingHours}h`);
-    if (form.nightTransfer) details.push(es ? '🌙 Traslado nocturno' : '🌙 Night transfer');
-    if (notes) details.push(`${es ? 'Notas' : 'Notes'}: ${notes}`);
-    details.push(`\n💰 ${es ? 'Total estimado' : 'Estimated total'}: USD ${priceResult.estimatedPrice}`);
 
-    return `${es ? 'Hola, quiero reservar un traslado:' : "Hello, I'd like to book a transfer:"}\n\n${details.join('\n')}`;
-  }, [priceResult, form, tripType, when, returnDate, returnTime, flightNumber, hotelName, streetAddress, notes, locale]);
+    const baseMsg = locale === 'es'
+      ? `Hola, quiero reservar un traslado:\n\n`
+      : `Hello, I'd like to book a transfer:\n\n`;
+
+    const details = [
+      `${locale === 'es' ? 'Desde' : 'From'}: ${priceResult.originLabel}`,
+      ...(priceResult.originMunicipio ? [`${locale === 'es' ? 'Municipio origen' : 'Origin municipio'}: ${priceResult.originMunicipio}`] : []),
+      `${locale === 'es' ? 'Hasta' : 'To'}: ${priceResult.destinationLabel}`,
+      ...(priceResult.destinationMunicipio ? [`${locale === 'es' ? 'Municipio destino' : 'Destination municipio'}: ${priceResult.destinationMunicipio}`] : []),
+      `${locale === 'es' ? 'Vehículo' : 'Vehicle'}: ${priceResult.vehicleLabel}`,
+      `${locale === 'es' ? 'Pasajeros' : 'Passengers'}: ${form.passengers}`,
+      `${locale === 'es' ? 'Tipo' : 'Trip'}: ${tripType === 'round-trip' ? (locale === 'es' ? 'Ida y Vuelta' : 'Round Trip') : (locale === 'es' ? 'Solo Ida' : 'One Way')}`,
+      `${locale === 'es' ? 'Salida' : 'Departure'}: ${departureDate}${departureTime ? ` ${departureTime}` : ''}`,
+    ];
+
+    if (originAddress) details.push(`📍 ${locale === 'es' ? 'Origen' : 'Origin'}: ${originAddress}`);
+    if (destAddress) details.push(`📍 ${locale === 'es' ? 'Destino' : 'Destination'}: ${destAddress}`);
+    if (tripType === 'round-trip' && returnDate) {
+      details.push(`${locale === 'es' ? 'Regreso' : 'Return'}: ${returnDate}${returnTime ? ` ${returnTime}` : ''}`);
+    }
+    if (flightNumber) details.push(`${locale === 'es' ? 'Vuelo' : 'Flight'}: ${flightNumber}`);
+    if (hotelName) details.push(`${locale === 'es' ? 'Hotel' : 'Hotel'}: ${hotelName}`);
+    if (streetAddress) details.push(`${locale === 'es' ? 'Dirección' : 'Address'}: ${streetAddress}`);
+    if (form.childSeats > 0) details.push(`${locale === 'es' ? 'Sillas infantiles' : 'Child seats'}: ${form.childSeats}`);
+    if (form.waitingHours > 0) details.push(`${locale === 'es' ? 'Espera' : 'Waiting'}: ${form.waitingHours}h`);
+    if (form.nightTransfer) details.push(locale === 'es' ? '🌙 Traslado nocturno' : '🌙 Night transfer');
+    if (notes) details.push(`${locale === 'es' ? 'Notas' : 'Notes'}: ${notes}`);
+
+    details.push(`\n💰 ${locale === 'es' ? 'Total estimado' : 'Estimated total'}: USD ${priceResult.estimatedPrice}`);
+
+    return `${baseMsg}${details.join('\n')}`;
+  }, [priceResult, form, tripType, departureDate, returnDate, departureTime, returnTime, flightNumber, hotelName, streetAddress, notes, locale, originAddress, destAddress]);
 
   const handleBookNow = useCallback(() => {
     const msg = buildWhatsAppMessage();
-    if (!msg || !waPhone) return;
+    if (!msg) return;
     window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   }, [buildWhatsAppMessage, waPhone]);
 
   const handleChatOnWhatsApp = useCallback(() => {
-    if (!waPhone) return;
-    const es = locale === 'es';
     const details = [
-      priceResult && `${es ? 'Desde' : 'From'}: ${priceResult.originLabel}`,
-      priceResult && `${es ? 'Hasta' : 'To'}: ${priceResult.destinationLabel}`,
-      vehicleLabel && `${es ? 'Vehículo' : 'Vehicle'}: ${vehicleLabel}`,
-      `${es ? 'Pasajeros' : 'Passengers'}: ${form.passengers}`,
-      hotelName && `Hotel: ${hotelName}`,
-      departureDate && `${es ? 'Fecha' : 'Date'}: ${departureDate}`,
-    ].filter(Boolean);
-    const msg = es
-      ? `Hola, estoy interesado/a en un traslado:\n\n${details.join('\n')}\n\nTengo una consulta. ¿Estás disponible?`
-      : `Hi, I'm interested in a transfer:\n\n${details.join('\n')}\n\nI have a question — are you available?`;
+      `${locale === 'es' ? 'Desde' : 'From'}: ${priceResult?.originLabel ?? ''}`,
+      `${locale === 'es' ? 'Hasta' : 'To'}: ${priceResult?.destinationLabel ?? ''}`,
+      `${locale === 'es' ? 'Vehículo' : 'Vehicle'}: ${priceResult?.vehicleLabel ?? ''}`,
+      `${locale === 'es' ? 'Pasajeros' : 'Passengers'}: ${form.passengers}`,
+    ];
+    if (hotelName) details.push(`${locale === 'es' ? 'Hotel' : 'Hotel'}: ${hotelName}`);
+    if (departureDate) details.push(`${locale === 'es' ? 'Fecha' : 'Date'}: ${departureDate}`);
+
+    const interestLine = details.join('\n');
+
+    const msg = locale === 'es'
+      ? `Hola, estoy interesado/a en reservar un traslado:\n\n${interestLine}\n\nTengo una consulta y quisiera asegurarme de algo. ¿Estás disponible?`
+      : `Hi, I'm interested in booking a transfer:\n\n${interestLine}\n\nI have a question and would like to double-check something. Are you available?`;
+
     window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-  }, [priceResult, vehicleLabel, form.passengers, hotelName, departureDate, locale, waPhone]);
+  }, [priceResult, form, hotelName, departureDate, locale, waPhone]);
+
+  const handlePayWithPayPal = useCallback(() => {
+    if (!priceResult) return;
+    const total = priceResult.estimatedPrice;
+    const paypalUrl = brandSettings.paypalMeLink || 'https://www.paypal.com/paypalme/carlostours';
+    const separator = paypalUrl.endsWith('/') ? '' : '/';
+    const url = total > 0 ? `${paypalUrl}${separator}${total}` : paypalUrl;
+    window.open(url, '_blank');
+  }, [priceResult, brandSettings.paypalMeLink]);
 
   const handleOriginSelect = useCallback((place: { placeId: string; address: string; lat: number; lng: number }) => {
     setOriginAddress(place.address);
     setOriginLatLng({ lat: place.lat, lng: place.lng });
+    
+    // Detect municipio from coordinates
     (async () => {
       const municipio = await detectMunicipio(place.lat, place.lng);
-      if (municipio) setForm((prev) => ({ ...prev, originMunicipio: municipio }));
+      if (municipio) {
+        setForm((prev) => ({ ...prev, originMunicipio: municipio }));
+      }
     })();
   }, []);
 
   const handleDestSelect = useCallback((place: { placeId: string; address: string; lat: number; lng: number }) => {
     setDestAddress(place.address);
     setDestLatLng({ lat: place.lat, lng: place.lng });
+    
+    // Detect municipio from coordinates
     (async () => {
       const municipio = await detectMunicipio(place.lat, place.lng);
-      if (municipio) setForm((prev) => ({ ...prev, destinationMunicipio: municipio }));
+      if (municipio) {
+        setForm((prev) => ({ ...prev, destinationMunicipio: municipio }));
+      }
     })();
   }, []);
-
-  const swapEnds = () => {
-    const tmpAddr = originAddress;
-    const tmpLatLng = originLatLng;
-    setOriginAddress(destAddress);
-    setOriginLatLng(destLatLng);
-    setDestAddress(tmpAddr);
-    setDestLatLng(tmpLatLng);
-    setForm((prev) => ({ ...prev, originMunicipio: prev.destinationMunicipio, destinationMunicipio: prev.originMunicipio }));
-  };
-
-  const scrollToPass = () => document.getElementById('transfer-pass')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   if (loading) {
     return (
       <div className="grid min-h-screen place-items-center font-display text-xl font-extrabold text-ink">
-        {t('loading', 'Loading…')}
+        Loading…
       </div>
     );
   }
 
-  const quoteReady = Boolean(priceResult && !priceError);
-  const paymentTitle = priceResult
-    ? `${t('paymentLine', 'Transfer')}: ${shortPlace(priceResult.originLabel)} → ${shortPlace(priceResult.destinationLabel)}`
-    : '';
-  const tripLabel = tripType === 'round-trip' ? t('roundTrip', 'Round Trip') : t('oneWay', 'One Way');
-
-  const StepHead = ({ n, title, hint }: { n: number; title: string; hint?: string }) => (
-    <div className="mb-5 flex items-start gap-3">
-      <span className="transfer-step-badge" aria-hidden="true">
-        <span>{n}</span>
-      </span>
-      <div>
-        <h2 className="font-display text-xl font-bold text-ink md:text-2xl">
-          <span className="mr-1.5" aria-hidden="true">{STEP_ICONS[n - 1]}</span>
-          {title}
-        </h2>
-        {hint && <p className="mt-0.5 text-sm text-ink-soft">{hint}</p>}
-      </div>
-    </div>
-  );
-
-  const field =
-    'w-full rounded-2xl border border-ink/15 bg-white/90 px-4 py-3.5 text-base text-ink outline-none transition focus:border-lagoon focus:bg-white';
-
   return (
-    <div className="page-top min-h-screen bg-paper pb-28 lg:pb-16">
+    <div className="min-h-screen bg-paper pb-16">
       <PageHeader
         tone="lagoon"
-        kicker={t('kicker', 'Door to door')}
-        title={t('title', 'Airport Transfers')}
-        subtitle={t(
-          'subtitle',
-          'Private transfers from Punta Cana Airport (PUJ) to any destination. Reliable, comfortable, and affordable.'
-        )}
+        kicker="Door to door"
+        title={<FormattedMessage id="transport.title" defaultMessage="Airport Transfers" />}
+        subtitle={
+          <FormattedMessage
+            id="transport.subtitle"
+            defaultMessage="Private transfers from Punta Cana Airport (PUJ) to any destination. Reliable, comfortable, and affordable."
+          />
+        }
         artLeft={<Sailboat className="h-28 w-28 animate-bob" />}
         artRight={<Starfish className="h-20 w-20 animate-sway" />}
       />
 
-      {/* The promises, before the form: what booking here gets you. */}
-      <div className="section-shell relative z-10 -mt-14 mb-10 max-w-6xl">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {[
-            ['💵', t('trustPriceTitle', 'Price before you book'), t('trustPriceText', 'Worked out from your real route before you commit to anything.')],
-            ['✈️', t('trustFlightTitle', 'Timed to your flight'), t('trustFlightText', 'Add your flight number and the pickup is planned around your landing.')],
-            ['🚐', t('trustPrivateTitle', 'Private, door to door'), t('trustPrivateText', 'Only your group on board, from the terminal to your hotel door.')],
-            ['🧸', t('trustKidsTitle', 'Kids welcome'), t('trustKidsText', 'Child seats on request — just add them under Extras.')],
-          ].map(([icon, title, text], index) => (
-            <Reveal key={title} delay={index * 0.06} y={16}>
-              <div className="transfer-promise h-full">
-                <h3 className="flex items-center gap-2 font-display text-sm font-bold leading-tight text-ink sm:block sm:text-base">
-                  <span className="text-xl sm:block sm:text-2xl" aria-hidden="true">{icon}</span>
-                  <span className="sm:mt-2 sm:block">{title}</span>
-                </h3>
-                <p className="mt-1 hidden text-sm leading-5 text-ink-soft sm:block">{text}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
+      <div className="section-shell max-w-5xl px-3 md:px-4">
 
-      <div className="section-shell max-w-6xl">
         {!mapsAvailable && (
-          <div className="mb-5 rounded-2xl bg-mango-light/60 px-4 py-3 text-sm font-semibold text-ink">
-            ⚠️ {t('mapsUnavailable', 'Map services are unavailable. Enter your pickup and drop-off manually below.')}
+          <div className="mb-4 rounded-2xl bg-mango-light px-4 py-3 text-sm text-mango-dark">
+            ⚠️ Map services unavailable. Enter your pickup/drop-off manually below.
           </div>
         )}
 
         {!config ? (
-          <div className="transfer-page-card text-center text-hibiscus-dark">
-            {t('configError', 'Unable to load transfer configuration. Please try again later.')}
+          <div className="rounded-3xl bg-red-50 p-8 text-center text-hibiscus-dark">
+            <FormattedMessage id="transport.configError" defaultMessage="Unable to load transfer configuration. Please try again later." />
           </div>
         ) : (
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-            {/* ── The journey ─────────────────────────────────────────── */}
-            <div className="min-w-0 flex-1 space-y-6">
-              <section className="transfer-page-card">
-                <StepHead n={1} title={t('pickupDropoff', 'Pickup & Drop-off')} hint={t('pickupHint', 'From the airport, a hotel, or any address in the east.')} />
-                <div className="transfer-route">
-                  <div className="transfer-route-stop">
-                    <span className="transfer-route-dot" aria-hidden="true">✈</span>
-                    <div className="min-w-0 flex-1">
-                      <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-ink-light">
-                        {t('origin', 'Pickup location')}
-                      </label>
-                      <PlaceAutocomplete
-                        placeholder={t('originPlaceholder', 'e.g. hotel, airport, address…')}
-                        value={originAddress}
-                        onPlaceSelect={handleOriginSelect}
-                        onClear={() => {
-                          setOriginAddress('');
-                          setOriginLatLng(null);
-                          setForm((prev) => ({ ...prev, originMunicipio: undefined }));
-                        }}
-                      />
-                      {form.originMunicipio && (
-                        <span className="mt-2 inline-flex rounded-full bg-lagoon-light/60 px-3 py-1 text-xs font-semibold text-lagoon-dark">
-                          {t('originMunicipio', 'Origin municipio')}: {form.originMunicipio}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="transfer-route-gap">
-                    <button type="button" onClick={swapEnds} className="transfer-swap" aria-label={t('swap', 'Swap pickup and drop-off')} title={t('swap', 'Swap pickup and drop-off')}>
-                      ⇅
-                    </button>
-                    {priceResult && (
-                      <span className="text-xs font-semibold text-ink-soft">
-                        {priceResult.distanceKm.toFixed(1)} km · {formatDuration(priceResult.durationMinutes)}
-                      </span>
+          <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+            <div className="flex-1 space-y-5 md:space-y-6">
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h2 className="mb-4 text-lg font-semibold text-ink-soft">
+                  📍 <FormattedMessage id="transport.pickupDropoff" defaultMessage="Pickup & Drop-off" />
+                </h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
+                      <FormattedMessage id="transport.origin" defaultMessage="Pickup location" />
+                    </label>
+                    <PlaceAutocomplete
+                      placeholder={locale === 'es' ? 'Ej: Hotel, aeropuerto, dirección...' : 'e.g. Hotel, airport, address...'}
+                      value={originAddress}
+                      onPlaceSelect={handleOriginSelect}
+                      onClear={() => {
+                        setOriginAddress('');
+                        setOriginLatLng(null);
+                        setForm((prev) => ({ ...prev, originMunicipio: undefined }));
+                      }}
+                    />
+                    {form.originMunicipio && (
+                      <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-lagoon-light px-3 py-1 text-xs font-semibold text-lagoon-dark">
+                        <span>📍</span>
+                        <span>{locale === 'es' ? 'Municipio origen' : 'Origin municipio'}: {form.originMunicipio}</span>
+                      </div>
                     )}
                   </div>
 
-                  <div className="transfer-route-stop">
-                    <span className="transfer-route-dot transfer-route-dot-end" aria-hidden="true">⚑</span>
-                    <div className="min-w-0 flex-1">
-                      <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-ink-light">
-                        {t('destination', 'Drop-off location')}
-                      </label>
-                      <PlaceAutocomplete
-                        placeholder={t('destinationPlaceholder', 'e.g. hotel, address, landmark…')}
-                        value={destAddress}
-                        onPlaceSelect={handleDestSelect}
-                        onClear={() => {
-                          setDestAddress('');
-                          setDestLatLng(null);
-                          setForm((prev) => ({ ...prev, destinationMunicipio: undefined }));
-                        }}
-                      />
-                      {form.destinationMunicipio && (
-                        <span className="mt-2 inline-flex rounded-full bg-mango-light/60 px-3 py-1 text-xs font-semibold text-mango-dark">
-                          {t('destMunicipio', 'Destination municipio')}: {form.destinationMunicipio}
-                        </span>
-                      )}
+                  {priceResult && (
+                    <div className="mt-3 rounded-lg bg-paper-warm px-3 py-2 text-sm text-ink-soft flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span>📏</span>
+                        <span className="font-medium">{priceResult.distanceKm.toFixed(1)} km • {(priceResult.distanceKm * 0.621371).toFixed(1)} mi</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span>🕒</span>
+                        <span className="font-medium">{formatDuration(priceResult.durationMinutes)}</span>
+                      </div>
                     </div>
+                  )}
+
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const tmpAddr = originAddress;
+                        const tmpLatLng = originLatLng;
+                        const tmpMunicipio = form.originMunicipio;
+
+                        setOriginAddress(destAddress);
+                        setOriginLatLng(destLatLng);
+                        setForm((prev) => ({ ...prev, originMunicipio: form.destinationMunicipio }));
+
+                        setDestAddress(tmpAddr);
+                        setDestLatLng(tmpLatLng);
+                        setForm((prev) => ({ ...prev, destinationMunicipio: tmpMunicipio }));
+                      }}
+                      className="grid h-9 w-9 place-items-center rounded-full bg-paper-warm text-ink-light transition hover:bg-lagoon-light hover:text-lagoon-dark active:scale-90"
+                      aria-label="Swap origin and destination"
+                    >
+                      ⇅
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
+                      <FormattedMessage id="transport.destination" defaultMessage="Drop-off location" />
+                    </label>
+                    <PlaceAutocomplete
+                      placeholder={locale === 'es' ? 'Ej: Hotel, dirección, lugar turístico...' : 'e.g. Hotel, address, landmark...'}
+                      value={destAddress}
+                      onPlaceSelect={handleDestSelect}
+                      onClear={() => {
+                        setDestAddress('');
+                        setDestLatLng(null);
+                        setForm((prev) => ({ ...prev, destinationMunicipio: undefined }));
+                      }}
+                    />
+                    {form.destinationMunicipio && (
+                      <div className="mt-2 inline-block rounded-full bg-mango-light px-3 py-1 text-xs font-semibold text-mango-dark">
+                        📍 {form.destinationMunicipio}
+                      </div>
+                    )}
                   </div>
                 </div>
-              </section>
+              </div>
 
-              <section className="transfer-page-card">
-                <StepHead n={2} title={t('dateTime', 'Date & Time')} />
-                <div className="mb-5 grid grid-cols-2 gap-2 rounded-full border border-ink/10 bg-paper-warm/70 p-1.5" role="radiogroup" aria-label={t('tripType', 'Trip Type')}>
-                  {(['round-trip', 'one-way'] as TripType[]).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      role="radio"
-                      aria-checked={tripType === type}
-                      onClick={() => setTripType(type)}
-                      className={`rounded-full px-4 py-3 text-sm font-extrabold transition sm:text-base ${
-                        tripType === type ? 'bg-lagoon text-white shadow-[var(--shade-sm)]' : 'text-ink-soft hover:text-ink'
-                      }`}
-                    >
-                      {type === 'round-trip' ? `⇄ ${t('roundTrip', 'Round Trip')}` : `→ ${t('oneWay', 'One Way')}`}
-                    </button>
-                  ))}
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <label className="mb-3 block text-sm font-semibold text-ink-soft">
+                  <FormattedMessage id="transport.tripType" defaultMessage="Trip Type" />
+                </label>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setTripType('round-trip')}
+                    className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
+                      tripType === 'round-trip'
+                        ? 'bg-lagoon text-white'
+                        : 'bg-paper text-ink hover:bg-mango-light'
+                    }`}
+                  >
+                    🔄 <FormattedMessage id="transport.roundTrip" defaultMessage="Round Trip" />
+                  </button>
+                  <button
+                    onClick={() => setTripType('one-way')}
+                    className={`flex-1 rounded-2xl border-[2.5px] border-ink px-4 py-4 text-center text-base font-extrabold shadow-ink-sm transition ${
+                      tripType === 'one-way'
+                        ? 'bg-lagoon text-white'
+                        : 'bg-paper text-ink hover:bg-mango-light'
+                    }`}
+                  >
+                    ➡️ <FormattedMessage id="transport.oneWay" defaultMessage="One Way" />
+                  </button>
                 </div>
+              </div>
+
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
+                  📅 <FormattedMessage id="transport.dateTime" defaultMessage="Date & Time" />
+                </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <DateTimePicker type="date" value={departureDate} onChange={setDepartureDate} label={t('departureDate', 'Departure date')} />
-                  <DateTimePicker type="time" value={departureTime} onChange={setDepartureTime} label={t('departureTime', 'Departure time')} />
+                  <DateTimePicker
+                    type="date"
+                    value={departureDate}
+                    onChange={setDepartureDate}
+                    label={locale === 'es' ? 'Fecha de Salida' : 'Departure Date'}
+                  />
+                  <DateTimePicker
+                    type="time"
+                    value={departureTime}
+                    onChange={setDepartureTime}
+                    label={locale === 'es' ? 'Hora de Salida' : 'Departure Time'}
+                  />
                   {tripType === 'round-trip' && (
                     <>
-                      <DateTimePicker type="date" value={returnDate} onChange={setReturnDate} label={t('returnDate', 'Return date')} />
-                      <DateTimePicker type="time" value={returnTime} onChange={setReturnTime} label={t('returnTime', 'Return time')} />
+                      <DateTimePicker
+                        type="date"
+                        value={returnDate}
+                        onChange={setReturnDate}
+                        label={locale === 'es' ? 'Fecha de Regreso' : 'Return Date'}
+                      />
+                      <DateTimePicker
+                        type="time"
+                        value={returnTime}
+                        onChange={setReturnTime}
+                        label={locale === 'es' ? 'Hora de Regreso' : 'Return Time'}
+                      />
                     </>
                   )}
                 </div>
-              </section>
+              </div>
 
-              <section className="transfer-page-card">
-                <StepHead n={3} title={t('vehicleAndPassengers', 'Vehicle & Passengers')} />
-                <div className="mb-5 max-w-xs">
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
+                  🚗 <FormattedMessage id="transport.vehicleAndPassengers" defaultMessage="Vehicle & Passengers" />
+                </h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
+                      <FormattedMessage id="transport.vehicleType" defaultMessage="Vehicle Type" />
+                    </label>
+                    <select
+                      value={form.vehicleKey}
+                      onChange={(e) => setForm((prev) => ({ ...prev, vehicleKey: e.target.value }))}
+                      className="w-full appearance-none rounded-2xl border-2 border-ink bg-white px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
+                    >
+                      {config.vehicleTypes.map((vt) => (
+                        <option key={vt.key} value={vt.key}>
+                          {vt.label} (≤{vt.maxPassengers} pax)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <MobileNumberPicker
                     value={form.passengers}
                     onChange={handlePassengerChange}
                     min={1}
                     max={100}
                     step={1}
-                    label={t('passengers', 'Passengers')}
-                    ariaLabel={t('passengers', 'Passengers')}
+                    label={locale === 'es' ? 'Pasajeros' : 'Passengers'}
+                    ariaLabel="passengers"
                   />
                 </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" role="radiogroup" aria-label={t('vehicleType', 'Vehicle Type')}>
-                  {config.vehicleTypes.map((vt) => {
-                    const text = vehicleText(vt, locale);
-                    const active = vt.key === form.vehicleKey;
-                    const tooSmall = form.passengers > vt.maxPassengers;
-                    return (
-                      <button
-                        key={vt.key}
-                        type="button"
-                        role="radio"
-                        aria-checked={active}
-                        onClick={() => setForm((prev) => ({ ...prev, vehicleKey: vt.key }))}
-                        className={`transfer-vehicle ${active ? 'transfer-vehicle-active' : ''}`}
-                      >
-                        <span className="transfer-vehicle-photo">
-                          {vt.image && !brokenImages[vt.key] ? (
-                            <img
-                              src={vt.image}
-                              alt=""
-                              loading="lazy"
-                              decoding="async"
-                              onError={() => setBrokenImages((prev) => ({ ...prev, [vt.key]: true }))}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-4xl" aria-hidden="true">🚐</span>
-                          )}
-                        </span>
-                        <span className="min-w-0 flex-1 text-left">
-                          <span className="block font-display text-base font-bold text-ink">{text.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-ink-soft">{text.description}</span>
-                          <span className={`mt-2 inline-flex rounded-full px-2.5 py-0.5 text-[0.7rem] font-bold ${tooSmall ? 'bg-mango-light/70 text-mango-dark' : 'bg-lagoon-light/50 text-lagoon-dark'}`}>
-                            👥 {t('upTo', 'up to {max}', { max: vt.maxPassengers })}
-                          </span>
-                        </span>
-                        {active && <span className="transfer-vehicle-check" aria-hidden="true">✓</span>}
-                      </button>
-                    );
-                  })}
-                </div>
                 {selectedVehicle && (
-                  <p className="mt-3 text-xs text-ink-light">
-                    {t('vehicleCapacity', 'Capacity: {min}–{max} passengers', {
-                      min: selectedVehicle.typicalPassengers[0],
-                      max: selectedVehicle.typicalPassengers[1],
-                    })}
-                  </p>
+                  <div className="mt-3 space-y-2 text-sm text-ink-soft">
+                    <p>
+                      <FormattedMessage
+                        id="transport.vehicleCapacity"
+                        defaultMessage="Capacity: {min}–{max} passengers"
+                        values={{ min: selectedVehicle.typicalPassengers[0], max: selectedVehicle.typicalPassengers[1] }}
+                      />
+                    </p>
+                    <p className="text-xs text-ink-light">{selectedVehicle.description}</p>
+                    {selectedVehicle.image && (
+                      <div className="mt-2 h-28 w-full overflow-hidden rounded-xl bg-paper-warm md:h-36">
+                        <img src={selectedVehicle.image} alt={selectedVehicle.label} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                      </div>
+                    )}
+                    {needsTwoVehicles && (
+                      <p className="flex items-center gap-1 rounded-lg bg-mango-light px-3 py-2 text-mango-dark">
+                        <span>⚠️</span>
+                        <FormattedMessage
+                          id="transport.twoVehiclesNeeded"
+                          defaultMessage="Double price applied: passenger count exceeds typical capacity"
+                        />
+                      </p>
+                    )}
+                  </div>
                 )}
-                {needsTwoVehicles && (
-                  <p className="mt-3 rounded-2xl bg-mango-light/60 px-4 py-2.5 text-sm font-semibold text-mango-dark">
-                    ⚠️ {t('twoVehiclesNeeded', 'Double price applied: passenger count exceeds typical capacity')}
-                  </p>
-                )}
-              </section>
+              </div>
 
-              <section className="transfer-page-card">
-                <StepHead n={4} title={t('extras', 'Extras')} />
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <label className={`transfer-chip ${form.nightTransfer ? 'transfer-chip-on' : ''}`}>
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
+                  ⚙️ <FormattedMessage id="transport.extras" defaultMessage="Extras" />
+                </h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label className="flex items-center gap-3 rounded-xl border border-ink/20 p-4 transition has-[:checked]:border-ink has-[:checked]:bg-lagoon-light active:scale-[0.98]">
                     <input
                       type="checkbox"
                       checked={form.nightTransfer}
                       onChange={(e) => setForm((prev) => ({ ...prev, nightTransfer: e.target.checked }))}
-                      className="h-5 w-5 accent-lagoon-dark"
+                      className="h-5 w-5 rounded border-2 border-ink text-lagoon-dark"
                     />
-                    <span>
-                      <span className="block text-sm font-bold text-ink">🌙 {t('nightTransfer', 'Night Transfer')}</span>
-                      <span className="block text-xs text-ink-soft">
-                        {t('nightSurchargeNote', '+{percent}% after 10 PM', { percent: nightPercent })}
-                      </span>
+                    <span className="text-sm text-ink-soft">
+                      🌙 <FormattedMessage id="transport.nightTransfer" defaultMessage="Night Transfer" />
                     </span>
                   </label>
                   <MobileNumberPicker
@@ -555,8 +518,8 @@ const Transport: React.FC = () => {
                     min={0}
                     max={10}
                     step={1}
-                    label={t('waitingHours', 'Waiting (hours)')}
-                    ariaLabel={t('waitingHours', 'Waiting (hours)')}
+                    label={locale === 'es' ? 'Espera (horas)' : 'Waiting (hours)'}
+                    ariaLabel="waiting hours"
                   />
                   <MobileNumberPicker
                     value={form.childSeats}
@@ -564,229 +527,204 @@ const Transport: React.FC = () => {
                     min={0}
                     max={10}
                     step={1}
-                    label={t('childSeats', 'Child seats')}
-                    ariaLabel={t('childSeats', 'Child seats')}
+                    label={locale === 'es' ? 'Sillas Infantiles' : 'Child Seats'}
+                    ariaLabel="child seats"
                   />
                 </div>
-              </section>
+                {form.nightTransfer && (
+                  <p className="mt-2 text-xs text-mango-dark">🌙 +15% night surcharge after 10 PM</p>
+                )}
+              </div>
 
-              <section className="transfer-page-card">
-                <StepHead n={5} title={t('locationInfo', 'Location Details')} hint={t('detailsHint', 'Optional, but it helps the driver find you.')} />
+              <div className="rounded-2xl border-[2.5px] border-ink bg-white p-4 shadow-ink-sm md:p-6">
+                <h3 className="mb-4 text-lg font-semibold text-ink-soft">
+                  📋 <FormattedMessage id="transport.locationInfo" defaultMessage="Location Details" />
+                </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-ink-light">{t('flightNumber', 'Flight Number')}</span>
-                    <input type="text" value={flightNumber} onChange={(e) => setFlightNumber(e.target.value)} placeholder={t('flightPlaceholder', 'e.g. AA 1234')} className={field} />
-                  </label>
-                  <label className="block">
-                    <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-ink-light">{t('hotelName', 'Hotel / Resort')}</span>
-                    <input type="text" value={hotelName} onChange={(e) => setHotelName(e.target.value)} placeholder={t('hotelPlaceholder', 'e.g. Iberostar')} className={field} />
-                  </label>
-                  <label className="block sm:col-span-2">
-                    <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-ink-light">{t('streetAddress', 'Street address')}</span>
-                    <input type="text" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder={t('streetPlaceholder', 'Only if it is not a hotel')} className={field} />
-                  </label>
-                  <label className="block sm:col-span-2">
-                    <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-ink-light">{t('notes', 'Notes')}</span>
-                    <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t('notesPlaceholder', 'Special requirements…')} rows={3} className={field} />
-                  </label>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
+                      <FormattedMessage id="transport.flightNumber" defaultMessage="Flight Number" />
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="text"
+                      value={flightNumber}
+                      onChange={(e) => setFlightNumber(e.target.value)}
+                      placeholder={locale === 'es' ? 'Ej: AA 1234' : 'e.g. AA 1234'}
+                      className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
+                      <FormattedMessage id="transport.hotelName" defaultMessage="Hotel / Resort" />
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="text"
+                      value={hotelName}
+                      onChange={(e) => setHotelName(e.target.value)}
+                      placeholder={locale === 'es' ? 'Ej: Iberostar' : 'e.g. Iberostar'}
+                      className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="mb-1.5 block text-xs font-medium text-ink-light">
+                      <FormattedMessage id="transport.notes" defaultMessage="Notes" />
+                    </label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder={locale === 'es' ? 'Requisitos especiales...' : 'Special requirements...'}
+                      rows={3}
+                      className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
+                    />
+                  </div>
                 </div>
-              </section>
+              </div>
             </div>
 
-            {/* ── The boarding pass ───────────────────────────────────── */}
-            <aside id="transfer-pass" className="w-full scroll-mt-28 lg:sticky lg:top-40 lg:w-[23rem] xl:w-[25rem]">
-              <div className="transfer-pass">
-                <div className="transfer-pass-head">
-                  <span className="text-[0.65rem] font-extrabold uppercase tracking-[0.24em] text-white/80">
-                    {t('passTitle', 'Transfer pass')}
-                  </span>
-                  <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-[0.65rem] font-bold text-white">{tripLabel}</span>
-                </div>
+            <div className="w-full lg:w-80 xl:w-96">
+              <div className="sticky top-24 space-y-5 md:space-y-6">
+                <div className="rounded-2xl border-[2.5px] border-ink bg-white p-5 shadow-ink-sm md:p-6">
+                  <h2 className="mb-4 text-lg font-semibold text-ink-soft">
+                    💰 <FormattedMessage id="transport.priceSummary" defaultMessage="Price Summary" />
+                  </h2>
 
-                <div className="px-5 pb-4 pt-5">
-                  <div className="grid grid-cols-[1fr,auto,1fr] items-center gap-2">
-                    <div className="min-w-0">
-                      <div className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-ink-light">{t('from', 'From')}</div>
-                      <div className="truncate font-display text-lg font-bold text-ink">
-                        {originAddress ? shortPlace(originAddress) : '—'}
+                  {priceError && (
+                    <div className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-hibiscus-dark">{priceError}</div>
+                  )}
+
+                  {priceResult && !priceError && (
+                    <div className="space-y-4">
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-lagoon-dark">{formatPrice(priceResult.estimatedPrice)}</p>
+                        <p className="text-xs text-ink-light">
+                          <FormattedMessage id="transport.estimatedPrice" defaultMessage="Estimated total price" />
+                        </p>
+                        <p className="mt-1 text-sm text-ink-soft">
+                          {tripType === 'round-trip' ? (
+                            <FormattedMessage id="transport.roundTripIncluded" defaultMessage="Round trip (both ways)" />
+                          ) : (
+                            <FormattedMessage id="transport.oneWayTrip" defaultMessage="One way transfer" />
+                          )}
+                        </p>
                       </div>
-                    </div>
-                    <span className="text-xl text-lagoon" aria-hidden="true">{tripType === 'round-trip' ? '⇄' : '→'}</span>
-                    <div className="min-w-0 text-right">
-                      <div className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-ink-light">{t('to', 'To')}</div>
-                      <div className="truncate font-display text-lg font-bold text-ink">
-                        {destAddress ? shortPlace(destAddress) : '—'}
-                      </div>
-                    </div>
-                  </div>
 
-                  <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-2xl bg-paper-warm/70 px-2 py-2">
-                      <dt className="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-ink-light">{t('passengers', 'Passengers')}</dt>
-                      <dd className="font-display text-base font-bold text-ink">{form.passengers}</dd>
-                    </div>
-                    <div className="rounded-2xl bg-paper-warm/70 px-2 py-2">
-                      <dt className="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-ink-light">{t('vehicle', 'Vehicle')}</dt>
-                      <dd className="truncate font-display text-sm font-bold text-ink">{vehicleLabel || '—'}</dd>
-                    </div>
-                    <div className="rounded-2xl bg-paper-warm/70 px-2 py-2">
-                      <dt className="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-ink-light">{t('date', 'Date')}</dt>
-                      <dd className="truncate font-display text-sm font-bold text-ink">{departureDate || '—'}</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <div className="transfer-pass-tear" aria-hidden="true" />
-
-                <div className="px-5 pb-5 pt-4">
-                  {quoteReady && priceResult ? (
-                    <>
-                      <div className="flex items-end justify-between gap-3">
-                        <div>
-                          <div className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-ink-light">
-                            {t('estimatedPrice', 'Estimated total price')}
-                          </div>
-                          <div className="font-display text-4xl font-bold leading-none text-lagoon-dark">
-                            {money(priceResult.estimatedPrice)}
-                          </div>
+                      <div className="space-y-2 border-t-2 border-ink/15 pt-4 text-sm text-ink-soft">
+                        <div className="flex justify-between">
+                          <span><FormattedMessage id="transport.origin" defaultMessage="From" /></span>
+                          <span className="font-medium">{priceResult.originLabel}</span>
                         </div>
-                        <span className="pb-1 text-right text-xs text-ink-soft">
-                          {tripType === 'round-trip'
-                            ? t('roundTripIncluded', 'Round trip (both ways)')
-                            : t('oneWayTrip', 'One way transfer')}
-                        </span>
-                      </div>
-
-                      <ul className="mt-4 space-y-1.5 text-sm text-ink-soft">
-                        <li className="flex justify-between gap-3">
-                          <span>📏 {t('distance', 'Distance')}</span>
-                          <span className="font-semibold text-ink">
-                            {priceResult.distanceKm.toFixed(1)} km · {(priceResult.distanceKm * 0.621371).toFixed(1)} mi
-                          </span>
-                        </li>
-                        <li className="flex justify-between gap-3">
-                          <span>🕒 {t('duration', 'Estimated travel time')}</span>
-                          <span className="font-semibold text-ink">{formatDuration(priceResult.durationMinutes)}</span>
-                        </li>
-                        {priceResult.breakdown.municipioMultiplierApplied && priceResult.breakdown.municipioMultiplierApplied !== 1 && (
-                          <li className="flex justify-between gap-3">
-                            <span>🏘️ {t('municipioMultiplier', 'Municipio multiplier')}</span>
-                            <span className="font-semibold text-ink">{priceResult.breakdown.municipioMultiplierApplied.toFixed(2)}×</span>
-                          </li>
+                        {priceResult.originMunicipio && (
+                          <div className="flex justify-between items-center text-lagoon-dark">
+                            <span>📍 <FormattedMessage id="transport.originMunicipio" defaultMessage="Origin municipio" /></span>
+                            <span className="font-semibold">{priceResult.originMunicipio}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span><FormattedMessage id="transport.destination" defaultMessage="To" /></span>
+                          <span className="font-medium">{priceResult.destinationLabel}</span>
+                        </div>
+                        {priceResult.destinationMunicipio && (
+                          <div className="flex justify-between items-center text-mango-dark">
+                            <span>📍 <FormattedMessage id="transport.destMunicipio" defaultMessage="Destination municipio" /></span>
+                            <span className="font-semibold">{priceResult.destinationMunicipio}</span>
+                          </div>
+                        )}
+                        {priceResult.breakdown.municipioMultiplierApplied && priceResult.breakdown.municipioMultiplierApplied !== 1.0 && (
+                          <div className="flex justify-between items-center rounded-lg bg-lagoon-light px-2 py-2 text-lagoon-dark font-semibold border-2 border-ink/15">
+                            <span>🏘️ <FormattedMessage id="transport.municipioMultiplier" defaultMessage="Municipio multiplier" /></span>
+                            <span className="text-lg">{priceResult.breakdown.municipioMultiplierApplied.toFixed(2)}×</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span><FormattedMessage id="transport.vehicle" defaultMessage="Vehicle" /></span>
+                          <span className="font-medium">{priceResult.vehicleLabel}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span><FormattedMessage id="transport.passengers" defaultMessage="Passengers" /></span>
+                          <span className="font-medium">{priceResult.passengers}</span>
+                        </div>
+                        {priceResult.distanceKm !== undefined && (
+                          <div className="flex justify-between">
+                            <span>📏 <FormattedMessage id="transport.distance" defaultMessage="Distance" /></span>
+                            <span className="font-medium">{priceResult.distanceKm.toFixed(1)} km • {(priceResult.distanceKm * 0.621371).toFixed(1)} mi</span>
+                          </div>
+                        )}
+                        {priceResult.durationMinutes !== undefined && (
+                          <div className="flex justify-between">
+                            <span>🕒 <FormattedMessage id="transport.duration" defaultMessage="Estimated travel time" /></span>
+                            <span className="font-medium">{formatDuration(priceResult.durationMinutes)}</span>
+                          </div>
+                        )}
+                        {routeGeometry && (
+                          <div className="mt-3">
+                            <RouteMap origin={originLatLng ?? undefined} destination={destLatLng ?? undefined} geometry={routeGeometry} className="h-72 rounded-xl border-2 border-ink/15" />
+                          </div>
                         )}
                         {form.nightTransfer && (
-                          <li className="flex justify-between gap-3">
-                            <span>🌙 {t('nightFee', 'Night fee')}</span>
-                            <span className="font-semibold text-ink">+{nightPercent}%</span>
-                          </li>
+                          <div className="flex justify-between text-mango-dark">
+                            <span>🌙 <FormattedMessage id="transport.nightFee" defaultMessage="Night fee" /></span>
+                            <span className="font-medium">+15%</span>
+                          </div>
                         )}
-                        {priceResult.breakdown.distanceDiscountPercent > 0 && (
-                          <li className="flex justify-between gap-3 text-lagoon-dark">
-                            <span>🏷️ {t('distanceDiscount', 'Distance discount')}</span>
-                            <span className="font-semibold">−{Math.round(priceResult.breakdown.distanceDiscountPercent)}%</span>
-                          </li>
+                        {priceResult.breakdown.distanceDiscountPercent !== undefined && priceResult.breakdown.distanceDiscountPercent > 0 && (
+                          <div className="flex justify-between text-lagoon-dark">
+                            <span>🏷️ <FormattedMessage id="transport.distanceDiscount" defaultMessage="Distance discount" /></span>
+                            <span className="font-medium">{priceResult.breakdown.distanceDiscountPercent}%</span>
+                          </div>
                         )}
                         {needsTwoVehicles && (
-                          <li className="flex justify-between gap-3 text-mango-dark">
-                            <span>🚐🚐 {t('doubleVehicle', 'Double vehicle')}</span>
-                            <span className="font-semibold">×2</span>
-                          </li>
+                          <div className="flex justify-between text-mango-dark">
+                            <span>🚗🚗 <FormattedMessage id="transport.doubleVehicle" defaultMessage="Double vehicle" /></span>
+                            <span className="font-medium">×2</span>
+                          </div>
                         )}
-                      </ul>
-
-                    </>
-                  ) : (
-                    <div className="py-4 text-center">
-                      <PalmTree className="mx-auto mb-2 h-16 w-16 opacity-80" />
-                      <p className="text-sm text-ink-soft">
-                        {priceError === 'needBoth'
-                          ? t('selectBoth', 'Choose both the pickup and the drop-off — exact places give the best price.')
-                          : priceError
-                          ? priceError
-                          : t('fillFields', 'Select pickup, drop-off, and vehicle to see the price')}
-                      </p>
+                      </div>
                     </div>
                   )}
 
-                  <div className="mt-5 space-y-3">
-                    {quoteReady && priceResult && (
-                      <PaymentDropdown
-                        excursionTitle={paymentTitle}
-                        selectedTier={`${vehicleLabel} · ${tripLabel}`}
-                        selectedPrice={money(priceResult.estimatedPrice)}
-                        amount={priceResult.estimatedPrice}
-                        persons={form.passengers}
-                        bookingDate={when}
-                        category="transport"
-                        locale={locale}
-                        methods={['card', 'paypal']}
-                        hideWhenEmpty
-                        buttonLabel={t('payNow', 'Book & pay now')}
-                        className="w-full"
-                        buttonClassName="flex w-full items-center justify-between gap-2.5 rounded-full bg-lagoon px-6 py-4 font-extrabold text-white shadow-[var(--shade)] transition hover:-translate-y-0.5 hover:bg-lagoon-dark active:translate-y-0"
-                      />
-                    )}
-                    <button
-                      onClick={handleBookNow}
-                      disabled={!quoteReady || !waPhone}
-                      className={`w-full rounded-full px-6 py-4 text-center text-base font-bold transition active:scale-[0.98] ${
-                        quoteReady && waPhone
-                          ? 'border border-jungle/30 bg-jungle text-white hover:bg-jungle-dark'
-                          : 'cursor-not-allowed bg-ink/10 text-ink-light'
-                      }`}
-                    >
-                      💬 {t('bookNow', 'Book via WhatsApp')}
-                    </button>
-                    <button
-                      onClick={handleChatOnWhatsApp}
-                      disabled={!waPhone}
-                      className="w-full rounded-full border border-ink/15 bg-white/80 px-6 py-3 text-center text-sm font-semibold text-lagoon-dark transition hover:bg-lagoon-light/40 disabled:opacity-50"
-                    >
-                      {t('chatOnWhatsApp', 'Chat / Question')}
-                    </button>
-                    {quoteReady && (
-                      <p className="text-center text-[0.7rem] leading-4 text-ink-light">
-                        {t('payHint', 'Pay securely online by card — your card details are entered on a secure payment page, never on this site.')}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Below the buttons: the route is a confirmation, the buttons are the point. */}
-                  {quoteReady && routeGeometry && (
-                    <RouteMap
-                      origin={originLatLng ?? undefined}
-                      destination={destLatLng ?? undefined}
-                      geometry={routeGeometry}
-                      className="mt-5 h-40 overflow-hidden rounded-[22px_16px_24px_14px] border border-ink/10"
-                    />
+                  {!priceResult && !priceError && (
+                    <div className="py-8 text-center text-sm text-ink-light">
+                      <FormattedMessage id="transport.fillFields" defaultMessage="Select pickup, drop-off, and vehicle to see the price" />
+                    </div>
                   )}
                 </div>
-              </div>
 
-              <div className="pointer-events-none mt-6 hidden justify-end lg:flex" aria-hidden="true">
-                <Pelican className="h-20 w-20 animate-bob" />
+                <div className="space-y-3">
+                  <button
+                    onClick={handleBookNow}
+                    disabled={!priceResult || !!priceError}
+                    className={`w-full rounded-2xl px-6 py-4 text-center text-base font-bold text-white shadow-ink-sm transition active:scale-[0.97] ${
+                      priceResult && !priceError
+                        ? 'bg-lagoon hover:bg-lagoon-light hover:text-ink'
+                        : 'cursor-not-allowed bg-ink/20'
+                    }`}
+                  >
+                    📱 <FormattedMessage id="transport.bookNow" defaultMessage="Book via WhatsApp" />
+                  </button>
+
+                  {priceResult && !priceError && brandSettings.paypalMeLink && (
+                    <button
+                      onClick={handlePayWithPayPal}
+                      className="w-full rounded-2xl bg-[#0070ba] px-6 py-4 text-center text-base font-bold text-white shadow-ink-sm transition hover:bg-[#003087] active:scale-[0.97]"
+                    >
+                      💳 <FormattedMessage id="payment.paypal" defaultMessage="Pay with PayPal" />
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleChatOnWhatsApp}
+                    className="w-full rounded-2xl border-2 border-ink bg-white px-6 py-4 text-center text-base font-semibold text-lagoon-dark transition hover:bg-lagoon-light active:scale-[0.97]"
+                  >
+                    💬 <FormattedMessage id="transport.chatOnWhatsApp" defaultMessage="Chat / Question" />
+                  </button>
+                </div>
               </div>
-            </aside>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Phones: the pass is below the whole form, so the total rides along at the foot. */}
-      {config && (
-        <div className="transfer-mobile-bar lg:hidden" data-hidden={passInView} aria-hidden={passInView}>
-          <div className="min-w-0">
-            <div className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-              {quoteReady ? t('estimatedPrice', 'Estimated total price') : t('passTitle', 'Transfer pass')}
-            </div>
-            <div className="truncate font-display text-lg font-bold text-ink">
-              {quoteReady && priceResult ? money(priceResult.estimatedPrice) : t('mobilePrompt', 'Pick your route')}
-            </div>
-          </div>
-          <button type="button" onClick={scrollToPass} className="shrink-0 rounded-full bg-lagoon px-5 py-3 text-sm font-extrabold text-white">
-            {quoteReady ? t('mobileCta', 'Book') : t('mobileSee', 'See pass')} ↓
-          </button>
-        </div>
-      )}
     </div>
   );
 };

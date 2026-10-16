@@ -1,50 +1,92 @@
-import React from 'react';
-import { FaCheck, FaLanguage, FaMagic, FaSpinner } from 'react-icons/fa';
-import { Lang, LANG_NAME } from '../../lib/autoTranslate';
-import type { TranslationJob, TranslationSync } from './useTranslationSync';
+import React, { useEffect, useState } from 'react';
+import { FaCheck, FaExchangeAlt, FaLanguage, FaSpinner } from 'react-icons/fa';
+import { providerStatus } from '../../services/aiGeneratorService';
+import { Lang, translateRecord } from '../../lib/autoTranslate';
 
 /**
- * The strip at the top of every multilingual editor.
+ * The strip at the top of every bilingual editor.
  *
- * Saving translates what the save changed — the tour that was edited, the
- * review that was added — into the other languages, and nothing else. This
- * strip says so, lets it be switched off (for a correction that belongs to
- * one language only), shows it working, and offers one more thing: filling
- * in what another language is MISSING. It never re-translates what a language
- * already has in its own words.
+ * It appears only when an AI provider on this deployment can actually answer —
+ * a button that fails when pressed is worse than no button, and on a site with
+ * no key and no binding this one is simply not there.
  *
- * It appears only when an AI provider on this deployment can actually answer.
+ * It translates and hands the result to the panel; the panel says what happens
+ * next, in `note`, before the operator presses anything. Two shapes are in use:
+ * the welcome-page editor loads the translation into the open editor so it can
+ * be read before saving, and the tour and transport panels write it into the
+ * other language's record, because those show one language at a time and there
+ * is no second editor to load it into.
  */
 
-interface TranslateBarProps {
-  sync: TranslationSync;
-  /** What is being translated, for the sentence. e.g. "la excursión editada". */
+interface TranslateBarProps<T> {
+  /** The record currently being edited, in `from`. */
+  value: T;
+  /** Which language that record is in. */
+  from: Lang;
+  /**
+   * Handed the translated copy. The panel decides what happens to it — some
+   * open it for review, some write it straight into the other language's
+   * record — and whatever it returns is what the operator is told.
+   */
+  onTranslated: (translated: T, to: Lang) => string | void | Promise<string | void>;
+  /** The sentence under the heading. Say what this button will actually do. */
+  note?: string;
+  /** What is being translated, for the sentence. e.g. "las excursiones". */
   what: string;
-  /** Translates on save? Panels without a save of their own (the blog list) say no. */
-  onSave?: boolean;
-  /** Fills one other language's gaps. Without it there is no button. */
-  fillMissing?: TranslationJob;
-  /** Which languages this strip is for, when not every other one. */
-  languages?: Lang[];
+  /** Hidden while the panel has nothing loaded yet. */
   disabled?: boolean;
 }
 
-const SHORT: Record<Lang, string> = { en: 'EN', es: 'ES', de: 'DE', fr: 'FR' };
+const OTHER: Record<Lang, Lang> = { en: 'es', es: 'en' };
+const NAME: Record<Lang, string> = { en: 'inglés', es: 'español' };
 
-const LANG_ES: Record<Lang, string> = { en: 'inglés', es: 'español', de: 'alemán', fr: 'francés' };
+function TranslateBar<T>({ value, from, onTranslated, what, note, disabled }: TranslateBarProps<T>) {
+  const [available, setAvailable] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState('');
+  const [problem, setProblem] = useState('');
+  const [done, setDone] = useState('');
 
-const TranslateBar: React.FC<TranslateBarProps> = ({
-  sync,
-  what,
-  onSave = true,
-  fillMissing,
-  languages,
-  disabled,
-}) => {
-  const targets = languages ?? sync.targets;
-  if (sync.available !== true || targets.length === 0) return null;
+  useEffect(() => {
+    (async () => {
+      const status = await providerStatus();
+      setAvailable(Boolean(status?.providers.some((p) => p.usable)));
+    })();
+  }, []);
 
-  const names = targets.map((t) => LANG_ES[t]).join(', ');
+  // Nothing to offer, so nothing is shown. No disabled control, no
+  // explanation nobody asked for.
+  if (available !== true) return null;
+
+  const to = OTHER[from];
+
+  const run = async () => {
+    setBusy(true);
+    setProblem('');
+    setDone('');
+    try {
+      const result = await translateRecord(value, from, to, (n, total) =>
+        setProgress(`Traduciendo ${n} de ${total}…`)
+      );
+      if (result.total === 0) {
+        setProblem('No hay texto que traducir en lo que está abierto.');
+        return;
+      }
+      const said = await onTranslated(result.value, to);
+      setDone(
+        typeof said === 'string'
+          ? said
+          : `${result.translated} texto(s) traducidos al ${NAME[to]}.`
+      );
+    } catch (error) {
+      setProblem(
+        `No se pudo traducir: ${error instanceof Error ? error.message : String(error)}`
+      );
+    } finally {
+      setBusy(false);
+      setProgress('');
+    }
+  };
 
   return (
     <div className="mb-5 rounded-3xl border border-lagoon/35 bg-lagoon/10 p-4 sm:p-5">
@@ -52,63 +94,37 @@ const TranslateBar: React.FC<TranslateBarProps> = ({
         <div className="flex items-start gap-3">
           <FaLanguage className="mt-0.5 h-6 w-6 shrink-0 text-lagoon-dark" />
           <div>
-            <p className="text-sm font-bold text-ink">Traducción automática</p>
+            <p className="text-sm font-bold text-ink">Traducir automáticamente</p>
             <p className="text-sm text-ink-soft">
-              {onSave
-                ? `Al guardar, solo ${what} se traduce al ${names}. Lo demás de esos idiomas no se toca; si solo cambia un precio o una foto, se copia sin traducir.`
-                : `Completa en ${names} solo lo que allí falta. Lo que ya está traducido no se toca.`}
-            </p>
-            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-ink-light">
-              <span className="rounded-full bg-lagoon/20 px-2 py-0.5 font-bold text-lagoon-dark">
-                {SHORT[sync.from]}
-              </span>
-              <span>→</span>
-              {targets.map((t) => (
-                <span key={t} className="rounded-full bg-paper-deep px-2 py-0.5 font-bold text-ink-soft" title={LANG_NAME[t]}>
-                  {SHORT[t]}
-                </span>
-              ))}
+              {note ||
+                `Pasa ${what} de ${NAME[from]} a ${NAME[to]} con la IA configurada.`}
             </p>
           </div>
         </div>
-        <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
-          {onSave && (
-            <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-ink">
-              <input
-                type="checkbox"
-                className="h-4 w-4 accent-lagoon-dark"
-                checked={sync.auto}
-                onChange={(event) => sync.setAuto(event.target.checked)}
-              />
-              Traducir los cambios al guardar
-            </label>
+        <button
+          type="button"
+          onClick={run}
+          disabled={busy || disabled}
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-lagoon-dark px-6 py-3 text-sm font-bold uppercase tracking-[0.08em] text-white transition hover:brightness-110 disabled:opacity-60"
+        >
+          {busy ? (
+            <><FaSpinner className="animate-spin" /> {progress || 'Traduciendo…'}</>
+          ) : (
+            <><FaExchangeAlt /> {NAME[from]} → {NAME[to]}</>
           )}
-          {fillMissing && (
-            <button
-              type="button"
-              onClick={() => sync.run(fillMissing, targets)}
-              disabled={sync.busy || disabled}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-lagoon-dark/40 bg-paper px-5 py-2 text-xs font-bold uppercase tracking-[0.08em] text-lagoon-dark transition hover:bg-lagoon/10 disabled:opacity-60"
-            >
-              <FaMagic /> Completar lo que falta
-            </button>
-          )}
-        </div>
+        </button>
       </div>
 
-      {sync.busy && (
-        <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-lagoon-dark">
-          <FaSpinner className="animate-spin" /> Traduciendo {sync.progress}
-        </p>
-      )}
-      {!sync.busy && sync.done && (
+      {done && (
         <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-jungle-dark">
-          <FaCheck /> {sync.done}
+          <FaCheck /> {done}
         </p>
       )}
-      {sync.problem && <p className="mt-3 text-sm font-semibold text-hibiscus-dark">{sync.problem}</p>}
+      {problem && (
+        <p className="mt-3 text-sm font-semibold text-hibiscus-dark">{problem}</p>
+      )}
     </div>
   );
-};
+}
 
 export default TranslateBar;

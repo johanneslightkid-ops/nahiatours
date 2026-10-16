@@ -1,7 +1,7 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
 
 /**
- * Cloudflare Function that proxies image and video uploads to Cloudinary.
+ * Cloudflare Function that proxies image uploads to Cloudinary.
  * Uses the server-side API key and secret set in the Cloudflare Pages
  * environment variables (not exposed to the browser).
  */
@@ -84,11 +84,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
     cloudinaryForm.set('signature', signature);
 
     // Upload to Cloudinary
-    // Cloudinary uses a distinct endpoint for videos. Keeping the resource
-    // type derived on the server means the home collage accepts either format
-    // from the same, authenticated admin control.
-    const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
-    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
     const uploadResponse = await fetch(uploadUrl, {
       method: 'POST',
       body: cloudinaryForm,

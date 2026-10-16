@@ -1,13 +1,7 @@
 {
   "brandName": "Tours",
-  "contactName": "",
   "phoneNumber": "+1 (809) 555-0123",
   "paypalMeLink": "https://www.paypal.com/paypalme/carlostours",
   "verifoneLink": "",
-  "brandicon": "",
-  "heroMedia": [
-    { "url": "/buggy.mp4", "type": "video", "alt": "Buggy adventure in Punta Cana" },
-    { "url": "/imgs/tours/tour_saona_island_detail_9.jpg", "type": "image", "alt": "Saona Island shore" },
-    { "url": "/imgs/tours/tour_speed_boat_detail_5.jpg", "type": "image", "alt": "Caribbean speedboat" }
-  ]
+  "brandicon": ""
 }

@@ -16,35 +16,42 @@ export interface TestimonialRecord {
   approved?: boolean;
 }
 
-/** A new site begins with no reviews — never with invented guest feedback. */
-const defaultTestimonials: TestimonialRecord[] = [];
-
-export const getAverageRating = (testimonials: TestimonialRecord[]): number | null => {
-  const visible = testimonials.filter((testimonial) => testimonial.approved !== false);
-  if (!visible.length) {
-    return null;
-  }
-
-  const total = visible.reduce((sum, testimonial) => sum + Number(testimonial.rating || 0), 0);
-  return Number((total / visible.length).toFixed(2));
-};
-
-export const getRatingVisibility = (
-  testimonials: TestimonialRecord[],
-  options?: { enabled?: boolean; min?: number; max?: number }
-): { visible: boolean; average: number | null; count: number } => {
-  const approved = testimonials.filter((testimonial) => testimonial.approved !== false);
-  const average = getAverageRating(approved);
-  const enabled = options?.enabled ?? true;
-  const min = Math.min(Math.max(options?.min ?? 3, 1), 5);
-  const max = Math.min(Math.max(options?.max ?? 5, min), 5);
-
-  return {
-    visible: enabled && approved.length > 0 && average !== null && average >= min && average <= max,
-    average,
-    count: approved.length,
-  };
-};
+/**
+ * Shown when the site has no reviews of its own yet.
+ *
+ * These are examples, not this operator's reviews. They are what a fresh
+ * install displays so the section is not an empty hole, and the moment KV
+ * holds anything they are gone.
+ */
+const defaultTestimonials: TestimonialRecord[] = [
+  {
+    id: '1',
+    name: 'Sarah Martinez',
+    email: 'sarah@example.com',
+    review:
+      'The quad adventure was absolutely incredible! Our guide knew everything about the jungle, and the cenote was so refreshing. Best day of our vacation!',
+    rating: 5,
+    createdAt: '2024-03-15',
+  },
+  {
+    id: '2',
+    name: 'Michael Johnson',
+    email: 'michael@example.com',
+    review:
+      'The Saona Island party boat exceeded all expectations. The energy was infectious, the food was delicious, and the snorkeling was amazing. Definitely doing it again next year!',
+    rating: 5,
+    createdAt: '2024-03-10',
+  },
+  {
+    id: '3',
+    name: 'Emma García',
+    email: 'emma@example.com',
+    review:
+      'Las cascadas de Samaná fueron hermosas. La caminata fue perfecta, el guía muy atento, y las fotos quedaron espectaculares. Una experiencia que nunca voy a olvidar.',
+    rating: 5,
+    createdAt: '2024-03-05',
+  },
+];
 
 const unwrapTestimonialPayload = (payload: unknown): TestimonialRecord[] => {
   const record = (payload as Record<string, unknown>)?.record ?? payload;
@@ -58,9 +65,9 @@ const unwrapTestimonialPayload = (payload: unknown): TestimonialRecord[] => {
 };
 
 /** Everything stored, approved or not. The admin panel wants this one. */
-export const getTestimonials = async (locale?: string): Promise<TestimonialRecord[]> => {
+export const getTestimonials = async (): Promise<TestimonialRecord[]> => {
   try {
-    const data = await apiGet<unknown>('testimonials', locale ? { locale } : undefined);
+    const data = await apiGet<unknown>('testimonials');
     return unwrapTestimonialPayload(data);
   } catch (error) {
     console.warn('Error loading testimonials:', error);
@@ -69,8 +76,8 @@ export const getTestimonials = async (locale?: string): Promise<TestimonialRecor
 };
 
 /** What a visitor should see: everything except what is waiting for approval. */
-export const getPublishedTestimonials = async (locale?: string): Promise<TestimonialRecord[]> =>
-  (await getTestimonials(locale)).filter((t) => t.approved !== false);
+export const getPublishedTestimonials = async (): Promise<TestimonialRecord[]> =>
+  (await getTestimonials()).filter((t) => t.approved !== false);
 
 /**
  * Replace the whole list. Admin only — it needs the password header.
@@ -80,10 +87,9 @@ export const getPublishedTestimonials = async (locale?: string): Promise<Testimo
  * that did not happen has to be able to say so.
  */
 export const saveTestimonials = async (
-  testimonials: TestimonialRecord[],
-  locale?: string
+  testimonials: TestimonialRecord[]
 ): Promise<TestimonialRecord[]> => {
-  await apiPut<unknown>('testimonials', { testimonials }, locale ? { locale } : undefined);
+  await apiPut<unknown>('testimonials', { testimonials });
   return testimonials;
 };
 

@@ -1,5 +1,5 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
-import { isProtectedResource } from '../../shared/paymentConfig';
+import { PROTECTED_RESOURCES } from '../../shared/paymentConfig';
 
 const RESOURCE_WITH_LOCALE = new Set([
   'blog',
@@ -82,13 +82,12 @@ const readLocalJson = async (
 const buildResourceKey = (resource: string, locale?: string) => {
   const normalized = resource.trim().toLowerCase();
 
-  // Some KV keys hold credentials — the payment secrets, the admin password,
-  // the pending bank payments with their CardNET session keys.
+  // Some KV keys hold credentials — the Stripe secret key, the admin password.
   // This endpoint is unauthenticated on GET and cached publicly, so it must
   // never be able to name one, however it is asked. Returning null here makes
   // the request a 400 alongside any other unknown resource, which also avoids
   // confirming that the key exists.
-  if (isProtectedResource(normalized)) {
+  if (PROTECTED_RESOURCES.has(normalized)) {
     return null;
   }
 
@@ -119,25 +118,25 @@ const createErrorResponse = (message: string, status = 400) =>
     headers: { 'Content-Type': 'application/json' },
   });
 
-const JSONBIN_RESOURCE_MAP: Record<string, string | { en: string; es: string; fr?: string; de?: string }> = {
+const JSONBIN_RESOURCE_MAP: Record<string, string | { en: string; es: string }> = {
   'brand': 'VITE_JSONBIN_BRAND_BIN_ID',
   'transfer-config': 'VITE_JSONBIN_TRANSFER_BIN_ID',
   'social-media': 'VITE_JSONBIN_SOCIAL_BIN_ID',
   'social-api-settings': 'VITE_JSONBIN_SOCIAL_API_SETTINGS_BIN_ID',
   'testimonials': 'VITE_JSONBIN_TESTIMONIALS_BIN_ID',
-  'blog': { en: 'VITE_JSONBIN_BLOG_EN', es: 'VITE_JSONBIN_BLOG_ES', fr: 'VITE_JSONBIN_BLOG_FR', de: 'VITE_JSONBIN_BLOG_DE' },
-  'tours': { en: 'VITE_JSONBIN_TOURS_EN', es: 'VITE_JSONBIN_TOURS_ES', fr: 'VITE_JSONBIN_TOURS_FR', de: 'VITE_JSONBIN_TOURS_DE' },
-  'transport-services': { en: 'VITE_JSONBIN_TRANSPORT_EN', es: 'VITE_JSONBIN_TRANSPORT_ES', fr: 'VITE_JSONBIN_TRANSPORT_FR', de: 'VITE_JSONBIN_TRANSPORT_DE' },
-  'example-tours': { en: 'VITE_JSONBIN_EXAMPLETESTOURS_EN_BIN_ID', es: 'VITE_JSONBIN_EXAMPLETESTOURS_ES_BIN_ID', fr: 'VITE_JSONBIN_EXAMPLETESTOURS_FR_BIN_ID', de: 'VITE_JSONBIN_EXAMPLETESTOURS_DE_BIN_ID' },
-  'story-elements': { en: 'VITE_JSONBIN_STORY_ELEMENTS_EN', es: 'VITE_JSONBIN_STORY_ELEMENTS_ES', fr: 'VITE_JSONBIN_STORY_ELEMENTS_FR', de: 'VITE_JSONBIN_STORY_ELEMENTS_DE' },
-  'intro-story': { en: 'VITE_JSONBIN_JOURNEY_EN', es: 'VITE_JSONBIN_JOURNEY_ES', fr: 'VITE_JSONBIN_JOURNEY_FR', de: 'VITE_JSONBIN_JOURNEY_DE' },
-  'story-nodes': { en: 'VITE_JSONBIN_STORY_NODES_EN', es: 'VITE_JSONBIN_STORY_NODES_ES', fr: 'VITE_JSONBIN_STORY_NODES_FR', de: 'VITE_JSONBIN_STORY_NODES_DE' },
+  'blog': { en: 'VITE_JSONBIN_BLOG_EN', es: 'VITE_JSONBIN_BLOG_ES' },
+  'tours': { en: 'VITE_JSONBIN_TOURS_EN', es: 'VITE_JSONBIN_TOURS_ES' },
+  'transport-services': { en: 'VITE_JSONBIN_TRANSPORT_EN', es: 'VITE_JSONBIN_TRANSPORT_ES' },
+  'example-tours': { en: 'VITE_JSONBIN_EXAMPLETESTOURS_EN_BIN_ID', es: 'VITE_JSONBIN_EXAMPLETESTOURS_ES_BIN_ID' },
+  'story-elements': { en: 'VITE_JSONBIN_STORY_ELEMENTS_EN', es: 'VITE_JSONBIN_STORY_ELEMENTS_ES' },
+  'intro-story': { en: 'VITE_JSONBIN_JOURNEY_EN', es: 'VITE_JSONBIN_JOURNEY_ES' },
+  'story-nodes': { en: 'VITE_JSONBIN_STORY_NODES_EN', es: 'VITE_JSONBIN_STORY_NODES_ES' },
   'story-quiz-rules': 'VITE_JSONBIN_STORY_RULES',
-  'translations': { en: 'VITE_JSONBIN_EN_BIN_ID', es: 'VITE_JSONBIN_ES_BIN_ID', fr: 'VITE_JSONBIN_FR_BIN_ID', de: 'VITE_JSONBIN_DE_BIN_ID' },
+  'translations': { en: 'VITE_JSONBIN_EN_BIN_ID', es: 'VITE_JSONBIN_ES_BIN_ID' },
 };
 
 const parseResourceKey = (key: string) => {
-  const match = /^(.*)-(en|es|fr|de)$/.exec(key);
+  const match = /^(.*)-(en|es)$/.exec(key);
   if (match) {
     return { resource: match[1], locale: match[2] };
   }
@@ -168,8 +167,7 @@ const getJsonBinUrl = (resource: string, locale: string | undefined, env: Record
     return null;
   }
 
-  const localeKey = locale as 'en' | 'es' | 'fr' | 'de';
-  const envKey = entry[localeKey] ?? entry.en ?? entry.es;
+  const envKey = entry[locale as 'en' | 'es'];
   return normalizeJsonBinUrl(env[envKey], method);
 };
 

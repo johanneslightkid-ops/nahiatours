@@ -9,12 +9,6 @@ export interface VehicleType {
   typicalPassengers: [number, number];
   description: string;
   image?: string;
-  /**
-   * Name and description per site language ('en', 'es', 'de', 'fr'). `label`
-   * and `description` above stay the fallback for any language missing here,
-   * and `label` is still what the vehicle key is derived from.
-   */
-  translations?: Partial<Record<string, { label?: string; description?: string }>>;
 }
 
 export interface TransferRoute {

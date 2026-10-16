@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { getBrandSettings, saveBrandSettings, BrandSettings, uploadBrandIcon } from '../services/brandService';
 import BrandIconEditor from '../components/admin/BrandIconEditor';
-import HeroMediaAdmin from '../components/admin/HeroMediaAdmin';
 import { getTours, saveTours, Tour } from '../services/toursService';
 import { useI18n } from '../contexts/I18nContext';
 import ServiceAdminPanel from '../components/admin/ServiceAdminPanel';
@@ -13,7 +12,6 @@ import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
 import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
 import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
-import SiteTextsAdmin from '../components/admin/SiteTextsAdmin';
 import { FaVideo, FaShareAlt, FaBook, FaRobot, FaMagic } from 'react-icons/fa';
 import { useSearchParams } from 'react-router-dom';
 
@@ -22,7 +20,6 @@ const Admin: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [brandSettings, setBrandSettings] = useState<BrandSettings>({
     brandName: 'Tours',
-    contactName: '',
     phoneNumber: '+1 (809) 555-0123',
     paypalMeLink: 'https://www.paypal.com/paypalme/tours',
     verifoneLink: '',
@@ -159,19 +156,18 @@ const Admin: React.FC = () => {
                 />
                 <input
                   type="text"
-                  value={brandSettings.contactName}
-                  onChange={(event) => setBrandSettings({ ...brandSettings, contactName: event.target.value })}
-                  placeholder="Nombre de la persona de contacto (WhatsApp)"
-                  className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
-                />
-                <input
-                  type="text"
                   value={brandSettings.paypalMeLink}
                   onChange={(event) => setBrandSettings({ ...brandSettings, paypalMeLink: event.target.value })}
                   placeholder="Enlace de PayPal"
                   className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
                 />
-                <HeroMediaAdmin brandSettings={brandSettings} setBrandSettings={setBrandSettings} />
+                <input
+                  type="text"
+                  value={brandSettings.verifoneLink}
+                  onChange={(event) => setBrandSettings({ ...brandSettings, verifoneLink: event.target.value })}
+                  placeholder="Enlace de Verifone"
+                  className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
+                />
                 <div className="flex gap-3">
                   <button
                     onClick={async () => {
@@ -206,8 +202,8 @@ const Admin: React.FC = () => {
                 </div>
                 <p><strong>Negocio:</strong> {brandSettings.brandName}</p>
                 <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
-                <p><strong>Contacto:</strong> {brandSettings.contactName || '—'}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>
+                <p><strong>Verifone:</strong> {brandSettings.verifoneLink || '—'}</p>
                 <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-lagoon-dark px-5 py-2 font-semibold text-white">
                   Editar datos del negocio
                 </button>
@@ -237,8 +233,7 @@ const Admin: React.FC = () => {
             setServices={setTours}
             loadServices={loadTours}
             saveServices={(services) => saveTours(services, locale)}
-            locale={locale}
-            loadTranslation={(to) => getTours(to, true)}
+            locale={locale === 'en' ? 'en' : 'es'}
             saveTranslation={(services, to) => saveTours(services, to)}
             siblingAdminPath="/admin/transport"
             siblingAdminLabel="Ir a Transporte"
@@ -249,13 +244,6 @@ const Admin: React.FC = () => {
         {activeSection === 'testimonials' && (
           <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
             <TestimonialsAdmin />
-          </div>
-        )}
-
-        {/* Menus, buttons and headings, per language */}
-        {activeSection === 'texts' && (
-          <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
-            <SiteTextsAdmin />
           </div>
         )}
 

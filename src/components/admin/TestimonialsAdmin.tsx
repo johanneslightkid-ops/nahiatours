@@ -14,7 +14,6 @@ import {
   saveTestimonials,
   TestimonialRecord,
 } from '../../services/testimonialService';
-import { useI18n } from '../../contexts/I18nContext';
 
 /**
  * Reseñas — the panel that did not exist.
@@ -22,11 +21,6 @@ import { useI18n } from '../../contexts/I18nContext';
  * Reviews could be left and could be read, and there was nowhere at all to
  * correct a typo, remove one, or publish one somebody had sent. They arrive
  * unapproved now, so this is also the only place they become visible.
- *
- * There is no translate strip here, on purpose. Reviews are ONE list that
- * every language shows (the API keeps no per-language copy), in the words the
- * guest wrote them in. "Translating" it into German would overwrite the
- * guest's own review with the German version for everybody.
  */
 
 const blank = (): TestimonialRecord => ({
@@ -59,7 +53,6 @@ const Stars: React.FC<{ value: number; onChange?: (v: number) => void }> = ({ va
 );
 
 const TestimonialsAdmin: React.FC = () => {
-  const { locale } = useI18n();
   const [items, setItems] = useState<TestimonialRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -70,13 +63,12 @@ const TestimonialsAdmin: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
-      const loaded = await getTestimonials(locale);
+      const loaded = await getTestimonials();
       setItems(loaded);
       setOriginal(loaded);
       setLoading(false);
     })();
-  }, [locale]);
+  }, []);
 
   const dirty = useMemo(
     () => JSON.stringify(items) !== JSON.stringify(original),
@@ -97,7 +89,7 @@ const TestimonialsAdmin: React.FC = () => {
       // Empty rows are the cost of an "add" button; they are dropped rather
       // than written, so a half-finished entry cannot reach the site.
       const cleaned = items.filter((t) => t.name.trim() && t.review.trim());
-      await saveTestimonials(cleaned, locale);
+      await saveTestimonials(cleaned);
       setItems(cleaned);
       setOriginal(cleaned);
       setSaved(true);

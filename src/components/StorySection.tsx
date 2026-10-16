@@ -1,53 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FoamLine, Flamingo, Parrot, Pelican, SeaTurtle } from './ui/Illustrations';
-import { LeafCanopy, Parallax, Reveal, SwimmingSchool } from './nature/Nature';
-
-/**
- * Each band of the story is a different corner of the coast, and gets its own
- * residents: a cotorra in the garden, fish and a turtle in the lagoon, a
- * flamingo at the cove, a pelican on the bay's dock post.
- */
-const StoryLife: React.FC<{ theme: string; flip: boolean }> = ({ theme, flip }) => {
-  const side = flip ? 'left-4 lg:left-10' : 'right-4 lg:right-10';
-  if (theme === 'lagoon-section') {
-    return (
-      <>
-        <SwimmingSchool className="z-0" opacity={0.6} />
-        <div className="pointer-events-none absolute left-0 top-[70%] z-0 hidden opacity-70 md:block" style={{ animation: 'swimRight 70s linear infinite', animationDelay: '-20s' }} aria-hidden="true">
-          <SeaTurtle className="h-20 w-16 rotate-90" />
-        </div>
-      </>
-    );
-  }
-  if (theme === 'cove-section') {
-    return (
-      <>
-        <LeafCanopy variant="jungle" />
-        <Parallax distance={40} className={`pointer-events-none absolute bottom-16 z-0 hidden lg:block ${side}`}>
-          <Flamingo className="h-48 w-28" />
-        </Parallax>
-      </>
-    );
-  }
-  if (theme === 'bay-section') {
-    return (
-      <>
-        <LeafCanopy variant="shore" />
-        <Parallax distance={50} className={`pointer-events-none absolute bottom-10 z-0 hidden lg:block ${side}`}>
-          <Pelican className="h-36 w-40" />
-        </Parallax>
-      </>
-    );
-  }
-  return (
-    <>
-      <LeafCanopy variant="garden" />
-      <Parallax distance={60} className={`pointer-events-none absolute top-24 z-0 hidden xl:block ${flip ? 'right-[6%]' : 'left-[46%]'}`}>
-        <Parrot className="h-36 w-24" />
-      </Parallax>
-    </>
-  );
-};
+import { FoamLine } from './ui/Illustrations';
 
 interface StorySectionProps {
   id: string;
@@ -176,11 +128,10 @@ const StorySection: React.FC<StorySectionProps> = ({
       <div
         className={`parallax-wash ${isAlternate ? 'parallax-wash-left' : 'parallax-wash-right'}`}
       />
-      <StoryLife theme={themeName || (isAlternate ? 'cove-section' : 'shore-section')} flip={isAlternate} />
 
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Header with emoji and title */}
-        <Reveal className={`mb-10 text-center sm:mb-12 ${isAlternate ? 'md:text-right' : 'md:text-left'}`}>
+        <div className={`mb-10 text-center sm:mb-12 ${isAlternate ? 'md:text-right' : 'md:text-left'}`}>
           {emoji && <div className={`section-icon mb-5 ${isAlternate ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}>{emoji}</div>}
           {title && <h2 className="scribble-title-bg mb-6 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h2>}
           {timeframe && (
@@ -188,7 +139,7 @@ const StorySection: React.FC<StorySectionProps> = ({
               {timeframe}
             </p>
           )}
-        </Reveal>
+        </div>
 
         {/* Main content grid */}
         <div className={`grid items-center gap-12 ${imageUrl || vimeoUrl ? 'md:grid-cols-2 lg:gap-20' : 'md:grid-cols-1'}`}>

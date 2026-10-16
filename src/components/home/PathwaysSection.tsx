@@ -1,5 +1,4 @@
 import React from 'react';
-import { localeText } from '../../lib/localeText';
 import { Link } from 'react-router-dom';
 import { HiArrowRight, HiSparkles } from 'react-icons/hi';
 import { FaWhatsapp } from 'react-icons/fa';
@@ -18,29 +17,10 @@ const PathwaysSection: React.FC = () => {
   const { locale } = useI18n();
   const { brandSettings } = useBrand();
   const { catalogue, hasProgress } = usePlanner();
+  const isEs = locale === 'es';
 
-  const copy = localeText(locale, {
-    en: {
-        eyebrow: 'Two ways to begin',
-        title: 'Pick how you want to build the day',
-        subtitle:
-          'Browse the catalogue at your own pace, or answer a few questions and let the planner build a real itinerary priced for your exact group.',
-        catalogueTitle: 'Catalogue mode',
-        catalogueText:
-          catalogue.length > 0
-            ? `Scroll all ${catalogue.length} excursions with photos, prices and details. Book the one you fall for.`
-            : 'Scroll every excursion with photos, prices and details. Book the one you fall for.',
-        catalogueCta: 'View excursions',
-        plannerTitle: 'Plan My Day',
-        plannerText:
-          'Twelve questions about your crew, your energy and your budget. You get a day-by-day itinerary with real prices and no impossible timings.',
-        plannerCta: hasProgress ? 'Resume my plan' : 'Start the planner',
-        plannerBadge: 'Intelligent',
-        or: 'or just ask us',
-        whatsapp: 'Chat on WhatsApp',
-        whatsappMessage: 'Hi! I would like to put together a day of excursions. What do you recommend?',
-      },
-    es: {
+  const copy = isEs
+    ? {
         eyebrow: 'Dos formas de empezar',
         title: 'Elige tu manera de armar el día',
         subtitle:
@@ -59,48 +39,27 @@ const PathwaysSection: React.FC = () => {
         or: 'o pregunta directamente',
         whatsapp: 'Escribir por WhatsApp',
         whatsappMessage: '¡Hola! Me gustaría armar un día de excursiones. ¿Qué me recomiendas?',
-      },
-    de: {
-      eyebrow: 'Zwei Wege zum Start',
-      title: 'Wähle, wie du deinen Tag gestaltest',
-      subtitle:
-        'Stöbere in Ruhe im Katalog, oder beantworte ein paar Fragen und lass den Planer einen echten Tagesablauf mit Preisen für deine Gruppe zusammenstellen.',
-      catalogueTitle: 'Katalog',
-      catalogueText:
-        catalogue.length > 0
-          ? `Alle ${catalogue.length} Ausflüge mit Fotos, Preisen und Details. Buche den, in den du dich verliebst.`
-          : 'Alle Ausflüge mit Fotos, Preisen und Details. Buche den, in den du dich verliebst.',
-      catalogueCta: 'Ausflüge ansehen',
-      plannerTitle: 'Meinen Tag planen',
-      plannerText:
-        'Zwölf Fragen zu deiner Gruppe, deiner Energie und deinem Budget. Du bekommst einen Plan für jeden Tag, mit echten Preisen und ohne unmögliche Zeiten.',
-      plannerCta: hasProgress ? 'Meinen Plan fortsetzen' : 'Planer starten',
-      plannerBadge: 'Intelligent',
-      or: 'oder frag uns einfach',
-      whatsapp: 'Per WhatsApp schreiben',
-      whatsappMessage: 'Hallo! Ich möchte einen Ausflugstag zusammenstellen. Was empfehlt ihr?',
-    },
-    fr: {
-      eyebrow: 'Deux façons de commencer',
-      title: 'Choisissez comment composer votre journée',
-      subtitle:
-        'Parcourez le catalogue à votre rythme, ou répondez à quelques questions et laissez le planificateur composer un vrai programme, chiffré pour votre groupe.',
-      catalogueTitle: 'Mode catalogue',
-      catalogueText:
-        catalogue.length > 0
-          ? `Les ${catalogue.length} excursions avec photos, prix et détails. Réservez celle qui vous fait craquer.`
-          : 'Toutes les excursions avec photos, prix et détails. Réservez celle qui vous fait craquer.',
-      catalogueCta: 'Voir les excursions',
-      plannerTitle: 'Planifier ma journée',
-      plannerText:
-        'Douze questions sur votre groupe, votre énergie et votre budget. Vous recevez un programme jour par jour, avec de vrais prix et sans horaires impossibles.',
-      plannerCta: hasProgress ? 'Reprendre mon plan' : 'Lancer le planificateur',
-      plannerBadge: 'Intelligent',
-      or: 'ou demandez-nous directement',
-      whatsapp: 'Écrire sur WhatsApp',
-      whatsappMessage: 'Bonjour ! J’aimerais composer une journée d’excursions. Que me conseillez-vous ?',
-    },
-  });
+      }
+    : {
+        eyebrow: 'Two ways to begin',
+        title: 'Pick how you want to build the day',
+        subtitle:
+          'Browse the catalogue at your own pace, or answer a few questions and let the planner build a real itinerary priced for your exact group.',
+        catalogueTitle: 'Catalogue mode',
+        catalogueText:
+          catalogue.length > 0
+            ? `Scroll all ${catalogue.length} excursions with photos, prices and details. Book the one you fall for.`
+            : 'Scroll every excursion with photos, prices and details. Book the one you fall for.',
+        catalogueCta: 'View excursions',
+        plannerTitle: 'Plan My Day',
+        plannerText:
+          'Twelve questions about your crew, your energy and your budget. You get a day-by-day itinerary with real prices and no impossible timings.',
+        plannerCta: hasProgress ? 'Resume my plan' : 'Start the planner',
+        plannerBadge: 'Intelligent',
+        or: 'or just ask us',
+        whatsapp: 'Chat on WhatsApp',
+        whatsappMessage: 'Hi! I would like to put together a day of excursions. What do you recommend?',
+      };
 
   return (
     <section
