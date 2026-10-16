@@ -188,7 +188,7 @@ const Home: React.FC = () => {
 
       {/* Call-to-Action Banner: prefer dynamic CTAs from storyData.callToActions */}
       {!storyData ? null : storyData.callToActions && storyData.callToActions.length > 0 ? (
-        <section ref={sunsetRef} className="home-section sunset-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
+        <section id="perfect-day" ref={sunsetRef} className="home-section sunset-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
           <CaribbeanSea className="z-0" pointerTarget={sunsetRef} />
           <GlidingBirds className="z-[1]" tone="text-[#2a1d3a]/70" count={4} />
           <div className="pointer-events-none absolute -bottom-6 -left-16 z-[1] h-80 w-56 opacity-90 sm:h-[28rem] sm:w-80" aria-hidden="true">
@@ -228,7 +228,7 @@ const Home: React.FC = () => {
           </div>
         </section>
       ) : (
-        <section ref={sunsetRef} className="home-section sunset-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
+        <section id="perfect-day" ref={sunsetRef} className="home-section sunset-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
           <CaribbeanSea className="z-0" pointerTarget={sunsetRef} />
           <GlidingBirds className="z-[1]" tone="text-[#2a1d3a]/70" count={4} />
           <div className="pointer-events-none absolute -bottom-6 -left-16 z-[1] h-80 w-56 opacity-90 sm:h-[28rem] sm:w-80" aria-hidden="true">

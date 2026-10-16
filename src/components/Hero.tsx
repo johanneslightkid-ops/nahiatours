@@ -287,8 +287,30 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
 
       <div className="absolute inset-x-0 bottom-14 z-30 flex justify-center">
         <a
-          href="#adventure_preview"
-          onClick={() => playClickFx()}
+          href="#perfect-day"
+          onClick={(event) => {
+            playClickFx();
+            // "Ready for your perfect day in paradise?" — a smooth glide down,
+            // or a jump for anyone who has asked for less motion.
+            const target = document.getElementById('perfect-day');
+            if (!target) return;
+            event.preventDefault();
+            const behavior: ScrollBehavior = reduced ? 'auto' : 'smooth';
+            target.scrollIntoView({ behavior, block: 'start' });
+            // Sections above can still change height while the page glides
+            // (late images, reveal animations), which leaves it short or past
+            // the mark on a phone. Once it settles, close the gap.
+            let settle = 0;
+            const correct = () => {
+              window.clearTimeout(settle);
+              settle = window.setTimeout(() => {
+                const offset = target.getBoundingClientRect().top;
+                if (Math.abs(offset) > 4) window.scrollBy({ top: offset, behavior });
+              }, 160);
+            };
+            window.addEventListener('scroll', correct, { passive: true });
+            window.setTimeout(() => window.removeEventListener('scroll', correct), 2500);
+          }}
           onMouseEnter={() => playHoverFx()}
           className="inline-flex items-center gap-2 rounded-leaf bg-paper-card/90 px-5 py-2 text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-ink no-underline shadow-ink"
         >
