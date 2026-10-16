@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
 import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks } from 'react-icons/md';
 import AdminNav from './AdminNav';
+import { showsBrandName } from '../../lib/brandDisplay';
 import LanguageSwitcher from '../LanguageSwitcher';
 import SoundToggle from '../SoundToggle';
 import { useBrand } from '../../contexts/BrandContext';
@@ -57,9 +58,13 @@ const Header: React.FC = () => {
               <img src="/competitor-logo.svg" alt="Logo" className="h-[7.875rem] w-[7.875rem]" />
             )}
           </div>
-          <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[10.75rem] sm:block lg:ml-[11.5rem]">
-            {brandSettings.brandName}
-          </h1>
+          {showsBrandName(brandSettings) ? (
+            <h1 className="relative hidden font-display text-2xl font-extrabold text-ink transition group-hover:text-mango-dark sm:ml-[10.75rem] sm:block lg:ml-[11.5rem]">
+              {brandSettings.brandName}
+            </h1>
+          ) : (
+            <span className="sr-only">{brandSettings.brandName}</span>
+          )}
         </Link>
 
         <button

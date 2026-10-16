@@ -43,7 +43,8 @@ decides how a change travels:
   the classes silently do nothing on the branches that lack the rest.
 * **This branch's own** — `src/styles/globals.css`, `tailwind.config.cjs`,
   `index.html`, `src/components/Hero.tsx`, `src/components/layout/Header.tsx`,
-  `Footer.tsx`, `src/components/ui/Illustrations.tsx`, the card components.
+  `Footer.tsx`, `src/components/ui/Illustrations.tsx`, the card components,
+  `src/config/siteDefaults.ts` (what this site shows before anyone chooses).
   **Never copy these across.** When a fix touches one, patch each branch's own
   copy instead of replacing it.
 
