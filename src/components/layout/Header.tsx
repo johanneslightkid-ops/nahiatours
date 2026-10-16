@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks } from 'react-icons/md';
 import { HiSparkles } from 'react-icons/hi';
 import AdminNav from './AdminNav';
+import { onNavLinkClick } from '../../lib/navScroll';
 import AdminLanguageSelect from '../admin/AdminLanguageSelect';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useBrand } from '../../contexts/BrandContext';
@@ -36,9 +37,9 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { to: '/#top', id: 'nav.home', fallback: 'Home', icon: <MdHome />, note: { en: 'the beach', es: 'la playa', fr: 'la plage', de: 'der Strand' }, match: (p) => p === '/' },
+  { to: '/', id: 'nav.home', fallback: 'Home', icon: <MdHome />, note: { en: 'the beach', es: 'la playa', fr: 'la plage', de: 'der Strand' }, match: (p) => p === '/' },
   {
-    to: '/plan#top',
+    to: '/plan',
     id: 'nav.plan',
     fallback: 'Plan',
     icon: <HiSparkles />,
@@ -46,10 +47,10 @@ const NAV: NavItem[] = [
     accent: 'mango',
     match: (p) => p.startsWith('/plan'),
   },
-  { to: '/tours#top', id: 'nav.tours', fallback: 'Tours', icon: <MdTour />, note: { en: 'excursions', es: 'excursiones', fr: 'excursions', de: 'Ausflüge' }, match: (p) => p.startsWith('/tours') || p.startsWith('/details/tours') },
-  { to: '/transport#top', id: 'nav.transport', fallback: 'Transport', icon: <MdLocalTaxi />, note: { en: 'rides', es: 'traslados', fr: 'trajets', de: 'Fahrten' }, match: (p) => p.startsWith('/transport') },
-  { to: '/blog#top', id: 'nav.blog', fallback: 'Blog', icon: <MdLibraryBooks />, note: { en: 'stories', es: 'historias', fr: 'histoires', de: 'Geschichten' }, match: (p) => p.startsWith('/blog') },
-  { to: '/contact#top', id: 'nav.contact', fallback: 'Contact', icon: <MdEmail />, note: { en: 'say hola', es: 'di hola', fr: 'dites hola', de: 'sag hallo' }, match: (p) => p.startsWith('/contact') },
+  { to: '/tours', id: 'nav.tours', fallback: 'Tours', icon: <MdTour />, note: { en: 'excursions', es: 'excursiones', fr: 'excursions', de: 'Ausflüge' }, match: (p) => p.startsWith('/tours') || p.startsWith('/details/tours') },
+  { to: '/transport', id: 'nav.transport', fallback: 'Transport', icon: <MdLocalTaxi />, note: { en: 'rides', es: 'traslados', fr: 'trajets', de: 'Fahrten' }, match: (p) => p.startsWith('/transport') },
+  { to: '/blog', id: 'nav.blog', fallback: 'Blog', icon: <MdLibraryBooks />, note: { en: 'stories', es: 'historias', fr: 'histoires', de: 'Geschichten' }, match: (p) => p.startsWith('/blog') },
+  { to: '/contact', id: 'nav.contact', fallback: 'Contact', icon: <MdEmail />, note: { en: 'say hola', es: 'di hola', fr: 'dites hola', de: 'sag hallo' }, match: (p) => p.startsWith('/contact') },
 ];
 
 const STRINGS = [22, 40, 28, 46, 30, 38];
@@ -208,8 +209,9 @@ const Signpost: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               >
                 <Link
                   to={item.to}
-                  onClick={() => {
+                  onClick={(event) => {
                     playClickFx();
+                    onNavLinkClick(event, item.to, location.pathname);
                     onClose();
                   }}
                   aria-current={active ? 'page' : undefined}
@@ -279,7 +281,7 @@ const Header: React.FC = () => {
     return (
       <>
         <Link
-          to="/#top"
+          to="/"
           aria-label={brandSettings.brandName}
           title={brandSettings.brandName}
           className="fixed left-2 top-1.5 z-[60] no-underline"
@@ -309,8 +311,11 @@ const Header: React.FC = () => {
       <header className="fixed inset-x-4 top-3 z-50 h-[5rem] lg:h-[9rem]">
         {/* Phones: a pebble with the logo and the name. */}
         <Link
-          to="/#top"
-          onClick={() => playClickFx()}
+          to="/"
+          onClick={(event) => {
+            playClickFx();
+            onNavLinkClick(event, '/', location.pathname);
+          }}
           className="absolute left-4 top-3 flex items-center gap-2.5 no-underline lg:hidden"
         >
           <Logo className="h-14 w-14" />
@@ -322,8 +327,11 @@ const Header: React.FC = () => {
           <Vine />
           <div className="section-shell relative flex h-full items-start justify-between">
             <Link
-              to="/#top"
-              onClick={() => playClickFx()}
+              to="/"
+              onClick={(event) => {
+                playClickFx();
+                onNavLinkClick(event, '/', location.pathname);
+              }}
               onMouseEnter={() => playHoverFx()}
               className="group relative mt-0 flex items-start gap-4 no-underline"
             >
@@ -366,7 +374,10 @@ const Header: React.FC = () => {
                       <span className="rope-string" style={{ height: `calc(${STRINGS[i % STRINGS.length]}px + ${ROPE_EXTRA})` }} />
                       <Link
                         to={item.to}
-                        onClick={() => playClickFx()}
+                        onClick={(event) => {
+                          playClickFx();
+                          onNavLinkClick(event, item.to, location.pathname);
+                        }}
                         onMouseEnter={() => playHoverFx()}
                         aria-current={active ? 'page' : undefined}
                         data-active={active}
