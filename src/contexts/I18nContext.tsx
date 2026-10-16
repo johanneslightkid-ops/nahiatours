@@ -2,9 +2,20 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { IntlProvider } from 'react-intl';
 import enMessagesJson from '../locales/en.json';
 import esMessagesJson from '../locales/es.json';
+import frMessagesJson from '../locales/fr.json';
+import deMessagesJson from '../locales/de.json';
 import { apiGet } from '../services/apiClient';
 
-type Locale = 'en' | 'es';
+export type Locale = 'en' | 'es' | 'fr' | 'de';
+/** The languages this site offers. The admin translates into these and no others. */
+export const SUPPORTED_LOCALES: readonly Locale[] = ['en', 'es', 'fr', 'de'];
+/**
+ * Which language's content records to read. Tours, blog, story and transport
+ * services are kept in all four languages on this site, so it is the reader's
+ * own; the services fall back to the bundled copy when a stored one is absent.
+ */
+export type ContentLocale = Locale;
+export const getContentLocale = (locale: Locale): ContentLocale => locale;
 
 interface I18nContextType {
   locale: Locale;
@@ -29,7 +40,6 @@ const flattenMessages = (
 ): Record<string, string> => {
   const source = nestedMessages ?? {};
   let flattened: Record<string, string> = {};
-
   for (const key in source) {
     if (Object.prototype.hasOwnProperty.call(source, key)) {
       const value = source[key as keyof typeof source];
@@ -44,14 +54,24 @@ const flattenMessages = (
       }
     }
   }
-
   return flattened;
 };
 
 const fallbackMessages: Record<Locale, Record<string, string>> = {
   en: flattenMessages(enMessagesJson as unknown as Record<string, unknown>),
   es: flattenMessages(esMessagesJson as unknown as Record<string, unknown>),
+  fr: flattenMessages(frMessagesJson as unknown as Record<string, unknown>),
+  de: flattenMessages(deMessagesJson as unknown as Record<string, unknown>),
 };
+
+/**
+ * The texts shipped with the build, flattened. The admin's "Site texts" panel
+ * shows these as the defaults and stores only what an operator changes.
+ */
+export const getBundledMessages = (locale: string): Record<string, string> =>
+  fallbackMessages[(SUPPORTED_LOCALES as readonly string[]).includes(locale) ? (locale as Locale) : 'en'];
+
+export { flattenMessages };
 
 const fetchMessages = async (locale: Locale): Promise<Record<string, string>> => {
   try {
@@ -60,7 +80,7 @@ const fetchMessages = async (locale: Locale): Promise<Record<string, string>> =>
     const remoteFlattened = flattenMessages(nestedMessages as Record<string, unknown>);
     return { ...fallbackMessages[locale], ...remoteFlattened };
   } catch (error) {
-    console.error(`Failed to fetch ${locale} messages:`, error);
+    console.warn(`Failed to fetch ${locale} messages from the API, using the bundled translations instead.`, error);
     return fallbackMessages[locale];
   }
 };
