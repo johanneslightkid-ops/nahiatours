@@ -16,6 +16,8 @@ const TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const SECRET_KEYS = new Set(['admin-password', 'payment-secrets', 'ai-settings', 'ADMIN_PASSWORD']);
 const isSecret = (name) => SECRET_KEYS.has(name) || name.startsWith('payment-order:');
 const OUT = 'kv-snapshot';
+/** Optional: only these keys (comma-separated). */
+const ONLY = (process.env.KV_SNAPSHOT_KEYS || '').split(',').map((k) => k.trim()).filter(Boolean);
 
 const cf = async (path, raw = false) => {
   const response = await fetch(`${API}${path}`, { headers: { Authorization: `Bearer ${TOKEN}` } });
@@ -44,6 +46,7 @@ for (const ns of namespaces) {
   const keys = await cf(`/accounts/${accountId}/storage/kv/namespaces/${ns.id}/keys?limit=1000`);
   index[ns.title] = { id: ns.id, keys: [] };
   for (const key of keys) {
+    if (ONLY.length && !ONLY.includes(key.name)) continue;
     if (isSecret(key.name)) {
       index[ns.title].keys.push({ name: key.name, skipped: 'credential' });
       continue;
