@@ -122,7 +122,44 @@ const writeBinding = (namespaceId) => {
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/**
+ * Is the binding already written into wrangler.toml by hand?
+ *
+ * A branch may pin its namespace id literally, outside the managed block, so
+ * that a build with no API token still binds KV — a tokenless build is where
+ * this script skips, and a Worker deployed with no binding reads the JSON
+ * bundled at /data/*.json, which from the outside is indistinguishable from a
+ * site whose content was wiped.
+ *
+ * Where that pin exists it is the answer, and this script must not add a
+ * second block: two `[[kv_namespaces]]` entries sharing one binding name is a
+ * hard wrangler error, so appending would turn "already correct" into "cannot
+ * deploy at all".
+ */
+const pinnedNamespaceId = () => {
+  const config = readFileSync(CONFIG_PATH, 'utf8');
+  // Only what is left once the managed block is taken out — otherwise this
+  // script would find its own previous output and never update it.
+  const unmanaged = config.replace(
+    new RegExp(`${escapeRegExp(BEGIN)}[\\s\\S]*?${escapeRegExp(END)}`, 'gm'),
+    ''
+  );
+  const pattern = new RegExp(
+    `^\\[\\[kv_namespaces\\]\\][\\s\\S]*?binding\\s*=\\s*"${escapeRegExp(BINDING)}"[\\s\\S]*?id\\s*=\\s*"([^"]+)"`,
+    'm'
+  );
+  return pattern.exec(unmanaged)?.[1] ?? null;
+};
+
 const main = async () => {
+  const pinned = pinnedNamespaceId();
+  if (pinned) {
+    log(`wrangler.toml already pins ${BINDING} → ${pinned}; leaving it alone.`);
+    log('A pinned id is deliberate — it binds KV even on a build with no API');
+    log('token. To change it, edit wrangler.toml.');
+    return;
+  }
+
   if (process.env.KV_NAMESPACE_ID) {
     log('using KV_NAMESPACE_ID from the environment');
     writeBinding(process.env.KV_NAMESPACE_ID);

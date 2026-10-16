@@ -25,6 +25,7 @@ import { onRequest as handleInitData } from '../functions/init-data';
 import { onRequest as handleBlog } from '../functions/blog';
 import { onRequest as handleAdminAuth } from '../functions/api/admin-auth';
 import { onRequest as handleAi } from '../functions/api/ai';
+import { onRequest as handleTranscribe } from '../functions/api/transcribe';
 import { onRequest as handleHealth } from '../functions/api/health';
 import { onRequest as handleTestimonials } from '../functions/api/testimonials';
 import { onRequest as handleAdminPassword } from '../functions/api/admin-password';
@@ -32,6 +33,12 @@ import { onRequest as handleStripeCheckout } from '../functions/api/stripe-check
 import { onRequest as handleStripeSession } from '../functions/api/stripe-session';
 import { onRequest as handleStripeReady } from '../functions/api/stripe-ready';
 import { onRequest as handlePaymentConfig } from '../functions/api/payment-config';
+import { onRequest as handlePaymentsReady } from '../functions/api/payments-ready';
+import { onRequest as handleCardCheckout } from '../functions/api/card-checkout';
+import { onRequest as handleAzulCheckout } from '../functions/api/azul-checkout';
+import { onRequest as handleCardnetCheckout } from '../functions/api/cardnet-checkout';
+import { onRequest as handlePayReturn } from '../functions/api/pay-return';
+import { onRequest as handlePaymentResult } from '../functions/api/payment-result';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
 
 export interface Env {
@@ -58,11 +65,20 @@ const ROUTES: Record<string, RouteHandler> = {
   // One endpoint for Gemini, OpenRouter and Workers AI. `/api/cf-ai` stays
   // routed below so an older client build keeps working after a deploy.
   '/api/ai': handleAi,
+  // Dictation from a phone: recorded audio to Whisper on Workers AI.
+  '/api/transcribe': handleTranscribe,
   '/api/admin-password': handleAdminPassword,
   '/api/stripe-checkout': handleStripeCheckout,
   '/api/stripe-session': handleStripeSession,
   '/api/stripe-ready': handleStripeReady,
   '/api/payment-config': handlePaymentConfig,
+  // One card endpoint for the storefront; the processor (Stripe, Azul or
+  // CardNET) is the operator's choice. See shared/cardCheckout.ts.
+  '/api/payments-ready': handlePaymentsReady,
+  '/api/card-checkout': handleCardCheckout,
+  '/api/azul-checkout': handleAzulCheckout,
+  '/api/cardnet-checkout': handleCardnetCheckout,
+  '/api/payment-result': handlePaymentResult,
   '/api/cf-ai': handleCfAi,
   '/api/upload': handleUpload,
   '/api/social-publish': handleSocialPublish,
@@ -76,6 +92,11 @@ const resolveHandler = (url: URL): RouteHandler | undefined => {
   const route = ROUTES[url.pathname];
   if (route) {
     return route;
+  }
+  // The banks send the guest back to /api/pay-return/<bank>/<order>/<outcome>:
+  // a path rather than a query string, because both append their own.
+  if (url.pathname.startsWith('/api/pay-return/')) {
+    return handlePayReturn;
   }
   // /blog is both a page and a legacy JSON endpoint. Only the documented
   // `?locale=` form is the endpoint; a plain visit gets the blog page.

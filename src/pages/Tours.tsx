@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { HiSearch, HiX } from 'react-icons/hi';
 import TourCard from '../components/TourCard';
 import { Tour, getTours, getServiceSlug } from '../services/toursService';
-import { useI18n } from '../contexts/I18nContext';
+import { getContentLocale, useI18n } from '../contexts/I18nContext';
 import { useBrand } from '../contexts/BrandContext';
 import PageHeader from '../components/layout/PageHeader';
 import { Catamaran, Pineapple, LeafSprig } from '../components/ui/Illustrations';
@@ -39,7 +39,7 @@ const Tours: React.FC = () => {
   useEffect(() => {
     let current = true;
     setLoading(true);
-    getTours(locale).then((fetched) => {
+    getTours(getContentLocale(locale)).then((fetched) => {
       if (!current) return;
       setTours(fetched);
       setLoading(false);

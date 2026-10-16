@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -27,9 +27,28 @@ const Blog = lazy(() => import('./pages/Blog'));
 const ServiceDetails = lazy(() => import('./pages/ServiceDetails'));
 const AdminTransport = lazy(() => import('./pages/AdminTransport'));
 const PlanMyDay = lazy(() => import('./pages/PlanMyDay'));
-// Where Stripe sends the customer back to. Lazy like every other
-// non-home route: nobody lands here first.
+// The receipt shown when a guest comes back from Stripe, AZUL or CardNET.
+// Lazy like every other non-home route: nobody lands here first.
 const PaymentReturn = lazy(() => import('./components/PaymentReturn'));
+
+/**
+ * The gateways send the guest back to the page they booked from — /tours,
+ * /transport — with `?paid=&session_id=` (Stripe) or `?payment_ref=` (the
+ * banks) on it. The receipt therefore has to be able to open over ANY page,
+ * not only at /payment/return, or the guest never sees it and the operator is
+ * never told. It is only fetched when one of those parameters is present.
+ */
+const PaymentReturnGate = () => {
+  const { pathname, search } = useLocation();
+  if (pathname === '/payment/return') return null;
+  const params = new URLSearchParams(search);
+  if (!params.has('paid') && !params.has('session_id') && !params.has('payment_ref')) return null;
+  return (
+    <Suspense fallback={null}>
+      <PaymentReturn />
+    </Suspense>
+  );
+};
 
 /**
  * Deliberately blank, and deliberately tall.
@@ -49,6 +68,7 @@ const App = () => {
           <IllustratedBackdrop />
 
           <ScrollToHash />
+          <PaymentReturnGate />
           <Header />
           <main id="top" className="relative z-20 flex-grow">
             <Suspense fallback={<RouteFallback />}>

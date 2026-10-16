@@ -1,3 +1,4 @@
+import { localeTag } from '../lib/localeText';
 import React, { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
@@ -55,7 +56,7 @@ const TourCard: React.FC<TourCardProps> = ({
   const totalAmount = useMemo(() => (rate.amount ?? 0) * persons, [rate.amount, persons]);
 
   const formattedSelectedDate = selectedDate
-    ? new Intl.DateTimeFormat(intl.locale === 'es' ? 'es-DO' : 'en-US', {
+    ? new Intl.DateTimeFormat(localeTag(intl.locale), {
       dateStyle: 'full',
     }).format(new Date(`${selectedDate}T00:00:00`))
     : '';
@@ -198,6 +199,11 @@ const TourCard: React.FC<TourCardProps> = ({
                 <PaymentDropdown
                   excursionTitle={title}
                   selectedPrice={totalAmount > 0 ? `$${totalAmount} USD` : price}
+                  amount={totalAmount > 0 ? totalAmount : undefined}
+                  persons={Math.max(1, persons)}
+                  bookingDate={formattedSelectedDate}
+                  category="tours"
+                  locale={intl.locale}
                   className="w-full"
                 />
               </div>

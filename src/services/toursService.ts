@@ -1,10 +1,10 @@
 import { tours as staticTours } from '../data/tours';
 import { transportServices as staticTransportServices } from '../data/transportServices';
 import type { TransferRoute } from '../types/transport';
-import { apiGet, apiPut } from './apiClient';
+import { ApiError, apiGet, apiPut } from './apiClient';
 import { getAdminPassword } from './authStore';
 
-type Locale = 'en' | 'es';
+export type Locale = 'en' | 'es' | 'de' | 'fr';
 export type ServiceCategory = 'tours' | 'transport';
 
 interface RawPricingTier {
@@ -90,7 +90,12 @@ const slugify = (value: string) =>
     .replace(/(^-|-$)/g, '');
 
 /** The single per-person label, in the reader's language. */
-export const perPersonTier = (locale: Locale) => (locale === 'es' ? 'Personas' : 'Persons');
+export const perPersonTier = (locale: Locale): string => {
+  if (locale === 'es') return 'Personas';
+  if (locale === 'de') return 'Personen';
+  if (locale === 'fr') return 'Personnes';
+  return 'Persons';
+};
 
 /**
  * Every service is priced at one rate per person.
@@ -177,12 +182,20 @@ const fetchServices = async (
   fallback: Tour[],
   category: ServiceCategory,
   locale: Locale,
-  allowFallback: boolean
+  allowFallback: boolean,
+  strict = false
 ): Promise<Tour[]> => {
   try {
-    const data = await apiGet<unknown>(resource, { locale });
+    // `exact`: a list that is about to be written back must be this
+    // language's own, never the English one served in its place.
+    const data = await apiGet<unknown>(resource, strict ? { locale, exact: 1 } : { locale });
     return normalizeServices((data as Record<string, unknown>)?.record ?? data, fallback, category, locale);
   } catch (error) {
+    // A list that is about to be written back must not be an empty stand-in
+    // for one that failed to load, or the save would wipe the real one. A
+    // language that has no list yet is the exception: it really is empty.
+    if (strict && error instanceof ApiError && error.status === 404) return [];
+    if (strict) throw error;
     console.error(`Failed to fetch services for ${resource}:`, error);
     return allowFallback ? fallback : [];
   }
@@ -191,11 +204,12 @@ const fetchServices = async (
 export const getExampleTours = async (locale: Locale): Promise<Tour[]> =>
   fetchServices('example-tours', staticTours, 'tours', locale, true);
 
-export const getTours = async (locale: Locale): Promise<Tour[]> =>
-  fetchServices('tours', [], 'tours', locale, false);
+/** `strict`: throw when the list cannot be read, for callers that write it back. */
+export const getTours = async (locale: Locale, strict = false): Promise<Tour[]> =>
+  fetchServices('tours', [], 'tours', locale, false, strict);
 
-export const getTransportServices = async (locale: Locale): Promise<Tour[]> =>
-  fetchServices('transport-services', [], 'transport', locale, false);
+export const getTransportServices = async (locale: Locale, strict = false): Promise<Tour[]> =>
+  fetchServices('transport-services', [], 'transport', locale, false, strict);
 
 export const getServicesByCategory = async (
   category: ServiceCategory,
