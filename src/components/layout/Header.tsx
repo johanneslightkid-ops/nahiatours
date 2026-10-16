@@ -6,6 +6,7 @@ import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks } from 'react-icon
 import { HiSparkles } from 'react-icons/hi';
 import AdminNav from './AdminNav';
 import { onNavLinkClick } from '../../lib/navScroll';
+import { showsBrandName } from '../../lib/brandDisplay';
 import AdminLanguageSelect from '../admin/AdminLanguageSelect';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useBrand } from '../../contexts/BrandContext';
@@ -319,7 +320,11 @@ const Header: React.FC = () => {
           className="absolute left-4 top-3 flex items-center gap-2.5 no-underline lg:hidden"
         >
           <Logo className="h-14 w-14" />
-          <span className="brand-name-crystal max-w-[11rem] text-lg leading-tight">{brandSettings.brandName}</span>
+          {showsBrandName(brandSettings) ? (
+            <span className="brand-name-crystal max-w-[11rem] text-lg leading-tight">{brandSettings.brandName}</span>
+          ) : (
+            <span className="sr-only">{brandSettings.brandName}</span>
+          )}
         </Link>
 
         {/* Wide screens: the vine. */}
@@ -347,9 +352,13 @@ const Header: React.FC = () => {
                 <span className="rope-string" style={{ height: `calc(1.4rem + ${ROPE_EXTRA})` }} />
                 <Logo className="h-24 w-24" />
               </motion.div>
-              <span className="desktop-brand-name brand-name-crystal mt-[4rem]">
-                {brandSettings.brandName}
-              </span>
+              {showsBrandName(brandSettings) ? (
+                <span className="desktop-brand-name brand-name-crystal mt-[4rem]">
+                  {brandSettings.brandName}
+                </span>
+              ) : (
+                <span className="sr-only">{brandSettings.brandName}</span>
+              )}
             </Link>
 
             <nav className="flex items-start gap-2 xl:gap-4" aria-label="Main">
