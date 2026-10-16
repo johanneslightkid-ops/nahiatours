@@ -158,26 +158,37 @@ const translateLines = async (lines, from, to) => {
   return out;
 };
 
-/** Batches of ~4k characters, a long article on its own. */
+/** Batches of ~4k characters, a long article on its own; four at a time. */
 const translateAll = async (texts, from, to) => {
   const todo = [...new Set(texts)].filter((t) => !memory.has(`${from}>${to}\u0000${t}`));
+  const batches = [];
   let batch = [];
   let size = 0;
-  const flush = async () => {
-    if (!batch.length) return;
-    const result = await translateLines(batch, from, to);
-    batch.forEach((t, i) => {
-      if (result[i]) memory.set(`${from}>${to}\u0000${t}`, result[i]);
-    });
-    batch = [];
-    size = 0;
-  };
   for (const t of todo) {
-    if (batch.length && (size + t.length > 4000 || batch.length >= 25)) await flush();
+    if (batch.length && (size + t.length > 4000 || batch.length >= 25)) {
+      batches.push(batch);
+      batch = [];
+      size = 0;
+    }
     batch.push(t);
     size += t.length;
   }
-  await flush();
+  if (batch.length) batches.push(batch);
+  let next = 0;
+  const worker = async () => {
+    while (next < batches.length) {
+      const mine = batches[next++];
+      try {
+        const result = await translateLines(mine, from, to);
+        mine.forEach((t, i) => {
+          if (result[i]) memory.set(`${from}>${to}\u0000${t}`, result[i]);
+        });
+      } catch (error) {
+        console.log(`    a batch failed (${String(error?.message || error).slice(0, 120)}); its strings stay untranslated`);
+      }
+    }
+  };
+  await Promise.all([worker(), worker(), worker(), worker()]);
   return texts.map((t) => memory.get(`${from}>${to}\u0000${t}`) ?? null);
 };
 
