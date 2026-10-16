@@ -37,6 +37,7 @@ import {
   syncRecord,
   translateRecord,
 } from '../../lib/autoTranslate';
+import { SUPPORTED_LOCALES } from '../../contexts/I18nContext';
 import MarkdownField from '../ui/MarkdownField';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
 
@@ -107,6 +108,8 @@ const newId = () => `element-${Date.now()}-${Math.random().toString(36).slice(2,
  * Blocks keep their id across languages — except where a language was written
  * apart and numbered its own, so the block at the same place stands in.
  */
+const LANGUAGE_LABEL: Record<string, string> = { en: 'Inglés', es: 'Español', de: 'Alemán', fr: 'Francés' };
+
 const STORY_PAIRING: ListSyncOptions<StoryElement> = {
   keyOf: (element) => element.id,
   match: 'key',
@@ -446,7 +449,7 @@ const StoryAdmin: React.FC = () => {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="inline-flex rounded-full bg-paper-warm p-1">
-            {(['en', 'es', 'de', 'fr'] as JourneyLocale[]).map((code) => (
+            {(SUPPORTED_LOCALES as readonly string[] as JourneyLocale[]).map((code) => (
               <button
                 key={code}
                 type="button"
@@ -455,7 +458,7 @@ const StoryAdmin: React.FC = () => {
                   locale === code ? 'bg-white text-ink shadow-sm' : 'text-ink-light'
                 }`}
               >
-                {code === 'en' ? 'Inglés' : code === 'es' ? 'Español' : code === 'de' ? 'Alemán' : 'Francés'}
+                {LANGUAGE_LABEL[code] ?? code.toUpperCase()}
               </button>
             ))}
           </div>
