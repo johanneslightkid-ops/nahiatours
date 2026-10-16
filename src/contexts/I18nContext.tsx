@@ -7,6 +7,8 @@ import deMessagesJson from '../locales/de.json';
 import { apiGet } from '../services/apiClient';
 
 export type Locale = 'en' | 'es' | 'fr' | 'de';
+/** The languages this site offers. The admin translates into these and no others. */
+export const SUPPORTED_LOCALES: readonly Locale[] = ['en', 'es', 'fr', 'de'];
 /** Content records are presently maintained in English and Spanish only. */
 export type ContentLocale = 'en' | 'es';
 export const getContentLocale = (locale: Locale): ContentLocale => (locale === 'es' ? 'es' : 'en');
@@ -57,6 +59,15 @@ const fallbackMessages: Record<Locale, Record<string, string>> = {
   fr: flattenMessages(frMessagesJson as unknown as Record<string, unknown>),
   de: flattenMessages(deMessagesJson as unknown as Record<string, unknown>),
 };
+
+/**
+ * The texts shipped with the build, flattened. The admin's "Site texts" panel
+ * shows these as the defaults and stores only what an operator changes.
+ */
+export const getBundledMessages = (locale: string): Record<string, string> =>
+  fallbackMessages[(SUPPORTED_LOCALES as readonly string[]).includes(locale) ? (locale as Locale) : 'en'];
+
+export { flattenMessages };
 
 const fetchMessages = async (locale: Locale): Promise<Record<string, string>> => {
   try {

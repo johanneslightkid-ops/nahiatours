@@ -13,6 +13,7 @@ import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
 import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
 import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
+import SiteTextsAdmin from '../components/admin/SiteTextsAdmin';
 import { FaVideo, FaShareAlt, FaBook, FaRobot, FaMagic } from 'react-icons/fa';
 import { useSearchParams } from 'react-router-dom';
 
@@ -255,6 +256,13 @@ const Admin: React.FC = () => {
         {activeSection === 'testimonials' && (
           <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
             <TestimonialsAdmin />
+          </div>
+        )}
+
+        {/* Menus, buttons and headings, per language */}
+        {activeSection === 'texts' && (
+          <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
+            <SiteTextsAdmin />
           </div>
         )}
 

@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   getTransferConfig,
   saveTransferConfig,
   uploadVehicleImage,
+  vehicleText,
 } from '../../services/transferConfigService';
 import type { TransferConfig, VehicleType } from '../../types/transport';
+import { useI18n, SUPPORTED_LOCALES } from '../../contexts/I18nContext';
+import TranslateBar from './TranslateBar';
+import { Lang, LANG_NAME } from '../../lib/autoTranslate';
 
 /**
  * The fleet.
@@ -20,7 +24,16 @@ import type { TransferConfig, VehicleType } from '../../types/transport';
  * be changed together and committed once. Uploads are the exception and happen
  * immediately, because an upload has to return a URL before there is anything
  * to put in the draft.
+ *
+ * Name and description are kept per language: the base fields are the text
+ * every language falls back to, and "Traducciones" holds one copy per site
+ * language. The translate strip fills those from whatever language the admin
+ * is being viewed in, and saves straight away, like the other panels' strips.
  */
+
+type VehicleCopy = { label: string; description: string };
+
+/** Keys are how a saved booking refers to a vehicle, so they have to be URL-safe. */
 
 const BLANK: VehicleType = {
   key: '',
@@ -33,7 +46,6 @@ const BLANK: VehicleType = {
   image: '',
 };
 
-/** Keys are how a saved booking refers to a vehicle, so they have to be URL-safe. */
 const toKey = (value: string) =>
   value
     .toLowerCase()
@@ -42,8 +54,12 @@ const toKey = (value: string) =>
     .replace(/^_+|_+$/g, '');
 
 const VehicleAdminPanel: React.FC = () => {
+  const { locale } = useI18n();
   const [config, setConfig] = useState<TransferConfig | null>(null);
   const [draft, setDraft] = useState<VehicleType[] | null>(null);
+  /** The latest draft, for the translate strip, which saves once per language in a row. */
+  const draftRef = useRef<VehicleType[] | null>(null);
+  draftRef.current = draft;
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<number | null>(null);
   const [message, setMessage] = useState('');
@@ -54,6 +70,18 @@ const VehicleAdminPanel: React.FC = () => {
       setDraft(transferConfig.vehicleTypes.map((vt) => ({ ...vt })));
     });
   }, []);
+
+  const updateTranslation = (index: number, lang: string, patch: Partial<VehicleCopy>) => {
+    setDraft((current) =>
+      current
+        ? current.map((vt, i) =>
+            i === index
+              ? { ...vt, translations: { ...vt.translations, [lang]: { ...vt.translations?.[lang], ...patch } } }
+              : vt
+          )
+        : current
+    );
+  };
 
   const update = (index: number, patch: Partial<VehicleType>) => {
     setDraft((current) =>
@@ -83,37 +111,59 @@ const VehicleAdminPanel: React.FC = () => {
     setDraft((current) => (current ? current.filter((_, i) => i !== index) : current));
   };
 
-  const save = async () => {
-    if (!config || !draft) return;
-
-    const missingLabel = draft.findIndex((vt) => !vt.label.trim());
+  /** Validate and key a fleet, or say what is wrong with it. */
+  const prepare = (vehicles: VehicleType[]): { ok: true; keyed: VehicleType[] } | { ok: false; error: string } => {
+    const missingLabel = vehicles.findIndex((vt) => !vt.label.trim());
     if (missingLabel !== -1) {
-      setMessage(`Vehicle ${missingLabel + 1} needs a name before it can be saved.`);
-      return;
+      return { ok: false, error: `El vehículo ${missingLabel + 1} necesita un nombre antes de guardarlo.` };
     }
 
     // A blank key on a new vehicle is derived from its name; an existing key is
     // never rewritten, because saved bookings and the planner refer to it.
-    const keyed = draft.map((vt) => ({ ...vt, key: vt.key || toKey(vt.label) }));
+    const keyed = vehicles.map((vt) => ({ ...vt, key: vt.key || toKey(vt.label) }));
 
     const duplicate = keyed.find((vt, i) => keyed.findIndex((o) => o.key === vt.key) !== i);
     if (duplicate) {
-      setMessage(`Two vehicles share the id "${duplicate.key}" — rename one of them.`);
-      return;
+      return { ok: false, error: `Dos vehículos comparten el id "${duplicate.key}" — cambia el nombre de uno.` };
     }
+    return { ok: true, keyed };
+  };
 
+  const persist = async (vehicles: VehicleType[]) => {
+    if (!config) throw new Error('La configuración aún no ha cargado.');
+    const prepared = prepare(vehicles);
+    if (!prepared.ok) throw new Error(prepared.error);
+    await saveTransferConfig({ ...config, vehicleTypes: prepared.keyed });
+    setConfig({ ...config, vehicleTypes: prepared.keyed });
+    const next = prepared.keyed.map((vt) => ({ ...vt }));
+    draftRef.current = next;
+    setDraft(next);
+  };
+
+  const save = async () => {
+    if (!config || !draft) return;
     setSaving(true);
     setMessage('');
     try {
-      await saveTransferConfig({ ...config, vehicleTypes: keyed });
-      setConfig({ ...config, vehicleTypes: keyed });
-      setDraft(keyed.map((vt) => ({ ...vt })));
+      await persist(draft);
       setMessage('Guardado.');
     } catch (error) {
-      setMessage(`Could not save: ${(error as Error).message}`);
+      setMessage(`No se pudo guardar: ${(error as Error).message}`);
     } finally {
       setSaving(false);
     }
+  };
+
+  /** The translate strip hands back one language at a time; each is saved as it arrives. */
+  const saveTranslation = async (copies: VehicleCopy[], to: Lang) => {
+    const current = draftRef.current ?? [];
+    const next = current.map((vt, i) =>
+      copies[i]
+        ? { ...vt, translations: { ...vt.translations, [to]: { label: copies[i].label, description: copies[i].description } } }
+        : vt
+    );
+    await persist(next);
+    return `${LANG_NAME[to]}: guardado`;
   };
 
   if (!draft) {
@@ -130,8 +180,8 @@ const VehicleAdminPanel: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Vehículos</h2>
           <p className="mt-1 text-sm text-slate-500">
-            The fleet shown on the Transport page. The picture here is what a visitor sees
-            when they pick this vehicle.
+            La flota de la página de traslados. La foto es lo que ve el visitante al elegir el
+            vehículo; el nombre y la descripción se muestran en su idioma.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -155,10 +205,19 @@ const VehicleAdminPanel: React.FC = () => {
             disabled={saving}
             className="rounded-2xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {saving ? 'Guardando…' : 'Save vehicles'}
+            {saving ? 'Guardando…' : 'Guardar vehículos'}
           </button>
         </div>
       </div>
+
+      <TranslateBar<VehicleCopy[]>
+        value={draft.map((vt) => vehicleText(vt, locale))}
+        from={locale as Lang}
+        what="los nombres y descripciones de los vehículos"
+        note="Traduce nombre y descripción de cada vehículo, tal como se ven en el idioma actual del panel, a los demás idiomas del sitio, y los guarda."
+        disabled={draft.length === 0}
+        onTranslated={(translated, to) => saveTranslation(translated, to)}
+      />
 
       <div className="space-y-4">
         {draft.map((vehicle, index) => (
@@ -222,13 +281,13 @@ const VehicleAdminPanel: React.FC = () => {
                   </label>
                   <label className="space-y-1">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      Id {vehicle.key && <span className="normal-case">(fixed once saved)</span>}
+                      Id {vehicle.key && <span className="normal-case">(fijo una vez guardado)</span>}
                     </span>
                     <input
                       type="text"
                       value={vehicle.key}
                       onChange={(event) => update(index, { key: toKey(event.target.value) })}
-                      placeholder="from the name"
+                      placeholder="sale del nombre"
                       className="w-full rounded-2xl border border-slate-200 px-4 py-2 font-mono text-sm"
                     />
                   </label>
@@ -246,6 +305,38 @@ const VehicleAdminPanel: React.FC = () => {
                     className="w-full rounded-2xl border border-slate-200 px-4 py-2"
                   />
                 </label>
+
+                <details className="rounded-2xl border border-slate-200 px-4 py-2">
+                  <summary className="cursor-pointer text-xs font-bold uppercase tracking-wider text-slate-500">
+                    Traducciones ({SUPPORTED_LOCALES.map((l) => l.toUpperCase()).join(' · ')})
+                  </summary>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Lo que quede vacío muestra el nombre y la descripción de arriba.
+                  </p>
+                  <div className="mt-3 space-y-3">
+                    {SUPPORTED_LOCALES.map((lang) => (
+                      <div key={lang} className="grid grid-cols-1 gap-2 sm:grid-cols-[3rem,1fr,2fr] sm:items-start">
+                        <span className="pt-2 text-xs font-bold text-slate-500">{lang.toUpperCase()}</span>
+                        <input
+                          type="text"
+                          value={vehicle.translations?.[lang]?.label ?? ''}
+                          onChange={(event) => updateTranslation(index, lang, { label: event.target.value })}
+                          placeholder={vehicle.label || 'Nombre'}
+                          aria-label={`Nombre (${lang})`}
+                          className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm"
+                        />
+                        <textarea
+                          value={vehicle.translations?.[lang]?.description ?? ''}
+                          onChange={(event) => updateTranslation(index, lang, { description: event.target.value })}
+                          placeholder={vehicle.description || 'Descripción'}
+                          aria-label={`Descripción (${lang})`}
+                          rows={2}
+                          className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </details>
 
                 <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                   <label className="space-y-1">

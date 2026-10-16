@@ -193,6 +193,11 @@ const TourCard: React.FC<TourCardProps> = ({
                 <PaymentDropdown
                   excursionTitle={title}
                   selectedPrice={totalAmount > 0 ? `$${totalAmount} USD` : price}
+                  amount={totalAmount > 0 ? totalAmount : undefined}
+                  persons={Math.max(1, persons)}
+                  bookingDate={formattedSelectedDate}
+                  category="tours"
+                  locale={intl.locale}
                   className="w-full"
                 />
               </div>

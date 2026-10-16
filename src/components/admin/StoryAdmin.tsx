@@ -27,6 +27,7 @@ import {
   uploadImage,
 } from '../../services/storyElementsService';
 import { JourneyLocale } from '../../services/introStoryService';
+import type { Lang } from '../../lib/autoTranslate';
 import MarkdownField from '../ui/MarkdownField';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaCheck, FaExchangeAlt, FaLanguage, FaSpinner } from 'react-icons/fa';
 import { providerStatus } from '../../services/aiGeneratorService';
 import { Lang, LANG_NAME, getTargetLanguages, translateRecord } from '../../lib/autoTranslate';
+import { SUPPORTED_LOCALES } from '../../contexts/I18nContext';
 
 /**
  * The strip at the top of every bilingual (now: multilingual) editor.
@@ -49,7 +50,7 @@ function TranslateBar<T>({ value, from, onTranslated, what, note, disabled }: Tr
 
   if (available !== true) return null;
 
-  const targets = getTargetLanguages(from);
+  const targets = getTargetLanguages(from, SUPPORTED_LOCALES);
 
   const run = async () => {
     setBusy(true);

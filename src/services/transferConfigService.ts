@@ -165,3 +165,15 @@ export async function updateMunicipioPriceMultipliers(config: TransferConfig, ne
   await saveTransferConfig(updated);
   return updated;
 }
+
+/** A vehicle's name and description in the reader's language, falling back to the base text. */
+export const vehicleText = (
+  vehicle: { label: string; description: string; translations?: Partial<Record<string, { label?: string; description?: string }>> },
+  locale: string
+): { label: string; description: string } => {
+  const translated = vehicle.translations?.[locale];
+  return {
+    label: translated?.label?.trim() || vehicle.label,
+    description: translated?.description?.trim() || vehicle.description,
+  };
+};

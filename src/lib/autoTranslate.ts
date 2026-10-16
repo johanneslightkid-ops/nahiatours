@@ -115,9 +115,13 @@ export const LANG_NAME: Record<Lang, string> = {
 
 const LANGUAGE = LANG_NAME;
 
-/** All other languages that should receive a translation. */
-export const getTargetLanguages = (from: Lang): Lang[] =>
-  (['en', 'es', 'de', 'fr'] as Lang[]).filter((l) => l !== from);
+/**
+ * All other languages that should receive a translation — of the languages
+ * this site actually offers, so a two-language site does not pay for German
+ * and French copies nobody can switch to.
+ */
+export const getTargetLanguages = (from: Lang, available: readonly string[] = ['en', 'es', 'de', 'fr']): Lang[] =>
+  (['en', 'es', 'de', 'fr'] as Lang[]).filter((l) => l !== from && available.includes(l));
 
 /**
  * Batched, because one call per string is both slow and expensive — and
