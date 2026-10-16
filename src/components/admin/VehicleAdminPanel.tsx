@@ -7,8 +7,11 @@ import {
 } from '../../services/transferConfigService';
 import type { TransferConfig, VehicleType } from '../../types/transport';
 import { useI18n, SUPPORTED_LOCALES } from '../../contexts/I18nContext';
+
+const sameCopy = (a: VehicleCopy, b: VehicleCopy) => a.label === b.label && a.description === b.description;
 import TranslateBar from './TranslateBar';
-import { Lang, LANG_NAME } from '../../lib/autoTranslate';
+import { useTranslationSync } from './useTranslationSync';
+import { Lang, syncRecord } from '../../lib/autoTranslate';
 
 /**
  * The fleet.
@@ -27,8 +30,9 @@ import { Lang, LANG_NAME } from '../../lib/autoTranslate';
  *
  * Name and description are kept per language: the base fields are the text
  * every language falls back to, and "Traducciones" holds one copy per site
- * language. The translate strip fills those from whatever language the admin
- * is being viewed in, and saves straight away, like the other panels' strips.
+ * language. Saving translates the name and description of the vehicles
+ * whose text this save changed — in the language the admin is viewed in —
+ * into the others; every other vehicle's translations are left alone.
  */
 
 type VehicleCopy = { label: string; description: string };
@@ -63,6 +67,7 @@ const VehicleAdminPanel: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<number | null>(null);
   const [message, setMessage] = useState('');
+  const sync = useTranslationSync(locale as Lang);
 
   useEffect(() => {
     getTransferConfig().then((transferConfig) => {
@@ -129,7 +134,7 @@ const VehicleAdminPanel: React.FC = () => {
     return { ok: true, keyed };
   };
 
-  const persist = async (vehicles: VehicleType[]) => {
+  const persist = async (vehicles: VehicleType[]): Promise<VehicleType[]> => {
     if (!config) throw new Error('La configuración aún no ha cargado.');
     const prepared = prepare(vehicles);
     if (!prepared.ok) throw new Error(prepared.error);
@@ -138,6 +143,74 @@ const VehicleAdminPanel: React.FC = () => {
     const next = prepared.keyed.map((vt) => ({ ...vt }));
     draftRef.current = next;
     setDraft(next);
+    return prepared.keyed;
+  };
+
+  /**
+   * Write some vehicles' copy in one language — into the config as it is in
+   * storage now, not as this panel loaded it, so a price changed in the panel
+   * below in the meantime is not put back.
+   */
+  const writeCopies = async (to: Lang, copies: Map<string, VehicleCopy>) => {
+    const withCopy = (vt: VehicleType): VehicleType => {
+      const copy = copies.get(vt.key);
+      return copy ? { ...vt, translations: { ...vt.translations, [to]: copy } } : vt;
+    };
+    const fresh = await getTransferConfig(true);
+    await saveTransferConfig({ ...fresh, vehicleTypes: fresh.vehicleTypes.map(withCopy) });
+    setConfig((current) => (current ? { ...current, vehicleTypes: current.vehicleTypes.map(withCopy) } : current));
+    setDraft((current) => {
+      const next = current ? current.map(withCopy) : current;
+      draftRef.current = next;
+      return next;
+    });
+  };
+
+  /** Only the vehicles whose name or description this save changed. */
+  const carryVehicles = async (
+    to: Lang,
+    report: (line: string) => void,
+    before: VehicleType[],
+    after: VehicleType[]
+  ): Promise<string | null> => {
+    const changed = after.filter((vt) => {
+      const prev = before.find((b) => b.key === vt.key);
+      return !prev || !sameCopy(vehicleText(prev, locale), vehicleText(vt, locale));
+    });
+    if (changed.length === 0) return null;
+    const copies = new Map<string, VehicleCopy>();
+    for (const [i, vt] of changed.entries()) {
+      report(`${i + 1}/${changed.length}`);
+      const prev = before.find((b) => b.key === vt.key);
+      const theirs = vt.translations?.[to];
+      const existing = theirs?.label || theirs?.description ? vehicleText(vt, to) : undefined;
+      const result = await syncRecord(
+        prev ? vehicleText(prev, locale) : undefined,
+        vehicleText(vt, locale),
+        existing,
+        locale as Lang,
+        to
+      );
+      copies.set(vt.key, { label: result.value.label, description: result.value.description });
+    }
+    await writeCopies(to, copies);
+    return `${copies.size} vehículo(s) traducido(s)`;
+  };
+
+  /** Only the vehicles that have no copy at all in that language. */
+  const fillMissingVehicles = async (to: Lang, report: (line: string) => void): Promise<string | null> => {
+    const missing = (draftRef.current ?? []).filter(
+      (vt) => vt.key && !vt.translations?.[to]?.label?.trim() && vt.label.trim()
+    );
+    if (missing.length === 0) return null;
+    const copies = new Map<string, VehicleCopy>();
+    for (const [i, vt] of missing.entries()) {
+      report(`${i + 1}/${missing.length}`);
+      const result = await syncRecord(undefined, vehicleText(vt, locale), undefined, locale as Lang, to);
+      copies.set(vt.key, { label: result.value.label, description: result.value.description });
+    }
+    await writeCopies(to, copies);
+    return `${copies.size} vehículo(s) traducido(s)`;
   };
 
   const save = async () => {
@@ -145,25 +218,15 @@ const VehicleAdminPanel: React.FC = () => {
     setSaving(true);
     setMessage('');
     try {
-      await persist(draft);
+      const before = config.vehicleTypes;
+      const saved = await persist(draft);
       setMessage('Guardado.');
+      void sync.afterSave((to, report) => carryVehicles(to, report, before, saved));
     } catch (error) {
       setMessage(`No se pudo guardar: ${(error as Error).message}`);
     } finally {
       setSaving(false);
     }
-  };
-
-  /** The translate strip hands back one language at a time; each is saved as it arrives. */
-  const saveTranslation = async (copies: VehicleCopy[], to: Lang) => {
-    const current = draftRef.current ?? [];
-    const next = current.map((vt, i) =>
-      copies[i]
-        ? { ...vt, translations: { ...vt.translations, [to]: { label: copies[i].label, description: copies[i].description } } }
-        : vt
-    );
-    await persist(next);
-    return `${LANG_NAME[to]}: guardado`;
   };
 
   if (!draft) {
@@ -210,13 +273,11 @@ const VehicleAdminPanel: React.FC = () => {
         </div>
       </div>
 
-      <TranslateBar<VehicleCopy[]>
-        value={draft.map((vt) => vehicleText(vt, locale))}
-        from={locale as Lang}
-        what="los nombres y descripciones de los vehículos"
-        note="Traduce nombre y descripción de cada vehículo, tal como se ven en el idioma actual del panel, a los demás idiomas del sitio, y los guarda."
+      <TranslateBar
+        sync={sync}
+        what="el nombre y la descripción de los vehículos que cambiaste"
+        fillMissing={fillMissingVehicles}
         disabled={draft.length === 0}
-        onTranslated={(translated, to) => saveTranslation(translated, to)}
       />
 
       <div className="space-y-4">

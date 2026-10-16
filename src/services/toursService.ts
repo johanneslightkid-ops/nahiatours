@@ -182,12 +182,16 @@ const fetchServices = async (
   fallback: Tour[],
   category: ServiceCategory,
   locale: Locale,
-  allowFallback: boolean
+  allowFallback: boolean,
+  strict = false
 ): Promise<Tour[]> => {
   try {
     const data = await apiGet<unknown>(resource, { locale });
     return normalizeServices((data as Record<string, unknown>)?.record ?? data, fallback, category, locale);
   } catch (error) {
+    // A list that is about to be written back must not be an empty stand-in
+    // for one that failed to load, or the save would wipe the real one.
+    if (strict) throw error;
     console.error(`Failed to fetch services for ${resource}:`, error);
     return allowFallback ? fallback : [];
   }
@@ -196,11 +200,12 @@ const fetchServices = async (
 export const getExampleTours = async (locale: Locale): Promise<Tour[]> =>
   fetchServices('example-tours', staticTours, 'tours', locale, true);
 
-export const getTours = async (locale: Locale): Promise<Tour[]> =>
-  fetchServices('tours', [], 'tours', locale, false);
+/** `strict`: throw when the list cannot be read, for callers that write it back. */
+export const getTours = async (locale: Locale, strict = false): Promise<Tour[]> =>
+  fetchServices('tours', [], 'tours', locale, false, strict);
 
-export const getTransportServices = async (locale: Locale): Promise<Tour[]> =>
-  fetchServices('transport-services', [], 'transport', locale, false);
+export const getTransportServices = async (locale: Locale, strict = false): Promise<Tour[]> =>
+  fetchServices('transport-services', [], 'transport', locale, false, strict);
 
 export const getServicesByCategory = async (
   category: ServiceCategory,

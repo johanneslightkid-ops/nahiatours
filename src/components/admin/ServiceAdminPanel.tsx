@@ -1,19 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import TranslateBar from './TranslateBar';
+import { useTranslationSync } from './useTranslationSync';
 import { Link } from 'react-router-dom';
 import { uploadImage, Tour, PricingOption } from '../../services/toursService';
 import MarkdownEditor from '../ui/MarkdownEditor';
-import { Lang } from '../../lib/autoTranslate';
+import { Lang, describeSync, fillMissingList, syncList, ListSyncOptions } from '../../lib/autoTranslate';
 
 type Category = 'tours' | 'transport';
 
 interface ServiceAdminPanelProps {
   /**
-   * Which language the list on screen is in, and where to put a translation
-   * of it. Both optional: without them the translate strip is simply absent,
-   * which is what a panel that is not bilingual wants.
+   * Which language the list on screen is in, and how to read and write the
+   * other languages' lists. All optional: without them the translate strip is
+   * simply absent, which is what a panel that is not multilingual wants.
    */
   locale?: Lang;
+  loadTranslation?: (to: Lang) => Promise<Tour[]>;
   saveTranslation?: (services: Tour[], to: Lang) => Promise<void>;
   title: string;
   category: Category;
@@ -79,10 +81,17 @@ const buildPricingOption = (option: PricingOption): PricingOption => {
   };
 };
 
+/**
+ * The languages' lists are paired by position — the third tour in German is
+ * the third tour in Spanish — so that is how a change is found in them.
+ */
+const PAIRING: ListSyncOptions<Tour> = { keyOf: (service) => String(service.id), match: 'position' };
+
 const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   title,
   category,
   locale,
+  loadTranslation,
   saveTranslation,
   services,
   setServices,
@@ -94,6 +103,8 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [draft, setDraft] = useState<Tour>(createEmptyService());
   const isEditing = editingId !== null;
+  const sync = useTranslationSync(locale ?? 'es');
+  const translatable = Boolean(locale && loadTranslation && saveTranslation);
 
   useEffect(() => {
     loadServices();
@@ -178,29 +189,57 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
     };
   };
 
+  /**
+   * Carry one save into the other languages: the edited, added or deleted
+   * service only. Runs after the save, in the background of the strip.
+   */
+  const translateChange = (before: Tour[], after: Tour[]) => {
+    if (!translatable || !locale || !loadTranslation || !saveTranslation) return;
+    void sync.afterSave(async (to, report) => {
+      const target = await loadTranslation(to);
+      const result = await syncList(target, before, after, locale, to, { ...PAIRING, onProgress: report });
+      if (!result.changed) return null;
+      await saveTranslation(result.list, to);
+      return describeSync(result);
+    });
+  };
+
+  const fillMissing = async (to: Lang, report: (line: string) => void) => {
+    if (!locale || !loadTranslation || !saveTranslation) return null;
+    const result = await fillMissingList(await loadTranslation(to), services, locale, to, {
+      ...PAIRING,
+      onProgress: report,
+    });
+    if (!result.changed) return null;
+    await saveTranslation(result.list, to);
+    return describeSync(result);
+  };
+
   const handleSave = async () => {
     const nextDraft = buildDraft();
     const nextServices = isEditing
       ? services.map((service) => (service.id === editingId ? nextDraft : service))
       : [...services, { ...nextDraft, id: Math.max(0, ...services.map((service) => service.id)) + 1 }];
 
+    const before = services;
     setServices(nextServices);
     await saveServices(nextServices);
     resetDraft();
+    translateChange(before, nextServices);
   };
 
   const handleDelete = async (id: number) => {
+    const before = services;
     const nextServices = services.filter((service) => service.id !== id);
     setServices(nextServices);
     await saveServices(nextServices);
+    translateChange(before, nextServices);
   };
 
   const handleImageUpload = async (index: number, file: File) => {
     const uploaded = await uploadImage(file);
     updateImage(index, uploaded);
   };
-
-  const other = locale === 'en' ? 'es' : 'en';
 
   return (
     <div className="space-y-8">
@@ -211,24 +250,15 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
         </Link>
       </div>
 
-      {/* Only when this panel was told which language it is showing AND given
-          somewhere to put translations. The strip hides itself when no AI
-          provider on this deployment can answer. */}
-      {locale && saveTranslation && (
+      {/* Only when this panel was told which language it is showing AND how
+          to reach the others. The strip hides itself when no AI provider on
+          this deployment can answer. */}
+      {translatable && (
         <TranslateBar
-          value={sortedServices}
-          from={locale}
-          what={category === 'transport' ? 'the transport services' : 'the tours'}
-          note={
-            category === 'transport'
-              ? 'Translates all transport services shown here into all other languages and saves them. Switch the language above to review them.'
-              : 'Translates all tours shown here into all other languages and saves them. Switch the language above to review them.'
-          }
-          disabled={sortedServices.length === 0}
-          onTranslated={async (translated, to) => {
-            await saveTranslation(translated as Tour[], to);
-            return `Saved in ${to.toUpperCase()}. Switch the language above to review.`;
-          }}
+          sync={sync}
+          what={category === 'transport' ? 'el servicio de transporte editado' : 'la excursión editada'}
+          fillMissing={fillMissing}
+          disabled={services.length === 0}
         />
       )}
 

@@ -30,6 +30,7 @@ const AdminTransport: React.FC = () => {
           setServices={setServices}
           loadServices={loadServices}
           locale={locale}
+          loadTranslation={(to) => getTransportServices(to, true)}
           saveTranslation={(items, to) => saveTransportServices(items, to)}
           saveServices={(nextServices) => saveTransportServices(nextServices, locale)}
           siblingAdminPath="/admin"

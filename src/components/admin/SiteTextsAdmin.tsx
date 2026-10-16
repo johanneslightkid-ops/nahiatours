@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaLanguage, FaSearch, FaUndo } from 'react-icons/fa';
 import { apiGet, apiPut } from '../../services/apiClient';
 import {
@@ -8,7 +8,8 @@ import {
   flattenMessages,
 } from '../../contexts/I18nContext';
 import TranslateBar from './TranslateBar';
-import { Lang, LANG_NAME } from '../../lib/autoTranslate';
+import { useTranslationSync } from './useTranslationSync';
+import { Lang, LANG_NAME, translateRecord } from '../../lib/autoTranslate';
 
 /**
  * Site texts: the menu, buttons, headings and labels — everything the visitor
@@ -20,19 +21,22 @@ import { Lang, LANG_NAME } from '../../lib/autoTranslate';
  * shipped text: a text nobody touched keeps following the build, so a wording
  * fixed in the code is not frozen by an old save.
  *
- * The translate strip translates the language on screen into the others, but
- * only FILLS what is missing there — a text still in English, or empty. A
- * translation somebody already wrote by hand is never overwritten.
+ * Saving translates the texts that save changed — and only those — into the
+ * other languages. "Completar lo que falta" fills what is missing there: a
+ * text still in English, or empty. Only those texts are sent to the AI, and a
+ * translation somebody already wrote by hand is never overwritten by it.
  */
 
 type Texts = Record<string, string>;
 
-const loadOverrides = async (locale: string): Promise<Texts> => {
+/** `strict` for a read that is written back: "nothing" after a failed read would erase that language's edits. */
+const loadOverrides = async (locale: string, strict = false): Promise<Texts> => {
   try {
     const data = await apiGet<unknown>('translations', { locale });
     const record = (data as Record<string, unknown>)?.record ?? data;
     return flattenMessages(record as Record<string, unknown>);
-  } catch {
+  } catch (error) {
+    if (strict) throw error;
     return {};
   }
 };
@@ -56,6 +60,9 @@ const SiteTextsAdmin: React.FC = () => {
   const [onlyUntranslated, setOnlyUntranslated] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+  /** The texts as loaded or last saved, so a save knows which ones it changed. */
+  const original = useRef<Texts>({});
+  const sync = useTranslationSync(lang as Lang);
 
   const english = useMemo(() => getBundledMessages('en'), []);
   const keys = useMemo(() => Object.keys(english).sort(), [english]);
@@ -63,7 +70,14 @@ const SiteTextsAdmin: React.FC = () => {
   const load = useCallback(async (target: string) => {
     setValues(null);
     setMessage(null);
-    setValues(effective(target, await loadOverrides(target)));
+    try {
+      const loaded = effective(target, await loadOverrides(target, true));
+      original.current = loaded;
+      setValues(loaded);
+    } catch (error) {
+      // Showing the shipped texts here would let a save erase this language's edits.
+      setMessage({ kind: 'error', text: `No se pudieron cargar los textos: ${(error as Error).message}` });
+    }
   }, []);
 
   useEffect(() => {
@@ -81,6 +95,14 @@ const SiteTextsAdmin: React.FC = () => {
     try {
       await save(lang, values);
       setMessage({ kind: 'ok', text: `Textos en ${LANG_NAME[lang as Lang]} guardados.` });
+      const changed: Texts = Object.fromEntries(
+        Object.entries(values).filter(([key, value]) => value !== original.current[key] && value.trim())
+      );
+      original.current = values;
+      if (Object.keys(changed).length > 0) {
+        const from = lang as Lang;
+        void sync.afterSave((to, report) => writeTranslated(changed, from, to, report));
+      }
     } catch (error) {
       setMessage({ kind: 'error', text: `No se pudo guardar: ${(error as Error).message}` });
     } finally {
@@ -88,21 +110,26 @@ const SiteTextsAdmin: React.FC = () => {
     }
   };
 
+  /** Translate just these texts into `to` and save them there, over whatever it had. */
+  const writeTranslated = async (texts: Texts, from: Lang, to: Lang, report: (line: string) => void) => {
+    const { value } = await translateRecord(texts, from, to, (n, total) => report(`${n}/${total}`));
+    const current = effective(to, await loadOverrides(to, true));
+    await save(to, { ...current, ...value });
+    return `${Object.keys(texts).length} texto(s) traducido(s)`;
+  };
+
   /** Fill only what the other language is missing; keep what someone wrote there. */
-  const handleTranslated = async (translated: Texts, to: Lang) => {
-    const current = effective(to, await loadOverrides(to));
-    let filled = 0;
-    const next: Texts = { ...current };
+  const fillMissing = async (to: Lang, report: (line: string) => void) => {
+    if (!values) return null;
+    const current = effective(to, await loadOverrides(to, true));
+    const missing: Texts = {};
     for (const key of keys) {
       const value = current[key];
       const untranslated = !value?.trim() || (to !== 'en' && value === english[key]);
-      if (untranslated && translated[key]?.trim()) {
-        next[key] = translated[key];
-        filled += 1;
-      }
+      if (untranslated && values[key]?.trim()) missing[key] = values[key];
     }
-    if (filled > 0) await save(to, next);
-    return filled > 0 ? `${LANG_NAME[to]}: ${filled} texto(s) completados` : `${LANG_NAME[to]}: ya estaba completo`;
+    if (Object.keys(missing).length === 0) return null;
+    return writeTranslated(missing, lang as Lang, to, report);
   };
 
   const groups = useMemo(() => {
@@ -156,13 +183,7 @@ const SiteTextsAdmin: React.FC = () => {
       </div>
 
       {values && (
-        <TranslateBar<Texts>
-          value={values}
-          from={lang as Lang}
-          what="los textos del sitio"
-          note={`Traduce los textos en ${LANG_NAME[lang as Lang]} a los demás idiomas, pero solo rellena los que allí faltan o siguen en inglés. Lo ya traducido a mano no se toca.`}
-          onTranslated={handleTranslated}
-        />
+        <TranslateBar sync={sync} what="los textos que cambiaste" fillMissing={fillMissing} />
       )}
 
       <div className="flex flex-wrap items-center gap-3">

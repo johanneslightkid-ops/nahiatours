@@ -105,12 +105,17 @@ const normalizeElements = (data: StoryElementsData): StoryElementsData => ({
   })),
 });
 
-export const getStoryElements = async (locale: JourneyLocale): Promise<StoryElementsData | null> => {
+export const getStoryElements = async (
+  locale: JourneyLocale,
+  strict = false
+): Promise<StoryElementsData | null> => {
   try {
     const response = await apiGet<unknown>('story-elements', { locale });
     const payload = unwrapRecord(response);
     return isStoryElementsData(payload) ? normalizeElements(payload) : null;
   } catch (error) {
+    // `strict` is for callers that write the story back: null would read as "empty".
+    if (strict) throw error;
     console.warn(`Failed to fetch ${locale} story elements:`, error);
     return null;
   }

@@ -238,6 +238,7 @@ const Admin: React.FC = () => {
             loadServices={loadTours}
             saveServices={(services) => saveTours(services, locale)}
             locale={locale}
+            loadTranslation={(to) => getTours(to, true)}
             saveTranslation={(services, to) => saveTours(services, to)}
             siblingAdminPath="/admin/transport"
             siblingAdminLabel="Ir a Transporte"

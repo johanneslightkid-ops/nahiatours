@@ -14,9 +14,7 @@ import {
   saveTestimonials,
   TestimonialRecord,
 } from '../../services/testimonialService';
-import TranslateBar from './TranslateBar';
 import { useI18n } from '../../contexts/I18nContext';
-import { Lang } from '../../lib/autoTranslate';
 
 /**
  * Reseñas — the panel that did not exist.
@@ -24,6 +22,11 @@ import { Lang } from '../../lib/autoTranslate';
  * Reviews could be left and could be read, and there was nowhere at all to
  * correct a typo, remove one, or publish one somebody had sent. They arrive
  * unapproved now, so this is also the only place they become visible.
+ *
+ * There is no translate strip here, on purpose. Reviews are ONE list that
+ * every language shows (the API keeps no per-language copy), in the words the
+ * guest wrote them in. "Translating" it into German would overwrite the
+ * guest's own review with the German version for everybody.
  */
 
 const blank = (): TestimonialRecord => ({
@@ -120,18 +123,6 @@ const TestimonialsAdmin: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <TranslateBar
-        value={items}
-        from={locale as Lang}
-        what="las reseñas"
-        note="Traduce las reseñas que ves aquí a todos los demás idiomas y las guarda."
-        disabled={items.length === 0}
-        onTranslated={async (translated, to) => {
-          await saveTestimonials(translated as TestimonialRecord[], to);
-          return `Guardadas en ${to.toUpperCase()}. Cambia el idioma arriba para revisarlas.`;
-        }}
-      />
-
       <div className="flex flex-col gap-4 rounded-3xl border border-ink/12 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
           <h2 className="text-2xl font-bold text-ink sm:text-3xl">Reseñas</h2>
