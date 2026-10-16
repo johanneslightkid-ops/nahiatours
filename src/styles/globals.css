@@ -1456,3 +1456,284 @@ select:focus {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TRANSFERS — a journey in the field book, and a boarding pass
+   ──────────────────────────────────────────────────────────────────────────
+   Static, all of it: shapes, shade and a dotted route. Nothing here animates
+   except the hover lift on a vehicle card, which is a transform.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.transfer-page-card {
+  position: relative;
+  border-radius: var(--pebble-a);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #fffdf8 0%, #fdf8ec 100%);
+  padding: 1.25rem;
+  box-shadow: var(--shade-sm), var(--shade);
+}
+
+@media (min-width: 768px) {
+  .transfer-page-card {
+    padding: 1.75rem;
+  }
+}
+
+.transfer-page-card:nth-child(even) {
+  border-radius: var(--pebble-b);
+}
+
+/* A numbered pebble, like a page number pencilled in the corner of the book. */
+.transfer-step-badge {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 58% 42% 52% 48% / 46% 56% 44% 54%;
+  background: linear-gradient(145deg, var(--lagoon-light) 0%, var(--lagoon) 100%);
+  color: #ffffff;
+  font-family: 'Yeseva One', serif;
+  font-size: 1.05rem;
+  box-shadow: var(--shade-sm);
+}
+
+.transfer-page-card:nth-child(3n + 2) .transfer-step-badge {
+  background: linear-gradient(145deg, var(--mango-light) 0%, var(--mango) 100%);
+  color: var(--ink);
+}
+
+.transfer-page-card:nth-child(3n) .transfer-step-badge {
+  background: linear-gradient(145deg, var(--jungle-light) 0%, var(--jungle) 100%);
+}
+
+/* The promises under the header. */
+.transfer-promise {
+  border-radius: var(--pebble-b);
+  border: 1px solid var(--line);
+  background: rgb(255 253 248 / 0.94);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shade-sm);
+}
+
+/* Pickup and drop-off as the two ends of a dotted route. */
+.transfer-route {
+  position: relative;
+}
+
+.transfer-route::before {
+  content: '';
+  position: absolute;
+  left: 1.05rem;
+  top: 2.6rem;
+  bottom: 2.6rem;
+  border-left: 3px dotted rgb(23 181 172 / 0.55);
+}
+
+.transfer-route-stop {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.transfer-route-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-top: 1.55rem;
+  border-radius: 999px;
+  background: var(--lagoon);
+  color: #ffffff;
+  font-size: 0.95rem;
+  box-shadow: 0 0 0 5px rgb(147 236 225 / 0.45);
+}
+
+.transfer-route-dot-end {
+  background: var(--hibiscus);
+  box-shadow: 0 0 0 5px rgb(255 177 166 / 0.45);
+}
+
+.transfer-route-gap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
+  padding-left: 3.05rem;
+}
+
+.transfer-swap {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper-warm);
+  color: var(--ink-soft);
+  font-weight: 800;
+  transition: transform 0.25s var(--ease-spring), background-color 0.2s;
+}
+
+.transfer-swap:hover {
+  background: var(--lagoon-light);
+  color: var(--lagoon-dark);
+  transform: rotate(180deg);
+}
+
+/* Vehicle cards. */
+.transfer-vehicle {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 0.85rem;
+  width: 100%;
+  border-radius: var(--pebble-b);
+  border: 1.5px solid var(--line);
+  background: #ffffff;
+  padding: 0.7rem;
+  text-align: left;
+  transition: transform 0.3s var(--ease-out), border-color 0.2s;
+}
+
+.transfer-vehicle:hover {
+  transform: translateY(-2px);
+  border-color: rgb(23 181 172 / 0.45);
+}
+
+.transfer-vehicle-active {
+  border-color: var(--lagoon);
+  background: linear-gradient(180deg, #f1fcfa 0%, #ffffff 100%);
+  box-shadow: 0 0 0 4px rgb(147 236 225 / 0.35);
+}
+
+.transfer-vehicle-photo {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 6.5rem;
+  min-height: 5.5rem;
+  overflow: hidden;
+  border-radius: 20px 12px 22px 10px;
+  background: var(--paper-warm);
+}
+
+.transfer-vehicle-check {
+  position: absolute;
+  right: 0.6rem;
+  top: 0.6rem;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  background: var(--lagoon);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+/* A toggle that reads as a chip. */
+.transfer-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  align-self: end;
+  min-height: 3.6rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: #ffffff;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.transfer-chip-on {
+  border-color: var(--lagoon);
+  background: #f1fcfa;
+}
+
+/* The boarding pass. */
+.transfer-pass {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px 22px 30px 22px;
+  background: #fffdf8;
+  border: 1px solid var(--line);
+  box-shadow: var(--shade-sm), var(--shade-lg);
+}
+
+.transfer-pass-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='40' viewBox='0 0 160 40'%3E%3Cpath d='M0 26 C20 18 40 34 60 26 C80 18 100 34 120 26 C140 18 150 24 160 22' stroke='%23ffffff' stroke-opacity='0.28' stroke-width='2' fill='none'/%3E%3C/svg%3E") 0 100% / 160px 40px repeat-x,
+    linear-gradient(110deg, var(--lagoon-dark) 0%, var(--lagoon) 60%, #3fc6bb 100%);
+}
+
+/* The tear line: a dashed rule with a half-moon bitten out of each side. */
+.transfer-pass-tear {
+  position: relative;
+  height: 0;
+  margin: 0 1.25rem;
+  border-top: 2px dashed rgb(14 59 54 / 0.18);
+}
+
+.transfer-pass-tear::before,
+.transfer-pass-tear::after {
+  content: '';
+  position: absolute;
+  top: -0.85rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.transfer-pass-tear::before {
+  left: -2.1rem;
+}
+
+.transfer-pass-tear::after {
+  right: -2.1rem;
+}
+
+/* Phones: the total at the foot of the screen. Solid, not frosted — a fixed
+   bar with backdrop-filter re-blurs on every scroll frame. */
+.transfer-mobile-bar {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+  padding: 0.55rem 0.6rem 0.55rem 1.25rem;
+  box-shadow: var(--shade-lg);
+  transition: transform 0.35s var(--ease-out), opacity 0.25s;
+}
+
+.transfer-mobile-bar[data-hidden='true'] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(130%);
+}
+
+@media (max-width: 639px) {
+  .transfer-promise {
+    padding: 0.7rem 0.85rem;
+  }
+}

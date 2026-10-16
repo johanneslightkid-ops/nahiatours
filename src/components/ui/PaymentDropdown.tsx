@@ -4,7 +4,12 @@ import { FaPaypal, FaCreditCard, FaWhatsapp, FaChevronDown, FaShieldAlt, FaUnive
 import { useBrand } from '../../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
-import { getPaymentMethodStates, getCardCheckoutLink, getBankPaymentLink } from '../../utils/paymentMethods';
+import {
+  getPaymentMethodStates,
+  getCardCheckoutLink,
+  getBankPaymentLink,
+  PaymentMethodId,
+} from '../../utils/paymentMethods';
 import {
   createStripeCheckout,
   getPaymentsReady,
@@ -60,6 +65,13 @@ interface PaymentDropdownProps {
   buttonLabel?: string;
   /** Extra classes for the trigger button, for pages that dress it differently. */
   buttonClassName?: string;
+  /**
+   * Offer only these methods — a page with its own WhatsApp button leaves out
+   * 'cash'. Defaults to every method.
+   */
+  methods?: PaymentMethodId[];
+  /** Render nothing, rather than a WhatsApp fallback, when no method is offered. */
+  hideWhenEmpty?: boolean;
 }
 
 type Lang = 'en' | 'es' | 'de' | 'fr';
@@ -243,6 +255,8 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   amount,
   buttonLabel,
   buttonClassName,
+  methods: allowedMethods,
+  hideWhenEmpty = false,
 }) => {
   const lang: Lang = (['es', 'de', 'fr'].includes(locale) ? locale : 'en') as Lang;
   const t = COPY[lang];
@@ -276,10 +290,17 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     azul: ready?.azul ?? false,
     cardnet: ready?.cardnet ?? false,
   });
+  if (allowedMethods) {
+    for (const id of Object.keys(methods) as PaymentMethodId[]) {
+      if (!allowedMethods.includes(id)) methods[id] = { ...methods[id], visible: false };
+    }
+  }
   const anyVisible = Object.values(methods).some((state) => state.visible);
   const hostedCardLink = getCardCheckoutLink(brandSettings);
   const totalUsd = typeof amount === 'number' && amount > 0 ? amount : extractAmountNumber(selectedPrice);
   const displayPrice = selectedPrice || (totalUsd ? formatMoney(totalUsd, 'USD', lang) : t.inquire);
+
+  const visibleCount = Object.values(methods).filter((state) => state.visible).length;
 
   const updateCoords = () => {
     if (buttonRef.current) {
@@ -288,7 +309,12 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
       let left = rect.right - width;
       if (left < 16) left = 16;
       if (left + width > window.innerWidth - 16) left = window.innerWidth - width - 16;
-      setDropdownCoords({ top: rect.bottom + 8, left });
+      // Open upwards when the menu would run off the bottom of the screen —
+      // a button low in a sticky sidebar otherwise opens a menu nobody can reach.
+      const height = 48 + visibleCount * 60;
+      const below = rect.bottom + 8;
+      const top = below + height > window.innerHeight - 8 && rect.top - height - 8 > 8 ? rect.top - height - 8 : below;
+      setDropdownCoords({ top, left });
     }
   };
 
@@ -302,7 +328,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
         window.removeEventListener('scroll', updateCoords, true);
       };
     }
-  }, [isOpen]);
+  }, [isOpen, visibleCount]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -610,6 +636,8 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
       </>
     ));
   };
+
+  if (hideWhenEmpty && !anyVisible) return null;
 
   return (
     <div className={`relative inline-block ${className}`}>
