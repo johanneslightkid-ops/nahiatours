@@ -43,6 +43,8 @@ interface PaymentDropdownProps {
   serviceId?: number | string;
   /** How many people are being paid for. */
   persons?: number;
+  /** Head count per rate, for a service sold at several (adults, children). */
+  quantities?: Record<string, number>;
   /** Human-readable preferred date, carried onto the payment for the operator. */
   bookingDate?: string;
   locale?: string;
@@ -220,6 +222,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   category = 'tours',
   serviceId,
   persons = 1,
+  quantities,
   bookingDate,
   locale = 'en',
   amount,
@@ -387,6 +390,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
         serviceId,
         title: excursionTitle,
         persons,
+        quantities,
         date: bookingDate,
         amount: totalUsd ?? undefined,
         locale: lang,

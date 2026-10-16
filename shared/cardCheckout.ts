@@ -73,7 +73,12 @@ export const startStripe = async (
   booking: PricedBooking,
   origin: string
 ): Promise<CardCheckout> => {
-  const { title, persons, unitPrice, returnPath, priceSource, date, locale, category } = booking;
+  const { title, persons, unitPrice, total, breakdown, returnPath, priceSource, date, locale, category } = booking;
+  // Priced rate by rate, the booking is one line for its total; otherwise one
+  // line per person at the single rate, which is how Stripe shows it best.
+  const quantity = breakdown ? 1 : persons;
+  const unitAmount = Math.round((breakdown ? total : unitPrice) * 100);
+  const people = breakdown ?? `${persons} ${persons === 1 ? 'person' : 'persons'}`;
   const params = formEncode({
     mode: 'payment',
     // {CHECKOUT_SESSION_ID} is substituted by Stripe on the way back.
@@ -81,16 +86,16 @@ export const startStripe = async (
     cancel_url: `${origin}${returnPath}?paid=0`,
     locale,
     'payment_method_types[0]': 'card',
-    'line_items[0][quantity]': persons,
+    'line_items[0][quantity]': quantity,
     'line_items[0][price_data][currency]': secrets.stripeCurrency,
-    'line_items[0][price_data][unit_amount]': Math.round(unitPrice * 100),
+    'line_items[0][price_data][unit_amount]': unitAmount,
     'line_items[0][price_data][product_data][name]': title,
-    'line_items[0][price_data][product_data][description]':
-      `${persons} ${persons === 1 ? 'person' : 'persons'}${date ? ` · ${date}` : ''}`,
+    'line_items[0][price_data][product_data][description]': `${people}${date ? ` · ${date}` : ''}`,
     // Everything the operator needs to recognise the booking, kept on the
     // payment itself so it survives independently of our own storage.
     'metadata[tour]': title,
     'metadata[persons]': persons,
+    ...(breakdown ? { 'metadata[rates]': breakdown } : {}),
     'metadata[date]': date,
     'metadata[category]': category,
     'metadata[price_source]': priceSource,

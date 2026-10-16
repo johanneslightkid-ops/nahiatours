@@ -20,6 +20,8 @@ export interface CheckoutBooking {
   date?: string;
   /** Only used if the server cannot find the item in the catalogue. */
   amount?: number;
+  /** Head count per rate, for a service sold at several (adults, children). */
+  quantities?: Record<string, number>;
   locale?: string;
   /** Path on this site to come back to. Defaults to wherever we are now. */
   returnPath?: string;

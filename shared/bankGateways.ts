@@ -222,7 +222,8 @@ export const buildAzulForm = async (
   origin: string
 ): Promise<{ action: string; fields: Record<string, string> }> => {
   const label = LABELS[order.booking.locale] ?? LABELS.en;
-  const people = `${order.booking.persons}${order.booking.date ? ` - ${plainText(order.booking.date, 30)}` : ''}`;
+  const count = order.booking.breakdown ? plainText(order.booking.breakdown, 40) : String(order.booking.persons);
+  const people = `${count}${order.booking.date ? ` - ${plainText(order.booking.date, 30)}` : ''}`;
 
   const fields: Record<string, string> = {
     MerchantId: secrets.azulMerchantId,
