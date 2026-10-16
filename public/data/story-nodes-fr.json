@@ -1,70 +1,70 @@
 [
   {
     "id": "welcome",
-    "hostTitle": "Hola! Welcome to {{brand}} 👋",
-    "subtitle": "Welcome to Bávaro & Punta Cana",
-    "narrative": "Whether you are planning your trip from home or already relaxing on the beaches of Bávaro, let me guide you to the perfect Dominican adventure tailored specifically to who you are traveling with and what you crave most.",
+    "hostTitle": "¡Hola ! Bienvenue chez {{brand}} 👋",
+    "subtitle": "Bienvenue à Bávaro et Punta Cana",
+    "narrative": "Que vous prépariez votre voyage depuis chez vous ou que vous profitiez déjà des plages de Bávaro, laissez-moi vous guider vers l’aventure dominicaine idéale, pensée pour vos compagnons de voyage et vos envies.",
     "mediaImage": "https://cdn.pixabay.com/photo/2016/11/19/14/00/beach-1836467_1280.jpg",
-    "question": "Ready to design your ideal Caribbean experience?",
+    "question": "Prêt à composer votre expérience caribéenne idéale ?",
     "options": [
       {
         "id": "start",
-        "label": "Start My Personal Journey 🌴",
-        "description": "3 quick questions to unlock your custom tour & transport package",
+        "label": "Commencer mon voyage personnalisé 🌴",
+        "description": "3 questions rapides pour découvrir votre formule excursions et transport sur mesure",
         "nextNodeId": "party_type",
         "theme": "ocean_blue"
       },
       {
         "id": "direct_catalogue",
-        "label": "Browse Full Catalogue 🛍️",
-        "description": "Skip story and see all tours, pricing, and transfers directly",
+        "label": "Voir tout le catalogue 🛍️",
+        "description": "Passer l’histoire et voir directement toutes les excursions, les prix et les transferts",
         "action": "switch_catalogue"
       }
     ]
   },
   {
     "id": "party_type",
-    "hostTitle": "Who is joining your journey?",
-    "subtitle": "Step 1 of 3: Travel Party",
-    "narrative": "Every group brings a different energy to paradise. Tell me who is coming along so I can match the right pace and atmosphere for your day.",
-    "question": "Select your travel crew:",
+    "hostTitle": "Qui vous accompagne ?",
+    "subtitle": "Étape 1 sur 3 : votre groupe",
+    "narrative": "Chaque groupe apporte une énergie différente au paradis. Dites-moi qui vient, pour que j’adapte le rythme et l’ambiance de votre journée.",
+    "question": "Choisissez votre groupe :",
     "options": [
       {
         "id": "solo",
-        "label": "Solo Explorer 🧳",
-        "description": "Seeking freedom, thrill, and friendly social vibes with fellow travelers",
+        "label": "Explorateur solo 🧳",
+        "description": "En quête de liberté, de frissons et de rencontres sympathiques avec d’autres voyageurs",
         "nextNodeId": "vibe_check",
         "answerKey": "partyType",
         "answerValue": "solo"
       },
       {
         "id": "couple",
-        "label": "Romantic Couple ❤️",
-        "description": "Celebrating romance, anniversaries, or intimate luxury on crystal waters",
+        "label": "Couple romantique ❤️",
+        "description": "Romance, anniversaires ou luxe intimiste sur une eau cristalline",
         "nextNodeId": "vibe_check",
         "answerKey": "partyType",
         "answerValue": "couple"
       },
       {
         "id": "family",
-        "label": "Family with Kids 👨‍👩‍👧‍👦",
-        "description": "Safety, engaging fun, screen-free memories, and kids & parents delight",
+        "label": "Famille avec enfants 👨‍👩‍👧‍👦",
+        "description": "Sécurité, plaisir garanti, souvenirs sans écrans et bonheur des petits comme des grands",
         "nextNodeId": "vibe_check",
         "answerKey": "partyType",
         "answerValue": "family"
       },
       {
         "id": "friends",
-        "label": "Friends / Squad 🍹",
-        "description": "High-energy party, epic photos, dancing, and unforgettable nightlife",
+        "label": "Entre amis 🍹",
+        "description": "Fête pleine d’énergie, photos épiques, danse et nuits inoubliables",
         "nextNodeId": "vibe_check",
         "answerKey": "partyType",
         "answerValue": "friends"
       },
       {
         "id": "vip_private",
-        "label": "Exclusive VIP Group 💎",
-        "description": "Private yachts, luxury SUV transfers, zero crowds, and custom service",
+        "label": "Groupe VIP exclusif 💎",
+        "description": "Yachts privés, transferts en SUV de luxe, zéro foule et service sur mesure",
         "nextNodeId": "vibe_check",
         "answerKey": "partyType",
         "answerValue": "vip_private"
@@ -73,15 +73,15 @@
   },
   {
     "id": "vibe_check",
-    "hostTitle": "What's your primary vibe?",
-    "subtitle": "Step 2 of 3: Mood & Rhythm",
-    "narrative": "From serene sapphire lagoons to jungle adrenaline and party boats, Bávaro has it all. What does your perfect day feel like?",
-    "question": "Choose your dream mood:",
+    "hostTitle": "Quelle est votre ambiance ?",
+    "subtitle": "Étape 2 sur 3 : humeur et rythme",
+    "narrative": "Des lagons saphir paisibles à l’adrénaline de la jungle en passant par les party boats, Bávaro a tout. À quoi ressemble votre journée parfaite ?",
+    "question": "Choisissez l’ambiance de vos rêves :",
     "options": [
       {
         "id": "water_chill",
-        "label": "Turquoise Waters & Relaxing Reefs 🌊",
-        "description": "Saona island beaches, natural pools, floating bars, and marine life",
+        "label": "Eaux turquoise et récifs paisibles 🌊",
+        "description": "Plages de l’île Saona, piscines naturelles, bars flottants et vie marine",
         "nextNodeId": "transport_needs",
         "answerKey": "vibe",
         "answerValue": "water_chill",
@@ -89,8 +89,8 @@
       },
       {
         "id": "jungle_thrill",
-        "label": "Jungle Adrenaline & Off-Road 🚜",
-        "description": "Muddy buggies, ziplining canopy, cenote swims, and mountain views",
+        "label": "Adrénaline dans la jungle et tout-terrain 🚜",
+        "description": "Buggies dans la boue, tyrolienne dans la canopée, baignade en cénote et vues sur la montagne",
         "nextNodeId": "transport_needs",
         "answerKey": "vibe",
         "answerValue": "jungle_thrill",
@@ -98,8 +98,8 @@
       },
       {
         "id": "party_nightlife",
-        "label": "Fiesta, Music & Sunset Beats 💃",
-        "description": "Party catamarans, sunset cocktails, Coco Bongo shows, and cave clubs",
+        "label": "Fiesta, musique et sunset 💃",
+        "description": "Catamarans festifs, cocktails au coucher du soleil, shows au Coco Bongo et boîtes troglodytes",
         "nextNodeId": "transport_needs",
         "answerKey": "vibe",
         "answerValue": "party_nightlife",
@@ -107,8 +107,8 @@
       },
       {
         "id": "culture_history",
-        "label": "Dominican Culture & Heritage 🏛️",
-        "description": "Colonial Santo Domingo history, cacao farms, coffee, and local villages",
+        "label": "Culture et patrimoine dominicains 🏛️",
+        "description": "Histoire coloniale de Saint-Domingue, plantations de cacao, café et villages locaux",
         "nextNodeId": "transport_needs",
         "answerKey": "vibe",
         "answerValue": "culture_history",
@@ -116,8 +116,8 @@
       },
       {
         "id": "vip_luxury",
-        "label": "Ultra-VIP Luxury & Private Yacht 🥂",
-        "description": "Lobster feast, private catamaran, quiet beaches, and dedicated host",
+        "label": "Luxe ultra-VIP et yacht privé 🥂",
+        "description": "Festin de langouste, catamaran privé, plages tranquilles et hôte dédié",
         "nextNodeId": "transport_needs",
         "answerKey": "vibe",
         "answerValue": "vip_luxury",
@@ -127,23 +127,23 @@
   },
   {
     "id": "transport_needs",
-    "hostTitle": "Need seamless private transport in the Dominican Republic?",
-    "subtitle": "Step 3 of 3: Logistics & Car + Driver",
-    "narrative": "I offer private air-conditioned SUV and van transfers with professional drivers anywhere in the Dominican Republic — single or return trips between Santo Domingo, Bávaro, Bayahibe, La Romana, or Puerto Plata.",
-    "question": "How would you like to handle your transportation?",
+    "hostTitle": "Besoin d’un transport privé sans souci en République dominicaine ?",
+    "subtitle": "Étape 3 sur 3 : logistique et voiture avec chauffeur",
+    "narrative": "Je propose des transferts privés en SUV et en van climatisés avec chauffeurs professionnels partout en République dominicaine — aller simple ou aller-retour entre Saint-Domingue, Bávaro, Bayahibe, La Romana et Puerto Plata.",
+    "question": "Comment souhaitez-vous organiser votre transport ?",
     "options": [
       {
         "id": "combo_transport",
-        "label": "Include Private Car + Driver Service 🚗",
-        "description": "Door-to-door private transfer from your resort/airport with flexible pickup",
+        "label": "Ajouter une voiture privée avec chauffeur 🚗",
+        "description": "Transfert privé porte à porte depuis votre resort ou l’aéroport, avec prise en charge flexible",
         "nextNodeId": "recommendation",
         "answerKey": "transportNeeded",
         "answerValue": true
       },
       {
         "id": "excursion_only",
-        "label": "Excursion Shared Pick-Up Only 🚌",
-        "description": "Standard excursion shuttle pick-up from your resort lobby included",
+        "label": "Navette d’excursion partagée uniquement 🚌",
+        "description": "Prise en charge standard par la navette d’excursion dans le hall de votre resort incluse",
         "nextNodeId": "recommendation",
         "answerKey": "transportNeeded",
         "answerValue": false
@@ -152,9 +152,9 @@
   },
   {
     "id": "recommendation",
-    "hostTitle": "Your Personalized Dominican Journey is Ready! ✨",
-    "subtitle": "Tailored Excursion & Transport Bundle",
-    "narrative": "Based on your preferences, I've curated a special package for you with exclusive pricing, seamless logistics, and direct WhatsApp support.",
+    "hostTitle": "Votre voyage dominicain personnalisé est prêt ! ✨",
+    "subtitle": "Formule excursions et transport sur mesure",
+    "narrative": "D’après vos préférences, j’ai composé une formule spéciale pour vous, avec des prix exclusifs, une organisation sans accroc et une assistance directe sur WhatsApp.",
     "isRecommendation": true
   }
 ]
