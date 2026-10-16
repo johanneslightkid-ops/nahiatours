@@ -1,0 +1,28 @@
+# Read-only: copies the values of some KV namespaces into a workflow artifact,
+# as a backup before restoring data and to compare one site's data with
+# another's. Never writes to KV and deploys nothing.
+name: KV snapshot
+
+on:
+  push:
+    branches: [claude/keen-fermat-k1zrts]
+    paths: [.github/workflows/kv-snapshot.yml, scripts/kv-snapshot.mjs]
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      KV_SNAPSHOT_TITLES: nahiatours-data,elcortecito-data,beautiful-tours-data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/kv-snapshot.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kv-snapshot
+          path: kv-snapshot
+          retention-days: 30
