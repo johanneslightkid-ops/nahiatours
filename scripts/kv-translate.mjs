@@ -205,6 +205,55 @@ const translateRecord = async (record, from, to) => {
   return { value: copy, total: slots.length, missed };
 };
 
+// ── Repair: strings that came back identical to their source ──────────────────
+/** A long text, translated a paragraph at a time. */
+const translateLong = async (text, from, to) => {
+  const parts = text.split(/(\n{2,})/);
+  const prose = parts.filter((p, i) => i % 2 === 0 && isProse(p));
+  const done = await translateAll(prose, from, to);
+  const map = new Map(prose.map((p, i) => [p, done[i]]));
+  return parts.map((p, i) => (i % 2 === 0 && map.get(p)) || p).join('');
+};
+
+const repair = async (s, keys) => {
+  for (const resource of RESOURCES) {
+    for (const to of TARGETS) {
+      const key = `${resource}-${to}`;
+      // Only what this script created; nahia.tours' story was translated by hand.
+      if (!keys.has(key) || (s.site === 'nahiatours' && resource === 'story-elements')) continue;
+      let source;
+      let from;
+      if (keys.has(`${resource}-en`)) [source, from] = [await kvGet(s.ns, `${resource}-en`), 'en'];
+      else if (keys.has(`${resource}-es`)) [source, from] = [await kvGet(s.ns, `${resource}-es`), 'es'];
+      else if (!STORED_ONLY.has(resource)) [source, from] = [bundled(s.branch, `${resource}-en.json`), 'en'];
+      if (!source) continue;
+      const target = await kvGet(s.ns, key);
+      const a = [];
+      const b = [];
+      collect(JSON.parse(JSON.stringify(source)), a);
+      collect(target, b);
+      if (a.length !== b.length) {
+        console.log(`  ${key}: shapes differ (${a.length}/${b.length}) — left alone`);
+        continue;
+      }
+      let fixed = 0;
+      for (let i = 0; i < b.length; i += 1) {
+        if (b[i].text === a[i].text && b[i].text.length > 40) {
+          const t = await translateLong(a[i].text, from, to);
+          if (t && t !== a[i].text) {
+            b[i].set(t);
+            fixed += 1;
+          }
+        }
+      }
+      if (fixed) {
+        if (APPLY) await kvPut(s.ns, key, target);
+        console.log(`  ${key}: ${APPLY ? 'repaired' : 'would repair'} ${fixed} untranslated string(s)`);
+      }
+    }
+  }
+};
+
 // ── Run ──────────────────────────────────────────────────────────────────────
 if (!TOKEN) throw new Error('no CLOUDFLARE_API_TOKEN');
 account = process.env.CLOUDFLARE_ACCOUNT_ID || (await (await cf('/accounts?per_page=50')).json()).result[0].id;
@@ -216,6 +265,10 @@ for (const s of SITES) {
   if (ONLY.length && !ONLY.includes(s.site)) continue;
   const keys = await kvKeys(s.ns);
   console.log(`\n## ${s.site} (${s.ns}) — ${keys.size} key(s) before`);
+  if (process.env.KV_TRANSLATE_REPAIR === '1') {
+    await repair(s, keys);
+    continue;
+  }
   for (const resource of RESOURCES) {
     const missing = TARGETS.filter((l) => !keys.has(`${resource}-${l}`));
     if (!missing.length) {
