@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { localeText } from '../lib/localeText';
 import { FormattedMessage } from 'react-intl';
 import { Link, useParams } from 'react-router-dom';
-import { useI18n } from '../contexts/I18nContext';
+import { getContentLocale, useI18n } from '../contexts/I18nContext';
 import { ServiceCategory, Tour, getServicesByCategory } from '../services/toursService';
 import { useBrand } from '../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
@@ -21,7 +22,7 @@ const ServiceDetails: React.FC = () => {
 
   useEffect(() => {
     const loadService = async () => {
-      const services = await getServicesByCategory(category as ServiceCategory, locale);
+      const services = await getServicesByCategory(category as ServiceCategory, getContentLocale(locale));
       const routeId = id.split('-')[0];
       const match = services.find((item) => String(item.id) === routeId) ?? null;
       setService(match);
@@ -332,46 +333,46 @@ const ServiceDetails: React.FC = () => {
                       <div className="mt-3 grid gap-2 text-sm text-ink-soft">
                         <div>{selectedRoute.origin} → {selectedRoute.destination}</div>
                         <div>
-                          <strong>{locale === 'es' ? 'Zona/Región:' : 'Zone/Region:'}</strong>{' '}
+                          <strong>{localeText(locale, { en: 'Zone/Region:', es: 'Zona/Región:', de: 'Zone/Region:', fr: 'Zone/Région :' })}</strong>{' '}
                           {getRegionFromAddress(selectedRoute.origin)} → {getRegionFromAddress(selectedRoute.destination)}
                         </div>
                         {selectedRoute.distanceKm ? (
                           <div>
-                            <strong>{locale === 'es' ? 'Distancia estimada:' : 'Distance:'}</strong>{' '}
+                            <strong>{localeText(locale, { en: 'Distance:', es: 'Distancia estimada:', de: 'Entfernung:', fr: 'Distance :' })}</strong>{' '}
                             {selectedRoute.distanceKm} km
                           </div>
                         ) : null}
 
                         <div className="mt-3 rounded-lg border border-ink/15 bg-paper-warm p-3">
                           <div className="flex justify-between">
-                            <span>{locale === 'es' ? 'Precio base' : 'Base distance price'}</span>
+                            <span>{localeText(locale, { en: 'Base distance price', es: 'Precio base', de: 'Grundpreis nach Entfernung', fr: 'Prix de base (distance)' })}</span>
                             <span>{priceResult ? `USD ${priceResult.breakdown.baseDistancePrice}` : basePrice != null ? `USD ${basePrice}` : 'N/A'}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span>{locale === 'es' ? 'Descuento total' : 'Total discount'}</span>
+                            <span>{localeText(locale, { en: 'Total discount', es: 'Descuento total', de: 'Rabatt gesamt', fr: 'Remise totale' })}</span>
                             <span>{priceResult ? `USD ${priceResult.breakdown.discountAmount}` : `USD ${totalDiscount}`}</span>
                           </div>
                           {priceResult ? (
                             <>
                               <div className="flex justify-between">
-                                <span>{locale === 'es' ? 'Descuento máximo' : 'Max discount'}</span>
+                                <span>{localeText(locale, { en: 'Max discount', es: 'Descuento máximo', de: 'Maximaler Rabatt', fr: 'Remise maximale' })}</span>
                                 <span>{`${priceResult.breakdown.distanceDiscountPercent}% (max ${priceResult.breakdown.distanceDiscountMaxPercent}%)`}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span>{locale === 'es' ? 'Curva de descuento' : 'Discount saturation'}</span>
+                                <span>{localeText(locale, { en: 'Discount saturation', es: 'Curva de descuento', de: 'Rabattkurve', fr: 'Courbe de remise' })}</span>
                                 <span>{`${priceResult.breakdown.distanceDiscountSaturationKm} km`}</span>
                               </div>
                             </>
                           ) : null}
                           <div className="flex justify-between font-semibold pt-2">
-                            <span>{locale === 'es' ? 'Total estimado' : 'Estimated total'}</span>
+                            <span>{localeText(locale, { en: 'Estimated total', es: 'Total estimado', de: 'Geschätzter Gesamtpreis', fr: 'Total estimé' })}</span>
                             <span>{finalTotal != null ? `USD ${finalTotal}` : 'N/A'}</span>
                           </div>
                         </div>
 
                         <div className="mt-3">
                           <button onClick={handleContactWhatsApp} className="rounded-full bg-lagoon px-5 py-2 font-semibold text-white">
-                            {locale === 'es' ? 'Contactar por WhatsApp' : 'Contact on WhatsApp'}
+                            {localeText(locale, { en: 'Contact on WhatsApp', es: 'Contactar por WhatsApp', de: 'Per WhatsApp kontaktieren', fr: 'Contacter sur WhatsApp' })}
                           </button>
                         </div>
                       </div>

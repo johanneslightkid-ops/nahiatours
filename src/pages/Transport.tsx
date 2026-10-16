@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { localeText } from '../lib/localeText';
 import PageHeader from '../components/layout/PageHeader';
 import { Sailboat, Starfish } from '../components/ui/Illustrations';
-import { getTransferConfig } from '../services/transferConfigService';
+import { getTransferConfig, vehicleText } from '../services/transferConfigService';
 import { calculateDistancePrice } from '../services/transferPricingEngine';
 import { getRouteBetweenPoints } from '../services/routingService';
 import { detectMunicipio } from '../services/municipioService';
@@ -14,7 +15,7 @@ import PlaceAutocomplete from '../components/PlaceAutocomplete';
 import DateTimePicker from '../components/ui/DateTimePicker';
 import MobileNumberPicker from '../components/ui/MobileNumberPicker';
 import RouteMap from '../components/RouteMap';
-import { createStripeCheckout, isStripeReady } from '../services/paymentService';
+import { getPaymentsReady, postToGateway, startCardCheckout } from '../services/paymentService';
 import { isPaymentMethodVisible } from '../utils/paymentMethods';
 
 type TripType = 'one-way' | 'round-trip';
@@ -137,15 +138,29 @@ const Transport: React.FC = () => {
     [config, form.vehicleKey]
   );
 
-  const handlePassengerChange = useCallback((value: number) => {
-    setForm((prev) => ({ ...prev, passengers: Math.max(1, Math.min(100, value)) }));
-  }, []);
+  // No more passengers than the chosen vehicle seats.
+  const maxPassengers = Math.max(1, selectedVehicle?.maxPassengers ?? 100);
+
+  const handlePassengerChange = useCallback(
+    (value: number | null) => {
+      setForm((prev) => ({ ...prev, passengers: Math.max(1, Math.min(maxPassengers, value ?? 1)) }));
+    },
+    [maxPassengers]
+  );
+
+  // Choosing a smaller vehicle winds the count down to what it seats — also
+  // when the vehicle list arrives or the admin lowers a capacity.
+  useEffect(() => {
+    if (form.passengers > maxPassengers) {
+      setForm((prev) => ({ ...prev, passengers: maxPassengers }));
+    }
+  }, [form.passengers, maxPassengers]);
 
   const needsTwoVehicles = useMemo(() => {
     if (!selectedVehicle) return false;
     const threshold = selectedVehicle.passengerThreshold ?? (selectedVehicle.maxPassengers + 1);
-    return form.passengers > threshold;
-  }, [selectedVehicle, form.passengers]);
+    return Math.min(form.passengers, maxPassengers) >= threshold;
+  }, [selectedVehicle, form.passengers, maxPassengers]);
 
   const waPhone = useMemo(() => {
     const raw = brandSettings.phoneNumber || '+18299999999';
@@ -222,15 +237,15 @@ const Transport: React.FC = () => {
 
   useEffect(() => {
     let current = true;
-    isStripeReady().then((ready) => {
-      if (current) setStripeReady(ready);
+    getPaymentsReady().then((ready) => {
+      if (current) setStripeReady(ready.card);
     });
     return () => {
       current = false;
     };
   }, []);
 
-  const cardVisible = isPaymentMethodVisible(brandSettings, 'stripe', stripeReady);
+  const cardVisible = isPaymentMethodVisible(brandSettings, 'card', stripeReady);
   const paypalVisible = isPaymentMethodVisible(brandSettings, 'paypal');
 
   const handlePayWithPayPal = useCallback(() => {
@@ -260,7 +275,7 @@ const Transport: React.FC = () => {
     setStartingCard(true);
     try {
       const route = `${originAddress || 'Pickup'} → ${destAddress || 'Drop-off'}`;
-      const url = await createStripeCheckout({
+      const start = await startCardCheckout({
         category: 'transport',
         title: `Private transfer · ${route}`.slice(0, 120),
         // The quote is already the total for the whole vehicle, so it is one
@@ -271,7 +286,8 @@ const Transport: React.FC = () => {
         locale,
         returnPath: '/transport',
       });
-      window.location.href = url;
+      if (start.kind === 'redirect') window.location.href = start.url;
+      else postToGateway(start.action, start.fields);
     } catch (error: any) {
       setStartingCard(false);
       setCardError(error?.message || 'Could not start the card payment.');
@@ -353,7 +369,7 @@ const Transport: React.FC = () => {
                       <FormattedMessage id="transport.origin" defaultMessage="Pickup location" />
                     </label>
                     <PlaceAutocomplete
-                      placeholder={locale === 'es' ? 'Ej: Hotel, aeropuerto, dirección...' : 'e.g. Hotel, airport, address...'}
+                      placeholder={localeText(locale, { en: 'e.g. Hotel, airport, address...', es: 'Ej: Hotel, aeropuerto, dirección...', de: 'z. B. Hotel, Flughafen, Adresse…', fr: 'ex. : hôtel, aéroport, adresse…' })}
                       value={originAddress}
                       onPlaceSelect={handleOriginSelect}
                       onClear={() => {
@@ -365,7 +381,7 @@ const Transport: React.FC = () => {
                     {form.originMunicipio && (
                       <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-lagoon-light px-3 py-1 text-xs font-semibold text-lagoon-dark">
                         <span>📍</span>
-                        <span>{locale === 'es' ? 'Municipio origen' : 'Origin municipio'}: {form.originMunicipio}</span>
+                        <span>{localeText(locale, { en: 'Origin municipio', es: 'Municipio origen', de: 'Abfahrtsgemeinde', fr: 'Commune de départ' })}: {form.originMunicipio}</span>
                       </div>
                     )}
                   </div>
@@ -411,7 +427,7 @@ const Transport: React.FC = () => {
                       <FormattedMessage id="transport.destination" defaultMessage="Drop-off location" />
                     </label>
                     <PlaceAutocomplete
-                      placeholder={locale === 'es' ? 'Ej: Hotel, dirección, lugar turístico...' : 'e.g. Hotel, address, landmark...'}
+                      placeholder={localeText(locale, { en: 'e.g. Hotel, address, landmark...', es: 'Ej: Hotel, dirección, lugar turístico...', de: 'z. B. Hotel, Adresse, Sehenswürdigkeit…', fr: 'ex. : hôtel, adresse, lieu touristique…' })}
                       value={destAddress}
                       onPlaceSelect={handleDestSelect}
                       onClear={() => {
@@ -466,13 +482,13 @@ const Transport: React.FC = () => {
                     type="date"
                     value={departureDate}
                     onChange={setDepartureDate}
-                    label={locale === 'es' ? 'Fecha de Salida' : 'Departure Date'}
+                    label={localeText(locale, { en: 'Departure Date', es: 'Fecha de Salida', de: 'Abfahrtsdatum', fr: 'Date de départ' })}
                   />
                   <DateTimePicker
                     type="time"
                     value={departureTime}
                     onChange={setDepartureTime}
-                    label={locale === 'es' ? 'Hora de Salida' : 'Departure Time'}
+                    label={localeText(locale, { en: 'Departure Time', es: 'Hora de Salida', de: 'Abfahrtszeit', fr: 'Heure de départ' })}
                   />
                   {tripType === 'round-trip' && (
                     <>
@@ -480,13 +496,13 @@ const Transport: React.FC = () => {
                         type="date"
                         value={returnDate}
                         onChange={setReturnDate}
-                        label={locale === 'es' ? 'Fecha de Regreso' : 'Return Date'}
+                        label={localeText(locale, { en: 'Return Date', es: 'Fecha de Regreso', de: 'Rückfahrtdatum', fr: 'Date de retour' })}
                       />
                       <DateTimePicker
                         type="time"
                         value={returnTime}
                         onChange={setReturnTime}
-                        label={locale === 'es' ? 'Hora de Regreso' : 'Return Time'}
+                        label={localeText(locale, { en: 'Return Time', es: 'Hora de Regreso', de: 'Rückfahrtzeit', fr: 'Heure de retour' })}
                       />
                     </>
                   )}
@@ -504,12 +520,20 @@ const Transport: React.FC = () => {
                     </label>
                     <select
                       value={form.vehicleKey}
-                      onChange={(e) => setForm((prev) => ({ ...prev, vehicleKey: e.target.value }))}
+                      onChange={(e) => {
+                        const nextKey = e.target.value;
+                        const nextMax = config?.vehicleTypes.find((v) => v.key === nextKey)?.maxPassengers;
+                        setForm((prev) => ({
+                          ...prev,
+                          vehicleKey: nextKey,
+                          passengers: nextMax ? Math.min(prev.passengers, Math.max(1, nextMax)) : prev.passengers,
+                        }));
+                      }}
                       className="w-full appearance-none rounded-2xl border border-[rgba(150,112,31,0.4)] bg-white px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     >
                       {config.vehicleTypes.map((vt) => (
                         <option key={vt.key} value={vt.key}>
-                          {vt.label} (≤{vt.maxPassengers} pax)
+                          {vehicleText(vt, locale).label} (≤{vt.maxPassengers} pax)
                         </option>
                       ))}
                     </select>
@@ -518,9 +542,9 @@ const Transport: React.FC = () => {
                     value={form.passengers}
                     onChange={handlePassengerChange}
                     min={1}
-                    max={100}
+                    max={maxPassengers}
                     step={1}
-                    label={locale === 'es' ? 'Pasajeros' : 'Passengers'}
+                    label={localeText(locale, { en: 'Passengers', es: 'Pasajeros', de: 'Fahrgäste', fr: 'Passagers' })}
                     ariaLabel="passengers"
                   />
                 </div>
@@ -533,10 +557,10 @@ const Transport: React.FC = () => {
                         values={{ min: selectedVehicle.typicalPassengers[0], max: selectedVehicle.typicalPassengers[1] }}
                       />
                     </p>
-                    <p className="text-xs text-ink-light">{selectedVehicle.description}</p>
+                    <p className="text-xs text-ink-light">{vehicleText(selectedVehicle, locale).description}</p>
                     {selectedVehicle.image && (
                       <div className="mt-2 h-28 w-full overflow-hidden rounded-xl bg-paper-warm md:h-36">
-                        <img src={selectedVehicle.image} alt={selectedVehicle.label} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                        <img src={selectedVehicle.image} alt={vehicleText(selectedVehicle, locale).label} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                       </div>
                     )}
                     {needsTwoVehicles && (
@@ -574,7 +598,7 @@ const Transport: React.FC = () => {
                     min={0}
                     max={10}
                     step={1}
-                    label={locale === 'es' ? 'Espera (horas)' : 'Waiting (hours)'}
+                    label={localeText(locale, { en: 'Waiting (hours)', es: 'Espera (horas)', de: 'Wartezeit (Stunden)', fr: 'Attente (heures)' })}
                     ariaLabel="waiting hours"
                   />
                   <MobileNumberPicker
@@ -583,7 +607,7 @@ const Transport: React.FC = () => {
                     min={0}
                     max={10}
                     step={1}
-                    label={locale === 'es' ? 'Sillas Infantiles' : 'Child Seats'}
+                    label={localeText(locale, { en: 'Child Seats', es: 'Sillas Infantiles', de: 'Kindersitze', fr: 'Sièges enfant' })}
                     ariaLabel="child seats"
                   />
                 </div>
@@ -606,7 +630,7 @@ const Transport: React.FC = () => {
                       inputMode="text"
                       value={flightNumber}
                       onChange={(e) => setFlightNumber(e.target.value)}
-                      placeholder={locale === 'es' ? 'Ej: AA 1234' : 'e.g. AA 1234'}
+                      placeholder={localeText(locale, { en: 'e.g. AA 1234', es: 'Ej: AA 1234', de: 'z. B. AA 1234', fr: 'ex. : AA 1234' })}
                       className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     />
                   </div>
@@ -619,7 +643,7 @@ const Transport: React.FC = () => {
                       inputMode="text"
                       value={hotelName}
                       onChange={(e) => setHotelName(e.target.value)}
-                      placeholder={locale === 'es' ? 'Ej: Iberostar' : 'e.g. Iberostar'}
+                      placeholder={localeText(locale, { en: 'e.g. Iberostar', es: 'Ej: Iberostar', de: 'z. B. Iberostar', fr: 'ex. : Iberostar' })}
                       className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     />
                   </div>
@@ -630,7 +654,7 @@ const Transport: React.FC = () => {
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder={locale === 'es' ? 'Requisitos especiales...' : 'Special requirements...'}
+                      placeholder={localeText(locale, { en: 'Special requirements...', es: 'Requisitos especiales...', de: 'Besondere Wünsche…', fr: 'Demandes particulières…' })}
                       rows={3}
                       className="w-full rounded-2xl border border-ink/20 px-4 py-4 text-base focus:bg-lagoon-light focus:outline-none"
                     />
@@ -687,15 +711,9 @@ const Transport: React.FC = () => {
                             <span className="font-semibold">{priceResult.destinationMunicipio}</span>
                           </div>
                         )}
-                        {priceResult.breakdown.municipioMultiplierApplied && priceResult.breakdown.municipioMultiplierApplied !== 1.0 && (
-                          <div className="flex justify-between items-center rounded-lg bg-lagoon-light px-2 py-2 text-lagoon-dark font-semibold border border-ink/15">
-                            <span>🏘️ <FormattedMessage id="transport.municipioMultiplier" defaultMessage="Municipio multiplier" /></span>
-                            <span className="text-lg">{priceResult.breakdown.municipioMultiplierApplied.toFixed(2)}×</span>
-                          </div>
-                        )}
                         <div className="flex justify-between">
                           <span><FormattedMessage id="transport.vehicle" defaultMessage="Vehicle" /></span>
-                          <span className="font-medium">{priceResult.vehicleLabel}</span>
+                          <span className="font-medium">{selectedVehicle ? vehicleText(selectedVehicle, locale).label : priceResult.vehicleLabel}</span>
                         </div>
                         <div className="flex justify-between">
                           <span><FormattedMessage id="transport.passengers" defaultMessage="Passengers" /></span>
@@ -721,19 +739,13 @@ const Transport: React.FC = () => {
                         {form.nightTransfer && (
                           <div className="flex justify-between text-mango-dark">
                             <span>🌙 <FormattedMessage id="transport.nightFee" defaultMessage="Night fee" /></span>
-                            <span className="font-medium">+15%</span>
-                          </div>
-                        )}
-                        {priceResult.breakdown.distanceDiscountPercent !== undefined && priceResult.breakdown.distanceDiscountPercent > 0 && (
-                          <div className="flex justify-between text-lagoon-dark">
-                            <span>🏷️ <FormattedMessage id="transport.distanceDiscount" defaultMessage="Distance discount" /></span>
-                            <span className="font-medium">{priceResult.breakdown.distanceDiscountPercent}%</span>
+                            <span className="font-medium"><FormattedMessage id="transport.includedInTotal" defaultMessage="included" /></span>
                           </div>
                         )}
                         {needsTwoVehicles && (
                           <div className="flex justify-between text-mango-dark">
                             <span>🚗🚗 <FormattedMessage id="transport.doubleVehicle" defaultMessage="Double vehicle" /></span>
-                            <span className="font-medium">×2</span>
+                            <span className="font-medium"><FormattedMessage id="transport.includedInTotal" defaultMessage="included" /></span>
                           </div>
                         )}
                       </div>

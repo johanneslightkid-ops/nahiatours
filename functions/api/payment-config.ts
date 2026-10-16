@@ -1,5 +1,10 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
-import { describePaymentConfig, writePaymentSecrets, PaymentEnv } from '../../shared/paymentConfig';
+import {
+  describePaymentConfig,
+  writePaymentSecrets,
+  PaymentEnv,
+  PaymentSecrets,
+} from '../../shared/paymentConfig';
 
 /**
  * Read and write the payment credentials, from the admin panel only.
@@ -12,7 +17,25 @@ import { describePaymentConfig, writePaymentSecrets, PaymentEnv } from '../../sh
  * PUT accepts a new key. Sending an empty string clears it; omitting the field
  * leaves whatever is stored alone, so the panel can save a currency change
  * without the operator having to retype a key it never showed them.
+ *
+ * The Azul and CardNET settings travel the same way. Their identifiers (merchant
+ * number, terminal, name) are reported back, because the banks print them on
+ * their own pages anyway; the Azul AuthKey is write-only, like the Stripe key.
  */
+
+/** Plain-text settings, with how long each may be. Validated as text only. */
+const TEXT_FIELDS: Partial<Record<keyof PaymentSecrets, number>> = {
+  azulMerchantId: 40,
+  azulMerchantName: 60,
+  azulMerchantType: 40,
+  azulCurrencyCode: 8,
+  azulAuthKey: 400,
+  cardnetMerchantNumber: 15,
+  cardnetTerminal: 12,
+  cardnetMerchantType: 4,
+  cardnetMerchantName: 40,
+  cardnetAcquirer: 3,
+};
 export async function onRequest(context: { request: Request; env: PaymentEnv }) {
   const { request, env } = context;
 
@@ -32,14 +55,14 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
   }
 
   if (request.method === 'PUT') {
-    let body: { stripeSecretKey?: unknown; stripeCurrency?: unknown };
+    let body: Record<string, unknown>;
     try {
-      body = (await request.json()) as typeof body;
+      body = (await request.json()) as Record<string, unknown>;
     } catch {
       return json({ error: 'Cuerpo de la petición inválido.' }, 400);
     }
 
-    const patch: { stripeSecretKey?: string; stripeCurrency?: string } = {};
+    const patch: Partial<PaymentSecrets> = {};
 
     if (typeof body.stripeSecretKey === 'string') {
       const key = body.stripeSecretKey.trim();
@@ -64,6 +87,47 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
         return json({ error: 'La moneda debe ser un código de tres letras, por ejemplo USD.' }, 400);
       }
       patch.stripeCurrency = currency;
+    }
+
+    for (const [field, max] of Object.entries(TEXT_FIELDS) as [keyof PaymentSecrets, number][]) {
+      const value = body[field];
+      if (typeof value === 'string') {
+        (patch as Record<string, unknown>)[field] = value.trim().slice(0, max);
+      }
+    }
+
+    if (typeof body.cardnetMerchantType === 'string' && body.cardnetMerchantType.trim() &&
+        !/^\d{4}$/.test(body.cardnetMerchantType.trim())) {
+      return json({ error: 'La categoría de comercio (MCC) de CardNET son cuatro dígitos, por ejemplo 4722.' }, 400);
+    }
+
+    if (['auto', 'stripe', 'azul', 'cardnet'].includes(String(body.cardProcessor))) {
+      patch.cardProcessor = body.cardProcessor as PaymentSecrets['cardProcessor'];
+    }
+
+    for (const field of ['azulMode', 'cardnetMode'] as const) {
+      if (body[field] === 'test' || body[field] === 'live') patch[field] = body[field] as 'test' | 'live';
+    }
+    for (const field of ['azulCurrency', 'cardnetCurrency'] as const) {
+      if (body[field] === 'USD' || body[field] === 'DOP') patch[field] = body[field] as 'USD' | 'DOP';
+    }
+
+    for (const field of ['dopPerUsd', 'itbisPercent'] as const) {
+      if (body[field] === undefined) continue;
+      const value = Number(body[field]);
+      const max = field === 'dopPerUsd' ? 10_000 : 30;
+      if (!Number.isFinite(value) || value < 0 || value > max) {
+        return json(
+          {
+            error:
+              field === 'dopPerUsd'
+                ? 'La tasa debe ser un número de pesos por dólar, por ejemplo 60.50.'
+                : 'El ITBIS debe ser un porcentaje entre 0 y 30.',
+          },
+          400
+        );
+      }
+      patch[field] = value;
     }
 
     const result = await writePaymentSecrets(env, patch);

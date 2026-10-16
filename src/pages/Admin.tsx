@@ -12,6 +12,7 @@ import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
 import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
 import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
+import SiteTextsAdmin from '../components/admin/SiteTextsAdmin';
 import { FaVideo, FaShareAlt, FaBook, FaRobot, FaMagic } from 'react-icons/fa';
 import { useSearchParams } from 'react-router-dom';
 
@@ -20,6 +21,7 @@ const Admin: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [brandSettings, setBrandSettings] = useState<BrandSettings>({
     brandName: 'Tours',
+    contactName: '',
     phoneNumber: '+1 (809) 555-0123',
     paypalMeLink: 'https://www.paypal.com/paypalme/tours',
     verifoneLink: '',
@@ -64,30 +66,8 @@ const Admin: React.FC = () => {
   }, [locale]);
 
   return (
-    <div className="min-h-screen bg-paper-warm py-8">
+    <div className="min-h-screen bg-paper-warm py-6">
       <div className="container mx-auto space-y-8 px-4">
-        {/* Admin Navigation */}
-        <div className="rounded-3xl bg-paper-card p-4 md:p-6 shadow-lg">
-          <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full overflow-hidden bg-paper-warm ring-1 ring-slate-200">
-                {brandSettings.brandicon ? (
-                  <img
-                    src={brandSettings.brandicon}
-                    alt={`${brandSettings.brandName} logo`}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-ink-light text-xs uppercase tracking-[.2em]">
-                    Logo
-                  </div>
-                )}
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-ink">Panel de administración</h1>
-            </div>
-          </div>
-        </div>
-
         {/* Brand Settings Section */}
         {activeSection === 'brand' && (
           <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
@@ -156,16 +136,16 @@ const Admin: React.FC = () => {
                 />
                 <input
                   type="text"
-                  value={brandSettings.paypalMeLink}
-                  onChange={(event) => setBrandSettings({ ...brandSettings, paypalMeLink: event.target.value })}
-                  placeholder="Enlace de PayPal"
+                  value={brandSettings.contactName}
+                  onChange={(event) => setBrandSettings({ ...brandSettings, contactName: event.target.value })}
+                  placeholder="Nombre de la persona de contacto (WhatsApp)"
                   className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
                 />
                 <input
                   type="text"
-                  value={brandSettings.verifoneLink}
-                  onChange={(event) => setBrandSettings({ ...brandSettings, verifoneLink: event.target.value })}
-                  placeholder="Enlace de Verifone"
+                  value={brandSettings.paypalMeLink}
+                  onChange={(event) => setBrandSettings({ ...brandSettings, paypalMeLink: event.target.value })}
+                  placeholder="Enlace de PayPal"
                   className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
                 />
                 <div className="flex gap-3">
@@ -202,8 +182,8 @@ const Admin: React.FC = () => {
                 </div>
                 <p><strong>Negocio:</strong> {brandSettings.brandName}</p>
                 <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
+                <p><strong>Contacto:</strong> {brandSettings.contactName || '—'}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>
-                <p><strong>Verifone:</strong> {brandSettings.verifoneLink || '—'}</p>
                 <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-lagoon-dark px-5 py-2 font-semibold text-white">
                   Editar datos del negocio
                 </button>
@@ -233,10 +213,9 @@ const Admin: React.FC = () => {
             setServices={setTours}
             loadServices={loadTours}
             saveServices={(services) => saveTours(services, locale)}
-            locale={locale === 'en' ? 'en' : 'es'}
+            locale={locale}
+            loadTranslation={(to) => getTours(to, true)}
             saveTranslation={(services, to) => saveTours(services, to)}
-            siblingAdminPath="/admin/transport"
-            siblingAdminLabel="Ir a Transporte"
           />
         )}
 
@@ -244,6 +223,13 @@ const Admin: React.FC = () => {
         {activeSection === 'testimonials' && (
           <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
             <TestimonialsAdmin />
+          </div>
+        )}
+
+        {/* Menus, buttons and headings, per language */}
+        {activeSection === 'texts' && (
+          <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
+            <SiteTextsAdmin />
           </div>
         )}
 

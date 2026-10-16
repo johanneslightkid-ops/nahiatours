@@ -65,6 +65,14 @@ binding = "AI"
 # Until a namespace exists the site still works: reads fall back to the JSON
 # bundled at /data/*.json. Only admin writes and /api/init-data need KV.
 
+# Pinned, so every build binds this site's own namespace ("amigotours-data") —
+# including a build with no API token to resolve the title with, which would
+# otherwise deploy with no KV at all and the site would read its defaults.
+# scripts/provision-kv.mjs leaves a pinned binding alone.
+[[kv_namespaces]]
+binding = "DATA_KV_F"
+id = "03cc4cd848174de1bfdbd8009b9a3cc0"
+
 # ==============================================================================
 # Environment variables
 # ==============================================================================
