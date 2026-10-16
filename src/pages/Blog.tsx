@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { localeText } from '../lib/localeText';
 import { FormattedMessage } from 'react-intl';
 import { MdTour, MdEvent } from 'react-icons/md';
 import { useBrand } from '../contexts/BrandContext';
@@ -17,16 +18,18 @@ const Blog = () => {
 
   useEffect(() => {
     const pageTitle = `${locale === 'es' ? 'Blog' : 'Blog'} | ${brandSettings.brandName}`;
-    const pageDescription =
-      locale === 'es'
-        ? 'Blog de viajes y tours en Punta Cana. Descubre historias, tips de viaje y guías sobre excursiones en República Dominicana.'
-        : 'Travel and tour blog in Punta Cana. Discover travel stories, tips, and guides about excursions in the Dominican Republic.';
+    const pageDescription = localeText(locale, {
+      en: 'Travel and tour blog in Punta Cana. Discover travel stories, tips, and guides about excursions in the Dominican Republic.',
+      es: 'Blog de viajes y tours en Punta Cana. Descubre historias, tips de viaje y guías sobre excursiones en República Dominicana.',
+      de: 'Reise- und Ausflugsblog aus Punta Cana: Geschichten, Reisetipps und Ratgeber zu Ausflügen in der Dominikanischen Republik.',
+      fr: 'Blog voyage et excursions à Punta Cana : récits, conseils et guides pour vos excursions en République dominicaine.',
+    });
 
     generateBlogPageMeta(pageTitle, pageDescription, window.location.href);
 
     if (articles.length > 0) {
       generateBlogListStructuredData(
-        locale === 'es' ? 'Blog de Tours' : 'Blog',
+        localeText(locale, { en: 'Blog', es: 'Blog de Tours', de: 'Reiseblog', fr: 'Blog voyage' }),
         pageDescription,
         articles
       );

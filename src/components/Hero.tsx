@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { localeText } from '../lib/localeText';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
@@ -38,6 +39,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
   const { brandSettings } = useBrand();
   const { locale } = useI18n();
   const isEs = locale === 'es';
+  const say = (texts: { en: string; es: string; de: string; fr: string }) => localeText(locale, texts);
   const reduced = useReducedMotion();
   const heroMedia = brandSettings.heroMedia?.length === 3
     ? brandSettings.heroMedia
@@ -100,9 +102,9 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
     );
 
   const trustSignals = [
-    { icon: <HiShieldCheck className="h-4 w-4 text-jungle" />, label: isEs ? 'Equipo local con licencia' : 'Licensed local crew' },
-    { icon: <HiCheck className="h-4 w-4 text-lagoon-dark" />, label: isEs ? 'Reserva al instante por WhatsApp' : 'Instant WhatsApp booking' },
-    { icon: <HiCheck className="h-4 w-4 text-mango-dark" />, label: isEs ? 'Recogida en el hotel' : 'Hotel pick-up included' },
+    { icon: <HiShieldCheck className="h-4 w-4 text-jungle" />, label: say({ en: 'Licensed local crew', es: 'Equipo local con licencia', de: 'Lizenziertes lokales Team', fr: 'Équipe locale agréée' }) },
+    { icon: <HiCheck className="h-4 w-4 text-lagoon-dark" />, label: say({ en: 'Instant WhatsApp booking', es: 'Reserva al instante por WhatsApp', de: 'Sofort per WhatsApp buchen', fr: 'Réservation instantanée par WhatsApp' }) },
+    { icon: <HiCheck className="h-4 w-4 text-mango-dark" />, label: say({ en: 'Hotel pick-up included', es: 'Recogida en el hotel', de: 'Abholung am Hotel inklusive', fr: 'Prise en charge à l’hôtel incluse' }) },
   ];
 
   return (
@@ -141,7 +143,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
               </div>
 
               <div className="mb-2">
-                <span className="hand-note">{isEs ? '¡Hola, viajero!' : '¡Hola, traveller!'}</span>
+                <span className="hand-note">{say({ en: '¡Hola, traveller!', es: '¡Hola, viajero!', de: '¡Hola, Reisende!', fr: '¡Hola, voyageur !' })}</span>
               </div>
 
               <h1 className="mb-6 font-display text-[2.6rem] font-bold leading-[1.02] text-ink sm:text-6xl lg:text-[4.4rem]">
@@ -209,7 +211,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
               <svg viewBox="0 0 60 40" className="h-8 w-12 -scale-x-100" aria-hidden="true">
                 <path d="M4 30 C20 34 40 26 52 8 M52 8 L44 10 M52 8 L52 17" stroke="white" strokeWidth={2.4} fill="none" strokeLinecap="round" />
               </svg>
-              {isEs ? 'toca el agua' : 'touch the water'}
+              {say({ en: 'touch the water', es: 'toca el agua', de: 'berühr das Wasser', fr: 'touchez l’eau' })}
             </motion.div>
 
             <motion.div
@@ -224,7 +226,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
                 </div>
                 <div className="flex items-center justify-between gap-3 px-2 pb-1 pt-3">
                   <p className="font-accent text-xl leading-none text-lagoon-dark sm:text-2xl">
-                    {isEs ? 'Saludos desde Bávaro' : 'Greetings from Bávaro'}
+                    {say({ en: 'Greetings from Bávaro', es: 'Saludos desde Bávaro', de: 'Grüße aus Bávaro', fr: 'Bons baisers de Bávaro' })}
                   </p>
                   {ratingBadge && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-mango-light px-2.5 py-1.5 font-display text-[0.72rem] font-bold text-ink shadow-sm sm:text-sm">
@@ -246,7 +248,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
                 <div className="hero-media-window h-28 sm:h-36 lg:h-40">
                   {renderMedia(heroMedia[1], 'h-full w-full object-cover photo-pop')}
                 </div>
-                <p className="hero-polaroid-caption">{isEs ? 'sol + sal' : 'sun + salt'}</p>
+                <p className="hero-polaroid-caption">{say({ en: 'sun + salt', es: 'sol + sal', de: 'Sonne + Salz', fr: 'soleil + sel' })}</p>
               </div>
             </motion.div>
 
@@ -260,7 +262,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
                 <div className="hero-media-window h-24 sm:h-32 lg:h-36">
                   {renderMedia(heroMedia[2], 'h-full w-full object-cover photo-pop')}
                 </div>
-                <p className="hero-polaroid-caption">{isEs ? 'un recuerdo' : 'a keepsake'}</p>
+                <p className="hero-polaroid-caption">{say({ en: 'a keepsake', es: 'un recuerdo', de: 'ein Andenken', fr: 'un souvenir' })}</p>
               </div>
             </motion.div>
 
@@ -290,7 +292,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
           onMouseEnter={() => playHoverFx()}
           className="inline-flex items-center gap-2 rounded-leaf bg-paper-card/90 px-5 py-2 text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-ink no-underline shadow-ink"
         >
-          <span>{isEs ? 'Explora las excursiones' : 'Explore the excursions'}</span>
+          <span>{say({ en: 'Explore the excursions', es: 'Explora las excursiones', de: 'Ausflüge entdecken', fr: 'Découvrir les excursions' })}</span>
           <HiArrowDown className="h-4 w-4 animate-bounce" />
         </a>
       </div>

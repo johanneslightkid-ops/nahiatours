@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { localeTag } from '../lib/localeText';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
@@ -39,7 +40,7 @@ const TourCard: React.FC<TourCardProps> = ({
   const { brandSettings } = useBrand();
   const brandName = brandSettings.brandName;
   const swayClass = `animate-wave-sway-${(index % 10) + 1}`;
-  const locale = intl.locale === 'es' ? 'es' : 'en';
+  const locale = (['es', 'de', 'fr'].includes(intl.locale) ? intl.locale : 'en') as 'en' | 'es' | 'de' | 'fr';
 
   // Everyone pays the same rate, so a tour has exactly one price and the only
   // thing to ask for is how many people are coming.
@@ -55,7 +56,7 @@ const TourCard: React.FC<TourCardProps> = ({
   const totalAmount = useMemo(() => (rate.amount ?? 0) * persons, [rate.amount, persons]);
 
   const formattedSelectedDate = selectedDate
-    ? new Intl.DateTimeFormat(intl.locale === 'es' ? 'es-DO' : 'en-US', {
+    ? new Intl.DateTimeFormat(localeTag(intl.locale), {
       dateStyle: 'full',
     }).format(new Date(`${selectedDate}T00:00:00`))
     : '';

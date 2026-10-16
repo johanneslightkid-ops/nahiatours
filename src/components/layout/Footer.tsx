@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { localeText } from '../../lib/localeText';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { MdAdminPanelSettings } from 'react-icons/md';
@@ -96,7 +97,7 @@ const Footer = () => {
                 <FormattedMessage id="footer.description" />
               </p>
               <p className="mt-4 font-accent text-2xl text-lagoon-light">
-                {locale === 'es' ? 'desde la playa de El Cortecito' : 'from the beach at El Cortecito'}
+                {localeText(locale, { en: 'from the beach at El Cortecito', es: 'desde la playa de El Cortecito', de: 'vom Strand in El Cortecito', fr: 'depuis la plage d’El Cortecito' })}
               </p>
 
               {socialAccounts.length > 0 && (

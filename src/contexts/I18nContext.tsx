@@ -9,9 +9,13 @@ import { apiGet } from '../services/apiClient';
 export type Locale = 'en' | 'es' | 'fr' | 'de';
 /** The languages this site offers. The admin translates into these and no others. */
 export const SUPPORTED_LOCALES: readonly Locale[] = ['en', 'es', 'fr', 'de'];
-/** Content records are presently maintained in English and Spanish only. */
-export type ContentLocale = 'en' | 'es';
-export const getContentLocale = (locale: Locale): ContentLocale => (locale === 'es' ? 'es' : 'en');
+/**
+ * Which language's content records to read. Tours, blog, story and transport
+ * services are kept in all four languages on this site, so it is the reader's
+ * own; the services fall back to the bundled copy when a stored one is absent.
+ */
+export type ContentLocale = Locale;
+export const getContentLocale = (locale: Locale): ContentLocale => locale;
 
 interface I18nContextType {
   locale: Locale;

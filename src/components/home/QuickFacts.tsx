@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { localeText } from '../../lib/localeText';
 import { motion } from 'framer-motion';
 import { usePlanner } from '../../contexts/PlannerContext';
 import { useI18n } from '../../contexts/I18nContext';
@@ -23,6 +24,7 @@ const QuickFacts: React.FC = () => {
   const { locale } = useI18n();
   const { brandSettings } = useBrand();
   const isEs = locale === 'es';
+  const say = (texts: { en: string; es: string; de: string; fr: string }) => localeText(locale, texts);
   const [ratingValue, setRatingValue] = useState<string>('—');
 
   useEffect(() => {
@@ -46,7 +48,7 @@ const QuickFacts: React.FC = () => {
 
   const ratingFact = {
     value: ratingValue,
-    label: isEs ? 'valoración media' : 'average guest rating',
+    label: say({ en: 'average guest rating', es: 'valoración media', de: 'durchschnittliche Gästebewertung', fr: 'note moyenne des voyageurs' }),
     art: <Starfish className="h-11 w-11" />,
     tone: 'from-[#E3FBF7] to-[#93ECE1]',
   };
@@ -54,20 +56,20 @@ const QuickFacts: React.FC = () => {
   const facts = [
     {
       value: catalogue.length > 0 ? String(catalogue.length) : '—',
-      label: isEs ? 'excursiones seleccionadas' : 'curated excursions',
+      label: say({ en: 'curated excursions', es: 'excursiones seleccionadas', de: 'ausgewählte Ausflüge', fr: 'excursions sélectionnées' }),
       art: <Sailboat className="h-12 w-12" />,
       tone: 'from-[#FFF1CF] to-[#FFD47E]',
     },
     ...(ratingValue !== '—' ? [ratingFact] : []),
     {
       value: '24/7',
-      label: isEs ? 'respuesta por WhatsApp' : 'WhatsApp response',
+      label: say({ en: 'WhatsApp response', es: 'respuesta por WhatsApp', de: 'Antwort per WhatsApp', fr: 'réponse sur WhatsApp' }),
       art: <Cocktail className="h-11 w-11" />,
       tone: 'from-[#FFE9E4] to-[#FFB1A6]',
     },
     {
-      value: isEs ? 'Incluido' : 'Included',
-      label: isEs ? 'recogida en el hotel' : 'hotel pick-up & drop-off',
+      value: say({ en: 'Included', es: 'Incluido', de: 'Inklusive', fr: 'Inclus' }),
+      label: say({ en: 'hotel pick-up & drop-off', es: 'recogida en el hotel', de: 'Abholung & Rückfahrt zum Hotel', fr: 'aller-retour depuis l’hôtel' }),
       art: <Hibiscus className="h-11 w-11" />,
       tone: 'from-[#EDF8E6] to-[#A3DB93]',
     },

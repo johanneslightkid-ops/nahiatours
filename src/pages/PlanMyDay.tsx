@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { localeText } from '../lib/localeText';
 import { motion } from 'framer-motion';
 import { usePlanner } from '../contexts/PlannerContext';
 import { usePlannerCopy } from '../planner/usePlannerCopy';
@@ -18,10 +19,12 @@ const PlanMyDay: React.FC = () => {
 
   useEffect(() => {
     const previous = document.title;
-    document.title =
-      locale === 'es'
-        ? 'Planea mi Día · Excursiones en Punta Cana'
-        : 'Plan My Day · Punta Cana Excursions';
+    document.title = localeText(locale, {
+      en: 'Plan My Day · Punta Cana Excursions',
+      es: 'Planea mi Día · Excursiones en Punta Cana',
+      de: 'Meinen Tag planen · Ausflüge in Punta Cana',
+      fr: 'Planifier ma journée · Excursions à Punta Cana',
+    });
     return () => {
       document.title = previous;
     };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { localeText } from '../lib/localeText';
 import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import Hero from '../components/Hero';
@@ -64,10 +65,13 @@ const Home: React.FC = () => {
     }
 
     generateBlogListStructuredData(
-      locale === 'es' ? 'Blog de Tours' : 'Blog',
-      locale === 'es'
-        ? 'Entradas del blog de viajes en Punta Cana para SEO y motores de búsqueda.'
-        : 'Punta Cana travel blog entries for SEO and search engines.',
+      localeText(locale, { en: 'Blog', es: 'Blog de Tours', de: 'Reiseblog', fr: 'Blog voyage' }),
+      localeText(locale, {
+        en: 'Punta Cana travel blog entries for SEO and search engines.',
+        es: 'Entradas del blog de viajes en Punta Cana para SEO y motores de búsqueda.',
+        de: 'Beiträge aus dem Reiseblog über Punta Cana.',
+        fr: 'Articles du blog voyage sur Punta Cana.',
+      }),
       seoArticles
     );
 
@@ -240,7 +244,7 @@ const Home: React.FC = () => {
             <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
               Your adventure is just one click away. Contact us on WhatsApp or choose your adventure below.
             </p>
-            <p className="mb-6 font-accent text-xl text-white/80">{locale === 'es' ? 'mueve el sol con el cursor' : 'move the sun with your pointer'}</p>
+            <p className="mb-6 font-accent text-xl text-white/80">{localeText(locale, { en: 'move the sun with your pointer', es: 'mueve el sol con el cursor', de: 'bewege die Sonne mit dem Zeiger', fr: 'déplacez le soleil avec le curseur' })}</p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <button
                 onMouseEnter={() => playHoverFx()}
