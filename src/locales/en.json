@@ -198,7 +198,9 @@
     "trustPrivateTitle": "Private, door to door",
     "trustPrivateText": "Only your group on board, from the terminal to your hotel door.",
     "trustKidsTitle": "Kids welcome",
-    "trustKidsText": "Child seats on request — just add them under Extras."
+    "trustKidsText": "Child seats on request — just add them under Extras.",
+    "maxForVehicle": "Up to {max} passengers in this vehicle",
+    "includedInTotal": "included"
   },
   "details": {
     "view": "View details",

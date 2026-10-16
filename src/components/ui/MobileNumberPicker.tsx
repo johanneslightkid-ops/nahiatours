@@ -78,7 +78,7 @@ const MobileNumberPicker: React.FC<Props> = ({
 
             {max !== undefined && max <= 10 && (
               <div className="mb-6 grid grid-cols-5 gap-2">
-                {Array.from({ length: Math.min(10, (max ?? 10) + 1) }, (_, i) => i).map((num) => (
+                {Array.from({ length: Math.min(10, (max ?? 10) - (min ?? 0) + 1) }, (_, i) => (min ?? 0) + i).map((num) => (
                   <button
                     key={num}
                     onClick={() => {

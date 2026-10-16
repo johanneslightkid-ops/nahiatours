@@ -198,7 +198,9 @@
     "trustPrivateTitle": "Privé, de porte à porte",
     "trustPrivateText": "Seulement votre groupe à bord, du terminal à la porte de l’hôtel.",
     "trustKidsTitle": "Enfants bienvenus",
-    "trustKidsText": "Sièges enfant sur demande — ajoutez-les dans Extras."
+    "trustKidsText": "Sièges enfant sur demande — ajoutez-les dans Extras.",
+    "maxForVehicle": "Jusqu’à {max} passagers dans ce véhicule",
+    "includedInTotal": "inclus"
   },
   "details": {
     "view": "Voir les détails",

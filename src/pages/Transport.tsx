@@ -182,15 +182,31 @@ const Transport: React.FC = () => {
   );
   const selectedVehicleText = selectedVehicle ? vehicleText(selectedVehicle, locale) : null;
 
-  const handlePassengerChange = useCallback((value: number | null) => {
-    setForm((prev) => ({ ...prev, passengers: Math.max(1, Math.min(100, value ?? 1)) }));
-  }, []);
+  // No more passengers than the chosen vehicle seats.
+  const maxPassengers = Math.max(1, selectedVehicle?.maxPassengers ?? 100);
 
+  const handlePassengerChange = useCallback(
+    (value: number | null) => {
+      setForm((prev) => ({ ...prev, passengers: Math.max(1, Math.min(maxPassengers, value ?? 1)) }));
+    },
+    [maxPassengers]
+  );
+
+  // Choosing a smaller vehicle winds the count down to what it seats — also
+  // when the vehicle list arrives or the admin lowers a capacity.
+  useEffect(() => {
+    if (form.passengers > maxPassengers) {
+      setForm((prev) => ({ ...prev, passengers: maxPassengers }));
+    }
+  }, [form.passengers, maxPassengers]);
+
+  // The same rule as the pricing engine (passengers >= threshold), so the
+  // warning never disagrees with the price.
   const needsTwoVehicles = useMemo(() => {
     if (!selectedVehicle) return false;
     const threshold = selectedVehicle.passengerThreshold ?? selectedVehicle.maxPassengers + 1;
-    return form.passengers > threshold;
-  }, [selectedVehicle, form.passengers]);
+    return Math.min(form.passengers, maxPassengers) >= threshold;
+  }, [selectedVehicle, form.passengers, maxPassengers]);
 
   const waPhone = useMemo(() => digitsOnly(brandSettings.phoneNumber || ''), [brandSettings.phoneNumber]);
 
@@ -471,11 +487,16 @@ const Transport: React.FC = () => {
                     value={form.passengers}
                     onChange={handlePassengerChange}
                     min={1}
-                    max={100}
+                    max={maxPassengers}
                     step={1}
                     label={t('passengers', 'Passengers')}
                     ariaLabel={t('passengers', 'Passengers')}
                   />
+                  {selectedVehicle && (
+                    <p className="mt-1.5 text-xs text-ink-light">
+                      {t('maxForVehicle', 'Up to {max} passengers in this vehicle', { max: maxPassengers })}
+                    </p>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" role="radiogroup" aria-label={t('vehicleType', 'Vehicle Type')}>
                   {config.vehicleTypes.map((vt) => {
@@ -488,7 +509,13 @@ const Transport: React.FC = () => {
                         type="button"
                         role="radio"
                         aria-checked={active}
-                        onClick={() => setForm((prev) => ({ ...prev, vehicleKey: vt.key }))}
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            vehicleKey: vt.key,
+                            passengers: Math.min(prev.passengers, Math.max(1, vt.maxPassengers)),
+                          }))
+                        }
                         className={`transfer-vehicle ${active ? 'transfer-vehicle-active' : ''}`}
                       >
                         <span className="transfer-vehicle-photo">
@@ -668,28 +695,16 @@ const Transport: React.FC = () => {
                           <span>🕒 {t('duration', 'Estimated travel time')}</span>
                           <span className="font-semibold text-ink">{formatDuration(priceResult.durationMinutes)}</span>
                         </li>
-                        {priceResult.breakdown.municipioMultiplierApplied && priceResult.breakdown.municipioMultiplierApplied !== 1 && (
-                          <li className="flex justify-between gap-3">
-                            <span>🏘️ {t('municipioMultiplier', 'Municipio multiplier')}</span>
-                            <span className="font-semibold text-ink">{priceResult.breakdown.municipioMultiplierApplied.toFixed(2)}×</span>
-                          </li>
-                        )}
                         {form.nightTransfer && (
                           <li className="flex justify-between gap-3">
                             <span>🌙 {t('nightFee', 'Night fee')}</span>
-                            <span className="font-semibold text-ink">+{nightPercent}%</span>
-                          </li>
-                        )}
-                        {priceResult.breakdown.distanceDiscountPercent > 0 && (
-                          <li className="flex justify-between gap-3 text-lagoon-dark">
-                            <span>🏷️ {t('distanceDiscount', 'Distance discount')}</span>
-                            <span className="font-semibold">−{Math.round(priceResult.breakdown.distanceDiscountPercent)}%</span>
+                            <span className="font-semibold text-ink">{t('includedInTotal', 'included')}</span>
                           </li>
                         )}
                         {needsTwoVehicles && (
                           <li className="flex justify-between gap-3 text-mango-dark">
                             <span>🚐🚐 {t('doubleVehicle', 'Double vehicle')}</span>
-                            <span className="font-semibold">×2</span>
+                            <span className="font-semibold">{t('includedInTotal', 'included')}</span>
                           </li>
                         )}
                       </ul>
