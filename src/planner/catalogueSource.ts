@@ -10,7 +10,7 @@ import { getServiceSlug, getTours, Tour } from '../services/toursService';
 import { matchTourProfile } from './tourProfiles';
 import type { CatalogueEntry } from './types';
 
-type Locale = 'en' | 'es';
+type Locale = 'en' | 'es' | 'de' | 'fr';
 
 interface RawTour {
   title?: string;

@@ -3,7 +3,7 @@ import introStoryEs from '../data/introStory.es.json';
 import { getStoryElements, StoryElementsData, StoryElement } from './storyElementsService';
 import { apiGet } from './apiClient';
 
-export type JourneyLocale = 'en' | 'es';
+export type JourneyLocale = 'en' | 'es' | 'de' | 'fr';
 
 export interface AdventureStory {
   id: string;
@@ -46,6 +46,8 @@ export interface StoryData {
 const fallbackStoryByLocale: Record<JourneyLocale, StoryData> = {
   en: introStoryEn as StoryData,
   es: introStoryEs as StoryData,
+  de: introStoryEn as StoryData,
+  fr: introStoryEn as StoryData,
 };
 
 const unwrapJsonBinRecord = (payload: unknown): unknown => {

@@ -4,13 +4,15 @@ import { DEFAULT_MUNICIPIO_MULTIPLIERS } from '../data/municipioPriceMultipliers
 import { apiGet, apiPut } from './apiClient';
 import { getAdminPassword } from './authStore';
 
-export async function getTransferConfig(): Promise<TransferConfig> {
+/** `strict`: throw when it cannot be read, for callers that write it back — never save the defaults over it. */
+export async function getTransferConfig(strict = false): Promise<TransferConfig> {
   try {
     const data = await apiGet<unknown>('transfer-config');
     const record = (data as Record<string, unknown>)?.record ?? data;
     const merged = mergeConfigWithDefaults(record as Partial<TransferConfig>);
     return ensureDistanceDiscountFields(merged);
   } catch (error) {
+    if (strict) throw error;
     console.error('Failed to fetch transfer config:', error);
     return {
       ...DEFAULT_TRANSFER_CONFIG,
@@ -165,3 +167,15 @@ export async function updateMunicipioPriceMultipliers(config: TransferConfig, ne
   await saveTransferConfig(updated);
   return updated;
 }
+
+/** A vehicle's name and description in the reader's language, falling back to the base text. */
+export const vehicleText = (
+  vehicle: { label: string; description: string; translations?: Partial<Record<string, { label?: string; description?: string }>> },
+  locale: string
+): { label: string; description: string } => {
+  const translated = vehicle.translations?.[locale];
+  return {
+    label: translated?.label?.trim() || vehicle.label,
+    description: translated?.description?.trim() || vehicle.description,
+  };
+};
