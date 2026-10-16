@@ -1,0 +1,26 @@
+# Read-only: looks for surviving copies of nahia.tours's brand record across
+# every KV namespace on the account. Never writes to KV and deploys nothing.
+name: KV brand hunt
+
+on:
+  push:
+    branches: [claude/eager-edison-peyvhu]
+    paths: [.github/workflows/kv-brand-hunt.yml, scripts/kv-brand-hunt.mjs]
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/kv-brand-hunt.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kv-brand-hunt
+          path: kv-brand-hunt
+          retention-days: 30
