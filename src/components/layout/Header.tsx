@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminNav from './AdminNav';
+import { showsBrandName } from '../../lib/brandDisplay';
 import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
@@ -103,11 +104,15 @@ const Header: React.FC = () => {
               <img src="/competitor-logo.svg" alt="Logo" className="h-[4.9rem] w-[4.9rem] sm:h-[7.875rem] sm:w-[7.875rem]" />
             )}
           </div>
-          <h1 className={`relative hidden font-display text-[1.7rem] font-bold tracking-tight text-ink transition-all duration-500 group-hover:text-coral-dark sm:block ${
-              isScrolled ? 'sm:ml-0 lg:ml-[4.75rem]' : 'sm:ml-[10.75rem] lg:ml-[11.5rem]'
-            }`}>
-            {brandSettings.brandName}
-          </h1>
+          {showsBrandName(brandSettings) ? (
+            <h1 className={`relative hidden font-display text-[1.7rem] font-bold tracking-tight text-ink transition-all duration-500 group-hover:text-coral-dark sm:block ${
+                isScrolled ? 'sm:ml-0 lg:ml-[4.75rem]' : 'sm:ml-[10.75rem] lg:ml-[11.5rem]'
+              }`}>
+              {brandSettings.brandName}
+            </h1>
+          ) : (
+            <span className="sr-only">{brandSettings.brandName}</span>
+          )}
         </Link>
 
         <button
