@@ -82,9 +82,13 @@ binding = "AI"
 # Note this is a Worker, so wrangler.toml is the source of truth for bindings —
 # a binding added in the dashboard is overwritten by the next deploy.
 #
-# [[kv_namespaces]]
-# binding = "DATA_KV_F"
-# id = "<namespace id>"
+# Pinned to elcortecito-data. Not resolved by title: the Worker's Cloudflare
+# git build has no KV_NAMESPACE_TITLE, and the script's default title is
+# nahiatours-data, so every such build bound El Cortecito to nahia.tours's
+# data and its admin wrote there. A literal id cannot resolve wrongly.
+[[kv_namespaces]]
+binding = "DATA_KV_F"
+id = "5026f24391e24f13b76f5e4918d6d72d"
 
 # ==============================================================================
 # Environment variables

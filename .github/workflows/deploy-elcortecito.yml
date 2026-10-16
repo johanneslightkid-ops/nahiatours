@@ -250,7 +250,11 @@ jobs:
       - name: Show the resolved KV binding
         run: |
           echo "wrangler.toml KV binding after the build:"
-          sed -n '/managed by scripts\/provision-kv/,/<<< managed/p' wrangler.toml
+          grep -n -A2 '^\[\[kv_namespaces\]\]' wrangler.toml
+          if ! grep -q 'id = "5026f24391e24f13b76f5e4918d6d72d"' wrangler.toml || [ "$(grep -c '^\[\[kv_namespaces\]\]' wrangler.toml)" != 1 ]; then
+            echo "::error::DATA_KV_F must be bound once, to elcortecito-data. Refusing to deploy."
+            exit 1
+          fi
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
