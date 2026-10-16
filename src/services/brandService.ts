@@ -62,6 +62,11 @@ export interface BrandSettings {
   heroRatingEnabled?: boolean;
   /** Range in stars that counts as a passing guest rating for the banner. */
   heroRatingRange?: HeroRatingRange;
+  /**
+   * The company name beside the logo in the navigation bar. Unset means the
+   * site's own default (src/config/siteDefaults.ts, read via lib/brandDisplay).
+   */
+  showBrandName?: boolean;
 }
 
 /**
@@ -157,6 +162,7 @@ const normalizeBrandSettings = (input: Partial<BrandSettings> | null | undefined
   heroMedia: normalizeHeroMedia(input?.heroMedia),
   heroRatingEnabled: typeof input?.heroRatingEnabled === 'boolean' ? input.heroRatingEnabled : true,
   heroRatingRange: normalizeHeroRatingRange(input?.heroRatingRange),
+  ...(typeof input?.showBrandName === 'boolean' ? { showBrandName: input.showBrandName } : {}),
 });
 
 export const getBrandSettings = async (): Promise<BrandSettings> => {

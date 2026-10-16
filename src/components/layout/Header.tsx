@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminNav from './AdminNav';
+import { showsBrandName } from '../../lib/brandDisplay';
 import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
@@ -71,9 +72,13 @@ const Header: React.FC = () => {
             )}
           </span>
           <span className="block">
-            <span className="block font-display text-lg leading-none text-ink transition group-hover:text-lagoon-dark sm:text-xl">
-              {brandSettings.brandName}
-            </span>
+            {showsBrandName(brandSettings) ? (
+              <span className="block font-display text-lg leading-none text-ink transition group-hover:text-lagoon-dark sm:text-xl">
+                {brandSettings.brandName}
+              </span>
+            ) : (
+              <span className="sr-only">{brandSettings.brandName}</span>
+            )}
             {/* The place is part of the promise, so it stays on the phone too
                 — a family searching from a hotel room wants to see "Bávaro". */}
             <span className="mt-1 block text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-ink-light sm:text-[0.68rem] sm:tracking-[0.16em]">
