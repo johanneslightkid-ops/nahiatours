@@ -113,6 +113,17 @@ const buildResourceKey = (resource: string, locale?: string) => {
  */
 const EMPTY_WHEN_UNSET = new Set(['social-api-settings', 'ai-settings', 'payment-config-public']);
 
+/** Content that is better read in English than not at all. */
+const FALLBACK_TO_ENGLISH = new Set([
+  'tours',
+  'transport-services',
+  'example-tours',
+  'blog',
+  'story-elements',
+  'intro-story',
+  'story-nodes',
+]);
+
 const createErrorResponse = (message: string, status = 400) =>
   new Response(JSON.stringify({ error: message }), {
     status,
@@ -296,7 +307,24 @@ export async function onRequest(context: { request: Request; env: Record<string,
 
   try {
     if (request.method === 'GET') {
-      const data = await loadStoredData(key, env, request.url);
+      let data = await loadStoredData(key, env, request.url);
+      let source = 'stored';
+      // A content record a site has not been given in German or French yet is
+      // served in English, so those readers see the catalogue rather than an
+      // empty page. Admin reads that write back ask for the exact record
+      // (?exact=1), so the translation tools still see what is missing. Site
+      // texts are left out on purpose: English overrides would cover the
+      // bundled German and French interface text.
+      if (
+        (data === null || data === undefined) &&
+        (locale === 'fr' || locale === 'de') &&
+        FALLBACK_TO_ENGLISH.has(resource.trim().toLowerCase()) &&
+        url.searchParams.get('exact') !== '1'
+      ) {
+        const englishKey = buildResourceKey(resource, 'en');
+        data = englishKey ? await loadStoredData(englishKey, env, request.url) : null;
+        source = 'english-fallback';
+      }
       if (data === null || data === undefined) {
         if (EMPTY_WHEN_UNSET.has(key)) {
           return new Response('{}', {
@@ -308,7 +336,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
       }
       return new Response(JSON.stringify(data), {
         status: 200,
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' },
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60', 'X-Data-Source': source },
       });
     }
 

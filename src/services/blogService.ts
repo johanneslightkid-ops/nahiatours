@@ -1,4 +1,4 @@
-import { apiGet, apiPut } from './apiClient';
+import { ApiError, apiGet, apiPut } from './apiClient';
 
 export type Locale = 'en' | 'es' | 'de' | 'fr';
 
@@ -144,11 +144,13 @@ const extractRecord = (data: unknown): unknown[] => {
 
 const fetchRawBlogArticles = async (locale: Locale, strict = false): Promise<unknown[]> => {
   try {
-    const data = await apiGet<unknown[]>('blog', { locale });
+    const data = await apiGet<unknown[]>('blog', strict ? { locale, exact: 1 } : { locale });
     return extractRecord(data);
   } catch (error) {
     // Every write below reads the list, changes one post and puts the list
     // back. Reading "nothing" after a failed fetch would put back one post.
+    // A language with no blog yet really is empty, though.
+    if (strict && error instanceof ApiError && error.status === 404) return [];
     if (strict) throw error;
     console.warn('[Blog] API fetch failed:', error);
     return [];

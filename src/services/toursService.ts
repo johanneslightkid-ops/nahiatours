@@ -1,7 +1,7 @@
 import { tours as staticTours } from '../data/tours';
 import { transportServices as staticTransportServices } from '../data/transportServices';
 import type { TransferRoute } from '../types/transport';
-import { apiGet, apiPut } from './apiClient';
+import { ApiError, apiGet, apiPut } from './apiClient';
 import { getAdminPassword } from './authStore';
 
 export type Locale = 'en' | 'es' | 'de' | 'fr';
@@ -186,11 +186,15 @@ const fetchServices = async (
   strict = false
 ): Promise<Tour[]> => {
   try {
-    const data = await apiGet<unknown>(resource, { locale });
+    // `exact`: a list that is about to be written back must be this
+    // language's own, never the English one served in its place.
+    const data = await apiGet<unknown>(resource, strict ? { locale, exact: 1 } : { locale });
     return normalizeServices((data as Record<string, unknown>)?.record ?? data, fallback, category, locale);
   } catch (error) {
     // A list that is about to be written back must not be an empty stand-in
-    // for one that failed to load, or the save would wipe the real one.
+    // for one that failed to load, or the save would wipe the real one. A
+    // language that has no list yet is the exception: it really is empty.
+    if (strict && error instanceof ApiError && error.status === 404) return [];
     if (strict) throw error;
     console.error(`Failed to fetch services for ${resource}:`, error);
     return allowFallback ? fallback : [];

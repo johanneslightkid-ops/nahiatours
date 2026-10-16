@@ -1,4 +1,4 @@
-import { apiGet, apiPut } from './apiClient';
+import { ApiError, apiGet, apiPut } from './apiClient';
 import { JourneyLocale } from './introStoryService';
 import { getAdminPassword } from './authStore';
 
@@ -110,11 +110,13 @@ export const getStoryElements = async (
   strict = false
 ): Promise<StoryElementsData | null> => {
   try {
-    const response = await apiGet<unknown>('story-elements', { locale });
+    const response = await apiGet<unknown>('story-elements', strict ? { locale, exact: 1 } : { locale });
     const payload = unwrapRecord(response);
     return isStoryElementsData(payload) ? normalizeElements(payload) : null;
   } catch (error) {
-    // `strict` is for callers that write the story back: null would read as "empty".
+    // `strict` is for callers that write the story back: null would read as
+    // "empty" — which is exactly right for a language that has none yet.
+    if (strict && error instanceof ApiError && error.status === 404) return null;
     if (strict) throw error;
     console.warn(`Failed to fetch ${locale} story elements:`, error);
     return null;
