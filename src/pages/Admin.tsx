@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { getBrandSettings, saveBrandSettings, BrandSettings, uploadBrandIcon } from '../services/brandService';
+import { showsBrandName } from '../lib/brandDisplay';
 import BrandIconEditor from '../components/admin/BrandIconEditor';
 import { getTours, saveTours, Tour } from '../services/toursService';
 import { useI18n } from '../contexts/I18nContext';
@@ -127,6 +128,15 @@ const Admin: React.FC = () => {
                   placeholder="Nombre del negocio"
                   className="rounded-2xl border border-ink/15 px-4 py-3"
                 />
+                <label className="flex items-center gap-3 rounded-2xl border border-ink/15 px-4 py-3 text-sm font-semibold text-ink-soft md:col-span-2">
+                  <input
+                    type="checkbox"
+                    checked={showsBrandName(brandSettings)}
+                    onChange={(event) => setBrandSettings({ ...brandSettings, showBrandName: event.target.checked })}
+                    className="h-4 w-4"
+                  />
+                  Mostrar el nombre del negocio junto al logo, en la barra de navegación
+                </label>
                 <input
                   type="text"
                   value={brandSettings.phoneNumber}
@@ -181,6 +191,7 @@ const Admin: React.FC = () => {
                   <span className="text-sm font-semibold text-ink-soft">Icono del menú, arriba a la izquierda</span>
                 </div>
                 <p><strong>Negocio:</strong> {brandSettings.brandName}</p>
+                <p><strong>Nombre junto al logo:</strong> {showsBrandName(brandSettings) ? 'visible' : 'oculto'}</p>
                 <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
                 <p><strong>Contacto:</strong> {brandSettings.contactName || '—'}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>
