@@ -1,0 +1,32 @@
+# Restores nahiatours-data and elcortecito-data as scripts/kv-restore.mjs
+# describes. Takes a full snapshot artifact first. Dry run unless the env
+# below says otherwise. Never deletes a key, deploys nothing.
+name: KV restore
+
+on:
+  push:
+    branches: [claude/keen-fermat-k1zrts]
+    paths: [.github/workflows/kv-restore.yml, scripts/kv-restore.mjs]
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      KV_SNAPSHOT_TITLES: nahiatours-data,elcortecito-data,beautiful-tours-data
+      KV_RESTORE_APPLY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Back up first
+        run: node scripts/kv-snapshot.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kv-backup-before-restore
+          path: kv-snapshot
+          retention-days: 90
+      - name: Restore
+        run: node scripts/kv-restore.mjs
