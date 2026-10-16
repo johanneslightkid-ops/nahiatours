@@ -187,7 +187,7 @@
     "date": "Datum",
     "selectBoth": "Wähle Abholort und Ziel — genaue Orte ergeben den besten Preis.",
     "payNow": "Jetzt buchen & bezahlen",
-    "payHint": "Bezahle per Karte, AZUL oder CardNET auf der sicheren Seite von Stripe oder der Bank — Kartendaten berühren diese Seite nie.",
+    "payHint": "Sicher online mit Karte bezahlen — die Kartendaten gibst du auf einer sicheren Zahlungsseite ein, nie auf dieser Seite.",
     "mobilePrompt": "Wähle deine Route",
     "mobileCta": "Buchen",
     "mobileSee": "Zum Pass",

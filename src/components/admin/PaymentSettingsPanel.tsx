@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { FaCreditCard, FaCheck, FaLock, FaUniversity, FaFlask } from 'react-icons/fa';
-import { BrandSettings, PaymentVisibility, saveBrandSettings } from '../../services/brandService';
+import { FaCreditCard, FaCheck, FaLock, FaUniversity, FaFlask, FaLink } from 'react-icons/fa';
+import { BrandSettings, saveBrandSettings } from '../../services/brandService';
 import {
   getPaymentConfigStatus,
   savePaymentConfig,
@@ -8,9 +8,12 @@ import {
   PaymentConfigPatch,
   GatewayMode,
   LocalCurrency,
+  CardProcessor,
+  CardProcessorChoice,
 } from '../../services/paymentService';
 import {
   getPaymentMethodStates,
+  withPaymentMethodEnabled,
   PaymentMethodId,
   PAYMENT_METHOD_IDS,
 } from '../../utils/paymentMethods';
@@ -21,17 +24,9 @@ interface PaymentSettingsPanelProps {
 }
 
 const METHOD_LABELS: Record<PaymentMethodId, { name: string; requirement: string }> = {
-  stripe: {
-    name: 'Tarjeta de crédito / débito (Stripe)',
-    requirement: 'Necesita "Aceptar tarjetas" más una clave secreta de Stripe o un enlace de pago',
-  },
-  azul: {
-    name: 'AZUL · Banco Popular',
-    requirement: 'Necesita las credenciales de la Página de Pagos AZUL o un Link de Pagos AZUL',
-  },
-  cardnet: {
-    name: 'CardNET',
-    requirement: 'Necesita los datos de afiliado de CardNET o un Enlace de Pago de CardNET',
+  card: {
+    name: 'Tarjeta de crédito / débito',
+    requirement: 'Necesita "Aceptar tarjetas" y un procesador configurado (o un enlace de pago)',
   },
   paypal: {
     name: 'PayPal',
@@ -41,6 +36,12 @@ const METHOD_LABELS: Record<PaymentMethodId, { name: string; requirement: string
     name: 'Concierge / efectivo por WhatsApp',
     requirement: 'Necesita un número de teléfono',
   },
+};
+
+const PROCESSOR_NAMES: Record<CardProcessor, string> = {
+  stripe: 'Stripe',
+  azul: 'AZUL · Banco Popular',
+  cardnet: 'CardNET',
 };
 
 /** CardNET publishes these for its certification lab. They only work in test mode. */
@@ -87,39 +88,36 @@ const draftFrom = (status: PaymentConfigStatus): BankDraft => ({
   cardnetCurrency: status.cardnet.currency,
 });
 
+type Notice = { kind: 'ok' | 'error'; text: string } | null;
+
 /**
  * Payment settings.
  *
+ * A guest pays BY CARD and never learns who processes it. Which processor that
+ * is — Stripe, AZUL (Banco Popular) or CardNET — is decided here, and only
+ * here: "Procesador de tarjetas" picks it, and each processor's credentials
+ * sit underneath. "Automático" uses the first one that is fully configured.
+ * With no processor configured, a payment link pasted from a processor's
+ * portal still lets guests pay; put {amount} in it if the link accepts one.
+ *
  * The secret keys are WRITE-ONLY here. This panel is told whether a key is on
  * file and whether it is live or test; it is never sent the key, and there is
- * no endpoint that would send it. That is the difference from the fork this
- * was ported from, where the key lived in the brand record and went out to
- * every visitor with it.
- *
- * AZUL and CARDNET work two ways, and either is enough:
- *
- *   - With merchant credentials, the exact amount of each booking travels to
- *     the bank's own payment page — a transfer quote is charged to the cent.
- *   - With only a payment link copied from the bank's portal, the guest is sent
- *     to that link. Put {amount} in it if the bank's link accepts one; if not,
- *     the guest is shown the amount to enter.
+ * no endpoint that would send it.
  *
  * Visibility is two switches deep on purpose. A method is only offered to
  * guests when it is configured AND left switched on, so turning something off
  * for a week does not mean deleting the credentials for it.
  */
-const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
-  brandSettings,
-  setBrandSettings,
-}) => {
+const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettings, setBrandSettings }) => {
   const [status, setStatus] = useState<PaymentConfigStatus | null>(null);
   const [secretDraft, setSecretDraft] = useState('');
   const [currencyDraft, setCurrencyDraft] = useState('');
   const [bank, setBank] = useState<BankDraft | null>(null);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
-  const [bankMessage, setBankMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
-  const [brandMessage, setBrandMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+  const [processorMessage, setProcessorMessage] = useState<Notice>(null);
+  const [message, setMessage] = useState<Notice>(null);
+  const [bankMessage, setBankMessage] = useState<Notice>(null);
+  const [brandMessage, setBrandMessage] = useState<Notice>(null);
 
   useEffect(() => {
     getPaymentConfigStatus()
@@ -133,60 +131,61 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
       );
   }, []);
 
-  const methods = getPaymentMethodStates(brandSettings, {
+  const processorReady: Record<CardProcessor, boolean> = {
     stripe: status?.stripeSecretConfigured ?? false,
     azul: status?.azul?.ready ?? false,
     cardnet: status?.cardnet?.ready ?? false,
-  });
+  };
+  const methods = getPaymentMethodStates(brandSettings, Boolean(status?.activeCardProcessor));
 
-  const toggleVisibility = (method: PaymentMethodId, visible: boolean) => {
-    const next: PaymentVisibility = { ...brandSettings.paymentVisibility, [method]: visible };
-    setBrandSettings({ ...brandSettings, paymentVisibility: next });
+  const run = async (setNotice: (notice: Notice) => void, work: () => Promise<string>) => {
+    setSaving(true);
+    setNotice(null);
+    try {
+      setNotice({ kind: 'ok', text: await work() });
+    } catch (error: any) {
+      setNotice({ kind: 'error', text: error?.message || 'No se pudo guardar.' });
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleSaveStripe = async () => {
-    setSaving(true);
-    setMessage(null);
-    try {
+  const chooseProcessor = (choice: CardProcessorChoice) =>
+    run(setProcessorMessage, async () => {
+      const next = await savePaymentConfig({ cardProcessor: choice });
+      setStatus(next);
+      return next.activeCardProcessor
+        ? `Las tarjetas se cobran con ${PROCESSOR_NAMES[next.activeCardProcessor]}.`
+        : 'Guardado. Configura el procesador para empezar a cobrar.';
+    });
+
+  const handleSaveStripe = () =>
+    run(setMessage, async () => {
       const patch: PaymentConfigPatch = {};
       // Omitted rather than sent empty, so saving a currency does not wipe a
       // key the operator was never shown.
       if (secretDraft.trim()) patch.stripeSecretKey = secretDraft.trim();
       if (currencyDraft.trim()) patch.stripeCurrency = currencyDraft.trim();
-
       const next = await savePaymentConfig(patch);
       setStatus(next);
       setSecretDraft('');
-      setMessage({ kind: 'ok', text: 'Configuración de pagos guardada.' });
-    } catch (error: any) {
-      setMessage({ kind: 'error', text: error?.message || 'No se pudo guardar.' });
-    } finally {
-      setSaving(false);
-    }
-  };
+      return 'Configuración de Stripe guardada.';
+    });
 
-  const handleClearStripe = async () => {
-    setSaving(true);
-    setMessage(null);
-    try {
+  const handleClearStripe = () =>
+    run(setMessage, async () => {
       const next = await savePaymentConfig({ stripeSecretKey: '' });
       setStatus(next);
       setSecretDraft('');
-      setMessage({ kind: 'ok', text: 'Clave de Stripe eliminada.' });
-    } catch (error: any) {
-      setMessage({ kind: 'error', text: error?.message || 'No se pudo borrar la clave.' });
-    } finally {
-      setSaving(false);
-    }
-  };
+      return 'Clave de Stripe eliminada.';
+    });
 
-  const updateBank = (patch: Partial<BankDraft>) => setBank((current) => (current ? { ...current, ...patch } : current));
+  const updateBank = (patch: Partial<BankDraft>) =>
+    setBank((current) => (current ? { ...current, ...patch } : current));
 
-  const handleSaveBanks = async (extra: PaymentConfigPatch = {}) => {
-    if (!bank) return;
-    setSaving(true);
-    setBankMessage(null);
-    try {
+  const handleSaveBanks = (extra: PaymentConfigPatch = {}) =>
+    run(setBankMessage, async () => {
+      if (!bank) return '';
       const patch: PaymentConfigPatch = {
         dopPerUsd: Number(bank.dopPerUsd.replace(',', '.')) || 0,
         itbisPercent: Number(bank.itbisPercent.replace(',', '.')) || 0,
@@ -205,58 +204,39 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
         ...extra,
       };
       // Write-only, like the Stripe key: only sent when something was typed.
-      if (bank.azulAuthKey.trim()) patch.azulAuthKey = bank.azulAuthKey.trim();
-
+      if (bank.azulAuthKey.trim() && extra.azulAuthKey === undefined) patch.azulAuthKey = bank.azulAuthKey.trim();
       const next = await savePaymentConfig(patch);
       setStatus(next);
       setBank(draftFrom(next));
-      setBankMessage({ kind: 'ok', text: 'Datos de AZUL y CardNET guardados.' });
-    } catch (error: any) {
-      setBankMessage({ kind: 'error', text: error?.message || 'No se pudo guardar.' });
-    } finally {
-      setSaving(false);
-    }
-  };
+      return 'Datos de AZUL y CardNET guardados.';
+    });
 
-  const handleSaveBrand = async () => {
-    setSaving(true);
-    setBrandMessage(null);
-    try {
-      const saved = await saveBrandSettings(brandSettings);
-      setBrandMessage(
-        saved
-          ? { kind: 'ok', text: 'Enlaces y visibilidad guardados.' }
-          : { kind: 'error', text: 'No se pudo guardar. ¿Sigue abierta tu sesión de administrador?' }
-      );
-    } catch (error: any) {
-      setBrandMessage({ kind: 'error', text: error?.message || 'No se pudo guardar.' });
-    } finally {
-      setSaving(false);
-    }
-  };
+  const handleSaveBrand = () =>
+    run(setBrandMessage, async () => {
+      if (!(await saveBrandSettings(brandSettings))) {
+        throw new Error('No se pudo guardar. ¿Sigue abierta tu sesión de administrador?');
+      }
+      return 'Guardado.';
+    });
 
   const field =
-    'w-full rounded-2xl border border-ink/15 bg-paper px-4 py-3 text-ink outline-none ' +
-    'transition focus:border-lagoon-dark';
+    'w-full rounded-2xl border border-ink/15 bg-paper px-4 py-3 text-ink outline-none transition focus:border-lagoon-dark';
   const label = 'space-y-2';
   const labelText = 'text-sm font-semibold text-ink-soft';
 
-  const Notice = ({ value }: { value: { kind: 'ok' | 'error'; text: string } | null }) =>
+  const NoticeLine = ({ value }: { value: Notice }) =>
     value ? (
-      <span className={`text-sm ${value.kind === 'ok' ? 'text-lagoon-dark' : 'text-sunset-dark'}`}>
-        {value.text}
-      </span>
+      <span className={`text-sm ${value.kind === 'ok' ? 'text-lagoon-dark' : 'text-sunset-dark'}`}>{value.text}</span>
     ) : null;
 
-  const ReadyChip = ({ ready, mode }: { ready: boolean; mode?: GatewayMode }) =>
+  const ReadyChip = ({ ready, mode }: { ready: boolean; mode?: GatewayMode | 'live' | 'test' | null }) =>
     ready ? (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-lagoon-dark/10 px-3 py-1 text-xs font-semibold text-lagoon-dark">
-        <FaCheck /> lista {mode && <em className="not-italic opacity-70">({mode === 'live' ? 'modo real' : 'modo de prueba'})</em>}
+        <FaCheck /> lista
+        {mode && <em className="not-italic opacity-70">({mode === 'live' ? 'modo real' : 'modo de prueba'})</em>}
       </span>
     ) : (
-      <span className="rounded-full bg-sunset-dark/10 px-3 py-1 text-xs font-semibold text-sunset-dark">
-        sin configurar
-      </span>
+      <span className="rounded-full bg-sunset-dark/10 px-3 py-1 text-xs font-semibold text-sunset-dark">sin configurar</span>
     );
 
   const ModeSwitch = ({ value, onChange }: { value: GatewayMode; onChange: (mode: GatewayMode) => void }) => (
@@ -283,6 +263,8 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
     </select>
   );
 
+  const choice = status?.cardProcessor ?? 'auto';
+
   return (
     <div className="mt-6 rounded-3xl border border-ink/10 p-5">
       <div className="mb-1 flex items-center gap-2">
@@ -290,17 +272,18 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
         <h3 className="text-lg font-semibold text-ink">Pagos</h3>
       </div>
       <p className="mb-5 max-w-2xl text-sm text-ink-soft">
-        Qué formas de pago ve un visitante. Una forma de pago solo aparece cuando está
-        configurada <em>y</em> encendida.
+        El visitante ve «Tarjeta», PayPal o el concierge — nunca qué procesador cobra la tarjeta.
+        Eso se decide aquí. Una forma de pago solo aparece cuando está configurada <em>y</em> encendida.
       </p>
 
-      {/* ── Stripe ─────────────────────────────────────────────────────── */}
+      {/* ── Card processor ─────────────────────────────────────────────── */}
       <div className="rounded-3xl border border-ink/10 bg-paper-warm/40 p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h4 className="font-semibold text-ink">Stripe · cobro con tarjeta</h4>
+            <h4 className="font-semibold text-ink">Procesador de tarjetas</h4>
             <p className="text-xs text-ink-soft">
-              El visitante paga en Stripe y vuelve aquí. No necesita cuenta de Stripe.
+              Quién cobra cuando un visitante paga con tarjeta. La tarjeta se pone siempre en la página
+              segura del procesador, nunca en este sitio.
             </p>
           </div>
           <label className="inline-flex cursor-pointer items-center gap-2">
@@ -308,30 +291,63 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
               type="checkbox"
               className="h-5 w-5 accent-lagoon-dark"
               checked={brandSettings.stripeEnabled ?? false}
-              onChange={(event) =>
-                setBrandSettings({ ...brandSettings, stripeEnabled: event.target.checked })
-              }
+              onChange={(event) => setBrandSettings({ ...brandSettings, stripeEnabled: event.target.checked })}
             />
             <span className="text-sm font-semibold text-ink">Aceptar tarjetas</span>
           </label>
         </div>
 
-        <div className="mb-4 flex flex-wrap items-center gap-3 text-sm">
-          <span className="text-ink-soft">Clave secreta:</span>
-          {status?.stripeSecretConfigured ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-lagoon-dark/10 px-3 py-1 font-semibold text-lagoon-dark">
-              <FaCheck /> guardada
-              {status.stripeMode && (
-                <em className="not-italic opacity-70">
-                  ({status.stripeMode === 'live' ? 'modo real' : 'modo de prueba'})
-                </em>
-              )}
-            </span>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" role="radiogroup" aria-label="Procesador de tarjetas">
+          {(['auto', 'stripe', 'azul', 'cardnet'] as CardProcessorChoice[]).map((option) => {
+            const active = choice === option;
+            const ready = option === 'auto' ? Boolean(status?.activeCardProcessor) : processorReady[option];
+            return (
+              <button
+                key={option}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                disabled={saving || !status}
+                onClick={() => chooseProcessor(option)}
+                className={`rounded-2xl border px-4 py-3 text-left transition ${
+                  active ? 'border-lagoon-dark bg-lagoon/10' : 'border-ink/15 bg-paper hover:border-lagoon'
+                }`}
+              >
+                <div className="text-sm font-semibold text-ink">
+                  {option === 'auto' ? 'Automático' : PROCESSOR_NAMES[option]}
+                </div>
+                <div className="mt-1 text-xs text-ink-light">
+                  {option === 'auto'
+                    ? status?.activeCardProcessor
+                      ? `ahora: ${PROCESSOR_NAMES[status.activeCardProcessor]}`
+                      : 'el primero que esté configurado'
+                    : ready
+                    ? 'configurado'
+                    : 'sin configurar'}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-xs text-ink-light">
+          {status?.activeCardProcessor ? (
+            <>
+              Ahora mismo las tarjetas se cobran con <strong>{PROCESSOR_NAMES[status.activeCardProcessor]}</strong>.
+              {choice !== 'auto' && status.activeCardProcessor !== choice &&
+                ` ${PROCESSOR_NAMES[choice as CardProcessor]} aún no está configurado, así que se usa el siguiente disponible.`}
+            </>
           ) : (
-            <span className="rounded-full bg-sunset-dark/10 px-3 py-1 font-semibold text-sunset-dark">
-              sin configurar
-            </span>
+            'Ningún procesador está configurado todavía. Rellena uno abajo, o pega un enlace de pago.'
           )}
+        </p>
+        <div className="mt-2"><NoticeLine value={processorMessage} /></div>
+      </div>
+
+      {/* ── Stripe ─────────────────────────────────────────────────────── */}
+      <div className="mt-5 rounded-3xl border border-ink/10 bg-paper-warm/40 p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h4 className="font-semibold text-ink">Stripe</h4>
+          <ReadyChip ready={processorReady.stripe} mode={status?.stripeMode} />
         </div>
 
         <div className="grid gap-4 md:grid-cols-[2fr,1fr]">
@@ -364,8 +380,8 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
         <p className="mt-3 flex items-start gap-2 text-xs text-ink-light">
           <FaLock className="mt-0.5 shrink-0" />
           <span>
-            La clave se guarda solo en el servidor y nunca se envía al navegador — ni siquiera a
-            este panel. Por eso no puedes verla aquí después de guardarla, solo reemplazarla.
+            La clave se guarda solo en el servidor y nunca se envía al navegador — ni siquiera a este
+            panel. Por eso no puedes verla aquí después de guardarla, solo reemplazarla.
           </span>
         </p>
 
@@ -386,7 +402,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
               Borrar la clave
             </button>
           )}
-          <Notice value={message} />
+          <NoticeLine value={message} />
         </div>
 
         {status && !status.storageAvailable && (
@@ -394,12 +410,6 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
             Esta instalación no tiene KV conectado, así que no se puede guardar nada aquí.
           </p>
         )}
-
-        <p className="mt-4 border-t border-ink/10 pt-4 text-xs text-ink-light">
-          ¿Sin clave? También puedes pegar un enlace de pago propio (Stripe Payment Link,
-          Verifone, etc.) en el campo de más arriba — funciona como alternativa, pero el importe
-          será el que tenga ese enlace, no el del carrito.
-        </p>
       </div>
 
       {/* ── AZUL and CardNET ───────────────────────────────────────────── */}
@@ -407,14 +417,12 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
         <div className="mt-5 rounded-3xl border border-ink/10 bg-paper-warm/40 p-5">
           <div className="mb-1 flex items-center gap-2">
             <FaUniversity className="text-lagoon-dark" />
-            <h4 className="font-semibold text-ink">Bancos dominicanos · AZUL y CardNET</h4>
+            <h4 className="font-semibold text-ink">AZUL y CardNET</h4>
           </div>
           <p className="mb-4 max-w-2xl text-xs text-ink-soft">
-            Con los datos de afiliado, cada reserva viaja con su importe exacto a la página de pago
-            del banco — también los traslados, cuyo precio sale del mapa. El visitante pone la
-            tarjeta en la página del banco, nunca aquí, y el resultado se comprueba con el banco
-            antes de avisarte por WhatsApp. Sin datos de afiliado, basta un enlace de pago del
-            portal del banco (más abajo, en cada banco).
+            Con los datos de afiliado, cada reserva viaja con su importe exacto a la página de pago del
+            banco — también los traslados, cuyo precio sale del mapa — y el resultado se comprueba con
+            el banco antes de avisarte por WhatsApp.
           </p>
 
           <div className="mb-5 grid gap-4 md:grid-cols-2">
@@ -429,8 +437,8 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
                 className={field}
               />
               <span className="block text-xs text-ink-light">
-                Los precios del catálogo están en dólares. Un banco que cobra en pesos los convierte
-                con esta tasa; sin tasa, ese banco no se ofrece.
+                Los precios del catálogo están en dólares. Un banco que cobra en pesos los convierte con
+                esta tasa; sin tasa, ese banco no cobra.
               </span>
             </label>
             <label className={label}>
@@ -482,7 +490,10 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
                 </label>
                 <label className={label}>
                   <span className={labelText}>
-                    AuthKey {status.azul.authKeyConfigured && <span className="text-lagoon-dark">(guardada — escribe solo para reemplazarla)</span>}
+                    AuthKey{' '}
+                    {status.azul.authKeyConfigured && (
+                      <span className="text-lagoon-dark">(guardada — escribe solo para reemplazarla)</span>
+                    )}
                   </span>
                   <input
                     className={field}
@@ -498,19 +509,10 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
                 <FaLock className="mt-0.5 shrink-0" />
                 <span>
                   AZUL entrega Merchant ID, AuthKey y el código de moneda al afiliarte al e-commerce,
-                  distintos para pruebas y para producción. La AuthKey firma cada pago y se queda en
-                  el servidor.
+                  distintos para pruebas y para producción. La AuthKey firma cada pago y se queda en el
+                  servidor.
                 </span>
               </p>
-              <label className={`${label} mt-4 block border-t border-ink/10 pt-4`}>
-                <span className={labelText}>…o un Link de Pagos AZUL</span>
-                <input
-                  className={field}
-                  value={brandSettings.azulLink ?? ''}
-                  onChange={(e) => setBrandSettings({ ...brandSettings, azulLink: e.target.value })}
-                  placeholder="https://… (opcional: {amount}, {currency}, {ref})"
-                />
-              </label>
             </div>
 
             {/* CardNET */}
@@ -553,15 +555,6 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
                   <FaFlask /> Usar los datos públicos del laboratorio de CardNET
                 </button>
               )}
-              <label className={`${label} mt-4 block border-t border-ink/10 pt-4`}>
-                <span className={labelText}>…o un Enlace de Pago de CardNET</span>
-                <input
-                  className={field}
-                  value={brandSettings.cardnetLink ?? ''}
-                  onChange={(e) => setBrandSettings({ ...brandSettings, cardnetLink: e.target.value })}
-                  placeholder="https://… (opcional: {amount}, {currency}, {ref})"
-                />
-              </label>
             </div>
           </div>
 
@@ -582,17 +575,38 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
                 Borrar la AuthKey de AZUL
               </button>
             )}
-            <Notice value={bankMessage} />
+            <NoticeLine value={bankMessage} />
           </div>
-          <p className="mt-3 text-xs text-ink-light">
-            Los enlaces de pago se guardan con el botón de abajo, junto con la visibilidad.
-          </p>
         </div>
       )}
 
-      {/* ── Visibility ─────────────────────────────────────────────────── */}
+      {/* ── Payment links, visibility ──────────────────────────────────── */}
       <div className="mt-5 rounded-3xl border border-ink/10 p-5">
-        <h4 className="mb-4 font-semibold text-ink">Qué ve el visitante</h4>
+        <div className="mb-1 flex items-center gap-2">
+          <FaLink className="text-lagoon-dark" />
+          <h4 className="font-semibold text-ink">Enlaces de pago (sin credenciales)</h4>
+        </div>
+        <p className="mb-4 max-w-2xl text-xs text-ink-soft">
+          Si aún no tienes un procesador configurado, pega aquí un enlace de pago de su portal. El
+          visitante lo verá simplemente como «pagar con tarjeta». Escribe {'{amount}'} donde el enlace
+          acepte el importe; si no lo acepta, se le muestra el importe a poner.
+        </p>
+        <div className="grid gap-3 md:grid-cols-3">
+          <label className={label}>
+            <span className={labelText}>Link de Pagos AZUL</span>
+            <input className={field} value={brandSettings.azulLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, azulLink: e.target.value })} placeholder="https://…" />
+          </label>
+          <label className={label}>
+            <span className={labelText}>Enlace de Pago CardNET</span>
+            <input className={field} value={brandSettings.cardnetLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, cardnetLink: e.target.value })} placeholder="https://…" />
+          </label>
+          <label className={label}>
+            <span className={labelText}>Otro (Stripe Payment Link, etc.)</span>
+            <input className={field} value={brandSettings.verifoneLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, verifoneLink: e.target.value })} placeholder="https://…" />
+          </label>
+        </div>
+
+        <h4 className="mb-4 mt-6 font-semibold text-ink">Qué ve el visitante</h4>
         <div className="space-y-3">
           {PAYMENT_METHOD_IDS.map((method) => {
             const state = methods[method];
@@ -621,7 +635,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
                     className="h-5 w-5 accent-lagoon-dark"
                     checked={state.enabled}
                     disabled={!state.configured}
-                    onChange={(event) => toggleVisibility(method, event.target.checked)}
+                    onChange={(event) => setBrandSettings(withPaymentMethodEnabled(brandSettings, method, event.target.checked))}
                   />
                   <span className="text-xs font-semibold text-ink-soft">Mostrar</span>
                 </label>
@@ -632,7 +646,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
 
         {!Object.values(methods).some((state) => state.visible) && (
           <p className="mt-4 rounded-2xl bg-mango/15 p-3 text-xs text-ink-soft">
-            Ahora mismo no hay ninguna forma de pago visible. El botón «Book &amp; Pay Now» abrirá
+            Ahora mismo no hay ninguna forma de pago visible. El botón de reservar y pagar abrirá
             WhatsApp directamente.
           </p>
         )}
@@ -643,9 +657,9 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
             disabled={saving}
             className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {saving ? 'Guardando…' : 'Guardar enlaces y visibilidad'}
+            {saving ? 'Guardando…' : 'Guardar enlaces, «Aceptar tarjetas» y visibilidad'}
           </button>
-          <Notice value={brandMessage} />
+          <NoticeLine value={brandMessage} />
         </div>
       </div>
     </div>

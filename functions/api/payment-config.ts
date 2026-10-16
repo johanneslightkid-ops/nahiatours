@@ -101,6 +101,10 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
       return json({ error: 'La categoría de comercio (MCC) de CardNET son cuatro dígitos, por ejemplo 4722.' }, 400);
     }
 
+    if (['auto', 'stripe', 'azul', 'cardnet'].includes(String(body.cardProcessor))) {
+      patch.cardProcessor = body.cardProcessor as PaymentSecrets['cardProcessor'];
+    }
+
     for (const field of ['azulMode', 'cardnetMode'] as const) {
       if (body[field] === 'test' || body[field] === 'live') patch[field] = body[field] as 'test' | 'live';
     }

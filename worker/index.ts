@@ -33,6 +33,7 @@ import { onRequest as handleStripeSession } from '../functions/api/stripe-sessio
 import { onRequest as handleStripeReady } from '../functions/api/stripe-ready';
 import { onRequest as handlePaymentConfig } from '../functions/api/payment-config';
 import { onRequest as handlePaymentsReady } from '../functions/api/payments-ready';
+import { onRequest as handleCardCheckout } from '../functions/api/card-checkout';
 import { onRequest as handleAzulCheckout } from '../functions/api/azul-checkout';
 import { onRequest as handleCardnetCheckout } from '../functions/api/cardnet-checkout';
 import { onRequest as handlePayReturn } from '../functions/api/pay-return';
@@ -68,9 +69,10 @@ const ROUTES: Record<string, RouteHandler> = {
   '/api/stripe-session': handleStripeSession,
   '/api/stripe-ready': handleStripeReady,
   '/api/payment-config': handlePaymentConfig,
-  // Azul (Banco Popular) and CardNET: hosted bank pages that take the amount
-  // with them. See shared/bankGateways.ts.
+  // One card endpoint for the storefront; the processor (Stripe, Azul or
+  // CardNET) is the operator's choice. See shared/cardCheckout.ts.
   '/api/payments-ready': handlePaymentsReady,
+  '/api/card-checkout': handleCardCheckout,
   '/api/azul-checkout': handleAzulCheckout,
   '/api/cardnet-checkout': handleCardnetCheckout,
   '/api/payment-result': handlePaymentResult,

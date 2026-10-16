@@ -171,13 +171,6 @@ const Admin: React.FC = () => {
                   placeholder="Enlace de PayPal"
                   className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
                 />
-                <input
-                  type="text"
-                  value={brandSettings.verifoneLink}
-                  onChange={(event) => setBrandSettings({ ...brandSettings, verifoneLink: event.target.value })}
-                  placeholder="Enlace de Verifone"
-                  className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
-                />
                 <HeroMediaAdmin brandSettings={brandSettings} setBrandSettings={setBrandSettings} />
                 <div className="flex gap-3">
                   <button
@@ -215,7 +208,6 @@ const Admin: React.FC = () => {
                 <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
                 <p><strong>Contacto:</strong> {brandSettings.contactName || '—'}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>
-                <p><strong>Verifone:</strong> {brandSettings.verifoneLink || '—'}</p>
                 <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-lagoon-dark px-5 py-2 font-semibold text-white">
                   Editar datos del negocio
                 </button>

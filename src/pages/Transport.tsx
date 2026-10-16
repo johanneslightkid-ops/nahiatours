@@ -27,9 +27,9 @@ import PaymentDropdown from '../components/ui/PaymentDropdown';
  * sits after the form, so a slim price bar at the foot of the screen carries
  * the total and jumps to it.
  *
- * The quote can be paid there and then: the amount is computed from the route,
- * so this is exactly the variable-amount case Stripe Checkout, AZUL's payment
- * page and CardNET's session were wired in for (see PaymentDropdown). WhatsApp
+ * The quote can be paid there and then, by card: the amount is computed from
+ * the route, and the card is charged exactly that on a secure payment page by
+ * whichever processor the operator configured (see PaymentDropdown). WhatsApp
  * booking stays beside it for anyone who would rather talk first.
  *
  * Every word on the page comes from the `transport.*` texts, so it reads in all
@@ -719,7 +719,7 @@ const Transport: React.FC = () => {
                         bookingDate={when}
                         category="transport"
                         locale={locale}
-                        methods={['stripe', 'azul', 'cardnet', 'paypal']}
+                        methods={['card', 'paypal']}
                         hideWhenEmpty
                         buttonLabel={t('payNow', 'Book & pay now')}
                         className="w-full"
@@ -746,7 +746,7 @@ const Transport: React.FC = () => {
                     </button>
                     {quoteReady && (
                       <p className="text-center text-[0.7rem] leading-4 text-ink-light">
-                        {t('payHint', 'Pay by card, AZUL or CardNET on the secure page of Stripe or your bank — card details never touch this site.')}
+                        {t('payHint', 'Pay securely online by card — your card details are entered on a secure payment page, never on this site.')}
                       </p>
                     )}
                   </div>

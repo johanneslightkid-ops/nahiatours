@@ -187,7 +187,7 @@
     "date": "Fecha",
     "selectBoth": "Elige el origen y el destino — los lugares exactos dan el mejor precio.",
     "payNow": "Reservar y pagar",
-    "payHint": "Paga con tarjeta, AZUL o CardNET en la página segura de Stripe o del banco — los datos de la tarjeta nunca pasan por este sitio.",
+    "payHint": "Paga con tarjeta en línea de forma segura — los datos de la tarjeta se ponen en una página de pago segura, nunca en este sitio.",
     "mobilePrompt": "Elige tu ruta",
     "mobileCta": "Reservar",
     "mobileSee": "Ver pase",

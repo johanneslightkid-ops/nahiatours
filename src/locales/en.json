@@ -187,7 +187,7 @@
     "date": "Date",
     "selectBoth": "Choose both the pickup and the drop-off — exact places give the best price.",
     "payNow": "Book & pay now",
-    "payHint": "Pay by card, AZUL or CardNET on the secure page of Stripe or your bank — card details never touch this site.",
+    "payHint": "Pay securely online by card — your card details are entered on a secure payment page, never on this site.",
     "mobilePrompt": "Pick your route",
     "mobileCta": "Book",
     "mobileSee": "See pass",

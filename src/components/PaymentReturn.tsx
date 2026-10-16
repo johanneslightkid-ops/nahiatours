@@ -29,11 +29,15 @@ import {
  * navigation, so a back button or a refresh re-shows the receipt without
  * telling the operator twice.
  *
- * AZUL and CARDNET come back as `?payment_ref=<order>` instead. The server has
- * already checked the bank's answer (Azul's signature, CardNET's session) by
- * then; this asks /api/payment-result for the verdict. A payment the bank
- * reported but the server could not verify is still passed to the operator —
- * flagged, so they check it in the bank's portal before confirming.
+ * A card processed by AZUL or CARDNET comes back as `?payment_ref=<order>`
+ * instead. The server has already checked the bank's answer (Azul's signature,
+ * CardNET's session) by then; this asks /api/payment-result for the verdict. A
+ * payment reported but not verifiable is still passed to the operator —
+ * flagged, so they check it in their payment portal before confirming.
+ *
+ * Nothing here names the processor: the guest paid by card, and which company
+ * processed it is the operator's business. The reference in the message is
+ * enough for the operator to find the payment.
  */
 
 type Receipt = {
@@ -46,8 +50,6 @@ type Receipt = {
   persons: number | null;
   date: string;
   priceSource: string;
-  /** "Stripe", "AZUL", "CardNET" — for the operator's message. */
-  via: string;
   reference: string;
 };
 
@@ -60,7 +62,6 @@ const fromStripe = (payment: CheckoutResult, sessionId: string): Receipt => ({
   persons: payment.persons,
   date: payment.date,
   priceSource: payment.priceSource,
-  via: 'Stripe',
   reference: sessionId,
 });
 
@@ -73,7 +74,6 @@ const fromBank = (payment: BankPaymentResult, ref: string): Receipt => ({
   persons: payment.persons,
   date: payment.date,
   priceSource: payment.priceSource,
-  via: payment.provider === 'azul' ? 'AZUL' : 'CardNET',
   reference: [ref, payment.authorizationCode && `Auth ${payment.authorizationCode}`, payment.reference && `RRN ${payment.reference}`]
     .filter(Boolean)
     .join(' · '),
@@ -186,16 +186,15 @@ const PaymentReturn: React.FC = () => {
     // Built line by line and joined, so an absent date leaves no gap rather
     // than a stray blank line in the middle of the operator's message.
     const check = result.unverified
-      ? '\n\n⚠️ El banco respondió pero no se pudo verificar automáticamente — revisa el pago en el portal de ' +
-        `${result.via} antes de confirmar. / The bank answered but it could not be verified automatically — ` +
-        `check the payment in the ${result.via} portal before confirming.`
+      ? '\n\n⚠️ El pago no se pudo verificar automáticamente — revísalo en tu portal de pagos antes de confirmar. / ' +
+        'The payment could not be verified automatically — check it in your payment portal before confirming.'
       : '';
 
     return [
       result.unverified ? '🟡 PAGO POR VERIFICAR / PAYMENT TO VERIFY' : '✅ PAGO RECIBIDO / PAYMENT RECEIVED',
       '',
-      `${total} pagado con tarjeta vía ${result.via}.`,
-      `${total} paid by card via ${result.via}.`,
+      `${total} pagado con tarjeta en línea.`,
+      `${total} paid online by card.`,
       '',
       `Tour: ${result.tour || '—'}`,
       people ? `Personas / People: ${people}` : '',
@@ -252,7 +251,7 @@ const PaymentReturn: React.FC = () => {
         {state === 'checking' && (
           <>
             <h2 className="font-display text-2xl font-bold">Confirmando el pago…</h2>
-            <p className="mt-3 text-ink-soft">Checking your payment with the bank. One moment.</p>
+            <p className="mt-3 text-ink-soft">Checking your payment. One moment.</p>
           </>
         )}
 

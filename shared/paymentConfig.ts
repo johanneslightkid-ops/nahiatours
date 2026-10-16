@@ -53,10 +53,21 @@ export const isProtectedResource = (key: string): boolean =>
   PROTECTED_RESOURCES.has(key) || PROTECTED_PREFIXES.some((prefix) => key.startsWith(prefix));
 
 export type GatewayMode = 'test' | 'live';
+/**
+ * Which processor charges a card. The GUEST never sees this — the storefront
+ * offers one "pay by card" option and the server picks the processor — so it
+ * is purely the operator's choice, made in the admin. 'auto' takes the first
+ * one that is configured, in CARD_PROCESSOR_ORDER.
+ */
+export type CardProcessor = 'stripe' | 'azul' | 'cardnet';
+export type CardProcessorChoice = 'auto' | CardProcessor;
+export const CARD_PROCESSOR_ORDER: CardProcessor[] = ['stripe', 'azul', 'cardnet'];
 /** What a Dominican acquirer charges in. The catalogue itself is priced in USD. */
 export type LocalCurrency = 'USD' | 'DOP';
 
 export interface PaymentSecrets {
+  /** Which processor charges cards. See CardProcessor. */
+  cardProcessor: CardProcessorChoice;
   /** `sk_live_…` or `sk_test_…`. Never leaves the server. */
   stripeSecretKey: string;
   /** ISO 4217, lower case, as Stripe wants it. */
@@ -95,6 +106,9 @@ export interface PaymentSecrets {
 
 /** What the admin panel is allowed to know about the above. */
 export interface PaymentConfigStatus {
+  cardProcessor: CardProcessorChoice;
+  /** The processor a card payment would go to right now, or null when none is ready. */
+  activeCardProcessor: CardProcessor | null;
   stripeSecretConfigured: boolean;
   /** 'live' | 'test' | null — derived from the key prefix, not from the key. */
   stripeMode: 'live' | 'test' | null;
@@ -126,6 +140,7 @@ export interface PaymentConfigStatus {
 }
 
 const DEFAULTS: PaymentSecrets = {
+  cardProcessor: 'auto',
   stripeSecretKey: '',
   stripeCurrency: 'usd',
   dopPerUsd: 0,
@@ -223,7 +238,10 @@ const normalize = (input: unknown): PaymentSecrets => {
   const rate = Number(source.dopPerUsd);
   const itbis = Number(source.itbisPercent);
 
+  const choice = source.cardProcessor;
   return {
+    cardProcessor:
+      choice === 'stripe' || choice === 'azul' || choice === 'cardnet' ? choice : 'auto',
     stripeSecretKey: text(source.stripeSecretKey, 400),
     stripeCurrency,
     dopPerUsd: Number.isFinite(rate) && rate > 0 && rate < 10_000 ? rate : 0,
@@ -321,10 +339,39 @@ export const isCardnetReady = (secrets: PaymentSecrets): boolean =>
       currencyUsable(secrets.cardnetCurrency, secrets)
   );
 
+const processorReady = (secrets: PaymentSecrets): Record<CardProcessor, boolean> => ({
+  stripe: secrets.stripeSecretKey.length > 0,
+  azul: isAzulReady(secrets),
+  cardnet: isCardnetReady(secrets),
+});
+
+/**
+ * The processor a card payment goes to: the operator's choice when it is
+ * configured, otherwise the first configured one — so a half-finished switch
+ * to a new bank never leaves the site unable to take cards.
+ */
+export const resolveCardProcessor = (secrets: PaymentSecrets): CardProcessor | null => {
+  const ready = processorReady(secrets);
+  const order =
+    secrets.cardProcessor === 'auto'
+      ? CARD_PROCESSOR_ORDER
+      : [secrets.cardProcessor, ...CARD_PROCESSOR_ORDER.filter((p) => p !== secrets.cardProcessor)];
+  return order.find((processor) => ready[processor]) ?? null;
+};
+
+/** What the chosen processor charges in, for showing a guest the amount before they leave. */
+export const cardChargeCurrency = (secrets: PaymentSecrets, processor: CardProcessor | null): string => {
+  if (processor === 'azul') return secrets.azulCurrency;
+  if (processor === 'cardnet') return secrets.cardnetCurrency;
+  return secrets.stripeCurrency.toUpperCase();
+};
+
 export const describePaymentConfig = async (env: PaymentEnv): Promise<PaymentConfigStatus> => {
   const secrets = await readPaymentSecrets(env);
   const key = secrets.stripeSecretKey;
   return {
+    cardProcessor: secrets.cardProcessor,
+    activeCardProcessor: resolveCardProcessor(secrets),
     stripeSecretConfigured: key.length > 0,
     stripeMode: key.startsWith('sk_live') ? 'live' : key.startsWith('sk_test') ? 'test' : null,
     stripeCurrency: secrets.stripeCurrency,

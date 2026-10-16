@@ -40,8 +40,14 @@ export interface CheckoutResult {
 export type GatewayMode = 'test' | 'live';
 export type LocalCurrency = 'USD' | 'DOP';
 export type BankProvider = 'azul' | 'cardnet';
+export type CardProcessor = 'stripe' | BankProvider;
+export type CardProcessorChoice = 'auto' | CardProcessor;
 
 export interface PaymentConfigStatus {
+  /** Which processor charges cards — the operator's choice, never shown to guests. */
+  cardProcessor: CardProcessorChoice;
+  /** Where a card payment would go right now, or null when none is configured. */
+  activeCardProcessor: CardProcessor | null;
   stripeSecretConfigured: boolean;
   stripeMode: 'live' | 'test' | null;
   stripeCurrency: string;
@@ -72,6 +78,7 @@ export interface PaymentConfigStatus {
 
 /** Everything the admin panel may send. Omitted fields stay as stored. */
 export interface PaymentConfigPatch {
+  cardProcessor?: CardProcessorChoice;
   stripeSecretKey?: string;
   stripeCurrency?: string;
   dopPerUsd?: number;
@@ -92,14 +99,23 @@ export interface PaymentConfigPatch {
   cardnetCurrency?: LocalCurrency;
 }
 
-/** What the storefront may know: which gateways work, and what they charge in. */
+/**
+ * What the storefront may know: whether a card can be taken, and in what
+ * currency. Not which processor — the guest pays by card, and the processor is
+ * the operator's business.
+ */
 export interface PaymentsReady {
-  stripe: boolean;
-  azul: boolean;
-  cardnet: boolean;
-  currencies: Record<BankProvider, LocalCurrency>;
+  card: boolean;
+  /** ISO code the card is charged in, e.g. USD or DOP. */
+  currency: string;
+  /** Pesos per catalogue dollar, when the card is charged in pesos. */
   dopPerUsd: number | null;
 }
+
+/** Where to send the guest: a hosted page to open, or a form to post to one. */
+export type CardCheckoutStart =
+  | { kind: 'redirect'; url: string }
+  | { kind: 'form'; action: string; fields: Record<string, string>; amount: number; currency: string };
 
 /** What /api/payment-result says became of an Azul or CardNET payment. */
 export interface BankPaymentResult {
@@ -117,31 +133,6 @@ export interface BankPaymentResult {
   authorizationCode: string;
   reference: string;
 }
-
-/**
- * Mint a Checkout Session and return the URL to send the guest to.
- *
- * Throws with the server's message, which is written for a guest to read.
- */
-export const createStripeCheckout = async (booking: CheckoutBooking): Promise<string> => {
-  const response = await fetch('/api/stripe-checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    cache: 'no-store',
-    body: JSON.stringify({
-      ...booking,
-      returnPath: booking.returnPath ?? window.location.pathname,
-    }),
-  });
-
-  const body = await response.json().catch(() => null);
-
-  if (!response.ok || !body?.url) {
-    throw new Error(body?.error || 'Could not start the card payment.');
-  }
-
-  return body.url as string;
-};
 
 /** Ask the server what became of a session. Never trusts the query string. */
 export const getCheckoutResult = async (sessionId: string): Promise<CheckoutResult> => {
@@ -193,35 +184,11 @@ export const savePaymentConfig = async (patch: PaymentConfigPatch): Promise<Paym
   return body as PaymentConfigStatus;
 };
 
-/**
- * Does the storefront have a working card option?
- *
- * Public, unauthenticated, and deliberately a single boolean: the guest's page
- * needs to know whether to draw a card button, and nothing more. A failure
- * answers false, so a hiccup hides the button rather than offering a dead one.
- */
-export const isStripeReady = async (): Promise<boolean> => {
-  try {
-    const response = await fetch('/api/stripe-ready', { cache: 'no-store' });
-    if (!response.ok) return false;
-    const body = await response.json().catch(() => null);
-    return Boolean(body?.ready);
-  } catch {
-    return false;
-  }
-};
-
-const NOT_READY: PaymentsReady = {
-  stripe: false,
-  azul: false,
-  cardnet: false,
-  currencies: { azul: 'DOP', cardnet: 'DOP' },
-  dopPerUsd: null,
-};
+const NOT_READY: PaymentsReady = { card: false, currency: 'USD', dopPerUsd: null };
 
 /**
- * Which gateways the storefront can offer. Like isStripeReady, a failure
- * answers "none", so a hiccup hides buttons rather than offering dead ones.
+ * Can the storefront take a card? A failure answers "no", so a hiccup hides
+ * the card button rather than offering a dead one.
  */
 export const getPaymentsReady = async (): Promise<PaymentsReady> => {
   try {
@@ -230,13 +197,8 @@ export const getPaymentsReady = async (): Promise<PaymentsReady> => {
     const body = await response.json().catch(() => null);
     if (!body || typeof body !== 'object') return NOT_READY;
     return {
-      stripe: Boolean(body.stripe),
-      azul: Boolean(body.azul),
-      cardnet: Boolean(body.cardnet),
-      currencies: {
-        azul: body.currencies?.azul === 'USD' ? 'USD' : 'DOP',
-        cardnet: body.currencies?.cardnet === 'USD' ? 'USD' : 'DOP',
-      },
+      card: Boolean(body.card),
+      currency: typeof body.currency === 'string' && body.currency ? body.currency.toUpperCase() : 'USD',
       dopPerUsd: typeof body.dopPerUsd === 'number' && body.dopPerUsd > 0 ? body.dopPerUsd : null,
     };
   } catch {
@@ -245,14 +207,12 @@ export const getPaymentsReady = async (): Promise<PaymentsReady> => {
 };
 
 /**
- * Open an Azul or CardNET payment for a booking. The answer is a form, not a
- * URL: both banks want the BROWSER to post to their page.
+ * Start a card payment. The server picks the processor the operator chose and
+ * answers with where to send the guest. Throws with a message written for the
+ * guest.
  */
-export const startBankCheckout = async (
-  provider: BankProvider,
-  booking: CheckoutBooking
-): Promise<{ ref: string; action: string; fields: Record<string, string> }> => {
-  const response = await fetch(`/api/${provider}-checkout`, {
+export const startCardCheckout = async (booking: CheckoutBooking): Promise<CardCheckoutStart> => {
+  const response = await fetch('/api/card-checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     cache: 'no-store',
@@ -262,16 +222,16 @@ export const startBankCheckout = async (
     }),
   });
   const body = await response.json().catch(() => null);
-  if (!response.ok || !body?.action || !body?.fields) {
-    throw new Error(body?.error || 'Could not start the payment.');
+  if (!response.ok || (body?.kind !== 'redirect' && body?.kind !== 'form')) {
+    throw new Error(body?.error || 'Could not open the secure payment page.');
   }
-  return body;
+  return body as CardCheckoutStart;
 };
 
 /**
- * Leave for the bank's page by posting a form, the way both banks ask for.
- * Same tab, for the same reason as Stripe: this runs after an await, where a
- * new window would be blocked, and the bank brings the guest back here.
+ * Leave for a payment page that wants a POST (the banks ask for exactly that).
+ * Same tab: this runs after an await, where a new window would be blocked, and
+ * the payment page brings the guest back here.
  */
 export const postToGateway = (action: string, fields: Record<string, string>) => {
   const form = document.createElement('form');
@@ -290,7 +250,7 @@ export const postToGateway = (action: string, fields: Record<string, string>) =>
   form.submit();
 };
 
-/** Ask the server what became of an Azul or CardNET payment. */
+/** Ask the server what became of a payment that came back with `?payment_ref=`. */
 export const getBankPaymentResult = async (ref: string): Promise<BankPaymentResult> => {
   const response = await fetch(`/api/payment-result?ref=${encodeURIComponent(ref)}`, {
     cache: 'no-store',
@@ -303,10 +263,10 @@ export const getBankPaymentResult = async (ref: string): Promise<BankPaymentResu
 };
 
 /**
- * A bank's own payment link with the amount filled in, when the link has room
- * for one: {amount} (or {monto}), {currency} and {ref} are replaced. A link
- * without placeholders is returned as it is — the guest is then shown the
- * amount to enter on the bank's page.
+ * A payment link from a processor's portal with the amount filled in, when the
+ * link has room for one: {amount} (or {monto}), {currency} and {ref} are
+ * replaced. A link without placeholders is returned as it is — the guest is
+ * then shown the amount to enter on the payment page.
  */
 export const fillPaymentLink = (
   link: string,
