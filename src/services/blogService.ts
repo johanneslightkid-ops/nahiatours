@@ -1,6 +1,6 @@
-import { apiGet, apiPut } from './apiClient';
+import { ApiError, apiGet, apiPut } from './apiClient';
 
-type Locale = 'en' | 'es';
+export type Locale = 'en' | 'es' | 'de' | 'fr';
 
 export interface RawBlogArticle {
   id?: string | number;
@@ -142,18 +142,23 @@ const extractRecord = (data: unknown): unknown[] => {
   return [];
 };
 
-const fetchRawBlogArticles = async (locale: Locale): Promise<unknown[]> => {
+const fetchRawBlogArticles = async (locale: Locale, strict = false): Promise<unknown[]> => {
   try {
-    const data = await apiGet<unknown[]>('blog', { locale });
+    const data = await apiGet<unknown[]>('blog', strict ? { locale, exact: 1 } : { locale });
     return extractRecord(data);
   } catch (error) {
+    // Every write below reads the list, changes one post and puts the list
+    // back. Reading "nothing" after a failed fetch would put back one post.
+    // A language with no blog yet really is empty, though.
+    if (strict && error instanceof ApiError && error.status === 404) return [];
+    if (strict) throw error;
     console.warn('[Blog] API fetch failed:', error);
     return [];
   }
 };
 
-export const getBlogArticles = async (locale: Locale): Promise<BlogArticle[]> => {
-  const rawArticles = await fetchRawBlogArticles(locale);
+export const getBlogArticles = async (locale: Locale, strict = false): Promise<BlogArticle[]> => {
+  const rawArticles = await fetchRawBlogArticles(locale, strict);
 
   return rawArticles
     .map((rawArticle) => normalizeBlogArticle(rawArticle as RawBlogArticle, locale))
@@ -162,7 +167,7 @@ export const getBlogArticles = async (locale: Locale): Promise<BlogArticle[]> =>
 
 export const saveBlogArticle = async (article: BlogArticle, locale: Locale): Promise<boolean> => {
   try {
-    const rawArticles = await fetchRawBlogArticles(locale);
+    const rawArticles = await fetchRawBlogArticles(locale, true);
     
     // Check if article with this id already exists, update it or append
     const existingIndex = rawArticles.findIndex((r: any) => String(r.id) === article.id || r.slug === article.slug);
@@ -199,7 +204,7 @@ export const saveBlogArticle = async (article: BlogArticle, locale: Locale): Pro
 
 export const deleteBlogArticle = async (id: string, locale: Locale): Promise<boolean> => {
   try {
-    const rawArticles = await fetchRawBlogArticles(locale);
+    const rawArticles = await fetchRawBlogArticles(locale, true);
     const existingIndex = rawArticles.findIndex((r: any) => String(r.id) === id);
     
     if (existingIndex >= 0) {
@@ -216,7 +221,7 @@ export const deleteBlogArticle = async (id: string, locale: Locale): Promise<boo
 
 export const toggleBlogArticleVisibility = async (id: string, locale: Locale): Promise<boolean> => {
   try {
-    const rawArticles = await fetchRawBlogArticles(locale);
+    const rawArticles = await fetchRawBlogArticles(locale, true);
     const existingIndex = rawArticles.findIndex((r: any) => String(r.id) === id);
     
     if (existingIndex >= 0) {

@@ -1,6 +1,7 @@
 import { AISettings } from './aiSettingsService';
 import { ApiError, apiPost } from './apiClient';
-import { hashtagsFor } from '../lib/blogTopics';
+import { BlogLang, hashtagsFor, keywordsFor, seasonalNote, topicById } from '../lib/blogTopics';
+import { LANGUAGE_NAME, LANGUAGE_VOICE, templateById } from '../lib/blogTemplates';
 
 /**
  * The blog generator.
@@ -27,6 +28,14 @@ export interface BlogGenerationParams {
   brandName?: string;
   /** Platforms the operator wants a social cut for. */
   socialPlatforms: string[];
+  /** Article shape, an id from lib/blogTemplates. */
+  template?: string;
+  /** Short real guest reviews, quoted as social proof. Never invented. */
+  reviews?: string[];
+  /** Editions to write besides English. Defaults to Spanish, French and German. */
+  languages?: BlogLang[];
+  /** Called as each edition starts, so the admin can say which one. */
+  onProgress?: (lang: BlogLang) => void;
 }
 
 export interface GeneratedArticle {
@@ -49,6 +58,13 @@ export interface SocialCut {
 export interface GeneratedPost {
   en: GeneratedArticle;
   es: GeneratedArticle;
+  fr: GeneratedArticle;
+  de: GeneratedArticle;
+  /**
+   * Editions the model could not write. They hold the English text until the
+   * admin translates them, and must not be published under their own flag.
+   */
+  missing: BlogLang[];
   images: string[];
   social: SocialCut[];
   /** Which provider and model actually answered, for the admin to show. */
@@ -248,6 +264,9 @@ image syntax.`
 
 const buildEnglishPrompt = (params: BlogGenerationParams, topicLabels: string[]) => {
   const brand = params.brandName?.trim() || 'our tour company';
+  const template = templateById(params.template || 'guide');
+  const keywords = keywordsFor(params.topics, 'en');
+  const reviews = (params.reviews || []).filter(Boolean).slice(0, 3);
 
   return `Write a long-form travel feature in ENGLISH for ${brand}, a tour operator in
 Punta Cana, Dominican Republic.
@@ -259,13 +278,20 @@ three real paragraphs long. If you find yourself finishing early, you have
 skipped the detail that makes the piece worth reading — go deeper instead of
 padding with adjectives.
 
+THE SHAPE OF THIS PIECE — ${template.label.en}
+${template.structure}
+Title: ${template.title}
+
 WHO YOU ARE WRITING FOR
 - Coming from: ${params.povOrigin || 'anywhere in the world'}
 - Age group: ${params.povAge || 'all ages'}
 - Travelling as: ${params.povGroup || 'any kind of group'}
 - Gender: ${params.povGender || 'mixed'}
 - Style and budget: ${params.povExclusivity || 'standard'}
-Write to that reader in the second person.
+Write to that reader in the second person. Think about what this reader is
+trying to decide, what worries them (safety, value, getting there, the kids,
+the sun) and what they will want to tell their friends afterwards — and answer
+all three.
 
 EXCURSIONS TO FEATURE
 ${params.selectedTours.length ? params.selectedTours.join('\n') : 'the best of Punta Cana and the Bávaro coast'}
@@ -273,6 +299,24 @@ ${params.selectedTours.length ? params.selectedTours.join('\n') : 'the best of P
 TOPICS TO LEAN INTO
 ${topicLabels.length ? topicLabels.join(', ') : 'whatever the notes below suggest'}
 
+SEARCH PHRASES — what travellers type. Use the first one in the title or the
+first subheading, and the others naturally in subheadings and text, never as a
+list and never more than once each:
+${keywords.length ? keywords.join(' · ') : 'Punta Cana excursions · things to do in Punta Cana · Bávaro tours'}
+
+THIS TIME OF YEAR
+${seasonalNote()}
+Mention it where it genuinely helps the reader plan.
+${
+  reviews.length
+    ? `
+WHAT REAL GUESTS SAID — you may quote one or two of these, word for word, in
+quotation marks and attributed to "a guest". Do not alter them and do not
+invent others:
+${reviews.map((r) => `- "${r}"`).join('\n')}
+`
+    : ''
+}
 NOTES FROM THE OPERATOR — treat these as ground truth and work every concrete
 detail into the piece:
 "${params.voiceTranscript || 'Focus on the experience itself: the water, the light, the food, the people, and how effortless the day feels when it is organised properly.'}"
@@ -283,26 +327,33 @@ HOW IT SHOULD READ
   brochure would miss.
 - Include what the day actually involves, what to bring, who it suits and who
   it does not, and what makes this operator's version better.
-- Weave in the search terms a traveller would type — Punta Cana, Bávaro, the
-  excursion names — naturally, never as a list.
+- Somewhere in the piece, one short line a reader would want to screenshot and
+  share — true, specific, a little surprising.
+- Respect the place and its people: name Dominican things by their names, and
+  write about local guides, cooks and drivers as people, not as scenery.
 - Never invent prices, distances, durations, safety claims or awards. If a
   fact is not in the notes, write around it.
 - Banned: "nestled", "hidden gem", "bucket list", "paradise found", "little
   slice of heaven", "unforgettable memories", "dive into", "look no further".
-- Close with a warm, confident invitation to get in touch. No hard sell.
+- ${template.id === 'faq' ? 'The questions are the body; no separate FAQ.' : 'End with "## Good to know": three short questions a reader would ask, each answered in two sentences.'}
+- Close with a warm, confident invitation to get in touch on WhatsApp. No hard sell.
 
 ${FORMAT(params.images.length)}`;
 };
 
-const buildSpanishPrompt = (english: GeneratedArticle, params: BlogGenerationParams) =>
-  `Below is a finished English travel feature. Produce the SPANISH edition of it.
+const buildEditionPrompt = (english: GeneratedArticle, lang: BlogLang, params: BlogGenerationParams) => {
+  const keywords = keywordsFor(params.topics, lang);
+  return `Below is a finished English travel feature. Produce the ${LANGUAGE_NAME[lang]} edition of it.
 
-This is not a translation exercise. Rewrite it as a Spanish-language travel
-writer from the Dominican Republic would have written it in the first place:
-Latin American Spanish, Dominican where it is natural, "tú" not "usted", idioms
-that exist in Spanish rather than English ones carried across. Keep the same
-structure, the same sections, the same facts and the same length — about
-${TARGET_WORDS} words — and keep every [[IMAGE-n]] marker exactly where it is.
+This is not a translation exercise. Rewrite it as a travel writer who writes in
+that language would have written it in the first place: ${LANGUAGE_VOICE[lang]}
+Keep the same structure, the same sections, the same facts and the same length
+— about ${TARGET_WORDS} words — and keep every [[IMAGE-n]] marker exactly where
+it is. Guest quotes stay as they are, in their original words.
+
+Write the title and the subheadings for how people search in that language.${
+    keywords.length ? ` Use these phrases where they fit naturally: ${keywords.join(' · ')}` : ''
+  }
 
 Never invent a fact the English version does not contain.
 
@@ -315,6 +366,7 @@ ${english.body}
 --- END ---
 
 ${FORMAT(params.images.length)}`;
+};
 
 const buildSocialPrompt = (
   article: GeneratedArticle,
@@ -327,6 +379,11 @@ const buildSocialPrompt = (
 One post per platform, in this exact format, nothing else:
 
 ${platforms.map((p) => `[${p.toUpperCase()}]\n<the post>`).join('\n\n')}
+
+Rules for every platform: the first line is the hook — a specific detail or a
+question the reader cannot scroll past — and it must make sense on its own. No
+engagement bait ("tag a friend who…"), no invented facts, no prices unless the
+article gives them. Speak like a local who loves the place, not like an ad.
 
 Rules per platform:
 - instagram: 3 to 5 short lines, warm and visual, one emoji at most per line,
@@ -393,7 +450,7 @@ export const generateBlogPost = async (
   params: BlogGenerationParams
 ): Promise<GeneratedPost> => {
   const brand = params.brandName?.trim() || 'our tour company';
-  const topicLabels = params.topics;
+  const topicLabels = params.topics.map((id) => topicById(id)?.label.en || id);
 
   const english = await callAi({
     prompt: buildEnglishPrompt(params, topicLabels),
@@ -407,38 +464,43 @@ export const generateBlogPost = async (
   const en = parseArticle(english.text, `A day out from ${brand}`);
   en.body = applyImagePlacement(en.body, params.images);
 
-  // Spanish is written from the finished English piece so the two carry the
-  // same facts, the same sections and the same pictures in the same places.
-  let es: GeneratedArticle;
-  try {
-    const spanish = await callAi({
-      prompt: buildSpanishPrompt(en, params),
-      system: SYSTEM,
-      maxTokens: MAX_OUTPUT_TOKENS,
-      temperature: 0.8,
-      settings,
-    });
-    es = parseArticle(spanish.text, en.title);
-    es.body = applyImagePlacement(es.body, params.images);
-  } catch (error) {
-    // An English post that saved is worth more than no post at all, so a
-    // failed Spanish pass is reported rather than fatal.
-    es = {
-      title: en.title,
-      caption: en.caption,
-      prelude: en.prelude,
-      body: `> La versión en español no se pudo generar: ${
-        error instanceof Error ? error.message : String(error)
-      }\n\n${en.body}`,
-      tags: en.tags,
-    };
+  // Each edition is written from the finished English piece, so all four carry
+  // the same facts, the same sections and the same pictures in the same places.
+  // One that fails is reported rather than fatal: the English is kept in its
+  // place and the admin translates it after saving.
+  const editions = {} as Record<BlogLang, GeneratedArticle>;
+  const missing: BlogLang[] = [];
+  for (const lang of params.languages ?? (['es', 'fr', 'de'] as BlogLang[])) {
+    if (lang === 'en') continue;
+    params.onProgress?.(lang);
+    try {
+      const edition = await callAi({
+        prompt: buildEditionPrompt(en, lang, params),
+        system: SYSTEM,
+        maxTokens: MAX_OUTPUT_TOKENS,
+        temperature: 0.8,
+        settings,
+      });
+      const article = parseArticle(edition.text, en.title);
+      article.body = applyImagePlacement(article.body, params.images);
+      editions[lang] = article;
+    } catch {
+      editions[lang] = { ...en };
+      missing.push(lang);
+    }
+  }
+  for (const lang of ['es', 'fr', 'de'] as BlogLang[]) {
+    if (!editions[lang]) {
+      editions[lang] = { ...en };
+      if (!missing.includes(lang)) missing.push(lang);
+    }
   }
 
   let social: SocialCut[] = [];
   if (params.socialPlatforms.length > 0) {
     try {
       const cut = await callAi({
-        prompt: buildSocialPrompt(en, params.socialPlatforms, hashtagsFor(params.topics), brand),
+        prompt: buildSocialPrompt(en, params.socialPlatforms, hashtagsFor(params.topics, 'en'), brand),
         system: SYSTEM,
         maxTokens: 1500,
         temperature: 0.9,
@@ -452,7 +514,10 @@ export const generateBlogPost = async (
 
   return {
     en,
-    es,
+    es: editions.es,
+    fr: editions.fr,
+    de: editions.de,
+    missing,
     images: params.images,
     social,
     provider: english.provider,

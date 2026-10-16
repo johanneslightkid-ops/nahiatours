@@ -85,9 +85,13 @@ binding = "AI"
 # Note this is a Worker, so wrangler.toml is the source of truth for bindings —
 # a binding added in the dashboard is overwritten by the next deploy.
 #
-# [[kv_namespaces]]
-# binding = "DATA_KV_F"
-# id = "<namespace id>"
+# Pinned, so every build binds this site's own namespace ("transporturist-data") —
+# including a build with no API token to resolve the title with, which would
+# otherwise deploy with no KV at all and the site would read its defaults.
+# scripts/provision-kv.mjs leaves a pinned binding alone.
+[[kv_namespaces]]
+binding = "DATA_KV_F"
+id = "9f66ad41f7c0469fb1178d3de75b0e68"
 
 # ==============================================================================
 # Environment variables

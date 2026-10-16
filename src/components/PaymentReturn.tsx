@@ -3,7 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FaCheckCircle, FaWhatsapp, FaTimes } from 'react-icons/fa';
 import { useBrand } from '../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
-import { getCheckoutResult, CheckoutResult } from '../services/paymentService';
+import {
+  getCheckoutResult,
+  getBankPaymentResult,
+  CheckoutResult,
+  BankPaymentResult,
+} from '../services/paymentService';
 
 /**
  * Where the guest lands after paying.
@@ -23,7 +28,56 @@ import { getCheckoutResult, CheckoutResult } from '../services/paymentService';
  * Fired once per session id: the id is marked in sessionStorage before the
  * navigation, so a back button or a refresh re-shows the receipt without
  * telling the operator twice.
+ *
+ * A card processed by AZUL or CARDNET comes back as `?payment_ref=<order>`
+ * instead. The server has already checked the bank's answer (Azul's signature,
+ * CardNET's session) by then; this asks /api/payment-result for the verdict. A
+ * payment reported but not verifiable is still passed to the operator —
+ * flagged, so they check it in their payment portal before confirming.
+ *
+ * Nothing here names the processor: the guest paid by card, and which company
+ * processed it is the operator's business. The reference in the message is
+ * enough for the operator to find the payment.
  */
+
+type Receipt = {
+  paid: boolean;
+  /** Paid, but the bank's word could not be checked: the operator must look. */
+  unverified: boolean;
+  amountTotal: number | null;
+  currency: string | null;
+  tour: string;
+  persons: number | null;
+  date: string;
+  priceSource: string;
+  reference: string;
+};
+
+const fromStripe = (payment: CheckoutResult, sessionId: string): Receipt => ({
+  paid: payment.paid,
+  unverified: false,
+  amountTotal: payment.amountTotal,
+  currency: payment.currency,
+  tour: payment.tour,
+  persons: payment.persons,
+  date: payment.date,
+  priceSource: payment.priceSource,
+  reference: sessionId,
+});
+
+const fromBank = (payment: BankPaymentResult, ref: string): Receipt => ({
+  paid: payment.paid,
+  unverified: payment.status === 'unverified',
+  amountTotal: payment.amountTotal,
+  currency: payment.currency,
+  tour: payment.tour,
+  persons: payment.persons,
+  date: payment.date,
+  priceSource: payment.priceSource,
+  reference: [ref, payment.authorizationCode && `Auth ${payment.authorizationCode}`, payment.reference && `RRN ${payment.reference}`]
+    .filter(Boolean)
+    .join(' · '),
+});
 
 const NOTIFIED_PREFIX = 'amigo:paid-notified:';
 const COUNTDOWN_SECONDS = 5;
@@ -45,14 +99,14 @@ const markNotified = (sessionId: string) => {
 };
 
 const money = (amount: number | null, currency: string | null) =>
-  amount === null ? '' : `${currency ?? 'USD'} $${amount.toFixed(2)}`;
+  amount === null ? '' : currency === 'DOP' ? `RD$ ${amount.toFixed(2)}` : `${currency ?? 'USD'} $${amount.toFixed(2)}`;
 
 const PaymentReturn: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { brandSettings } = useBrand();
 
-  const [result, setResult] = useState<CheckoutResult | null>(null);
+  const [result, setResult] = useState<Receipt | null>(null);
   const [state, setState] = useState<'idle' | 'checking' | 'done' | 'failed' | 'cancelled'>('idle');
   const [countdown, setCountdown] = useState<number | null>(null);
   const [sessionId, setSessionId] = useState('');
@@ -60,12 +114,14 @@ const PaymentReturn: React.FC = () => {
   const params = new URLSearchParams(location.search);
   const paidFlag = params.get('paid');
   const incomingSession = params.get('session_id') ?? '';
+  const incomingRef = params.get('payment_ref') ?? '';
 
   /** Strip the payment params so a refresh does not replay any of this. */
   const clearQuery = useCallback(() => {
     const next = new URLSearchParams(location.search);
     next.delete('paid');
     next.delete('session_id');
+    next.delete('payment_ref');
     const search = next.toString();
     navigate({ pathname: location.pathname, search: search ? `?${search}` : '' }, { replace: true });
   }, [location.pathname, location.search, navigate]);
@@ -75,18 +131,32 @@ const PaymentReturn: React.FC = () => {
       setState('cancelled');
       return;
     }
-    if (paidFlag !== '1' || !incomingSession) return;
+
+    const bank = Boolean(incomingRef);
+    const id = bank ? incomingRef : incomingSession;
+    if (!bank && (paidFlag !== '1' || !incomingSession)) return;
 
     let current = true;
     setState('checking');
-    setSessionId(incomingSession);
+    setSessionId(id);
 
-    getCheckoutResult(incomingSession)
+    const lookup: Promise<Receipt | 'cancelled'> = bank
+      ? getBankPaymentResult(id).then((payment) =>
+          payment.status === 'cancelled' ? 'cancelled' : fromBank(payment, id)
+        )
+      : getCheckoutResult(id).then((payment) => fromStripe(payment, id));
+
+    lookup
       .then((payment) => {
         if (!current) return;
+        if (payment === 'cancelled') {
+          setState('cancelled');
+          return;
+        }
         setResult(payment);
-        setState(payment.paid ? 'done' : 'failed');
-        if (payment.paid && !wasNotified(incomingSession)) {
+        const settled = payment.paid || payment.unverified;
+        setState(settled ? 'done' : 'failed');
+        if (settled && !wasNotified(id)) {
           setCountdown(COUNTDOWN_SECONDS);
         }
       })
@@ -97,7 +167,7 @@ const PaymentReturn: React.FC = () => {
     return () => {
       current = false;
     };
-  }, [paidFlag, incomingSession]);
+  }, [paidFlag, incomingSession, incomingRef]);
 
   const operatorMessage = useCallback(() => {
     if (!result) return '';
@@ -115,17 +185,22 @@ const PaymentReturn: React.FC = () => {
 
     // Built line by line and joined, so an absent date leaves no gap rather
     // than a stray blank line in the middle of the operator's message.
+    const check = result.unverified
+      ? '\n\n⚠️ El pago no se pudo verificar automáticamente — revísalo en tu portal de pagos antes de confirmar. / ' +
+        'The payment could not be verified automatically — check it in your payment portal before confirming.'
+      : '';
+
     return [
-      '✅ PAGO RECIBIDO / PAYMENT RECEIVED',
+      result.unverified ? '🟡 PAGO POR VERIFICAR / PAYMENT TO VERIFY' : '✅ PAGO RECIBIDO / PAYMENT RECEIVED',
       '',
-      `${total} pagado con tarjeta vía Stripe.`,
-      `${total} paid by card via Stripe.`,
+      `${total} pagado con tarjeta en línea.`,
+      `${total} paid online by card.`,
       '',
       `Tour: ${result.tour || '—'}`,
       people ? `Personas / People: ${people}` : '',
       when.trim(),
       '',
-      `Ref: ${sessionId}${note}`,
+      `Ref: ${result.reference || sessionId}${note}${check}`,
     ]
       .filter((line, index, all) => line !== '' || all[index - 1] !== '')
       .join('\n');
@@ -176,7 +251,7 @@ const PaymentReturn: React.FC = () => {
         {state === 'checking' && (
           <>
             <h2 className="font-display text-2xl font-bold">Confirmando el pago…</h2>
-            <p className="mt-3 text-ink-soft">Checking your payment with Stripe. One moment.</p>
+            <p className="mt-3 text-ink-soft">Checking your payment. One moment.</p>
           </>
         )}
 
@@ -185,8 +260,12 @@ const PaymentReturn: React.FC = () => {
             <div className="mb-4 flex items-center gap-3">
               <FaCheckCircle className="h-9 w-9 text-jungle" />
               <div>
-                <h2 className="font-display text-2xl font-bold leading-tight">¡Pago recibido!</h2>
-                <p className="text-sm text-ink-light">Payment received</p>
+                <h2 className="font-display text-2xl font-bold leading-tight">
+                  {result.unverified ? 'Pago en revisión' : '¡Pago recibido!'}
+                </h2>
+                <p className="text-sm text-ink-light">
+                  {result.unverified ? 'Payment being checked' : 'Payment received'}
+                </p>
               </div>
             </div>
 

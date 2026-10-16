@@ -41,13 +41,15 @@ const buildResourceEntries = (env: Record<string, string | undefined>) => {
     { resource: 'transfer-config', envKey: 'VITE_JSONBIN_TRANSFER_BIN_ID' },
     { resource: 'social-media', envKey: 'VITE_JSONBIN_SOCIAL_BIN_ID' },
     { resource: 'testimonials', envKey: 'VITE_JSONBIN_TESTIMONIALS_BIN_ID' },
-    { resource: 'blog', envKey: { en: 'VITE_JSONBIN_BLOG_EN', es: 'VITE_JSONBIN_BLOG_ES' } },
-    { resource: 'tours', envKey: { en: 'VITE_JSONBIN_TOURS_EN', es: 'VITE_JSONBIN_TOURS_ES' } },
-    { resource: 'transport-services', envKey: { en: 'VITE_JSONBIN_TRANSPORT_EN', es: 'VITE_JSONBIN_TRANSPORT_ES' } },
-    { resource: 'example-tours', envKey: { en: 'VITE_JSONBIN_EXAMPLETESTOURS_EN_BIN_ID', es: 'VITE_JSONBIN_EXAMPLETESTOURS_ES_BIN_ID' } },
-    { resource: 'story-elements', envKey: { en: 'VITE_JSONBIN_STORY_ELEMENTS_EN', es: 'VITE_JSONBIN_STORY_ELEMENTS_ES' } },
-    { resource: 'intro-story', envKey: { en: 'VITE_JSONBIN_JOURNEY_EN', es: 'VITE_JSONBIN_JOURNEY_ES' } },
-    { resource: 'translations', envKey: { en: 'VITE_JSONBIN_EN_BIN_ID', es: 'VITE_JSONBIN_ES_BIN_ID' } },
+    { resource: 'blog', envKey: { en: 'VITE_JSONBIN_BLOG_EN', es: 'VITE_JSONBIN_BLOG_ES', fr: 'VITE_JSONBIN_BLOG_FR', de: 'VITE_JSONBIN_BLOG_DE' } },
+    { resource: 'tours', envKey: { en: 'VITE_JSONBIN_TOURS_EN', es: 'VITE_JSONBIN_TOURS_ES', fr: 'VITE_JSONBIN_TOURS_FR', de: 'VITE_JSONBIN_TOURS_DE' } },
+    { resource: 'transport-services', envKey: { en: 'VITE_JSONBIN_TRANSPORT_EN', es: 'VITE_JSONBIN_TRANSPORT_ES', fr: 'VITE_JSONBIN_TRANSPORT_FR', de: 'VITE_JSONBIN_TRANSPORT_DE' } },
+    { resource: 'example-tours', envKey: { en: 'VITE_JSONBIN_EXAMPLETESTOURS_EN_BIN_ID', es: 'VITE_JSONBIN_EXAMPLETESTOURS_ES_BIN_ID', fr: 'VITE_JSONBIN_EXAMPLETESTOURS_FR_BIN_ID', de: 'VITE_JSONBIN_EXAMPLETESTOURS_DE_BIN_ID' } },
+    { resource: 'story-elements', envKey: { en: 'VITE_JSONBIN_STORY_ELEMENTS_EN', es: 'VITE_JSONBIN_STORY_ELEMENTS_ES', fr: 'VITE_JSONBIN_STORY_ELEMENTS_FR', de: 'VITE_JSONBIN_STORY_ELEMENTS_DE' } },
+    { resource: 'story-nodes', envKey: { en: 'VITE_JSONBIN_STORY_NODES_EN', es: 'VITE_JSONBIN_STORY_NODES_ES', fr: 'VITE_JSONBIN_STORY_NODES_FR', de: 'VITE_JSONBIN_STORY_NODES_DE' } },
+    { resource: 'intro-story', envKey: { en: 'VITE_JSONBIN_JOURNEY_EN', es: 'VITE_JSONBIN_JOURNEY_ES', fr: 'VITE_JSONBIN_JOURNEY_FR', de: 'VITE_JSONBIN_JOURNEY_DE' } },
+    { resource: 'story-quiz-rules', envKey: 'VITE_JSONBIN_STORY_RULES' },
+    { resource: 'translations', envKey: { en: 'VITE_JSONBIN_EN_BIN_ID', es: 'VITE_JSONBIN_ES_BIN_ID', fr: 'VITE_JSONBIN_FR_BIN_ID', de: 'VITE_JSONBIN_DE_BIN_ID' } },
   ];
 };
 
@@ -101,7 +103,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
         continue;
       }
 
-      for (const locale of ['en', 'es'] as const) {
+      for (const locale of ['en', 'es', 'fr', 'de'] as const) {
         const envKey = entry.envKey[locale];
         const binUrl = normalizeJsonBinUrl(env[envKey]);
         const resourceKey = `${entry.resource}-${locale}`;

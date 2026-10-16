@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useI18n } from './I18nContext';
+import { getContentLocale, useI18n } from './I18nContext';
 import { usePlannerCopy } from '../planner/usePlannerCopy';
 import { buildPlan, MAX_PLAN_DAYS } from '../planner/engine';
 import { buildCatalogue, loadPlannerCatalogue } from '../planner/catalogueSource';
@@ -124,7 +124,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     let current = true;
     setLoading(true);
 
-    loadPlannerCatalogue(locale)
+    loadPlannerCatalogue(getContentLocale(locale))
       .then((tours) => {
         if (!current) return;
         setCatalogue(buildCatalogue(tours));
