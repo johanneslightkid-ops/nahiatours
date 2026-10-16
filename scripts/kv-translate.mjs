@@ -254,12 +254,40 @@ const repair = async (s, keys) => {
   }
 };
 
+// ── Fix: one field, by path, e.g. "bavarotours:tours:0.description" ─────────
+const fixField = async (spec) => {
+  const [site, resource, path] = spec.split(':');
+  const s = SITES.find((x) => x.site === site);
+  const keys = await kvKeys(s.ns);
+  const from = keys.has(`${resource}-en`) ? 'en' : 'es';
+  const source = await kvGet(s.ns, `${resource}-${from}`);
+  const get = (obj) => path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+  const text = get(source);
+  for (const to of TARGETS) {
+    const key = `${resource}-${to}`;
+    const target = await kvGet(s.ns, key);
+    if (!target || typeof text !== 'string') continue;
+    const translated = await translateLong(text, from, to);
+    const parts = path.split('.');
+    const parent = parts.slice(0, -1).reduce((o, k) => o[k], target);
+    console.log(`  ${site} ${key} ${path}: ${translated.slice(0, 80).replace(/\n/g, ' ')}…`);
+    if (translated && translated !== text) {
+      parent[parts[parts.length - 1]] = translated;
+      if (APPLY) await kvPut(s.ns, key, target);
+    }
+  }
+};
+
 // ── Run ──────────────────────────────────────────────────────────────────────
 if (!TOKEN) throw new Error('no CLOUDFLARE_API_TOKEN');
 account = process.env.CLOUDFLARE_ACCOUNT_ID || (await (await cf('/accounts?per_page=50')).json()).result[0].id;
 console.log(APPLY ? '[kv-translate] APPLYING' : '[kv-translate] dry run — nothing is written, nothing is translated');
 mkdirSync('kv-translate', { recursive: true });
 const report = [];
+if (process.env.KV_TRANSLATE_FIX) {
+  for (const spec of process.env.KV_TRANSLATE_FIX.split(',')) await fixField(spec.trim());
+  process.exit(0);
+}
 
 for (const s of SITES) {
   if (ONLY.length && !ONLY.includes(s.site)) continue;
