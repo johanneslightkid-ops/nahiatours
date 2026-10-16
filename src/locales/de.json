@@ -37,8 +37,7 @@
   "payment": {
     "paypal": "Mit PayPal zahlen",
     "paypalContact": "Anzahlung mit PayPal zahlen",
-    "verifone": "Mit Verifone zahlen",
-    "verifoneContact": "Anzahlung mit Verifone zahlen",
+    "cardDeposit": "Anzahlung mit Karte zahlen",
     "total": "Zahlungsbetrag"
   },
   "parallax": {

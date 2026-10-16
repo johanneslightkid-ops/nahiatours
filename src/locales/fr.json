@@ -37,8 +37,7 @@
   "payment": {
     "paypal": "Payer avec PayPal",
     "paypalContact": "Payer l'acompte avec PayPal",
-    "verifone": "Payer avec Verifone",
-    "verifoneContact": "Payer l'acompte avec Verifone",
+    "cardDeposit": "Payer l'acompte par carte",
     "total": "Total du paiement"
   },
   "parallax": {

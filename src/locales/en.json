@@ -37,8 +37,7 @@
   "payment": {
     "paypal": "Pay with PayPal",
     "paypalContact": "Pay deposit with PayPal",
-    "verifone": "Pay with Verifone",
-    "verifoneContact": "Pay deposit with Verifone",
+    "cardDeposit": "Pay a deposit by card",
     "total": "Payment total"
   },
   "parallax": {
