@@ -25,6 +25,7 @@ import { onRequest as handleInitData } from '../functions/init-data';
 import { onRequest as handleBlog } from '../functions/blog';
 import { onRequest as handleAdminAuth } from '../functions/api/admin-auth';
 import { onRequest as handleAi } from '../functions/api/ai';
+import { onRequest as handleTranscribe } from '../functions/api/transcribe';
 import { onRequest as handleHealth } from '../functions/api/health';
 import { onRequest as handleTestimonials } from '../functions/api/testimonials';
 import { onRequest as handleAdminPassword } from '../functions/api/admin-password';
@@ -64,6 +65,8 @@ const ROUTES: Record<string, RouteHandler> = {
   // One endpoint for Gemini, OpenRouter and Workers AI. `/api/cf-ai` stays
   // routed below so an older client build keeps working after a deploy.
   '/api/ai': handleAi,
+  // Dictation from a phone: recorded audio to Whisper on Workers AI.
+  '/api/transcribe': handleTranscribe,
   '/api/admin-password': handleAdminPassword,
   '/api/stripe-checkout': handleStripeCheckout,
   '/api/stripe-session': handleStripeSession,

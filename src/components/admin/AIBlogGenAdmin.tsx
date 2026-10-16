@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCheck, FaCopy, FaImages, FaMagic, FaMicrophone, FaRedo, FaSave, FaSearch, FaShareAlt, FaSpinner, FaStop, FaTrash } from 'react-icons/fa';
 import { getTours, Tour } from '../../services/toursService';
 import { getAISettings, AISettings } from '../../services/aiSettingsService';
@@ -7,13 +7,16 @@ import { saveBlogArticle, getBlogArticles, BlogArticle } from '../../services/bl
 import TranslateBar from './TranslateBar';
 import { useTranslationSync } from './useTranslationSync';
 import { Lang, translateRecord } from '../../lib/autoTranslate';
-import { SUPPORTED_LOCALES } from '../../contexts/I18nContext';
+import { SUPPORTED_LOCALES, useI18n } from '../../contexts/I18nContext';
+import { useDictation } from '../../lib/useDictation';
 import { getSocialApiSettings } from '../../services/socialApiSettingsService';
 import { getSocialMediaData, SocialMediaAccount } from '../../services/socialMediaService';
 import { apiPost } from '../../services/apiClient';
 import { getAdminPassword } from '../../services/authStore';
 import { useBrand } from '../../contexts/BrandContext';
-import { TOPICS, hashtagsFor } from '../../lib/blogTopics';
+import { TOPICS, hashtagsFor, keywordsFor, seasonalNote, BlogLang } from '../../lib/blogTopics';
+import { BLOG_TEMPLATES } from '../../lib/blogTemplates';
+import { getPublishedTestimonials } from '../../services/testimonialService';
 import { SHARE_TARGETS, shareTo, copyText, shareTargetFor } from '../../lib/socialShare';
 import ArticleBody from '../ui/ArticleBody';
 
@@ -62,11 +65,21 @@ interface PostState {
   post: GeneratedPost;
   saved: boolean;
   /** Which language the preview is showing. */
-  view: 'en' | 'es';
+  view: BlogLang;
 }
 
-/** The generator writes English and Spanish itself; any other site language is translated from the English. */
-const EXTRA_LANGUAGES = SUPPORTED_LOCALES.filter((l) => l !== 'en' && l !== 'es') as Lang[];
+/** The generator writes every site language itself, from the English piece. */
+const EDITIONS = SUPPORTED_LOCALES.filter((l) => l !== 'en') as BlogLang[];
+const LANGUAGE_TABS: Record<BlogLang, string> = { es: 'Español', en: 'English', fr: 'Français', de: 'Deutsch' };
+const PROGRESS_LANGUAGE: Record<BlogLang, string> = { en: 'inglés', es: 'español', fr: 'francés', de: 'alemán' };
+
+/** Short, well-rated reviews make the best quotes. */
+const quotableReviews = (reviews: { review: string; rating: number }[]): string[] =>
+  reviews
+    .filter((r) => Number(r.rating) >= 4 && r.review && r.review.length >= 30 && r.review.length <= 280)
+    .sort((a, b) => Number(b.rating) - Number(a.rating))
+    .slice(0, 3)
+    .map((r) => r.review.replace(/\s+/g, ' ').trim());
 
 const slugify = (value: string) =>
   value
@@ -88,6 +101,9 @@ const AIBlogGenAdmin: React.FC = () => {
 
   // ── The brief ────────────────────────────────────────────────────────────
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [template, setTemplate] = useState<string>(BLOG_TEMPLATES[0].id);
+  const [reviews, setReviews] = useState<string[]>([]);
+  const [quoteReviews, setQuoteReviews] = useState(true);
   const [selectedTours, setSelectedTours] = useState<string[]>([]);
   const [audience, setAudience] = useState<Audience>({
     origin: 'Estados Unidos',
@@ -120,9 +136,9 @@ const AIBlogGenAdmin: React.FC = () => {
   const sync = useTranslationSync('en');
 
   // ── Dictation ────────────────────────────────────────────────────────────
-  const [recording, setRecording] = useState(false);
-  const recognitionRef = useRef<any>(null);
-  const finalTranscriptRef = useRef('');
+  // The notes are dictated in the language the admin is working in.
+  const { locale } = useI18n();
+  const dictation = useDictation(notes, setNotes, locale);
 
   useEffect(() => {
     (async () => {
@@ -133,61 +149,19 @@ const AIBlogGenAdmin: React.FC = () => {
       // click rather than after a wait.
       const status = await providerStatus();
       if (status) setAnyProviderUsable(status.providers.some((prov) => prov.usable));
+      try {
+        setReviews(quotableReviews(await getPublishedTestimonials()));
+      } catch {
+        setReviews([]);
+      }
       const social = await getSocialMediaData();
       setSocialAccounts((social.accounts || []).filter((a: SocialMediaAccount) => a.enabled));
     })();
 
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'es-DO';
-      recognition.onresult = (event: any) => {
-        let interim = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          const chunk = event.results[i][0].transcript;
-          // Interim results repeat the whole in-progress phrase, so only the
-          // finalised ones may be accumulated.
-          if (event.results[i].isFinal) finalTranscriptRef.current += chunk;
-          else interim += chunk;
-        }
-        setNotes(finalTranscriptRef.current + interim);
-      };
-      recognition.onend = () => setRecording(false);
-      recognition.onerror = () => setRecording(false);
-      recognitionRef.current = recognition;
-    }
-
-    return () => {
-      try {
-        recognitionRef.current?.stop();
-      } catch {
-        /* already stopped */
-      }
-      recognitionRef.current = null;
-    };
   }, []);
 
   const toggle = (list: string[], value: string) =>
     list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
-
-  const toggleRecording = () => {
-    const recognition = recognitionRef.current;
-    if (!recognition) return;
-    if (recording) {
-      recognition.stop();
-      setRecording(false);
-      return;
-    }
-    finalTranscriptRef.current = notes ? `${notes} ` : '';
-    try {
-      recognition.start();
-      setRecording(true);
-    } catch {
-      /* start() throws when already running; onend settles the state */
-    }
-  };
 
   /** Upload straight away, so the article can reference a real URL. */
   const handleImages = async (files: FileList | null) => {
@@ -255,12 +229,17 @@ const AIBlogGenAdmin: React.FC = () => {
     return '1 artículo traducido';
   };
 
+  /** All four languages at once; an edition the model could not write is translated instead. */
   const savePost = async (entry: PostState) => {
     await saveBlogArticle(buildArticleRecord(entry.post.en, entry.post, 'en', entry.id), 'en');
-    await saveBlogArticle(buildArticleRecord(entry.post.es, entry.post, 'es', entry.id), 'es');
+    for (const lang of EDITIONS) {
+      if (entry.post.missing.includes(lang)) continue;
+      await saveBlogArticle(buildArticleRecord(entry.post[lang], entry.post, lang, entry.id), lang);
+    }
     setPosts((prev) => prev.map((p) => (p.id === entry.id ? { ...p, saved: true } : p)));
-    if (EXTRA_LANGUAGES.length > 0) {
-      void sync.afterSave((to, report) => translatePost(entry, to, report), EXTRA_LANGUAGES);
+    const toTranslate = entry.post.missing.filter((lang) => EDITIONS.includes(lang)) as Lang[];
+    if (toTranslate.length > 0) {
+      void sync.afterSave((to, report) => translatePost(entry, to, report), toTranslate);
     }
   };
 
@@ -322,11 +301,8 @@ const AIBlogGenAdmin: React.FC = () => {
 
     try {
       for (let i = 0; i < variations; i += 1) {
-        setProgress(
-          variations > 1
-            ? `Escribiendo el artículo ${i + 1} de ${variations}…`
-            : 'Escribiendo el artículo en inglés, luego en español…'
-        );
+        const of = variations > 1 ? ` (${i + 1}/${variations})` : '';
+        setProgress(`Escribiendo en inglés${of}…`);
 
         const post = await generateBlogPost(aiSettings, {
           povOrigin: audience.origin,
@@ -335,14 +311,16 @@ const AIBlogGenAdmin: React.FC = () => {
           povGender: audience.gender,
           povExclusivity: audience.style,
           selectedTours,
-          topics: selectedTopics.map(
-            (id) => TOPICS.find((t) => t.id === id)?.label.es || id
-          ),
+          topics: selectedTopics,
           voiceTranscript: notes,
           mediaBase64: firstImageBase64,
           images,
           brandName: brandSettings.brandName,
           socialPlatforms: platforms,
+          template,
+          reviews: quoteReviews ? reviews : [],
+          languages: EDITIONS,
+          onProgress: (lang) => setProgress(`Escribiendo la edición en ${PROGRESS_LANGUAGE[lang]}${of}…`),
         });
 
         const entry: PostState = {
@@ -440,8 +418,9 @@ const AIBlogGenAdmin: React.FC = () => {
             <FaMagic className="text-mango" /> Generador de blog
           </h2>
           <p className="mt-1 text-sm text-ink-light">
-            Escribe un artículo largo en inglés y español, con pie de foto, entrada en negrita e
-            imágenes colocadas. Proveedor activo:{' '}
+            Escribe un artículo largo en inglés, español, francés y alemán, con pie de foto,
+            entrada en negrita, imágenes colocadas y las búsquedas de cada idioma. Proveedor
+            activo:{' '}
             <strong className="text-ink">{providerLabel}</strong>
           </p>
         </div>
@@ -510,8 +489,36 @@ const AIBlogGenAdmin: React.FC = () => {
           ))}
         </div>
 
+        <div className="mt-6">
+          <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
+            Formato del artículo
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {BLOG_TEMPLATES.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTemplate(t.id)}
+                title={t.hint}
+                className={chip(template === t.id)}
+              >
+                {t.label.es}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-ink-light">
+            {BLOG_TEMPLATES.find((t) => t.id === template)?.hint}
+          </p>
+        </div>
+
         {selectedTopics.length > 0 && (
           <div className="mt-4 rounded-2xl bg-paper-warm p-3">
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
+              Búsquedas que el artículo trabajará (español)
+            </p>
+            <p className="mb-3 mt-1 break-words text-sm text-ink-soft">
+              {keywordsFor(selectedTopics, 'es').join(' · ')}
+            </p>
             <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
               Hashtags que se usarán
             </p>
@@ -620,18 +627,32 @@ const AIBlogGenAdmin: React.FC = () => {
             <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
               Notas para el artículo
             </p>
-            {recognitionRef.current && (
+            {dictation.mode !== 'none' && (
               <button
                 type="button"
-                onClick={toggleRecording}
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold transition ${
-                  recording ? 'bg-hibiscus text-white' : 'border border-ink/20 text-ink-soft hover:border-lagoon'
+                onClick={dictation.toggle}
+                disabled={dictation.transcribing}
+                aria-pressed={dictation.listening}
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold transition disabled:opacity-60 ${
+                  dictation.listening ? 'bg-hibiscus text-white' : 'border border-ink/20 text-ink-soft hover:border-lagoon'
                 }`}
               >
-                {recording ? <><FaStop /> Detener</> : <><FaMicrophone /> Dictar</>}
+                {dictation.transcribing ? (
+                  <><FaSpinner className="animate-spin" /> Transcribiendo…</>
+                ) : dictation.listening ? (
+                  <><FaStop /> Detener{dictation.mode === 'record' ? ` · ${dictation.seconds}s` : ''}</>
+                ) : (
+                  <><FaMicrophone /> Dictar</>
+                )}
               </button>
             )}
           </div>
+          {dictation.error && <p className="mb-2 text-xs font-semibold text-hibiscus-dark">{dictation.error}</p>}
+          {dictation.mode === 'none' && (
+            <p className="mb-2 text-xs text-ink-light">
+              Este navegador no permite dictar. Puedes usar el micrófono del teclado del teléfono.
+            </p>
+          )}
           <textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
@@ -750,7 +771,24 @@ const AIBlogGenAdmin: React.FC = () => {
           </div>
         </div>
 
+        <p className="mt-5 rounded-2xl bg-paper-warm p-3 text-xs text-ink-soft">
+          <strong className="text-ink">Temporada:</strong> {seasonalNote()}
+        </p>
+
         <div className="mt-5 flex flex-wrap gap-5 border-t border-ink/10 pt-5">
+          <label className="inline-flex items-center gap-2.5 text-sm font-semibold text-ink-soft">
+            <input
+              type="checkbox"
+              checked={quoteReviews && reviews.length > 0}
+              onChange={(event) => setQuoteReviews(event.target.checked)}
+              disabled={reviews.length === 0}
+              className="h-4 w-4"
+            />
+            Citar reseñas reales
+            <span className="text-xs font-normal text-ink-light">
+              ({reviews.length ? `${reviews.length} disponibles` : 'no hay reseñas publicadas'})
+            </span>
+          </label>
           <label className="inline-flex items-center gap-2.5 text-sm font-semibold text-ink-soft">
             <input
               type="checkbox"
@@ -777,11 +815,12 @@ const AIBlogGenAdmin: React.FC = () => {
       </section>
 
       {/* ── The result ──────────────────────────────────────────────────── */}
-      {posts.length > 0 && (
+      {/* Only for an edition the model could not write itself. */}
+      {posts.some((entry) => entry.post.missing.length > 0) && (
         <TranslateBar
           sync={sync}
           what="el artículo publicado"
-          languages={EXTRA_LANGUAGES}
+          languages={EDITIONS as Lang[]}
           fillMissing={fillMissingPosts}
           disabled={!posts.some((entry) => entry.saved)}
         />
@@ -794,7 +833,7 @@ const AIBlogGenAdmin: React.FC = () => {
           <section key={entry.id} className={card}>
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-ink/10 pb-4">
               <div className="inline-flex rounded-full bg-paper-warm p-1">
-                {(['es', 'en'] as const).map((lang) => (
+                {(['es', 'en', 'fr', 'de'] as const).map((lang) => (
                   <button
                     key={lang}
                     type="button"
@@ -807,7 +846,12 @@ const AIBlogGenAdmin: React.FC = () => {
                       entry.view === lang ? 'bg-white text-ink shadow-sm' : 'text-ink-light'
                     }`}
                   >
-                    {lang === 'es' ? 'Español' : 'English'}
+                    {LANGUAGE_TABS[lang]}
+                    {entry.post.missing.includes(lang) && (
+                      <span className="ml-1 text-[0.7em] text-sunset-dark" title="Se traducirá al guardar">
+                        *
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
