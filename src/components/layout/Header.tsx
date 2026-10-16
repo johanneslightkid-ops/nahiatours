@@ -53,6 +53,16 @@ const NAV: NavItem[] = [
 
 const STRINGS = [22, 40, 28, 46, 30, 38];
 
+/**
+ * The header floats 0.75rem below the top of the window, so a rope that only
+ * started at the header looked tied to thin air. Every rope is ROPE_EXTRA
+ * longer and every hanging piece is lifted by ROPE_LIFT: the ropes now run up
+ * past the edge of the window, and what hangs from them sits the difference
+ * (1.5rem) lower than before.
+ */
+const ROPE_EXTRA = '3rem';
+const ROPE_LIFT = '-1.5rem';
+
 /* ── Pieces ────────────────────────────────────────────────────────────── */
 
 const Vine: React.FC = () => (
@@ -312,17 +322,17 @@ const Header: React.FC = () => {
             >
               <motion.div
                 className="flex flex-col items-center"
-                style={{ transformOrigin: '50% 0%' }}
+                style={{ transformOrigin: '50% 0%', marginTop: ROPE_LIFT }}
                 initial={reduced ? false : { y: -120 }}
                 animate={{ y: 0 }}
                 whileHover={{ rotate: [0, -6, 4, -2, 0], transition: { duration: 1.4 } }}
                 transition={{ type: 'spring', stiffness: 90, damping: 11 }}
               >
                 {/* Logo rope — anchored to y=0 of the vine container */}
-                <span className="rope-string" style={{ height: '1.4rem' }} />
+                <span className="rope-string" style={{ height: `calc(1.4rem + ${ROPE_EXTRA})` }} />
                 <Logo className="h-24 w-24" />
               </motion.div>
-              <span className="desktop-brand-name brand-name-crystal mt-10">
+              <span className="desktop-brand-name brand-name-crystal mt-[4rem]">
                 {brandSettings.brandName}
               </span>
             </Link>
@@ -334,7 +344,7 @@ const Header: React.FC = () => {
                   <motion.div
                     key={item.to}
                     className="flex flex-col items-center"
-                    style={{ transformOrigin: '50% 0%' }}
+                    style={{ transformOrigin: '50% 0%', marginTop: ROPE_LIFT }}
                     initial={reduced ? false : { y: -140 }}
                     animate={{ y: 0 }}
                     transition={{ type: 'spring', stiffness: 110, damping: 10, delay: 0.1 + i * 0.07 }}
@@ -346,7 +356,7 @@ const Header: React.FC = () => {
                       whileTap={{ scale: 0.95 }}
                     >
                       {/* Rope runs from top-0 of the header wrapper */}
-                      <span className="rope-string" style={{ height: `${STRINGS[i % STRINGS.length]}px` }} />
+                      <span className="rope-string" style={{ height: `calc(${STRINGS[i % STRINGS.length]}px + ${ROPE_EXTRA})` }} />
                       <Link
                         to={item.to}
                         onClick={() => playClickFx()}
