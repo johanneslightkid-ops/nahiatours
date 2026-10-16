@@ -6,6 +6,8 @@ export interface PaymentVisibility {
   stripe?: boolean;
   paypal?: boolean;
   cash?: boolean;
+  azul?: boolean;
+  cardnet?: boolean;
 }
 
 export type HeroMediaType = 'image' | 'video';
@@ -42,6 +44,15 @@ export interface BrandSettings {
    */
   verifoneLink: string;
   brandicon: string;
+  /**
+   * A payment link from the bank's own portal — Azul's "Link de Pagos" or
+   * CardNET's "Enlace de Pago". Used when the gateway itself is not configured
+   * with merchant credentials. May carry {amount}, {currency} and {ref}
+   * placeholders, which the storefront fills in; without them it is opened as
+   * it is and the guest is shown the amount to pay.
+   */
+  azulLink?: string;
+  cardnetLink?: string;
   /** Master switch for card payments. Off by default: nothing takes money by accident. */
   stripeEnabled?: boolean;
   paymentVisibility?: PaymentVisibility;
@@ -74,7 +85,9 @@ const defaultBrandSettings: BrandSettings = {
   verifoneLink: '',
   brandicon: '',
   stripeEnabled: false,
-  paymentVisibility: { stripe: true, paypal: true, cash: true },
+  azulLink: '',
+  cardnetLink: '',
+  paymentVisibility: { stripe: true, paypal: true, cash: true, azul: true, cardnet: true },
   heroMedia: defaultHeroMedia,
   heroRatingEnabled: true,
   heroRatingRange: { min: 3, max: 5 },
@@ -86,6 +99,8 @@ const normalizePaymentVisibility = (input: unknown): PaymentVisibility => {
     stripe: typeof source.stripe === 'boolean' ? source.stripe : true,
     paypal: typeof source.paypal === 'boolean' ? source.paypal : true,
     cash: typeof source.cash === 'boolean' ? source.cash : true,
+    azul: typeof source.azul === 'boolean' ? source.azul : true,
+    cardnet: typeof source.cardnet === 'boolean' ? source.cardnet : true,
   };
 };
 
@@ -131,6 +146,8 @@ const normalizeBrandSettings = (input: Partial<BrandSettings> | null | undefined
   phoneNumber: typeof input?.phoneNumber === 'string' ? input.phoneNumber : '',
   paypalMeLink: typeof input?.paypalMeLink === 'string' ? input.paypalMeLink : '',
   verifoneLink: typeof input?.verifoneLink === 'string' ? input.verifoneLink : '',
+  azulLink: typeof input?.azulLink === 'string' ? input.azulLink.trim() : '',
+  cardnetLink: typeof input?.cardnetLink === 'string' ? input.cardnetLink.trim() : '',
   brandicon:
    typeof input?.brandicon === 'string' && input.brandicon.trim()
      ? input.brandicon
@@ -153,11 +170,14 @@ export const getBrandSettings = async (): Promise<BrandSettings> => {
   }
 };
 
-export const saveBrandSettings = async (settings: BrandSettings): Promise<void> => {
+/** Resolves false when the save failed, so a panel can say so instead of claiming success. */
+export const saveBrandSettings = async (settings: BrandSettings): Promise<boolean> => {
   try {
     await apiPut<unknown>('brand', settings);
+    return true;
   } catch (error) {
     console.error('Failed to save brand settings:', error);
+    return false;
   }
 };
 

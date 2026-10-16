@@ -1,5 +1,5 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
-import { PROTECTED_RESOURCES } from '../../shared/paymentConfig';
+import { isProtectedResource } from '../../shared/paymentConfig';
 
 const RESOURCE_WITH_LOCALE = new Set([
   'blog',
@@ -82,12 +82,13 @@ const readLocalJson = async (
 const buildResourceKey = (resource: string, locale?: string) => {
   const normalized = resource.trim().toLowerCase();
 
-  // Some KV keys hold credentials — the Stripe secret key, the admin password.
+  // Some KV keys hold credentials — the payment secrets, the admin password,
+  // the pending bank payments with their CardNET session keys.
   // This endpoint is unauthenticated on GET and cached publicly, so it must
   // never be able to name one, however it is asked. Returning null here makes
   // the request a 400 alongside any other unknown resource, which also avoids
   // confirming that the key exists.
-  if (PROTECTED_RESOURCES.has(normalized)) {
+  if (isProtectedResource(normalized)) {
     return null;
   }
 
