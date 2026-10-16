@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import TourCard from '../components/TourCard';
 import { Tour, getTours, getServiceSlug } from '../services/toursService';
-import { useI18n } from '../contexts/I18nContext';
+import { getContentLocale, useI18n } from '../contexts/I18nContext';
 import { useBrand } from '../contexts/BrandContext';
 import PageHeader from '../components/layout/PageHeader';
 import { Sailboat, Pineapple } from '../components/ui/Illustrations';
@@ -19,7 +19,7 @@ const Tours: React.FC = () => {
 
   const loadTours = async () => {
     setLoading(true);
-    const fetchedTours = await getTours(locale);
+    const fetchedTours = await getTours(getContentLocale(locale));
     setTours(fetchedTours);
     setLoading(false);
   };
@@ -33,7 +33,7 @@ const Tours: React.FC = () => {
   }
 
   return (
-    <div className="pb-20">
+    <div className="page-top pb-20">
       <PageHeader
         tone="lagoon"
         kicker="Pick your day"

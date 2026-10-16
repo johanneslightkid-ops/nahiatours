@@ -63,14 +63,14 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
       className={`group flex h-full flex-col overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
     >
       {/* Image container */}
-      <div className="relative h-60 overflow-hidden border-b-[2.5px] border-ink bg-paper-warm sm:h-64 md:h-80">
+      <div className="relative h-60 overflow-hidden bg-paper-warm sm:h-64 md:h-80">
         <img
           src={adventure.imageUrl}
           alt={adventure.title}
           className="photo-pop h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" decoding="async"
         />
         {/* Ink wash on hover, so the play button has something to sit against */}
-        <div className="absolute inset-0 bg-ink/45 opacity-0 transition-opacity group-hover:opacity-100" />
+        <div className="absolute inset-0 bg-gradient-to-t from-abyss/70 via-abyss/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
         {/* Video button overlay */}
         {!showVideo && (
@@ -86,9 +86,13 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
         )}
 
         {/* Emoji badge */}
-        <div className="absolute right-4 top-4 rotate-3 rounded-full border-[2.5px] border-ink bg-mango-light p-3 text-3xl leading-none shadow-ink-sm">
+        <div className="absolute right-4 top-4 rotate-3 rounded-pebble bg-paper-card/90 p-3 text-3xl leading-none shadow-ink transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
           {adventure.emoji}
         </div>
+        {/* The water line where the photo meets the card. */}
+        <svg className="pointer-events-none absolute inset-x-0 -bottom-px h-6 w-full" viewBox="0 0 400 24" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 14 C60 2 120 22 200 12 C280 2 340 20 400 10 L400 24 L0 24 Z" fill="#FFFDF8" />
+        </svg>
       </div>
 
       {/* Video embed */}

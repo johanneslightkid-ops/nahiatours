@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { localeTag } from '../lib/localeText';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
@@ -39,7 +40,7 @@ const TourCard: React.FC<TourCardProps> = ({
   const { brandSettings } = useBrand();
   const brandName = brandSettings.brandName;
   const swayClass = `animate-wave-sway-${(index % 10) + 1}`;
-  const locale = intl.locale === 'es' ? 'es' : 'en';
+  const locale = (['es', 'de', 'fr'].includes(intl.locale) ? intl.locale : 'en') as 'en' | 'es' | 'de' | 'fr';
 
   // Everyone pays the same rate, so a tour has exactly one price and the only
   // thing to ask for is how many people are coming.
@@ -55,7 +56,7 @@ const TourCard: React.FC<TourCardProps> = ({
   const totalAmount = useMemo(() => (rate.amount ?? 0) * persons, [rate.amount, persons]);
 
   const formattedSelectedDate = selectedDate
-    ? new Intl.DateTimeFormat(intl.locale === 'es' ? 'es-DO' : 'en-US', {
+    ? new Intl.DateTimeFormat(localeTag(intl.locale), {
       dateStyle: 'full',
     }).format(new Date(`${selectedDate}T00:00:00`))
     : '';
@@ -96,7 +97,7 @@ const TourCard: React.FC<TourCardProps> = ({
       className={`group mb-8 inline-block flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
     >
       {/* Media Frame */}
-      <div className="relative aspect-[16/10] overflow-hidden border-b-[2.5px] border-ink">
+      <div className="relative aspect-[16/10] overflow-hidden">
         <Link to={detailsPath} onClick={() => playClickFx()} className="block h-full w-full" aria-label={title}>
           <img
             src={image}
@@ -107,6 +108,10 @@ const TourCard: React.FC<TourCardProps> = ({
         <div className="artsy-brick-badge absolute left-4 top-4">
           <span>★ Excursion</span>
         </div>
+        {/* The water line where the photo meets the card. */}
+        <svg className="pointer-events-none absolute inset-x-0 -bottom-px h-6 w-full" viewBox="0 0 400 24" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 14 C60 2 120 22 200 12 C280 2 340 20 400 10 L400 24 L0 24 Z" fill="#FFFDF8" />
+        </svg>
       </div>
 
       {/* Content */}
@@ -172,7 +177,7 @@ const TourCard: React.FC<TourCardProps> = ({
               />
             </label>
 
-            <div className="flex items-center justify-between rounded-2xl border-[2.5px] border-ink bg-mango px-5 py-3 shadow-ink-sm">
+            <div className="flex items-center justify-between rounded-[22px_12px_22px_12px] bg-gradient-to-r from-mango-light to-mango px-5 py-3 shadow-mango">
               <span className="text-xs font-extrabold uppercase tracking-wider text-ink">
                 <FormattedMessage id="payment.total" defaultMessage="Total Estimate" />
               </span>
@@ -189,6 +194,11 @@ const TourCard: React.FC<TourCardProps> = ({
                 <PaymentDropdown
                   excursionTitle={title}
                   selectedPrice={totalAmount > 0 ? `$${totalAmount} USD` : price}
+                  amount={totalAmount > 0 ? totalAmount : undefined}
+                  persons={Math.max(1, persons)}
+                  bookingDate={formattedSelectedDate}
+                  category="tours"
+                  locale={intl.locale}
                   className="w-full"
                 />
               </div>

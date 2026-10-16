@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "image": "https://cdn.pixabay.com/photo/2016/11/18/17/20/airport-1834685_1280.jpg",
+    "title": "Privater Transfer (Zone Punta Cana)",
+    "description": "Privater Flughafentransfer mit persönlichem Empfang und Hilfe beim Gepäck.",
+    "price": "From USD 15",
+    "pricingOptions": [
+      {
+        "tier": "Personen",
+        "price": "From USD 15",
+        "amount": 15
+      }
+    ],
+    "details": {
+      "description": "Schneller, bequemer Transfer vom Flughafen oder Hotel mit eigenem Fahrer und klimatisiertem Fahrzeug.",
+      "images": [
+        "https://cdn.pixabay.com/photo/2016/11/18/17/20/airport-1834685_1280.jpg",
+        "https://cdn.pixabay.com/photo/2016/11/29/09/16/airport-1867307_1280.jpg"
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "image": "https://cdn.pixabay.com/photo/2016/11/29/09/32/car-1868725_1280.jpg",
+    "title": "Luxus-Transfer",
+    "description": "Premium-SUV oder Van für Geschäftsreisende und besondere Anlässe.",
+    "price": "From USD 35",
+    "pricingOptions": [
+      {
+        "tier": "Personen",
+        "price": "From USD 35",
+        "amount": 35
+      }
+    ],
+    "details": {
+      "description": "Mach deine Ankunft besonders: ein stilvoller VIP-Transfer mit erstklassigem Komfort.",
+      "images": [
+        "https://cdn.pixabay.com/photo/2016/11/29/09/32/car-1868725_1280.jpg",
+        "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"
+      ]
+    }
+  }
+]

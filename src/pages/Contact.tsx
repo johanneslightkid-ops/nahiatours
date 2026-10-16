@@ -9,7 +9,7 @@ const Contact = () => {
   const { brandSettings } = useBrand();
 
   return (
-    <div className="pb-20">
+    <div className="page-top pb-20">
       <PageHeader
         tone="mango"
         kicker="Say hola"

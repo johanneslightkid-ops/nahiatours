@@ -1,6 +1,14 @@
 # ==============================================================================
-# Cloudflare Worker configuration (static assets + API routes)
+# El Cortecito — Cloudflare Worker (static assets + API routes)
 # ==============================================================================
+#
+# A SEPARATE SITE out of the same repository, not a change to any existing one.
+# `nahiatours` is production; this is the living-water design (WebGL water,
+# botanical illustration). `wrangler deploy` addresses a Worker by name, so the
+# name below is the only thing that decides where this lands, and the deploy
+# workflow asserts it before it uploads anything.
+#
+# Served at https://elcortecito.johannes-neugschwentner.workers.dev
 #
 # The Cloudflare project deploys with `npx wrangler deploy`, the Workers
 # command. It needs `main` (a script entry point) and `[assets]` (a directory to
@@ -13,7 +21,7 @@
 # now Workers-shaped. worker/index.ts dispatches to the same functions/*
 # handlers the Pages deployment used, so no endpoint logic is duplicated.
 
-name = "nahiatours"
+name = "elcortecito"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 
@@ -98,12 +106,12 @@ binding = "AI"
 
 [vars]
 # Which site and which branch this configuration belongs to, reported by
-# /api/health. Three sites share this repository, and when one of them starts
+# /api/health. Six sites share this repository, and when one of them starts
 # serving another's pages there is otherwise nothing to read: these two lines
 # make a wrongly-routed domain say so in one request. They are labels, not
 # settings — nothing reads them but the health endpoint.
-SITE = "nahiatours"
-SITE_BRANCH = "main"
+SITE = "elcortecito"
+SITE_BRANCH = "elcortecito"
 
 ADMIN_PASSWORD = "admin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"

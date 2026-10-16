@@ -26,12 +26,15 @@ export const BrandProvider: React.FC<BrandProviderProps> = ({ children }) => {
   // was never configured — not even for that one render.
   const [brandSettings, setBrandSettings] = useState<BrandSettings>({
     brandName: 'Tours',
+    contactName: '',
     phoneNumber: '',
     paypalMeLink: '',
     verifoneLink: '',
     brandicon: '',
     stripeEnabled: false,
     paymentVisibility: { stripe: true, paypal: true, cash: true },
+    heroRatingEnabled: true,
+    heroRatingRange: { min: 3, max: 5 },
   });
 
   useEffect(() => {
