@@ -15,7 +15,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
       KV_SNAPSHOT_TITLES: nahiatours-data,elcortecito-data,beautiful-tours-data
-      KV_RESTORE_APPLY: '0'
+      KV_RESTORE_APPLY: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
