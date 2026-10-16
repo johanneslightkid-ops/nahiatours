@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import TranslateBar from './TranslateBar';
 import { useTranslationSync } from './useTranslationSync';
-import { Link } from 'react-router-dom';
 import { uploadImage, Tour, PricingOption } from '../../services/toursService';
 import MarkdownEditor from '../ui/MarkdownEditor';
 import { Lang, describeSync, fillMissingList, syncList, ListSyncOptions } from '../../lib/autoTranslate';
@@ -23,8 +22,6 @@ interface ServiceAdminPanelProps {
   setServices: React.Dispatch<React.SetStateAction<Tour[]>>;
   loadServices: () => Promise<void>;
   saveServices: (services: Tour[]) => Promise<void>;
-  siblingAdminPath: string;
-  siblingAdminLabel: string;
 }
 
 /**
@@ -97,8 +94,6 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   setServices,
   loadServices,
   saveServices,
-  siblingAdminPath,
-  siblingAdminLabel,
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [draft, setDraft] = useState<Tour>(createEmptyService());
@@ -243,12 +238,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold text-ink">{title}</h1>
-        <Link to={siblingAdminPath} className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">
-          {siblingAdminLabel}
-        </Link>
-      </div>
+      <h1 className="text-3xl font-bold text-ink">{title}</h1>
 
       {/* Only when this panel was told which language it is showing AND how
           to reach the others. The strip hides itself when no AI provider on

@@ -19,28 +19,37 @@ import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaQuoteRight, FaLanguag
  * panel that fixes it. The menu you repair the site with should not depend on
  * the data you are repairing.
  */
+export type AdminLang = 'en' | 'es' | 'fr' | 'de';
+
 export interface AdminNavItem {
   /** `?section=` value, or null when the entry is its own route. */
   section: string | null;
   /** Used only for the entries that are a route of their own. */
   path?: string;
   icon: IconType;
-  label: { en: string; es: string };
+  /** One short word each, so the whole menu fits on one line. */
+  label: Record<AdminLang, string>;
 }
 
 export const ADMIN_NAV: AdminNavItem[] = [
-  { section: 'brand', icon: MdSettings, label: { en: 'Brand', es: 'Marca' } },
-  { section: 'story', icon: FaBook, label: { en: 'Welcome page', es: 'Página de inicio' } },
-  { section: 'tours', icon: MdTour, label: { en: 'Tours', es: 'Excursiones' } },
-  { section: null, path: '/admin/transport', icon: MdLocalTaxi, label: { en: 'Transport', es: 'Transporte' } },
-  { section: 'testimonials', icon: FaQuoteRight, label: { en: 'Reviews', es: 'Reseñas' } },
-  { section: 'texts', icon: FaLanguage, label: { en: 'Site texts', es: 'Textos del sitio' } },
-  { section: 'tiktok', icon: FaTiktok, label: { en: 'TikTok', es: 'TikTok' } },
-  { section: 'social', icon: FaShareAlt, label: { en: 'Social', es: 'Redes' } },
-  { section: 'aiSettings', icon: FaRobot, label: { en: 'AI setup', es: 'IA: ajustes' } },
-  { section: 'aiBlogGen', icon: FaMagic, label: { en: 'Blog writer', es: 'Redactor de blog' } },
+  { section: 'brand', icon: MdSettings, label: { en: 'Brand', es: 'Marca', fr: 'Marque', de: 'Marke' } },
+  { section: 'story', icon: FaBook, label: { en: 'Home', es: 'Inicio', fr: 'Accueil', de: 'Start' } },
+  { section: 'tours', icon: MdTour, label: { en: 'Tours', es: 'Tours', fr: 'Tours', de: 'Touren' } },
+  { section: null, path: '/admin/transport', icon: MdLocalTaxi, label: { en: 'Transport', es: 'Transporte', fr: 'Transport', de: 'Transport' } },
+  { section: 'testimonials', icon: FaQuoteRight, label: { en: 'Reviews', es: 'Reseñas', fr: 'Avis', de: 'Bewertungen' } },
+  { section: 'texts', icon: FaLanguage, label: { en: 'Texts', es: 'Textos', fr: 'Textes', de: 'Texte' } },
+  { section: 'tiktok', icon: FaTiktok, label: { en: 'TikTok', es: 'TikTok', fr: 'TikTok', de: 'TikTok' } },
+  { section: 'social', icon: FaShareAlt, label: { en: 'Social', es: 'Redes', fr: 'Réseaux', de: 'Social' } },
+  { section: 'aiSettings', icon: FaRobot, label: { en: 'AI', es: 'IA', fr: 'IA', de: 'KI' } },
+  { section: 'aiBlogGen', icon: FaMagic, label: { en: 'Blog', es: 'Blog', fr: 'Blog', de: 'Blog' } },
 ];
 
-/** Spanish for anything that is not explicitly English — these sites are Dominican. */
-export const adminLabel = (item: AdminNavItem, locale: string): string =>
-  locale.toLowerCase().startsWith('en') ? item.label.en : item.label.es;
+/** The admin's own language. Anything unknown reads Spanish — these sites are Dominican. */
+export const adminLang = (locale: string): AdminLang => {
+  const code = locale.toLowerCase().slice(0, 2);
+  return code === 'en' || code === 'fr' || code === 'de' ? code : 'es';
+};
+
+export const adminLabel = (item: AdminNavItem, locale: string): string => item.label[adminLang(locale)];
+
+export const LOGOUT_LABEL: Record<AdminLang, string> = { en: 'Log out', es: 'Salir', fr: 'Quitter', de: 'Abmelden' };

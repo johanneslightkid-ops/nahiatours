@@ -16,7 +16,7 @@ const AdminTransport: React.FC = () => {
   }, [locale]);
 
   return (
-    <div className="min-h-screen bg-paper-warm py-8">
+    <div className="min-h-screen bg-paper-warm py-6">
       <div className="container mx-auto px-4 space-y-8">
         {/* The fleet comes first: it is the thing with pictures, and the
             pricing panels below are meaningless until the vehicles exist. */}
@@ -33,8 +33,6 @@ const AdminTransport: React.FC = () => {
           loadTranslation={(to) => getTransportServices(to, true)}
           saveTranslation={(items, to) => saveTransportServices(items, to)}
           saveServices={(nextServices) => saveTransportServices(nextServices, locale)}
-          siblingAdminPath="/admin"
-          siblingAdminLabel="Ir a Excursiones"
         />
       </div>
     </div>

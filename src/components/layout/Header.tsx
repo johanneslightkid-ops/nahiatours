@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks } from 'react-icons/md';
 import { HiSparkles } from 'react-icons/hi';
 import AdminNav from './AdminNav';
+import AdminLanguageSelect from '../admin/AdminLanguageSelect';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useBrand } from '../../contexts/BrandContext';
 import { useI18n } from '../../contexts/I18nContext';
@@ -272,26 +273,32 @@ const Header: React.FC = () => {
   const isAdminRoute = location.pathname.startsWith('/admin') && isAuthenticated;
 
   // The back office keeps a plain working bar: it is a tool, not a beach.
+  // One line: the menu, the language and log-out. The logo is pinned to the
+  // corner, out of the flow, so its sway and aura never push anything around.
   if (isAdminRoute) {
     return (
-      <header className="lobster-header sticky top-0 z-50">
-        <div className="section-shell flex flex-wrap items-center justify-between gap-3 py-3">
-          <Link to="/#top" className="flex items-center gap-3 no-underline">
-            <Logo className="h-11 w-11 ring-2" />
-            <span className="font-display text-xl font-bold text-ink">{brandSettings.brandName}</span>
-          </Link>
-          <nav className="flex flex-wrap items-center justify-end gap-2">
+      <>
+        <Link
+          to="/#top"
+          aria-label={brandSettings.brandName}
+          title={brandSettings.brandName}
+          className="fixed left-2 top-1.5 z-[60] no-underline"
+        >
+          <Logo className="h-9 w-9 ring-2" />
+        </Link>
+        <header className="lobster-header sticky top-0 z-50">
+          <nav className="flex items-center gap-2 py-1.5 pl-14 pr-2">
             <AdminNav
               onNavigate={() => playClickFx()}
               onLogout={() => {
                 clearAdminPassword();
                 navigate('/');
               }}
+              trailing={<AdminLanguageSelect />}
             />
-            <LanguageSwitcher />
           </nav>
-        </div>
-      </header>
+        </header>
+      </>
     );
   }
 

@@ -67,30 +67,8 @@ const Admin: React.FC = () => {
   }, [locale]);
 
   return (
-    <div className="min-h-screen bg-paper-warm py-8">
+    <div className="min-h-screen bg-paper-warm py-6">
       <div className="container mx-auto space-y-8 px-4">
-        {/* Admin Navigation */}
-        <div className="rounded-3xl bg-paper-card p-4 md:p-6 shadow-lg">
-          <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full overflow-hidden bg-paper-warm ring-1 ring-slate-200">
-                {brandSettings.brandicon ? (
-                  <img
-                    src={brandSettings.brandicon}
-                    alt={`${brandSettings.brandName} logo`}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-ink-light text-xs uppercase tracking-[.2em]">
-                    Logo
-                  </div>
-                )}
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-ink">Panel de administración</h1>
-            </div>
-          </div>
-        </div>
-
         {/* Brand Settings Section */}
         {activeSection === 'brand' && (
           <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
@@ -240,8 +218,6 @@ const Admin: React.FC = () => {
             locale={locale}
             loadTranslation={(to) => getTours(to, true)}
             saveTranslation={(services, to) => saveTours(services, to)}
-            siblingAdminPath="/admin/transport"
-            siblingAdminLabel="Ir a Transporte"
           />
         )}
 
