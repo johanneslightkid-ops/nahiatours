@@ -2,16 +2,12 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import ContactForm from '../components/ContactForm';
 import { useBrand } from '../contexts/BrandContext';
-import { getCardPaymentLink } from '../utils/paymentMethods';
 import PageHeader from '../components/layout/PageHeader';
 import { Toucan, Hibiscus } from '../components/ui/Illustrations';
+import QuickPay from '../components/payment/QuickPay';
 
 const Contact = () => {
   const { brandSettings } = useBrand();
-  // The bank's own payment link, whichever one the admin set. A link that
-  // expects an amount filled in is for a booking, not for an open deposit.
-  const cardLink = getCardPaymentLink(brandSettings);
-  const cardDepositLink = cardLink && !/\{(amount|monto|currency|ref)\}/i.test(cardLink) ? cardLink : '';
 
   return (
     <div className="pb-20">
@@ -31,18 +27,6 @@ const Contact = () => {
             <h2 className="mb-5 font-display text-3xl font-bold text-ink"><FormattedMessage id="contact.getInTouch" /></h2>
             <p className="mb-2 text-ink-soft"><FormattedMessage id="contact.addressLabel" />: Bávaro, Punta Cana</p>
             <p className="mb-6 text-ink-soft"><FormattedMessage id="contact.phoneLabel" />: {brandSettings.phoneNumber}</p>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              {brandSettings.paypalMeLink && (
-                <a href={brandSettings.paypalMeLink} target="_blank" rel="noreferrer" className="tropical-button w-full sm:w-auto">
-                  <FormattedMessage id="payment.paypalContact" defaultMessage="Pay deposit with PayPal" />
-                </a>
-              )}
-              {cardDepositLink && (
-                <a href={cardDepositLink} target="_blank" rel="noreferrer" className="tropical-button-outline w-full sm:w-auto">
-                  <FormattedMessage id="payment.cardDeposit" defaultMessage="Pay a deposit by card" />
-                </a>
-              )}
-            </div>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60530.5!2d-68.4156!3d18.6945!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ea891645dcbfe77%3A0x4877e4aeefa14d62!2sEl%20Cortecito%2C%20Punta%20Cana!5e0!3m2!1sen!2sdo!4v1234567890123!5m2!1sen!2sdo"
               width="100%"
@@ -53,6 +37,13 @@ const Contact = () => {
               title="Punta Cana Location"
             ></iframe>
           </div>
+        </div>
+
+        {/* Any amount, by card or PayPal — the deposit buttons that used to
+            sit beside the map, grown into a widget that also takes links
+            from the WhatsApp return prompt (/contact?pay=…&ref=…#pay). */}
+        <div className="mt-10">
+          <QuickPay />
         </div>
       </div>
     </div>
