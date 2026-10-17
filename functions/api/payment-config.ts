@@ -35,6 +35,8 @@ const TEXT_FIELDS: Partial<Record<keyof PaymentSecrets, number>> = {
   cardnetMerchantType: 4,
   cardnetMerchantName: 40,
   cardnetAcquirer: 3,
+  verifoneMerchantCode: 40,
+  verifoneSecretWord: 400,
 };
 export async function onRequest(context: { request: Request; env: PaymentEnv }) {
   const { request, env } = context;
@@ -101,14 +103,14 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
       return json({ error: 'La categoría de comercio (MCC) de CardNET son cuatro dígitos, por ejemplo 4722.' }, 400);
     }
 
-    if (['auto', 'stripe', 'azul', 'cardnet'].includes(String(body.cardProcessor))) {
+    if (['auto', 'stripe', 'azul', 'cardnet', 'verifone'].includes(String(body.cardProcessor))) {
       patch.cardProcessor = body.cardProcessor as PaymentSecrets['cardProcessor'];
     }
 
-    for (const field of ['azulMode', 'cardnetMode'] as const) {
+    for (const field of ['azulMode', 'cardnetMode', 'verifoneMode'] as const) {
       if (body[field] === 'test' || body[field] === 'live') patch[field] = body[field] as 'test' | 'live';
     }
-    for (const field of ['azulCurrency', 'cardnetCurrency'] as const) {
+    for (const field of ['azulCurrency', 'cardnetCurrency', 'verifoneCurrency'] as const) {
       if (body[field] === 'USD' || body[field] === 'DOP') patch[field] = body[field] as 'USD' | 'DOP';
     }
 

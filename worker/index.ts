@@ -36,6 +36,7 @@ import { onRequest as handlePaymentConfig } from '../functions/api/payment-confi
 import { onRequest as handlePaymentsReady } from '../functions/api/payments-ready';
 import { onRequest as handleCardCheckout } from '../functions/api/card-checkout';
 import { onRequest as handleAzulCheckout } from '../functions/api/azul-checkout';
+import { onRequest as handleVerifoneCheckout } from '../functions/api/verifone-checkout';
 import { onRequest as handleCardnetCheckout } from '../functions/api/cardnet-checkout';
 import { onRequest as handlePayReturn } from '../functions/api/pay-return';
 import { onRequest as handlePaymentResult } from '../functions/api/payment-result';
@@ -77,6 +78,7 @@ const ROUTES: Record<string, RouteHandler> = {
   '/api/payments-ready': handlePaymentsReady,
   '/api/card-checkout': handleCardCheckout,
   '/api/azul-checkout': handleAzulCheckout,
+  '/api/verifone-checkout': handleVerifoneCheckout,
   '/api/cardnet-checkout': handleCardnetCheckout,
   '/api/payment-result': handlePaymentResult,
   '/api/cf-ai': handleCfAi,

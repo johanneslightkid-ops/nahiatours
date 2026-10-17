@@ -11,7 +11,7 @@ import { getContentLocale, useI18n } from './I18nContext';
 import { usePlannerCopy } from '../planner/usePlannerCopy';
 import { buildPlan, MAX_PLAN_DAYS } from '../planner/engine';
 import { buildCatalogue, loadPlannerCatalogue } from '../planner/catalogueSource';
-import { defaultsForParty, StepDef, StepId, visibleSteps } from '../planner/questions';
+import { defaultsForParty, refineSteps, StepDef, StepId, stepById, visibleSteps } from '../planner/questions';
 import { CatalogueEntry, DayPlan, EMPTY_PROFILE, TravelProfile } from '../planner/types';
 import type { PartyType } from '../planner/tourProfiles';
 
@@ -34,6 +34,10 @@ interface PlannerContextValue {
   goBack: () => void;
   goToStep: (id: StepId) => void;
   progress: number;
+  /** Set while the guest answers one optional fine-tune question from the plan. */
+  refining: StepId | null;
+  /** The optional questions, for the fine-tune panel on the plan. */
+  refinements: StepDef[];
 
   catalogue: CatalogueEntry[];
   loading: boolean;
@@ -86,6 +90,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [pinned, setPinned] = useState<string[]>([]);
   const [banned, setBanned] = useState<string[]>([]);
   const [lastAdded, setLastAdded] = useState<string | null>(null);
+  const [refining, setRefining] = useState<StepId | null>(null);
   const [catalogue, setCatalogue] = useState<CatalogueEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [hydrated, setHydrated] = useState(false);
@@ -138,7 +143,14 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, [locale]);
 
-  const steps = useMemo(() => visibleSteps(profile), [profile]);
+  const coreSteps = useMemo(() => visibleSteps(profile), [profile]);
+  const refinements = useMemo(() => refineSteps(profile), [profile]);
+  // A fine-tune is a one-question detour: it is the whole flow until answered.
+  const steps = useMemo(() => {
+    if (!refining) return coreSteps;
+    const step = stepById(profile, refining);
+    return step ? [step] : coreSteps;
+  }, [coreSteps, profile, refining]);
 
   const patchProfile = useCallback((patch: Partial<TravelProfile>) => {
     setProfile((current) => ({ ...current, ...patch }));
@@ -159,6 +171,11 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 
   const goNext = useCallback(() => {
+    if (refining) {
+      setRefining(null);
+      setStage('result');
+      return;
+    }
     const current = Math.min(stepIndexRef.current, Math.max(0, steps.length - 1));
     // A state updater must stay pure — switching stage from inside one made
     // React re-enter the render and swallow the transition to the plan.
@@ -168,27 +185,39 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     stepIndexRef.current = current + 1;
     setStepIndex(current + 1);
-  }, [steps.length]);
+  }, [refining, steps.length]);
 
   const goBack = useCallback(() => {
+    if (refining) {
+      setRefining(null);
+      setStage('result');
+      return;
+    }
     const previous = Math.max(0, Math.min(stepIndexRef.current, steps.length - 1) - 1);
     stepIndexRef.current = previous;
     setStepIndex(previous);
-  }, [steps.length]);
+  }, [refining, steps.length]);
 
   const goToStep = useCallback(
     (id: StepId) => {
-      const index = steps.findIndex((step) => step.id === id);
+      const index = coreSteps.findIndex((step) => step.id === id);
       if (index >= 0) {
+        setRefining(null);
         stepIndexRef.current = index;
         setStepIndex(index);
         setStage('questions');
+        return;
+      }
+      if (refinements.some((step) => step.id === id)) {
+        setRefining(id);
+        setStage('questions');
       }
     },
-    [steps]
+    [coreSteps, refinements]
   );
 
   const start = useCallback(() => {
+    setRefining(null);
     stepIndexRef.current = 0;
     setStage('questions');
     setStepIndex(0);
@@ -199,6 +228,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [profile.partyType]);
 
   const reset = useCallback(() => {
+    setRefining(null);
     setProfile(EMPTY_PROFILE);
     stepIndexRef.current = 0;
     setStepIndex(0);
@@ -250,7 +280,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setProfile((current) => ({ ...current, days: Math.max(1, visibleDays - 1) }));
   }, [plan, visibleDays]);
 
-  const progress = steps.length > 0 ? Math.min(1, (stepIndex + 1) / steps.length) : 0;
+  const shownIndex = refining ? 0 : stepIndex;
+  const progress = steps.length > 0 ? Math.min(1, (shownIndex + 1) / steps.length) : 0;
   const hasProgress = Boolean(profile.partyType);
 
   const value: PlannerContextValue = {
@@ -262,12 +293,14 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setAnswer,
     patchProfile,
     steps,
-    stepIndex: Math.min(stepIndex, Math.max(0, steps.length - 1)),
-    currentStep: steps[Math.min(stepIndex, Math.max(0, steps.length - 1))],
+    stepIndex: Math.min(shownIndex, Math.max(0, steps.length - 1)),
+    currentStep: steps[Math.min(shownIndex, Math.max(0, steps.length - 1))],
     goNext,
     goBack,
     goToStep,
     progress,
+    refining,
+    refinements,
     catalogue,
     loading,
     plan,
