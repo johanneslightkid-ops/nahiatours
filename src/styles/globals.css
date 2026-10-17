@@ -1427,3 +1427,14 @@ select:focus {
 @media (prefers-reduced-motion: reduce) {
   .voice-ring { animation: none !important; opacity: 0.6; }
 }
+
+/* The option the voice guide is reading right now: a warm glow around it,
+   so what is heard and what is seen are visibly the same thing. Static —
+   it changes once per option, never animates per frame. */
+[data-voice-focus='true'] {
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 0 0 3px theme('colors.mango.light'),
+    0 0 22px 6px theme('colors.mango.DEFAULT');
+}

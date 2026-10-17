@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { HiArrowLeft, HiArrowRight, HiLightBulb } from 'react-icons/hi';
 import { usePlanner } from '../../contexts/PlannerContext';
@@ -21,7 +21,7 @@ import {
 import type { ConstraintKey, KidAgeBand, TravelProfile } from '../../planner/types';
 import type { InterestKey } from '../../planner/tourProfiles';
 import { VoiceMatch, VoiceOption } from '../../planner/voice';
-import { echoId, feedbackLines, stepVoice } from '../../planner/voiceScript';
+import { echoLine, feedbackLines, stepVoice } from '../../planner/voiceScript';
 import { ChipToggle, CountStepper, EnergyScale, OptionCard } from './PlannerControls';
 import { VoiceGuide, VoiceOutcome } from './VoiceGuide';
 import { playClickFx } from '../../lib/soundEngine';
@@ -261,9 +261,30 @@ export const QuestionStep: React.FC = () => {
 
   // ── Voice: what to read, what to listen for, what an answer does ─────────
   const voice = useMemo(
-    () => (stepId ? stepVoice(stepId, copy, flow, locale) : { id: '', script: '', options: [] as VoiceOption[] }),
+    () => (stepId ? stepVoice(stepId, copy, flow, locale) : { segments: [], options: [] as VoiceOption[] }),
     [stepId, copy, flow, locale]
   );
+
+  // While an option is being read aloud it glows and is brought up near the
+  // top of the screen, so what is heard and what is seen are the same thing.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [voiceFocus, setVoiceFocus] = useState<string | null>(null);
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    panel.querySelectorAll('[data-voice-focus]').forEach((node) => node.removeAttribute('data-voice-focus'));
+    if (!voiceFocus) return;
+    const target = panel.querySelector<HTMLElement>(`[data-voice-option="${CSS.escape(voiceFocus)}"]`);
+    if (!target) return;
+    target.setAttribute('data-voice-focus', 'true');
+    const headroom = Math.max(96, window.innerHeight * 0.16);
+    const top = target.getBoundingClientRect().top;
+    // Only move when the option is not already sitting comfortably in view.
+    if (top < headroom - 8 || top > window.innerHeight * 0.55) {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: window.scrollY + top - headroom, behavior: reduce ? 'auto' : 'smooth' });
+    }
+  }, [voiceFocus]);
 
   // The same words the recording was made from (see feedbackLines).
   const pickOneLine = useMemo(
@@ -296,7 +317,7 @@ export const QuestionStep: React.FC = () => {
             advance();
             return { listenAgain: false };
           }
-          return { listenAgain: true, say: pickOneLine, sayId: 'fb-pick-one' };
+          return { listenAgain: true, say: { id: 'fb-pick-one', text: pickOneLine } };
         }
         return { listenAgain: true };
       }
@@ -312,7 +333,7 @@ export const QuestionStep: React.FC = () => {
           advance();
           return { listenAgain: false };
         }
-        return { listenAgain: true, say: flow.voice.didntCatch, sayId: 'fb-didnt-catch' };
+        return { listenAgain: true, say: { id: 'fb-didnt-catch', text: flow.voice.didntCatch } };
       }
 
       // An option, by name or by number.
@@ -329,7 +350,7 @@ export const QuestionStep: React.FC = () => {
         const label = voice.options.find((option) => option.id === match.id)?.label ?? '';
         if (stepId === 'interests') toggleInterest(match.id as InterestKey);
         else toggleConstraint(match.id as ConstraintKey);
-        return { listenAgain: true, say: label, sayId: echoId(stepId, match.id) };
+        return { listenAgain: true, say: echoLine(stepId, { id: match.id, label }) };
       }
       return { listenAgain: false };
     },
@@ -348,12 +369,13 @@ export const QuestionStep: React.FC = () => {
       initial={{ opacity: 0, y: 26 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      ref={panelRef}
       className="planner-panel px-5 py-7 sm:px-9 sm:py-10"
     >
       <VoiceGuide
         stepKey={`${refining ?? 'core'}-${currentStep.id}`}
-        script={voice.script}
-        clipId={voice.id}
+        segments={voice.segments}
+        onSegment={setVoiceFocus}
         options={voice.options}
         wantsNumber={voice.wantsNumber}
         onMatch={onVoice}
@@ -393,6 +415,7 @@ export const QuestionStep: React.FC = () => {
           {choice.entries.map((entry, index) => (
             <OptionCard
               key={entry.id}
+              voiceId={entry.id}
               emoji={entry.emoji}
               label={entry.label}
               description={entry.desc}
@@ -411,6 +434,7 @@ export const QuestionStep: React.FC = () => {
             {INTERESTS.map((key) => (
               <ChipToggle
                 key={key}
+                voiceId={key}
                 emoji={copy.interests[key].emoji}
                 label={copy.interests[key].label}
                 selected={profile.interests.includes(key)}
@@ -446,6 +470,7 @@ export const QuestionStep: React.FC = () => {
             {CONSTRAINTS.map((key, index) => (
               <OptionCard
                 key={key}
+                voiceId={key}
                 emoji={copy.questions.constraints.options[key].emoji}
                 label={copy.questions.constraints.options[key].label}
                 description={copy.questions.constraints.options[key].desc}
