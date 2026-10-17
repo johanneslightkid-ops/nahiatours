@@ -21,7 +21,7 @@ import {
 import type { ConstraintKey, KidAgeBand, TravelProfile } from '../../planner/types';
 import type { InterestKey } from '../../planner/tourProfiles';
 import { VoiceMatch, VoiceOption } from '../../planner/voice';
-import { echoId, stepVoice } from '../../planner/voiceScript';
+import { echoId, feedbackLines, stepVoice } from '../../planner/voiceScript';
 import { ChipToggle, CountStepper, EnergyScale, OptionCard } from './PlannerControls';
 import { VoiceGuide, VoiceOutcome } from './VoiceGuide';
 import { playClickFx } from '../../lib/soundEngine';
@@ -265,6 +265,12 @@ export const QuestionStep: React.FC = () => {
     [stepId, copy, flow, locale]
   );
 
+  // The same words the recording was made from (see feedbackLines).
+  const pickOneLine = useMemo(
+    () => feedbackLines(copy, flow).find((line) => line.id === 'fb-pick-one')?.text ?? copy.ui.pickAtLeastOne,
+    [copy, flow]
+  );
+
   const onVoice = useCallback(
     (match: VoiceMatch): VoiceOutcome => {
       const multi = stepId === 'interests' || stepId === 'constraints';
@@ -290,7 +296,7 @@ export const QuestionStep: React.FC = () => {
             advance();
             return { listenAgain: false };
           }
-          return { listenAgain: true, say: copy.ui.pickAtLeastOne, sayId: 'fb-pick-one' };
+          return { listenAgain: true, say: pickOneLine, sayId: 'fb-pick-one' };
         }
         return { listenAgain: true };
       }
@@ -327,7 +333,7 @@ export const QuestionStep: React.FC = () => {
       }
       return { listenAgain: false };
     },
-    [advance, canContinue, choice, clearAdvance, copy.ui.pickAtLeastOne, finishWithNothing, flow.voice.didntCatch, goBack, handleSelect, setAnswer, stepId, toggleConstraint, toggleInterest, voice.options]
+    [advance, canContinue, choice, clearAdvance, pickOneLine, finishWithNothing, flow.voice.didntCatch, goBack, handleSelect, setAnswer, stepId, toggleConstraint, toggleInterest, voice.options]
   );
 
   if (!currentStep || !questionCopy) return null;
