@@ -5,6 +5,7 @@ import {
   readOrder,
   saveOrder,
   verifyAzulReturn,
+  verifyVerifoneReturn,
   BankProvider,
   OrderStatus,
 } from '../../shared/bankGateways';
@@ -14,6 +15,7 @@ import {
  *
  *   /api/pay-return/azul/<order>/approved|declined|cancelled
  *   /api/pay-return/cardnet/<order>/approved|cancelled
+ *   /api/pay-return/verifone/<order>/approved
  *
  * The outcome in the path is only a hint. Azul's word counts once its AuthHash
  * checks out against the AuthKey; CardNET's counts once CardNET itself, asked
@@ -30,7 +32,7 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
   const url = new URL(request.url);
   const [, , , provider, id, outcome] = url.pathname.split('/');
 
-  if ((provider !== 'azul' && provider !== 'cardnet') || !id) {
+  if ((provider !== 'azul' && provider !== 'cardnet' && provider !== 'verifone') || !id) {
     return redirect('/');
   }
 
@@ -59,6 +61,19 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
       order.reference = params.get('RRN') || undefined;
       order.message = (params.get('ResponseMessage') || params.get('ErrorDescription') || '').slice(0, 120) || undefined;
     }
+  } else if (provider === 'verifone') {
+    // 2Checkout only redirects here once an order has been placed. A
+    // signature that checks out, for this order and this price, is a payment;
+    // one that does not is left for the operator to confirm in 2Checkout's
+    // panel — never called paid on the strength of the query string alone.
+    const { authentic, sameOrder, reference } = await verifyVerifoneReturn(
+      url.searchParams,
+      order,
+      secrets.verifoneSecretWord
+    );
+    status = authentic && sameOrder ? 'paid' : 'unverified';
+    order.reference = reference || undefined;
+    order.message = authentic ? undefined : 'Confirm this order in the 2Checkout control panel.';
   } else {
     // CardNET uses its cancel address for declines as well, so the session is
     // asked either way; the path only decides what to assume when it cannot be.

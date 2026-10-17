@@ -45,6 +45,8 @@ export interface StepDef {
   isAnswered: (profile: TravelProfile) => boolean;
   /** Single-choice steps jump forward on tap; multi-selects wait. */
   autoAdvance?: boolean;
+  /** `core` is asked in the guided flow, `refine` is offered on the plan. */
+  tier: 'core' | 'refine';
 }
 
 export const PARTY_TYPES: PartyType[] = ['solo', 'couple', 'family', 'friends', 'multigen'];
@@ -79,87 +81,147 @@ export const OCCASIONS: OccasionKey[] = ['none', 'honeymoon', 'anniversary', 'bi
 
 export const MAX_INTERESTS = 5;
 
+/**
+ * The guided flow is the short list of questions a plan genuinely cannot be
+ * built without, ordered so the fun one (what pulls you in) comes second and
+ * the dull one (anything to plan around) comes last with a one-tap way out.
+ *
+ * Everything else — budget, pace, transport, what to take home, the date —
+ * has a sensible default and is offered on the plan itself as a "fine-tune",
+ * where the guest can see what each answer changes. Thirteen questions in a
+ * row was the single biggest reason people left before seeing a plan.
+ */
 export const STEPS: StepDef[] = [
   {
     id: 'partyType',
     kind: 'choice',
+    tier: 'core',
     autoAdvance: true,
     isAnswered: (p) => Boolean(p.partyType),
   },
   {
     id: 'headcount',
     kind: 'counts',
-    applies: (p) => p.partyType !== 'solo',
+    tier: 'core',
+    // A couple is two and a solo traveller is one: asking would be noise.
+    applies: (p) => p.partyType !== 'solo' && p.partyType !== 'couple',
     isAnswered: (p) => p.adults + p.children > 0,
-  },
-  {
-    id: 'adultAge',
-    kind: 'choice',
-    autoAdvance: true,
-    isAnswered: (p) => Boolean(p.adultAge),
-  },
-  {
-    id: 'energy',
-    kind: 'scale',
-    isAnswered: () => true,
   },
   {
     id: 'interests',
     kind: 'multi',
+    tier: 'core',
     isAnswered: (p) => p.interests.length > 0,
   },
   {
-    id: 'aim',
-    kind: 'choice',
-    autoAdvance: true,
-    isAnswered: (p) => Boolean(p.aim),
+    id: 'energy',
+    kind: 'scale',
+    tier: 'core',
+    isAnswered: () => true,
   },
   {
-    id: 'dayShape',
+    id: 'adultAge',
     kind: 'choice',
+    tier: 'core',
     autoAdvance: true,
-    isAnswered: (p) => Boolean(p.dayShape),
+    isAnswered: (p) => Boolean(p.adultAge),
   },
   {
     id: 'days',
     kind: 'stepper',
+    tier: 'core',
     isAnswered: (p) => p.days >= 1,
-  },
-  {
-    id: 'budget',
-    kind: 'choice',
-    autoAdvance: true,
-    isAnswered: (p) => Boolean(p.budget),
-  },
-  {
-    id: 'transport',
-    kind: 'choice',
-    autoAdvance: true,
-    isAnswered: (p) => Boolean(p.transport),
-  },
-  {
-    id: 'constraints',
-    kind: 'multi',
-    optional: true,
-    isAnswered: () => true,
   },
   {
     id: 'occasion',
     kind: 'choice',
+    // Honeymoons, hen parties and milestone birthdays change the shortlist
+    // most for couples and groups; for the rest it waits on the plan page.
+    tier: 'core',
     optional: true,
     autoAdvance: true,
+    applies: (p) => p.partyType === 'couple' || p.partyType === 'friends' || p.partyType === 'multigen',
+    isAnswered: (p) => Boolean(p.occasion),
+  },
+  {
+    id: 'constraints',
+    kind: 'multi',
+    tier: 'core',
+    optional: true,
+    isAnswered: () => true,
+  },
+  {
+    id: 'budget',
+    kind: 'choice',
+    tier: 'refine',
+    autoAdvance: true,
+    isAnswered: (p) => Boolean(p.budget),
+  },
+  {
+    id: 'dayShape',
+    kind: 'choice',
+    tier: 'refine',
+    autoAdvance: true,
+    isAnswered: (p) => Boolean(p.dayShape),
+  },
+  {
+    id: 'aim',
+    kind: 'choice',
+    tier: 'refine',
+    autoAdvance: true,
+    isAnswered: (p) => Boolean(p.aim),
+  },
+  {
+    id: 'transport',
+    kind: 'choice',
+    tier: 'refine',
+    autoAdvance: true,
+    isAnswered: (p) => Boolean(p.transport),
+  },
+  {
+    id: 'occasion',
+    kind: 'choice',
+    tier: 'refine',
+    optional: true,
+    autoAdvance: true,
+    applies: (p) => !(p.partyType === 'couple' || p.partyType === 'friends' || p.partyType === 'multigen'),
     isAnswered: (p) => Boolean(p.occasion),
   },
   {
     id: 'logistics',
     kind: 'logistics',
+    tier: 'refine',
     optional: true,
     isAnswered: () => true,
   },
 ];
 
+const applies = (step: StepDef, profile: TravelProfile) => (step.applies ? step.applies(profile) : true);
+
+/** The guided questions, in order, for this traveller. */
 export const visibleSteps = (profile: TravelProfile): StepDef[] =>
-  STEPS.filter((step) => (step.applies ? step.applies(profile) : true));
+  STEPS.filter((step) => step.tier === 'core' && applies(step, profile));
+
+/** The optional answers offered on the plan page. */
+export const refineSteps = (profile: TravelProfile): StepDef[] =>
+  STEPS.filter((step) => step.tier === 'refine' && applies(step, profile));
+
+/** Any step by id, whichever tier it sits in for this traveller. */
+export const stepById = (profile: TravelProfile, id: StepId): StepDef | undefined =>
+  STEPS.find((step) => step.id === id && applies(step, profile)) ?? STEPS.find((step) => step.id === id);
+
+/**
+ * Who comes first in the party list depends on who actually travels here
+ * from each market: Latin-American visitors come as families, very often with
+ * the grandparents; German-speaking and French guests are mostly couples and
+ * families; North America sends couples, families and friends' trips alike.
+ */
+export const partyOrder = (locale: string): PartyType[] => {
+  if (locale.startsWith('es')) return ['family', 'multigen', 'couple', 'friends', 'solo'];
+  if (locale.startsWith('de')) return ['couple', 'family', 'friends', 'solo', 'multigen'];
+  if (locale.startsWith('fr')) return ['couple', 'family', 'friends', 'multigen', 'solo'];
+  return ['couple', 'family', 'friends', 'solo', 'multigen'];
+};
 
 /** Sensible defaults so a skipped headcount still prices correctly. */
 export const defaultsForParty = (party: PartyType): Partial<TravelProfile> => {

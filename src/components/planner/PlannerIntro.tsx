@@ -6,6 +6,9 @@ import { usePlanner } from '../../contexts/PlannerContext';
 import { usePlannerCopy } from '../../planner/usePlannerCopy';
 import { ProfileChips } from './ProfileChips';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
+import { useI18n } from '../../contexts/I18nContext';
+import { getFlowCopy } from '../../planner/flowCopy';
+import { useMediaQuery } from '../../lib/useMediaQuery';
 
 /** Slow drifting strip of real catalogue photography behind the intro. */
 const CatalogueDrift: React.FC<{ images: string[] }> = ({ images }) => {
@@ -31,6 +34,10 @@ const CatalogueDrift: React.FC<{ images: string[] }> = ({ images }) => {
 export const PlannerIntro: React.FC = () => {
   const { start, resume, hasProgress, catalogue } = usePlanner();
   const copy = usePlannerCopy();
+  const { locale } = useI18n();
+  const flow = getFlowCopy(locale);
+  const touch = useMediaQuery('(pointer: coarse)');
+  const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
   const images = catalogue.slice(0, 10).map((entry) => entry.tour.image).filter(Boolean);
 
@@ -88,8 +95,15 @@ export const PlannerIntro: React.FC = () => {
           </div>
 
           <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-paper/60">
-            {copy.hero.minutes}
+            {flow.minutes('6–8')}
           </p>
+
+          {touch && canSpeak && (
+            <p className="mt-3 flex max-w-xl items-start gap-2 text-sm leading-snug text-paper/80">
+              <span aria-hidden="true">🎙️</span>
+              {flow.voiceTeaser}
+            </p>
+          )}
 
           {hasProgress && (
             <div className="mt-8 border-t border-paper/20 pt-6">
