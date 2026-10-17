@@ -4,6 +4,7 @@ import { useI18n } from '../../contexts/I18nContext';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { getFlowCopy } from '../../planner/flowCopy';
 import { haptic, HAPTIC } from '../../planner/haptics';
+import { lineHash } from '../../planner/voiceScript';
 import {
   matchUtterance,
   pickVoice,
@@ -58,11 +59,16 @@ const STORAGE_KEY = 'planner_voice';
  * device's synthesiser simply reads that line instead.
  */
 const CLIP_ROOT = '/audio/planner';
-let manifest: Promise<Record<string, string[]>> | null = null;
+/** { en: { 'q-partyType': '<fingerprint of the recorded words>' }, … } */
+let manifest: Promise<Record<string, Record<string, string>>> | null = null;
+// Kept once loaded: each question mounts a fresh guide, and it must know the
+// clips before it starts reading, not a network round trip later.
+let manifestLoaded: Record<string, Record<string, string>> | null = null;
 const loadManifest = () =>
   (manifest ??= fetch(`${CLIP_ROOT}/manifest.json`, { cache: 'no-cache' })
     .then((response) => (response.ok ? response.json() : {}))
-    .catch(() => ({})));
+    .catch(() => ({}))
+    .then((list) => (manifestLoaded = list && typeof list === 'object' ? list : {})));
 
 const readEnabled = () => {
   try {
@@ -98,7 +104,7 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, clipId,
 
   const recognition = useRef<Recognition | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
-  const [clips, setClips] = useState<Set<string>>(() => new Set());
+  const [clips, setClips] = useState<Record<string, string>>(() => manifestLoaded?.[voiceLocale(locale)] ?? {});
   // Set when the tap that switched the guide on already started reading.
   const startedByTap = useRef(false);
   const retries = useRef(0);
@@ -110,7 +116,7 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, clipId,
 
   useEffect(() => {
     let current = true;
-    loadManifest().then((list) => current && setClips(new Set(list[lang] ?? [])));
+    loadManifest().then((list) => current && setClips(list[lang] ?? {}));
     return () => {
       current = false;
     };
@@ -173,7 +179,9 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, clipId,
       };
 
       setPhase('speaking');
-      if (id && clips.has(id)) {
+      // Only a recording of exactly these words: after a copy edit the old
+      // clip would say something the screen no longer does.
+      if (id && clips[id] && clips[id] === lineHash(text)) {
         // One element for the whole session: once iOS has let it play from a
         // tap, it may play again without one.
         const player = (audio.current ??= new Audio());
@@ -374,7 +382,11 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, clipId,
           <HiVolumeOff className="h-4 w-4" />
         </button>
       </div>
-      {Ctor && <p className="mt-1.5 px-1 text-[0.68rem] leading-snug text-paper/55">{flow.voice.privacy}</p>}
+      {(Ctor || Object.keys(clips).length > 0) && (
+        <p className="mt-1.5 px-1 text-[0.68rem] leading-snug text-paper/55">
+          {[Object.keys(clips).length > 0 ? flow.voice.aiVoice : '', Ctor ? flow.voice.privacy : ''].filter(Boolean).join(' ')}
+        </p>
+      )}
     </div>
   );
 };
