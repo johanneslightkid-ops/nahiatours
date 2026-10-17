@@ -247,9 +247,16 @@ export const spokenList = (items: string[], or: string): string =>
 export const speakable = (text: string, locale: VoiceLocale): string => {
   const to = { en: 'to', es: 'a', de: 'bis', fr: 'à' }[locale];
   const dollars = { en: 'dollars', es: 'dólares', de: 'Dollar', fr: 'dollars' }[locale];
+  const and = { en: 'and', es: 'y', de: 'und', fr: 'et' }[locale];
+  const or = { en: 'or', es: 'o', de: 'oder', fr: 'ou' }[locale];
   return text
+    .replace(/\s*&\s*/g, ` ${and} `)
+    .replace(/\s+\/\s+/g, ` ${or} `)
     .replace(/\s*[–—-]\s*(?=\$?\d)/g, ` ${to} `)
-    .replace(/(\d+)\s*\+/g, (_, n) => `${n} ${locale === 'en' ? 'plus' : '+'}`)
+    .replace(/(\d+)\s*\+/g, (_, n) => `${n} ${{ en: 'plus', es: 'o más', de: 'und älter', fr: 'et plus' }[locale]}`)
     .replace(/\$(\d+)/g, (_, n) => `${n} ${dollars}`)
+    .replace(/(\d+)\s*\$/g, (_, n) => `${n} ${dollars}`)
+    // "soltero/a" → "soltero o soltera"
+    .replace(/(\p{L}+)o\/a\b/gu, (_, stem) => `${stem}o ${or} ${stem}a`)
     .replace(/\n/g, ' ');
 };

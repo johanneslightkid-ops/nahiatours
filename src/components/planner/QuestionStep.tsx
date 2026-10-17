@@ -20,7 +20,8 @@ import {
 } from '../../planner/questions';
 import type { ConstraintKey, KidAgeBand, TravelProfile } from '../../planner/types';
 import type { InterestKey } from '../../planner/tourProfiles';
-import { spokenList, VoiceMatch, VoiceOption } from '../../planner/voice';
+import { VoiceMatch, VoiceOption } from '../../planner/voice';
+import { echoId, stepVoice } from '../../planner/voiceScript';
 import { ChipToggle, CountStepper, EnergyScale, OptionCard } from './PlannerControls';
 import { VoiceGuide, VoiceOutcome } from './VoiceGuide';
 import { playClickFx } from '../../lib/soundEngine';
@@ -259,36 +260,10 @@ export const QuestionStep: React.FC = () => {
   }, [advance, canContinue, choice, clearAdvance, goBack, handleSelect, refining, stepId, stepIndex, toggleConstraint, toggleInterest]);
 
   // ── Voice: what to read, what to listen for, what an answer does ─────────
-  const voice = useMemo((): { script: string; options: VoiceOption[]; wantsNumber?: boolean } => {
-    if (!stepId || !questionCopy) return { script: '', options: [] };
-    const say = (labels: string[]) => `${flow.voice.youCanSay}: ${spokenList(labels, flow.voice.or)}.`;
-    const title = String(questionCopy.title);
-
-    if (choice) {
-      const options = choice.entries.map((entry) => ({ id: entry.id, label: entry.label }));
-      return { script: `${title} ${say(options.map((o) => o.label))}`, options };
-    }
-    switch (stepId) {
-      case 'interests': {
-        const options = INTERESTS.map((key) => ({ id: key, label: copy.interests[key].label }));
-        return { script: `${title} ${say(options.map((o) => o.label))} ${flow.voice.multiDone}`, options };
-      }
-      case 'constraints': {
-        const options = CONSTRAINTS.map((key) => ({ id: key, label: copy.questions.constraints.options[key].label }));
-        return { script: `${title} ${say(options.map((o) => o.label))} ${flow.voice.constraintsNone}`, options };
-      }
-      case 'energy': {
-        const options = copy.questions.energy.scale.map((step, index) => ({ id: String(index + 1), label: step.label }));
-        return { script: `${title} ${say(options.map((o) => o.label))}`, options, wantsNumber: true };
-      }
-      case 'days':
-        return { script: `${title} ${flow.voice.days}`, options: [], wantsNumber: true };
-      case 'headcount':
-        return { script: `${title} ${flow.voice.counts}`, options: [] };
-      default:
-        return { script: `${title} ${flow.voice.logistics}`, options: [] };
-    }
-  }, [stepId, questionCopy, choice, copy, flow]);
+  const voice = useMemo(
+    () => (stepId ? stepVoice(stepId, copy, flow, locale) : { id: '', script: '', options: [] as VoiceOption[] }),
+    [stepId, copy, flow, locale]
+  );
 
   const onVoice = useCallback(
     (match: VoiceMatch): VoiceOutcome => {
@@ -315,7 +290,7 @@ export const QuestionStep: React.FC = () => {
             advance();
             return { listenAgain: false };
           }
-          return { listenAgain: true, say: copy.ui.pickAtLeastOne };
+          return { listenAgain: true, say: copy.ui.pickAtLeastOne, sayId: 'fb-pick-one' };
         }
         return { listenAgain: true };
       }
@@ -331,7 +306,7 @@ export const QuestionStep: React.FC = () => {
           advance();
           return { listenAgain: false };
         }
-        return { listenAgain: true, say: flow.voice.didntCatch };
+        return { listenAgain: true, say: flow.voice.didntCatch, sayId: 'fb-didnt-catch' };
       }
 
       // An option, by name or by number.
@@ -348,7 +323,7 @@ export const QuestionStep: React.FC = () => {
         const label = voice.options.find((option) => option.id === match.id)?.label ?? '';
         if (stepId === 'interests') toggleInterest(match.id as InterestKey);
         else toggleConstraint(match.id as ConstraintKey);
-        return { listenAgain: true, say: label };
+        return { listenAgain: true, say: label, sayId: echoId(stepId, match.id) };
       }
       return { listenAgain: false };
     },
@@ -372,6 +347,7 @@ export const QuestionStep: React.FC = () => {
       <VoiceGuide
         stepKey={`${refining ?? 'core'}-${currentStep.id}`}
         script={voice.script}
+        clipId={voice.id}
         options={voice.options}
         wantsNumber={voice.wantsNumber}
         onMatch={onVoice}

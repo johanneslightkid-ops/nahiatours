@@ -15,13 +15,15 @@ import {
 } from '../../planner/voice';
 
 /** What the question does with an answer: keep listening (multi-select) or not. */
-export type VoiceOutcome = { listenAgain: boolean; say?: string };
+export type VoiceOutcome = { listenAgain: boolean; say?: string; sayId?: string };
 
 interface VoiceGuideProps {
   /** Changes whenever a different question is on screen. */
   stepKey: string;
   /** Read aloud when the question appears. */
   script: string;
+  /** Recorded clip of the same words, if one exists (see planner/voiceScript.ts). */
+  clipId?: string;
   options: VoiceOption[];
   wantsNumber?: boolean;
   onMatch: (match: VoiceMatch) => VoiceOutcome;
@@ -50,6 +52,18 @@ const recognitionCtor = (): (new () => Recognition) | null => {
 
 const STORAGE_KEY = 'planner_voice';
 
+/**
+ * Recorded clips, when someone has made them. The manifest lists which ids
+ * exist per language, so a missing recording costs no failed request — the
+ * device's synthesiser simply reads that line instead.
+ */
+const CLIP_ROOT = '/audio/planner';
+let manifest: Promise<Record<string, string[]>> | null = null;
+const loadManifest = () =>
+  (manifest ??= fetch(`${CLIP_ROOT}/manifest.json`, { cache: 'no-cache' })
+    .then((response) => (response.ok ? response.json() : {}))
+    .catch(() => ({})));
+
 const readEnabled = () => {
   try {
     return localStorage.getItem(STORAGE_KEY) === '1';
@@ -68,7 +82,7 @@ const readEnabled = () => {
  * browser can speak but not listen, it reads aloud and the guest taps; where
  * it can do neither, the guide does not appear at all.
  */
-export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options, wantsNumber, onMatch }) => {
+export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, clipId, options, wantsNumber, onMatch }) => {
   const { locale } = useI18n();
   const flow = getFlowCopy(locale);
   const lang = voiceLocale(locale);
@@ -83,12 +97,24 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
   const [problem, setProblem] = useState<'blocked' | null>(null);
 
   const recognition = useRef<Recognition | null>(null);
+  const audio = useRef<HTMLAudioElement | null>(null);
+  const [clips, setClips] = useState<Set<string>>(() => new Set());
+  // Set when the tap that switched the guide on already started reading.
+  const startedByTap = useRef(false);
   const retries = useRef(0);
   const speakTimer = useRef<number | null>(null);
   // Always the latest props, so the recogniser's callbacks never act on a
   // question that has already left the screen.
-  const latest = useRef({ options, wantsNumber, onMatch, script });
-  latest.current = { options, wantsNumber, onMatch, script };
+  const latest = useRef({ options, wantsNumber, onMatch, script, clipId });
+  latest.current = { options, wantsNumber, onMatch, script, clipId };
+
+  useEffect(() => {
+    let current = true;
+    loadManifest().then((list) => current && setClips(new Set(list[lang] ?? [])));
+    return () => {
+      current = false;
+    };
+  }, [lang]);
 
   const stopAll = useCallback(() => {
     if (speakTimer.current !== null) window.clearTimeout(speakTimer.current);
@@ -97,6 +123,11 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
       synth?.cancel();
     } catch {
       /* nothing to cancel */
+    }
+    if (audio.current) {
+      audio.current.onended = null;
+      audio.current.onerror = null;
+      audio.current.pause();
     }
     if (recognition.current) {
       recognition.current.onend = null;
@@ -113,14 +144,8 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
   }, [synth]);
 
   const speak = useCallback(
-    (text: string, then?: () => void) => {
-      if (!synth) return then?.();
+    (text: string, then?: () => void, id?: string) => {
       stopAll();
-      const utterance = new SpeechSynthesisUtterance(speakable(text, lang));
-      utterance.lang = RECOGNITION_LANG[lang];
-      const voice = pickVoice(synth.getVoices(), lang);
-      if (voice) utterance.voice = voice;
-      utterance.rate = 1.02;
 
       let finished = false;
       const done = () => {
@@ -132,15 +157,35 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
         // A short gap so the recogniser does not hear the end of the voice.
         if (then) window.setTimeout(then, 250);
       };
-      utterance.onend = done;
-      utterance.onerror = done;
-      // Some Android builds never fire `end`; don't wait on them forever.
-      speakTimer.current = window.setTimeout(done, 2500 + text.length * 75);
+
+      const synthesise = () => {
+        if (!synth) return done();
+        const utterance = new SpeechSynthesisUtterance(speakable(text, lang));
+        utterance.lang = RECOGNITION_LANG[lang];
+        const voice = pickVoice(synth.getVoices(), lang);
+        if (voice) utterance.voice = voice;
+        utterance.rate = 1.02;
+        utterance.onend = done;
+        utterance.onerror = done;
+        // Some Android builds never fire `end`; don't wait on them forever.
+        speakTimer.current = window.setTimeout(done, 2500 + text.length * 75);
+        synth.speak(utterance);
+      };
 
       setPhase('speaking');
-      synth.speak(utterance);
+      if (id && clips.has(id)) {
+        // One element for the whole session: once iOS has let it play from a
+        // tap, it may play again without one.
+        const player = (audio.current ??= new Audio());
+        player.onended = done;
+        player.onerror = synthesise;
+        player.src = `${CLIP_ROOT}/${lang}/${id}.mp3`;
+        player.play().catch(synthesise);
+        return;
+      }
+      synthesise();
     },
-    [lang, stopAll, synth]
+    [clips, lang, stopAll, synth]
   );
 
   const listen = useCallback(() => {
@@ -167,7 +212,7 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
         haptic(HAPTIC.miss);
         if (retries.current < 1) {
           retries.current += 1;
-          speak(flow.voice.didntCatch, listen);
+          speak(flow.voice.didntCatch, listen, 'fb-didnt-catch');
         } else {
           setPhase('idle');
         }
@@ -177,7 +222,7 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
       haptic(HAPTIC.heard);
       retries.current = 0;
       if (match.kind === 'command' && match.command === 'repeat') {
-        speak(latest.current.script, listen);
+        speak(latest.current.script, listen, latest.current.clipId);
         return;
       }
       if (match.kind === 'command' && match.command === 'stop') {
@@ -186,7 +231,7 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
         return;
       }
       const outcome = handle(match);
-      if (outcome.say) speak(outcome.say, outcome.listenAgain ? listen : undefined);
+      if (outcome.say) speak(outcome.say, outcome.listenAgain ? listen : undefined, outcome.sayId);
       else if (outcome.listenAgain) listen();
       else setPhase('idle');
     };
@@ -227,7 +272,11 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
   useEffect(() => {
     if (!enabled) return undefined;
     retries.current = 0;
-    speak(latest.current.script, Ctor ? listen : undefined);
+    if (startedByTap.current) {
+      startedByTap.current = false;
+      return stopAll;
+    }
+    speak(latest.current.script, Ctor ? listen : undefined, latest.current.clipId);
     return stopAll;
     // Only when the question changes or the guide is switched on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -248,13 +297,11 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
         type="button"
         onClick={() => {
           haptic(HAPTIC.tap);
-          // iOS only lets a page speak once it has spoken inside a tap; an
-          // empty utterance here unlocks the question that follows.
-          try {
-            synth.speak(new SpeechSynthesisUtterance(''));
-          } catch {
-            /* nothing to unlock */
-          }
+          // iOS only lets a page make sound that a tap started, so the first
+          // question is read right here rather than after the next render.
+          retries.current = 0;
+          startedByTap.current = true;
+          speak(latest.current.script, Ctor ? listen : undefined, latest.current.clipId);
           setEnabled(true);
         }}
         className="voice-pill mb-5 flex w-full items-center gap-3 px-4 py-3 text-left"
@@ -307,7 +354,7 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, script, options
           onClick={() => {
             haptic(HAPTIC.tap);
             retries.current = 0;
-            speak(latest.current.script, Ctor ? listen : undefined);
+            speak(latest.current.script, Ctor ? listen : undefined, latest.current.clipId);
           }}
           aria-label={flow.voice.repeat}
           className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-paper/30 text-paper"
