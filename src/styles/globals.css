@@ -1372,3 +1372,58 @@ select:focus {
     transform: none;
   }
 }
+
+/* ── Planner: fine-tune cards and the voice guide ───────────────────────────
+   Added with the shorter planner flow. Colours come from this site's own
+   Tailwind palette, so the pieces sit in its design rather than another's. */
+
+.planner-refine {
+  border-radius: 20px 12px 20px 12px;
+  border: 1px dashed rgb(255 255 255 / 0.3);
+  background: rgb(255 255 255 / 0.05);
+  padding: 0.85rem 0.9rem;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.planner-refine[data-set='true'] {
+  border-style: solid;
+  border-color: theme('colors.mango.DEFAULT');
+  background: rgb(255 255 255 / 0.1);
+}
+
+.planner-refine:active {
+  transform: scale(0.97);
+}
+
+.voice-pill {
+  border-radius: 22px 14px 22px 14px;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  background: rgb(255 255 255 / 0.07);
+}
+
+/* A ring that breathes while the guide listens — opacity and scale only. */
+.voice-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 2px solid theme('colors.mango.light');
+  opacity: 0;
+  pointer-events: none;
+}
+
+.voice-mic[data-phase='listening'] .voice-ring {
+  animation: voice-breathe 1.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.voice-mic[data-phase='speaking'] .voice-ring {
+  animation: voice-breathe 2.2s ease-in-out infinite;
+}
+
+@keyframes voice-breathe {
+  0% { opacity: 0.9; transform: scale(0.92); }
+  100% { opacity: 0; transform: scale(1.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-ring { animation: none !important; opacity: 0.6; }
+}

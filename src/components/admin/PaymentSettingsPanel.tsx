@@ -42,6 +42,7 @@ const PROCESSOR_NAMES: Record<CardProcessor, string> = {
   stripe: 'Stripe',
   azul: 'AZUL · Banco Popular',
   cardnet: 'CardNET',
+  verifone: 'Verifone · 2Checkout',
 };
 
 /** CardNET publishes these for its certification lab. They only work in test mode. */
@@ -135,6 +136,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
     stripe: status?.stripeSecretConfigured ?? false,
     azul: status?.azul?.ready ?? false,
     cardnet: status?.cardnet?.ready ?? false,
+    verifone: status?.verifone?.ready ?? false,
   };
   const methods = getPaymentMethodStates(brandSettings, Boolean(status?.activeCardProcessor));
 
@@ -209,6 +211,35 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
       setStatus(next);
       setBank(draftFrom(next));
       return 'Datos de AZUL y CardNET guardados.';
+    });
+
+  // ── Verifone (2Checkout) ──────────────────────────────────────────────
+  const [verifoneCode, setVerifoneCode] = useState('');
+  const [verifoneSecret, setVerifoneSecret] = useState('');
+  const [verifoneMode, setVerifoneMode] = useState<GatewayMode>('test');
+  const [verifoneCurrency, setVerifoneCurrency] = useState<LocalCurrency>('USD');
+  const [verifoneMessage, setVerifoneMessage] = useState<Notice>(null);
+  useEffect(() => {
+    if (!status?.verifone) return;
+    setVerifoneCode(status.verifone.merchantCode);
+    setVerifoneMode(status.verifone.mode);
+    setVerifoneCurrency(status.verifone.currency);
+  }, [status?.verifone?.merchantCode, status?.verifone?.mode, status?.verifone?.currency]);
+
+  const handleSaveVerifone = (clearSecret = false) =>
+    run(setVerifoneMessage, async () => {
+      const patch: PaymentConfigPatch = {
+        verifoneMerchantCode: verifoneCode.trim(),
+        verifoneMode,
+        verifoneCurrency,
+      };
+      // Write-only, like the Stripe key: only sent when something was typed.
+      if (clearSecret) patch.verifoneSecretWord = '';
+      else if (verifoneSecret.trim()) patch.verifoneSecretWord = verifoneSecret.trim();
+      const next = await savePaymentConfig(patch);
+      setStatus(next);
+      setVerifoneSecret('');
+      return clearSecret ? 'Palabra secreta de Verifone eliminada.' : 'Datos de Verifone guardados.';
     });
 
   const handleSaveBrand = () =>
@@ -298,7 +329,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" role="radiogroup" aria-label="Procesador de tarjetas">
-          {(['auto', 'stripe', 'azul', 'cardnet'] as CardProcessorChoice[]).map((option) => {
+          {(['auto', 'stripe', 'azul', 'cardnet', 'verifone'] as CardProcessorChoice[]).map((option) => {
             const active = choice === option;
             const ready = option === 'auto' ? Boolean(status?.activeCardProcessor) : processorReady[option];
             return (
@@ -580,6 +611,86 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
         </div>
       )}
 
+      {/* ── Verifone (2Checkout) ───────────────────────────────────────── */}
+      <div className="mt-5 rounded-3xl border border-ink/10 bg-paper-warm/40 p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h4 className="flex items-center gap-2 font-semibold text-ink">
+              <FaCreditCard className="text-sky-dark" /> Verifone · 2Checkout
+            </h4>
+            <p className="max-w-2xl text-xs text-ink-soft">
+              El cobro en línea de Verifone es 2Checkout. Cada reserva genera aquí mismo un enlace de pago
+              dinámico, firmado con tu palabra secreta, con el importe exacto: sin llamadas a ningún
+              servidor y sin que el visitante tenga que iniciar sesión. El dinero llega a tu cuenta de 2Checkout.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <ReadyChip ready={processorReady.verifone} mode={status?.verifone?.mode} />
+            <ModeSwitch value={verifoneMode} onChange={setVerifoneMode} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <label className={label}>
+            <span className={labelText}>Código de comerciante (Merchant Code)</span>
+            <input
+              className={field}
+              value={verifoneCode}
+              onChange={(e) => setVerifoneCode(e.target.value)}
+              placeholder="250123456789"
+              autoComplete="off"
+            />
+          </label>
+          <label className={label}>
+            <span className={labelText}>
+              Buy-Link Secret Word {status?.verifone?.secretWordConfigured && '(guardada)'}
+            </span>
+            <input
+              type="password"
+              className={field}
+              value={verifoneSecret}
+              onChange={(e) => setVerifoneSecret(e.target.value)}
+              placeholder={status?.verifone?.secretWordConfigured ? 'Dejar vacío para conservar' : 'Palabra secreta'}
+              autoComplete="off"
+            />
+          </label>
+          <label className={label}>
+            <span className={labelText}>Moneda del cobro</span>
+            <CurrencySwitch value={verifoneCurrency} onChange={setVerifoneCurrency} />
+          </label>
+        </div>
+
+        <p className="mt-3 flex items-start gap-2 text-xs text-ink-light">
+          <FaLock className="mt-0.5 shrink-0" />
+          <span>
+            Ambos datos están en el panel de 2Checkout, en <em>Integrations → Webhooks &amp; API</em>. La palabra
+            secreta se guarda solo en el servidor y nunca vuelve al navegador. En modo de pruebas los pedidos se
+            marcan como prueba (<code>test=1</code>). Activa en 2Checkout los productos dinámicos (“dynamic
+            products”) si tu cuenta no los tiene ya.
+          </span>
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => handleSaveVerifone()}
+            disabled={saving}
+            className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            {saving ? 'Guardando…' : 'Guardar Verifone'}
+          </button>
+          {status?.verifone?.secretWordConfigured && (
+            <button
+              onClick={() => handleSaveVerifone(true)}
+              disabled={saving}
+              className="rounded-full border border-sunset-dark/40 px-5 py-2 text-sm font-semibold text-sunset-dark disabled:opacity-50"
+            >
+              Borrar la palabra secreta
+            </button>
+          )}
+          <NoticeLine value={verifoneMessage} />
+        </div>
+      </div>
+
       {/* ── Payment links, visibility ──────────────────────────────────── */}
       <div className="mt-5 rounded-3xl border border-ink/10 p-5">
         <div className="mb-1 flex items-center gap-2">
@@ -601,7 +712,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
             <input className={field} value={brandSettings.cardnetLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, cardnetLink: e.target.value })} placeholder="https://…" />
           </label>
           <label className={label}>
-            <span className={labelText}>Otro (Stripe Payment Link, etc.)</span>
+            <span className={labelText}>Verifone u otro (2Checkout, Stripe Payment Link…)</span>
             <input className={field} value={brandSettings.verifoneLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, verifoneLink: e.target.value })} placeholder="https://…" />
           </label>
         </div>

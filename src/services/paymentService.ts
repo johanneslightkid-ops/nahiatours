@@ -41,7 +41,7 @@ export interface CheckoutResult {
 
 export type GatewayMode = 'test' | 'live';
 export type LocalCurrency = 'USD' | 'DOP';
-export type BankProvider = 'azul' | 'cardnet';
+export type BankProvider = 'azul' | 'cardnet' | 'verifone';
 export type CardProcessor = 'stripe' | BankProvider;
 export type CardProcessorChoice = 'auto' | CardProcessor;
 
@@ -76,6 +76,14 @@ export interface PaymentConfigStatus {
     acquirer: string;
     currency: LocalCurrency;
   };
+  /** Verifone's online checkout, 2Checkout: a signed dynamic buy-link. */
+  verifone: {
+    ready: boolean;
+    mode: GatewayMode;
+    merchantCode: string;
+    currency: LocalCurrency;
+    secretWordConfigured: boolean;
+  };
 }
 
 /** Everything the admin panel may send. Omitted fields stay as stored. */
@@ -99,6 +107,11 @@ export interface PaymentConfigPatch {
   cardnetMerchantName?: string;
   cardnetAcquirer?: string;
   cardnetCurrency?: LocalCurrency;
+  verifoneMode?: GatewayMode;
+  verifoneMerchantCode?: string;
+  /** Write-only. Empty string clears it. */
+  verifoneSecretWord?: string;
+  verifoneCurrency?: LocalCurrency;
 }
 
 /**

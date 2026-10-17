@@ -20,6 +20,18 @@ import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import { ProfileChips } from './ProfileChips';
 import { PlanTourCard } from './PlanTourCard';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
+import { useI18n } from '../../contexts/I18nContext';
+import { getFlowCopy } from '../../planner/flowCopy';
+import type { StepId } from '../../planner/questions';
+
+const REFINE_EMOJI: Partial<Record<StepId, string>> = {
+  budget: '💵',
+  dayShape: '⚖️',
+  aim: '🧭',
+  transport: '🚐',
+  occasion: '🎉',
+  logistics: '📍',
+};
 
 export const PlanResult: React.FC = () => {
   const {
@@ -35,9 +47,12 @@ export const PlanResult: React.FC = () => {
     reset,
     goToStep,
     steps,
+    refinements,
   } = usePlanner();
   const copy = usePlannerCopy();
   const { brandSettings } = useBrand();
+  const { locale } = useI18n();
+  const flow = getFlowCopy(locale);
   const [showRuledOut, setShowRuledOut] = useState(false);
 
   const whatsappUrl = useMemo(() => {
@@ -56,6 +71,29 @@ export const PlanResult: React.FC = () => {
       </div>
     );
   }
+
+  // The current answer to an optional question, or nothing if left unset.
+  const refineAnswer = (id: StepId): { emoji: string; label: string } | null => {
+    const q = copy.questions;
+    switch (id) {
+      case 'budget':
+        return profile.budget ? q.budget.options[profile.budget] : null;
+      case 'dayShape':
+        return profile.dayShape ? q.dayShape.options[profile.dayShape] : null;
+      case 'aim':
+        return profile.aim ? q.aim.options[profile.aim] : null;
+      case 'transport':
+        return profile.transport ? q.transport.options[profile.transport] : null;
+      case 'occasion':
+        return profile.occasion && profile.occasion !== 'none' ? q.occasion.options[profile.occasion] : null;
+      case 'logistics': {
+        const parts = [profile.startDate, profile.pickupZone].filter(Boolean);
+        return parts.length ? { emoji: '📍', label: parts.join(' · ') } : null;
+      }
+      default:
+        return null;
+    }
+  };
 
   const perDay = Math.round(plan.perPersonTotal / Math.max(1, plan.days.length));
   const totalItems = plan.days.reduce((sum, day) => sum + day.items.length, 0);
@@ -112,6 +150,43 @@ export const PlanResult: React.FC = () => {
           <ProfileChips />
         </div>
       </motion.header>
+
+      {/* ── Fine-tune: the optional answers, each with what it changes ───── */}
+      {refinements.length > 0 && (
+        <section className="planner-panel px-5 py-6 sm:px-9">
+          <h3 className="font-display text-xl font-bold text-paper sm:text-2xl">{flow.refine.title}</h3>
+          <p className="mt-1 text-sm text-paper/75">{flow.refine.hint}</p>
+          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            {refinements.map((step) => {
+              const answer = refineAnswer(step.id);
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  onMouseEnter={() => playHoverFx()}
+                  onClick={() => {
+                    playClickFx();
+                    goToStep(step.id);
+                  }}
+                  data-set={Boolean(answer)}
+                  className="planner-refine text-left"
+                >
+                  <span className="text-xl leading-none">{answer?.emoji ?? REFINE_EMOJI[step.id]}</span>
+                  <span className="mt-2 block text-[0.66rem] font-extrabold uppercase tracking-[0.14em] text-paper/60">
+                    {flow.refine.label[step.id]}
+                  </span>
+                  <span className="mt-0.5 block text-sm font-bold leading-snug text-paper">
+                    {answer?.label ?? flow.refine.notSet}
+                  </span>
+                  {!answer && (
+                    <span className="mt-1 block text-[0.72rem] leading-snug text-paper/65">{flow.refine.impact[step.id]}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ── Money bar ───────────────────────────────────────────────────── */}
       <section className="planner-panel grid gap-6 px-6 py-6 sm:grid-cols-3 sm:px-9">
