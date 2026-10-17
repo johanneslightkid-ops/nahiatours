@@ -83,6 +83,21 @@ export const feedbackLines = (copy: PlannerCopy, flow: FlowCopy): Array<{ id: st
   { id: 'fb-pick-one', text: /[.!?]$/.test(copy.ui.pickAtLeastOne) ? copy.ui.pickAtLeastOne : `${copy.ui.pickAtLeastOne}.` },
 ];
 
+/**
+ * Fingerprint of a line's wording (FNV-1a). A recording is listed in the
+ * manifest with the fingerprint of the words it was made from, so when the
+ * copy changes the stale clip is skipped and the synthesiser reads the new
+ * words until the line is recorded again.
+ */
+export const lineHash = (text: string): string => {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash.toString(16).padStart(8, '0');
+};
+
 /** A ticked multi-select answer is confirmed by saying its label. */
 export const echoId = (stepId: StepId, optionId: string) => `echo-${stepId}-${optionId}`;
 
