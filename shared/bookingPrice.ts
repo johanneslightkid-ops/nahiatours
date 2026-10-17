@@ -192,7 +192,10 @@ export const priceBooking = async (
   let persons = Math.max(1, Math.min(60, Math.floor(Number(body.persons) || 1)));
   const title = String(body.title ?? '').trim().slice(0, 120) || 'Excursion';
 
-  const record = await findServiceRecord(env, body);
+  // A payment of an amount agreed with the operator — a deposit, the rest of
+  // a booking made on WhatsApp. There is no catalogue item to look up: the
+  // amount is the guest's own, bounded below, and recorded as client-priced.
+  const record = body.category === 'custom' ? null : await findServiceRecord(env, body);
   const byRate = record ? priceByRate(record, body.quantities) : null;
   if (byRate && 'error' in byRate) return { ok: false, error: byRate.error };
   if (byRate && byRate.persons > 60) return { ok: false, error: 'That is more people than one booking can take.' };
