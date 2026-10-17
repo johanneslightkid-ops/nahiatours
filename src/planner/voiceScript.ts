@@ -12,21 +12,29 @@ import {
   StepId,
   TRANSPORTS,
 } from './questions';
-import { spokenList, VoiceOption } from './voice';
+import type { VoiceOption } from './voice';
 
 /**
  * Everything the voice guide says, as data.
  *
  * One function decides the words for each question, so the guide on the page
  * and the list of clips handed to whoever records them can never drift apart.
- * Every line has a stable id; a recorded clip is stored as
- * /audio/planner/<locale>/<id>.mp3 and played instead of the synthesiser
- * whenever it exists.
+ *
+ * A question is read as a sequence of segments — the question itself, then
+ * each option on its own, then any closing instruction — so the page always
+ * knows which option is being spoken and can show it. Every segment has a
+ * stable id; a recorded clip is stored as /audio/planner/<locale>/<id>.mp3
+ * and played instead of the synthesiser whenever it exists.
  */
-export interface StepVoice {
-  /** Clip id of the question as read aloud. */
+export interface VoiceSegment {
   id: string;
-  script: string;
+  text: string;
+  /** Set while an option is being read, so the page can point at it. */
+  optionId?: string;
+}
+
+export interface StepVoice {
+  segments: VoiceSegment[];
   options: VoiceOption[];
   wantsNumber?: boolean;
 }
@@ -40,40 +48,53 @@ const CHOICE_IDS: Partial<Record<StepId, readonly string[]>> = {
   occasion: OCCASIONS,
 };
 
+/** The clip of one option's label, also used to confirm a ticked answer. */
+export const optionId = (stepId: StepId, option: string) => `opt-${stepId}-${option}`;
+
 export const stepVoice = (stepId: StepId, copy: PlannerCopy, flow: FlowCopy, locale: string): StepVoice => {
   const q = copy.questions as Record<string, any>;
   // A question read aloud needs to end like a sentence before the next one.
   const raw = String(q[stepId]?.title ?? '').trim();
   const title = /[.?!…]$/.test(raw) ? raw : `${raw}.`;
-  const list = (labels: string[]) => `${flow.voice.youCanSay}: ${spokenList(labels, flow.voice.or)}`;
-  const say = (labels: string[]) => `${list(labels)}.`;
-  const id = `q-${stepId}`;
+  const intro = { id: `q-${stepId}` };
+
+  // "You can say:" then each option, the last one joined with "or".
+  const listed = (options: VoiceOption[], closing?: string): VoiceSegment[] => [
+    { ...intro, text: `${title} ${flow.voice.youCanSay}:` },
+    ...options.map((option, index) =>
+      index === options.length - 1 && options.length > 1
+        ? { id: `${optionId(stepId, option.id)}-or`, text: `${flow.voice.or} ${option.label}.`, optionId: option.id }
+        : { id: optionId(stepId, option.id), text: `${option.label},`, optionId: option.id }
+    ),
+    ...(closing ? [{ id: `q-${stepId}-end`, text: closing }] : []),
+  ];
 
   const ids = stepId === 'partyType' ? partyOrder(locale) : CHOICE_IDS[stepId];
   if (ids) {
     const options = ids.map((key) => ({ id: key, label: String(q[stepId].options[key].label) }));
-    return { id, script: `${title} ${say(options.map((o) => o.label))}`, options };
+    return { segments: listed(options), options };
   }
 
   switch (stepId) {
     case 'interests': {
       const options = INTERESTS.map((key) => ({ id: key, label: copy.interests[key].label }));
-      return { id, script: `${title} ${say(options.map((o) => o.label))} ${flow.voice.multiDone}`, options };
+      return { segments: listed(options, flow.voice.multiDone), options };
     }
     case 'constraints': {
       const options = CONSTRAINTS.map((key) => ({ id: key, label: copy.questions.constraints.options[key].label }));
-      return { id, script: `${title} ${list(options.map((o) => o.label))}, ${flow.voice.constraintsNone}`, options };
+      const none = flow.voice.constraintsNone.charAt(0).toUpperCase() + flow.voice.constraintsNone.slice(1);
+      return { segments: listed(options, none), options };
     }
     case 'energy': {
       const options = copy.questions.energy.scale.map((step, index) => ({ id: String(index + 1), label: step.label }));
-      return { id, script: `${title} ${say(options.map((o) => o.label))}`, options, wantsNumber: true };
+      return { segments: listed(options), options, wantsNumber: true };
     }
     case 'days':
-      return { id, script: `${title} ${flow.voice.days}`, options: [], wantsNumber: true };
+      return { segments: [{ ...intro, text: `${title} ${flow.voice.days}` }], options: [], wantsNumber: true };
     case 'headcount':
-      return { id, script: `${title} ${flow.voice.counts}`, options: [] };
+      return { segments: [{ ...intro, text: `${title} ${flow.voice.counts}` }], options: [] };
     default:
-      return { id, script: `${title} ${flow.voice.logistics}`, options: [] };
+      return { segments: [{ ...intro, text: `${title} ${flow.voice.logistics}` }], options: [] };
   }
 };
 
@@ -99,7 +120,11 @@ export const lineHash = (text: string): string => {
 };
 
 /** A ticked multi-select answer is confirmed by saying its label. */
-export const echoId = (stepId: StepId, optionId: string) => `echo-${stepId}-${optionId}`;
+export const echoLine = (stepId: StepId, option: VoiceOption): VoiceSegment => ({
+  id: optionId(stepId, option.id),
+  text: `${option.label},`,
+  optionId: option.id,
+});
 
 /** Every clip for one language, in the order a recording session would take them. */
 export const allVoiceLines = (
@@ -108,13 +133,20 @@ export const allVoiceLines = (
   flow: FlowCopy,
   locale: string
 ): Array<{ id: string; text: string }> => {
-  const lines: Array<{ id: string; text: string }> = [];
+  const seen = new Map<string, string>();
+  const add = (id: string, text: string) => {
+    if (!seen.has(id)) seen.set(id, text);
+  };
   for (const step of steps) {
     const voice = stepVoice(step, copy, flow, locale);
-    lines.push({ id: voice.id, text: voice.script });
+    voice.segments.forEach((segment) => add(segment.id, segment.text));
     if (step === 'interests' || step === 'constraints') {
-      voice.options.forEach((option) => lines.push({ id: echoId(step, option.id), text: option.label }));
+      voice.options.forEach((option) => {
+        const echo = echoLine(step, option);
+        add(echo.id, echo.text);
+      });
     }
   }
-  return [...lines, ...feedbackLines(copy, flow)];
+  feedbackLines(copy, flow).forEach((line) => add(line.id, line.text));
+  return [...seen.entries()].map(([id, text]) => ({ id, text }));
 };

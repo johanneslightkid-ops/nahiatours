@@ -4,6 +4,8 @@ import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 import { haptic, HAPTIC } from '../../planner/haptics';
 
 interface OptionCardProps {
+  /** Lets the voice guide find and light up this option while reading it. */
+  voiceId?: string;
   emoji: string;
   label: string;
   description?: string;
@@ -13,6 +15,7 @@ interface OptionCardProps {
 }
 
 export const OptionCard: React.FC<OptionCardProps> = ({
+  voiceId,
   emoji,
   label,
   description,
@@ -23,6 +26,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
   <button
     type="button"
     data-selected={selected}
+    data-voice-option={voiceId}
     className="planner-option group"
     onMouseEnter={() => playHoverFx()}
     onClick={() => {
@@ -60,6 +64,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 );
 
 interface ChipToggleProps {
+  voiceId?: string;
   emoji?: string;
   label: string;
   selected: boolean;
@@ -68,6 +73,7 @@ interface ChipToggleProps {
 }
 
 export const ChipToggle: React.FC<ChipToggleProps> = ({
+  voiceId,
   emoji,
   label,
   selected,
@@ -77,6 +83,7 @@ export const ChipToggle: React.FC<ChipToggleProps> = ({
   <button
     type="button"
     data-selected={selected}
+    data-voice-option={voiceId}
     disabled={disabled && !selected}
     className="planner-chip disabled:cursor-not-allowed disabled:opacity-35"
     onMouseEnter={() => playHoverFx()}
@@ -175,6 +182,7 @@ export const EnergyScale: React.FC<EnergyScaleProps> = ({ value, steps, onChange
               }}
               aria-label={step.label}
               aria-pressed={isActive}
+              data-voice-option={String(level)}
               className={`group relative flex flex-col items-center gap-2 rounded-2xl border px-1 py-3 transition-all duration-300 ${
                   isActive
                   ? 'border-lagoon-light bg-lagoon-light/20'
