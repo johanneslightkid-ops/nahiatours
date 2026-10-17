@@ -19,9 +19,29 @@ import { BrandSettings } from '../services/brandService';
  * guest to a dead end.
  */
 
-export type PaymentMethodId = 'stripe' | 'paypal' | 'cash';
+export type PaymentMethodId = 'stripe' | 'azul' | 'cardnet' | 'paypal' | 'cash';
 
-export const PAYMENT_METHOD_IDS: PaymentMethodId[] = ['stripe', 'paypal', 'cash'];
+export const PAYMENT_METHOD_IDS: PaymentMethodId[] = ['stripe', 'azul', 'cardnet', 'paypal', 'cash'];
+
+/**
+ * What the server says each card gateway can do right now
+ * (/api/payment-gateways). The Dominican gateways — AZUL and CardNet — are
+ * configured entirely on the server, so the browser can only learn that they
+ * are ready, never with what.
+ */
+export interface GatewayReadiness {
+  stripe: boolean;
+  azul: boolean;
+  cardnet: boolean;
+}
+
+/** Older callers pass a single boolean meaning "Stripe is ready". */
+export type ReadinessInput = boolean | Partial<GatewayReadiness> | undefined;
+
+const toReadiness = (input: ReadinessInput): GatewayReadiness =>
+  typeof input === 'boolean'
+    ? { stripe: input, azul: false, cardnet: false }
+    : { stripe: Boolean(input?.stripe), azul: Boolean(input?.azul), cardnet: Boolean(input?.cardnet) };
 
 export interface PaymentMethodState {
   /** The method has everything it needs to actually take a payment. */
@@ -38,21 +58,26 @@ const hasValue = (value?: string | null): boolean =>
   typeof value === 'string' && value.trim().length > 0;
 
 /**
- * @param stripeReady whether /api/payment-config reports a secret key on file.
- *        Unknown (the storefront has not asked, or the call failed) is treated
- *        as false, so a card button is never shown on a guess.
+ * @param ready what /api/payment-gateways reports (or, from older callers, a
+ *        single boolean for Stripe). Unknown is treated as false, so a card
+ *        button is never shown on a guess.
  */
 export const isPaymentMethodConfigured = (
   brandSettings: BrandSettings,
   method: PaymentMethodId,
-  stripeReady = false
+  ready: ReadinessInput = false
 ): boolean => {
+  const gateways = toReadiness(ready);
   switch (method) {
     case 'stripe':
       // A hosted link the operator pasted in is a valid way to take a card
       // even with no API key, so either one counts.
       return Boolean(brandSettings.stripeEnabled) &&
-        (stripeReady || hasValue(brandSettings.verifoneLink));
+        (gateways.stripe || hasValue(brandSettings.verifoneLink));
+    case 'azul':
+      return gateways.azul;
+    case 'cardnet':
+      return gateways.cardnet;
     case 'paypal':
       return hasValue(brandSettings.paypalMeLink);
     case 'cash':
@@ -70,10 +95,10 @@ export const isPaymentMethodEnabled = (
 
 export const getPaymentMethodStates = (
   brandSettings: BrandSettings,
-  stripeReady = false
+  ready: ReadinessInput = false
 ): PaymentMethodStates =>
   PAYMENT_METHOD_IDS.reduce((states, method) => {
-    const configured = isPaymentMethodConfigured(brandSettings, method, stripeReady);
+    const configured = isPaymentMethodConfigured(brandSettings, method, ready);
     const enabled = isPaymentMethodEnabled(brandSettings, method);
     states[method] = { configured, enabled, visible: configured && enabled };
     return states;
@@ -82,17 +107,17 @@ export const getPaymentMethodStates = (
 export const isPaymentMethodVisible = (
   brandSettings: BrandSettings,
   method: PaymentMethodId,
-  stripeReady = false
+  ready: ReadinessInput = false
 ): boolean =>
-  isPaymentMethodConfigured(brandSettings, method, stripeReady) &&
+  isPaymentMethodConfigured(brandSettings, method, ready) &&
   isPaymentMethodEnabled(brandSettings, method);
 
 /** False when every method is unconfigured or hidden — the storefront then offers WhatsApp only. */
 export const hasVisiblePaymentMethod = (
   brandSettings: BrandSettings,
-  stripeReady = false
+  ready: ReadinessInput = false
 ): boolean =>
-  PAYMENT_METHOD_IDS.some((method) => isPaymentMethodVisible(brandSettings, method, stripeReady));
+  PAYMENT_METHOD_IDS.some((method) => isPaymentMethodVisible(brandSettings, method, ready));
 
 /**
  * The hosted page a card payment should open when there is no API key — the

@@ -6,6 +6,10 @@ export interface PaymentVisibility {
   stripe?: boolean;
   paypal?: boolean;
   cash?: boolean;
+  /** AZUL — Banco Popular's card gateway. */
+  azul?: boolean;
+  /** CardNet — BHD and most other Dominican banks. */
+  cardnet?: boolean;
 }
 
 export interface BrandSettings {
@@ -44,7 +48,7 @@ const defaultBrandSettings: BrandSettings = {
   verifoneLink: '',
   brandicon: '',
   stripeEnabled: false,
-  paymentVisibility: { stripe: true, paypal: true, cash: true },
+  paymentVisibility: { stripe: true, paypal: true, cash: true, azul: true, cardnet: true },
 };
 
 const normalizePaymentVisibility = (input: unknown): PaymentVisibility => {
@@ -53,6 +57,8 @@ const normalizePaymentVisibility = (input: unknown): PaymentVisibility => {
     stripe: typeof source.stripe === 'boolean' ? source.stripe : true,
     paypal: typeof source.paypal === 'boolean' ? source.paypal : true,
     cash: typeof source.cash === 'boolean' ? source.cash : true,
+    azul: typeof source.azul === 'boolean' ? source.azul : true,
+    cardnet: typeof source.cardnet === 'boolean' ? source.cardnet : true,
   };
 };
 

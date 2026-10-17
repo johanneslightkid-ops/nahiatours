@@ -36,11 +36,86 @@ export interface CheckoutResult {
   priceSource: string;
 }
 
+export type GatewayEnvironment = 'test' | 'production';
+
+export interface GatewayStatus {
+  configured: boolean;
+  environment: GatewayEnvironment;
+  merchantName: string;
+  merchantHint: string;
+  merchantType: string;
+  currencyCode: string;
+  exchangeRate: number;
+  itbisRate: number;
+  endpointOverride: string;
+}
+
 export interface PaymentConfigStatus {
   stripeSecretConfigured: boolean;
   stripeMode: 'live' | 'test' | null;
   stripeCurrency: string;
   storageAvailable: boolean;
+  azul: GatewayStatus & { authKeyConfigured: boolean };
+  cardnet: GatewayStatus & { terminalHint: string; acquiringInstitutionCode: string };
+}
+
+/** Fields the admin may send for AZUL. Omit one to keep what is stored. */
+export interface AzulPatch {
+  merchantId?: string;
+  merchantName?: string;
+  merchantType?: string;
+  currencyCode?: string;
+  /** Write-only. Empty string clears it. */
+  authKey?: string;
+  environment?: GatewayEnvironment;
+  exchangeRate?: number;
+  itbisRate?: number;
+  paymentPageUrl?: string;
+}
+
+/** Fields the admin may send for CardNet. Omit one to keep what is stored. */
+export interface CardnetPatch {
+  merchantNumber?: string;
+  merchantTerminal?: string;
+  merchantName?: string;
+  merchantType?: string;
+  acquiringInstitutionCode?: string;
+  currencyCode?: string;
+  environment?: GatewayEnvironment;
+  exchangeRate?: number;
+  itbisRate?: number;
+  apiBase?: string;
+}
+
+export type DominicanGateway = 'azul' | 'cardnet';
+
+/** What /api/dr-order reports about an AZUL or CardNet payment. */
+export interface OrderResult {
+  id: string;
+  gateway: DominicanGateway;
+  status: 'pending' | 'paid' | 'declined' | 'cancelled' | 'error';
+  paid: boolean;
+  environment: GatewayEnvironment;
+  tour: string;
+  persons: number | null;
+  date: string;
+  category: string;
+  priceSource: string;
+  amountTotal: number | null;
+  currency: string | null;
+  totalUsd: number;
+  authorizationCode: string;
+  reference: string;
+  card: string;
+  message: string;
+}
+
+export interface GatewayReadinessReport {
+  stripe: boolean;
+  azul: boolean;
+  cardnet: boolean;
+  azulTest: boolean;
+  cardnetTest: boolean;
 }
 
 /**
@@ -101,6 +176,8 @@ export const getPaymentConfigStatus = async (): Promise<PaymentConfigStatus> => 
 export const savePaymentConfig = async (patch: {
   stripeSecretKey?: string;
   stripeCurrency?: string;
+  azul?: AzulPatch;
+  cardnet?: CardnetPatch;
 }): Promise<PaymentConfigStatus> => {
   const password = getAdminPassword();
   if (!password) {
@@ -137,4 +214,73 @@ export const isStripeReady = async (): Promise<boolean> => {
   } catch {
     return false;
   }
+};
+
+/**
+ * Which card gateways can take a payment right now — public, booleans only.
+ * A failure answers "none", so a hiccup hides buttons rather than offering
+ * dead ones.
+ */
+export const getGatewayReadiness = async (): Promise<GatewayReadinessReport> => {
+  const none: GatewayReadinessReport = { stripe: false, azul: false, cardnet: false, azulTest: false, cardnetTest: false };
+  try {
+    const response = await fetch('/api/payment-gateways', { cache: 'no-store' });
+    if (!response.ok) return none;
+    const body = await response.json().catch(() => null);
+    return body ? { ...none, ...body } : none;
+  } catch {
+    return none;
+  }
+};
+
+/**
+ * Leave for AZUL or CardNet.
+ *
+ * Both gateways need the guest's BROWSER to arrive at their page with a form
+ * POST, so the server returns the form (an action URL and its fields) and this
+ * builds it and submits it. A same-tab navigation, which is what brings the
+ * guest back to us afterwards. Throws with a sentence written for the guest.
+ */
+export const startDominicanCheckout = async (
+  gateway: DominicanGateway,
+  booking: CheckoutBooking
+): Promise<void> => {
+  const response = await fetch('/api/dr-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    body: JSON.stringify({
+      ...booking,
+      gateway,
+      returnPath: booking.returnPath ?? window.location.pathname,
+    }),
+  });
+  const body = await response.json().catch(() => null);
+  if (!response.ok || !body?.action || !body?.fields) {
+    throw new Error(body?.error || 'Could not start the card payment.');
+  }
+
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = body.action;
+  form.style.display = 'none';
+  for (const [name, value] of Object.entries(body.fields as Record<string, string>)) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+  document.body.appendChild(form);
+  form.submit();
+};
+
+/** What became of an AZUL or CardNet order. Never trusts the query string. */
+export const getOrderResult = async (order: string): Promise<OrderResult> => {
+  const response = await fetch(`/api/dr-order?order=${encodeURIComponent(order)}`, { cache: 'no-store' });
+  const body = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(body?.error || 'Could not verify that payment.');
+  }
+  return body as OrderResult;
 };

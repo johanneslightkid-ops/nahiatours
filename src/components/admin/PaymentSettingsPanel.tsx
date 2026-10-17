@@ -11,6 +11,7 @@ import {
   PaymentMethodId,
   PAYMENT_METHOD_IDS,
 } from '../../utils/paymentMethods';
+import DominicanGatewaysPanel from './DominicanGatewaysPanel';
 
 interface PaymentSettingsPanelProps {
   brandSettings: BrandSettings;
@@ -21,6 +22,14 @@ const METHOD_LABELS: Record<PaymentMethodId, { name: string; requirement: string
   stripe: {
     name: 'Tarjeta de crédito / débito (Stripe)',
     requirement: 'Necesita "Aceptar tarjetas" más una clave secreta de Stripe o un enlace de pago',
+  },
+  azul: {
+    name: 'Tarjeta · AZUL (Banco Popular)',
+    requirement: 'Necesita MerchantId, MerchantName y AuthKey de AZUL',
+  },
+  cardnet: {
+    name: 'Tarjeta · CardNet (BHD y otros bancos)',
+    requirement: 'Necesita MerchantNumber, MerchantTerminal y MerchantName de CardNet',
   },
   paypal: {
     name: 'PayPal',
@@ -66,7 +75,11 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
       );
   }, []);
 
-  const methods = getPaymentMethodStates(brandSettings, status?.stripeSecretConfigured ?? false);
+  const methods = getPaymentMethodStates(brandSettings, {
+    stripe: status?.stripeSecretConfigured ?? false,
+    azul: status?.azul?.configured ?? false,
+    cardnet: status?.cardnet?.configured ?? false,
+  });
 
   const toggleVisibility = (method: PaymentMethodId, visible: boolean) => {
     const next: PaymentVisibility = { ...brandSettings.paymentVisibility, [method]: visible };
@@ -237,6 +250,9 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({
           será el que tenga ese enlace, no el del carrito.
         </p>
       </div>
+
+      {/* ── AZUL & CardNet ─────────────────────────────────────────────── */}
+      <DominicanGatewaysPanel status={status} onSaved={setStatus} />
 
       {/* ── Visibility ─────────────────────────────────────────────────── */}
       <div className="mt-5 rounded-3xl border border-ink/10 p-5">

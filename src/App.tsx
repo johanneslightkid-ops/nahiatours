@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -40,6 +40,22 @@ const PaymentReturn = lazy(() => import('./components/PaymentReturn'));
  */
 const RouteFallback = () => <div className="min-h-[70vh]" aria-hidden="true" />;
 
+/**
+ * Every checkout sends the guest back to the page they paid from, with
+ * `?paid=…` and a session or order id. The receipt has to appear there, not
+ * only at /payment/return — so it is mounted here, and its code is fetched
+ * only when those parameters are actually present.
+ */
+const PaymentReturnGate = () => {
+  const { pathname, search } = useLocation();
+  if (pathname === '/payment/return' || !/[?&]paid=/.test(search)) return null;
+  return (
+    <Suspense fallback={null}>
+      <PaymentReturn />
+    </Suspense>
+  );
+};
+
 const App = () => {
   return (
     <PlannerProvider>
@@ -49,6 +65,7 @@ const App = () => {
           <IllustratedBackdrop />
 
           <ScrollToHash />
+          <PaymentReturnGate />
           <Header />
           <main id="top" className="relative z-20 flex-grow">
             <Suspense fallback={<RouteFallback />}>

@@ -32,6 +32,10 @@ import { onRequest as handleStripeCheckout } from '../functions/api/stripe-check
 import { onRequest as handleStripeSession } from '../functions/api/stripe-session';
 import { onRequest as handleStripeReady } from '../functions/api/stripe-ready';
 import { onRequest as handlePaymentConfig } from '../functions/api/payment-config';
+import { onRequest as handleDrCheckout } from '../functions/api/dr-checkout';
+import { onRequest as handleDrReturn } from '../functions/api/dr-return';
+import { onRequest as handleDrOrder } from '../functions/api/dr-order';
+import { onRequest as handlePaymentGateways } from '../functions/api/payment-gateways';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
 
 export interface Env {
@@ -63,6 +67,12 @@ const ROUTES: Record<string, RouteHandler> = {
   '/api/stripe-session': handleStripeSession,
   '/api/stripe-ready': handleStripeReady,
   '/api/payment-config': handlePaymentConfig,
+  // Dominican card gateways: AZUL (Banco Popular) and CardNet (BHD and most
+  // other banks). The return path carries the gateway, outcome and order id
+  // as segments — see resolveHandler.
+  '/api/dr-checkout': handleDrCheckout,
+  '/api/dr-order': handleDrOrder,
+  '/api/payment-gateways': handlePaymentGateways,
   '/api/cf-ai': handleCfAi,
   '/api/upload': handleUpload,
   '/api/social-publish': handleSocialPublish,
@@ -76,6 +86,11 @@ const resolveHandler = (url: URL): RouteHandler | undefined => {
   const route = ROUTES[url.pathname];
   if (route) {
     return route;
+  }
+  // AZUL appends its result to the query string of the URL it was given, so
+  // the order travels in the path instead: /api/dr-return/{gateway}/{outcome}/{order}.
+  if (url.pathname.startsWith('/api/dr-return/')) {
+    return handleDrReturn;
   }
   // /blog is both a page and a legacy JSON endpoint. Only the documented
   // `?locale=` form is the endpoint; a plain visit gets the blog page.

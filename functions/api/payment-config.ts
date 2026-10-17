@@ -1,5 +1,12 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
-import { describePaymentConfig, writePaymentSecrets, PaymentEnv } from '../../shared/paymentConfig';
+import {
+  describePaymentConfig,
+  writePaymentSecrets,
+  PaymentEnv,
+  PaymentSecretsPatch,
+  AzulSettings,
+  CardnetSettings,
+} from '../../shared/paymentConfig';
 
 /**
  * Read and write the payment credentials, from the admin panel only.
@@ -12,7 +19,34 @@ import { describePaymentConfig, writePaymentSecrets, PaymentEnv } from '../../sh
  * PUT accepts a new key. Sending an empty string clears it; omitting the field
  * leaves whatever is stored alone, so the panel can save a currency change
  * without the operator having to retype a key it never showed them.
+ *
+ * The same holds for the Dominican gateways under `azul` and `cardnet`: each
+ * field present is saved, each absent one is kept. AZUL's AuthKey is
+ * write-only exactly like the Stripe key.
  */
+
+/** Copy only the named fields, and only strings and numbers. */
+const pick = <T,>(source: unknown, keys: (keyof T)[]): Partial<T> => {
+  const out: Partial<T> = {};
+  if (!source || typeof source !== 'object') return out;
+  for (const key of keys) {
+    const value = (source as Record<string, unknown>)[key as string];
+    if (typeof value === 'string' || typeof value === 'number') {
+      (out as Record<string, unknown>)[key as string] = value;
+    }
+  }
+  return out;
+};
+
+const AZUL_FIELDS: (keyof AzulSettings)[] = [
+  'merchantId', 'merchantName', 'merchantType', 'currencyCode', 'authKey',
+  'environment', 'exchangeRate', 'itbisRate', 'paymentPageUrl',
+];
+const CARDNET_FIELDS: (keyof CardnetSettings)[] = [
+  'merchantNumber', 'merchantTerminal', 'merchantName', 'merchantType',
+  'acquiringInstitutionCode', 'currencyCode', 'environment', 'exchangeRate',
+  'itbisRate', 'apiBase',
+];
 export async function onRequest(context: { request: Request; env: PaymentEnv }) {
   const { request, env } = context;
 
@@ -32,14 +66,21 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
   }
 
   if (request.method === 'PUT') {
-    let body: { stripeSecretKey?: unknown; stripeCurrency?: unknown };
+    let body: { stripeSecretKey?: unknown; stripeCurrency?: unknown; azul?: unknown; cardnet?: unknown };
     try {
       body = (await request.json()) as typeof body;
     } catch {
       return json({ error: 'Cuerpo de la petición inválido.' }, 400);
     }
 
-    const patch: { stripeSecretKey?: string; stripeCurrency?: string } = {};
+    const patch: PaymentSecretsPatch = {};
+
+    if (body.azul !== undefined) {
+      patch.azul = pick<AzulSettings>(body.azul, AZUL_FIELDS);
+    }
+    if (body.cardnet !== undefined) {
+      patch.cardnet = pick<CardnetSettings>(body.cardnet, CARDNET_FIELDS);
+    }
 
     if (typeof body.stripeSecretKey === 'string') {
       const key = body.stripeSecretKey.trim();

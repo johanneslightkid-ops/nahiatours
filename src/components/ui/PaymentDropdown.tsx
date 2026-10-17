@@ -1,16 +1,48 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FaPaypal, FaCreditCard, FaWhatsapp, FaChevronDown, FaShieldAlt } from 'react-icons/fa';
+import { FaPaypal, FaCreditCard, FaWhatsapp, FaChevronDown, FaShieldAlt, FaUniversity } from 'react-icons/fa';
 import { useBrand } from '../../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 import { getPaymentMethodStates, getCardCheckoutLink } from '../../utils/paymentMethods';
-import { createStripeCheckout, isStripeReady } from '../../services/paymentService';
+import {
+  createStripeCheckout,
+  getGatewayReadiness,
+  startDominicanCheckout,
+  GatewayReadinessReport,
+} from '../../services/paymentService';
+
+type CardGateway = 'stripe' | 'azul' | 'cardnet';
+
+/**
+ * How each card gateway introduces itself. AZUL and CardNet are the two
+ * acquirers that settle to a Dominican bank account: AZUL is Banco Popular's,
+ * CardNet serves BHD, Banreservas and most other banks. Both take any Visa or
+ * Mastercard, local or foreign.
+ */
+const GATEWAY_COPY: Record<CardGateway, { name: string; sub: string; page: string }> = {
+  stripe: {
+    name: 'Credit / Debit Card',
+    sub: 'Secure checkout — no account needed',
+    page: 'Stripe',
+  },
+  azul: {
+    name: 'Tarjeta · AZUL',
+    sub: 'Banco Popular · Visa / Mastercard',
+    page: 'AZUL (Banco Popular)',
+  },
+  cardnet: {
+    name: 'Tarjeta · CardNet',
+    sub: 'BHD y otros bancos · Visa / Mastercard',
+    page: 'CardNet',
+  },
+};
 
 /**
  * How a guest pays.
  *
- * Card goes to Stripe for real. There is no Payment Link with the amount in
+ * Card goes to Stripe, AZUL or CardNet for real — whichever the operator has
+ * configured and left switched on. There is no Payment Link with the amount in
  * the query string — Stripe links are fixed-price — so the server mints a
  * Checkout Session per booking and the browser is sent to the one-shot hosted
  * page it returns. The guest needs no Stripe account; Stripe offers a login
@@ -70,26 +102,36 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   const [cardModalOpen, setCardModalOpen] = useState(false);
   const [starting, setStarting] = useState(false);
   const [cardError, setCardError] = useState('');
-  const [stripeReady, setStripeReady] = useState(false);
+  const [readiness, setReadiness] = useState<GatewayReadinessReport>({
+    stripe: false,
+    azul: false,
+    cardnet: false,
+    azulTest: false,
+    cardnetTest: false,
+  });
+  const [cardGateway, setCardGateway] = useState<CardGateway>('stripe');
+  const stripeReady = readiness.stripe;
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [dropdownCoords, setDropdownCoords] = useState<{ top: number; left: number } | null>(null);
   const { brandSettings } = useBrand();
 
-  // Asked once per mount rather than per card: the answer is a single boolean
+  // Asked once per mount rather than per card: the answer is a few booleans
   // and the endpoint lets the browser cache it briefly.
   useEffect(() => {
     let current = true;
-    isStripeReady().then((ready) => {
-      if (current) setStripeReady(ready);
+    getGatewayReadiness().then((report) => {
+      if (current) setReadiness(report);
     });
     return () => {
       current = false;
     };
   }, []);
 
-  const methods = getPaymentMethodStates(brandSettings, stripeReady);
-  const anyVisible = methods.stripe.visible || methods.paypal.visible || methods.cash.visible;
+  const methods = getPaymentMethodStates(brandSettings, readiness);
+  const anyVisible = Object.values(methods).some((method) => method.visible);
+  const isTestGateway =
+    (cardGateway === 'azul' && readiness.azulTest) || (cardGateway === 'cardnet' && readiness.cardnetTest);
   const hostedCardLink = getCardCheckoutLink(brandSettings);
 
   const updateCoords = () => {
@@ -156,10 +198,11 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     openWhatsAppConfirmation('VIP Concierge / Cash');
   };
 
-  const handleCard = () => {
+  const handleCard = (gateway: CardGateway = 'stripe') => {
     playClickFx();
     setIsOpen(false);
     setCardError('');
+    setCardGateway(gateway);
     setCardModalOpen(true);
   };
 
@@ -173,6 +216,28 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
    */
   const handleCardProceed = async () => {
     playClickFx();
+
+    // AZUL and CardNet: the server signs (or opens a session for) the booking
+    // and this page posts the guest to the bank's own card screen.
+    if (cardGateway !== 'stripe') {
+      setStarting(true);
+      setCardError('');
+      try {
+        await startDominicanCheckout(cardGateway, {
+          category,
+          serviceId,
+          title: excursionTitle,
+          persons,
+          date: bookingDate,
+          amount: extractAmountNumber(selectedPrice) ?? undefined,
+          locale,
+        });
+      } catch (error: any) {
+        setStarting(false);
+        setCardError(error?.message || 'Could not start the card payment.');
+      }
+      return;
+    }
 
     // No API key, but the operator pasted their own hosted page: use that.
     if (!stripeReady && hostedCardLink) {
@@ -241,17 +306,40 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
           {methods.stripe.visible && (
             <button
               onMouseEnter={() => playHoverFx()}
-              onClick={handleCard}
+              onClick={() => handleCard('stripe')}
               className="flex w-full items-center gap-3 rounded-xl p-3 text-left group transition hover:bg-paper/10"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky/25 text-sky-light group-hover:scale-110 transition-transform">
                 <FaCreditCard className="h-4 w-4" />
               </div>
               <div>
-                <div className="text-xs font-bold">Credit / Debit Card</div>
-                <div className="text-[0.65rem] text-paper/70">Secure checkout — no account needed</div>
+                <div className="text-xs font-bold">{GATEWAY_COPY.stripe.name}</div>
+                <div className="text-[0.65rem] text-paper/70">{GATEWAY_COPY.stripe.sub}</div>
               </div>
             </button>
+          )}
+
+          {(['azul', 'cardnet'] as const).map((gateway) =>
+            methods[gateway].visible ? (
+              <button
+                key={gateway}
+                onMouseEnter={() => playHoverFx()}
+                onClick={() => handleCard(gateway)}
+                className="flex w-full items-center gap-3 rounded-xl p-3 text-left group transition hover:bg-paper/10"
+              >
+                <div
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg group-hover:scale-110 transition-transform ${
+                    gateway === 'azul' ? 'bg-sky-dark/40 text-sky-light' : 'bg-lagoon/30 text-lagoon-light'
+                  }`}
+                >
+                  <FaUniversity className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold">{GATEWAY_COPY[gateway].name}</div>
+                  <div className="text-[0.65rem] text-paper/70">{GATEWAY_COPY[gateway].sub}</div>
+                </div>
+              </button>
+            ) : null
           )}
 
           {methods.paypal.visible && (
@@ -307,7 +395,9 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
                 💳
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Card Checkout</h3>
+                <h3 className="text-lg font-bold text-white">
+                  {cardGateway === 'stripe' ? 'Card Checkout' : `Card Checkout · ${GATEWAY_COPY[cardGateway].page}`}
+                </h3>
                 <p className="text-xs text-paper/70">{excursionTitle}</p>
               </div>
             </div>
@@ -333,8 +423,20 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
               </div>
               <div className="flex items-center gap-2 border-t-2 border-paper/20 pt-2 text-paper/70">
                 <FaShieldAlt className="text-jungle-light" />
-                <span>Card details are entered on Stripe, never on this site</span>
+                <span>Card details are entered on {GATEWAY_COPY[cardGateway].page}, never on this site</span>
               </div>
+              {cardGateway !== 'stripe' && (
+                <p className="text-[0.65rem] leading-relaxed text-paper/60">
+                  Se cobra en la moneda del comercio (RD$ o US$) a la tasa del sitio; el importe exacto se
+                  muestra en la página del banco. / Charged in the merchant's currency at the site's rate —
+                  the exact amount is shown on the bank's page.
+                </p>
+              )}
+              {isTestGateway && (
+                <p className="rounded-lg bg-mango/20 px-2 py-1 text-[0.65rem] font-bold text-mango-light">
+                  MODO DE PRUEBA · TEST MODE — no real charge
+                </p>
+              )}
             </div>
 
             {cardError && (
@@ -354,7 +456,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
                   : `Pay ${selectedPrice ?? ''} with Card`}
               </button>
               <p className="text-center text-[0.65rem] text-paper/60">
-                You will be taken to Stripe and returned here when the payment is done.
+                You will be taken to {GATEWAY_COPY[cardGateway].page} and returned here when the payment is done.
               </p>
             </div>
           </div>

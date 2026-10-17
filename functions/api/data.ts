@@ -1,5 +1,5 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
-import { PROTECTED_RESOURCES } from '../../shared/paymentConfig';
+import { isProtectedResource } from '../../shared/paymentConfig';
 
 const RESOURCE_WITH_LOCALE = new Set([
   'blog',
@@ -86,8 +86,9 @@ const buildResourceKey = (resource: string, locale?: string) => {
   // This endpoint is unauthenticated on GET and cached publicly, so it must
   // never be able to name one, however it is asked. Returning null here makes
   // the request a 400 alongside any other unknown resource, which also avoids
-  // confirming that the key exists.
-  if (PROTECTED_RESOURCES.has(normalized)) {
+  // confirming that the key exists. Order records of card payments
+  // (`payment-order:…`) are refused by prefix for the same reason.
+  if (isProtectedResource(normalized)) {
     return null;
   }
 
