@@ -337,7 +337,7 @@
     "pricing": [
       {
         "tier": "Personnes",
-        "price": "$60"
+        "price": "$80"
       }
     ],
     "images": [
@@ -397,7 +397,7 @@
     "pricing": [
       {
         "tier": "Personnes",
-        "price": "$60"
+        "price": "$80"
       }
     ],
     "images": [
@@ -601,9 +601,134 @@
     "pricing": [
       {
         "tier": "Personnes",
-        "price": "$110"
+        "price": "$120"
       }
     ],
-    "images": []
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_dolphin_detail_2.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_dolphin_detail_3.jpg"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/tours/tour_dolphin_detail_4.jpg"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/tours/tour_dolphin_detail_5.jpg"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/tours/tour_dolphin_detail_6.jpg"
+      }
+    ]
+  },
+  {
+    "title": "Scuba Doo : le récif en scooter sous-marin",
+    "description": "Pas de permis de plongée, pas de bouteille, pas de cheveux mouillés : le Scuba Doo est un scooter sous-marin coiffé d'un dôme transparent rempli d'air frais. Vous respirez et parlez normalement en glissant au-dessus du jardin de coraux de Bávaro, à quelques mètres sous la surface.\n\n**Les temps forts :**\n• Une courte sortie en bateau à fond de verre jusqu'au récif\n• Environ 15 à 20 minutes aux commandes de votre propre scooter, vers 3 à 4 mètres, toujours accompagné d'un guide plongeur\n• Poissons-perroquets, sergents-majors et coraux cerveaux à portée de main (mais on ne touche pas !)\n• Un arrêt snorkeling pour revoir le même récif depuis la surface\n\n**Durée :** environ 3 h 30, transferts compris\n\n**Inclus :**\n• Transport aller-retour depuis l'hôtel\n• Briefing de sécurité en espagnol et en anglais\n• Scooter Scuba Doo avec un guide plongeur à vos côtés\n• Sortie en bateau à fond de verre et équipement de snorkeling\n• Gilet de sauvetage, eau et boissons fraîches\n\n**Bon à savoir :** Inutile de savoir plonger, il suffit d'être à l'aise dans l'eau. Femmes enceintes et personnes ayant des problèmes d'oreilles ou de cœur : demandez-nous avant. Photos et vidéos sous-marines proposées sur place, en supplément.",
+    "pricing": [
+      {
+        "tier": "Personnes",
+        "price": "$70"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_1.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_2.jpg"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_3.jpg"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_4.jpg"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_5.jpg"
+      }
+    ]
+  },
+  {
+    "title": "Pêche au gros : marlin, dorade coryphène et wahoo au large de Bávaro",
+    "description": "À quelques milles de Bávaro, le fond plonge d'un coup vers le grand bleu, et c'est là que chassent les beaux poissons de pêche sportive. Embarquez sur un petit bateau de pêche partagé avec un capitaine dominicain expérimenté et son équipage, mettez les lignes à la traîne… et attendez que le moulinet se mette à chanter.\n\n**Les temps forts :**\n• Pêche à la traîne sur le tombant : dorade coryphène, wahoo, thon, barracuda et, en saison, marlin bleu et blanc et voilier\n• Chacun prend son tour aux cannes — l'équipage prépare les appâts et vous aide à combattre et à remonter le poisson\n• La côte de Bávaro et de Cabeza de Toro vue depuis la mer\n• Peu de pêcheurs par bateau : personne n'attend son tour très longtemps\n\n**Durée :** environ 4 heures en mer, plus les transferts\n\n**Inclus :**\n• Transport aller-retour depuis l'hôtel\n• Bateau de pêche sportive avec capitaine et équipage\n• Cannes, moulinets, appâts et matériel\n• Eau, sodas et rhum dominicain\n\n**Bon à savoir :** Une prise n'est jamais garantie — c'est la pêche — mais l'équipage connaît ces eaux par cœur. Les accompagnateurs qui ne pêchent pas peuvent venir comme observateurs. Si vous êtes sujet au mal de mer, prenez quelque chose avant : au large, ça bouge plus que dans le lagon.",
+    "pricing": [
+      {
+        "tier": "Personnes",
+        "price": "$120"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_fishing_detail_1.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_fishing_detail_2.jpg"
+      }
+    ]
+  },
+  {
+    "title": "Banana boat : éclats de rire et plongeons à Bávaro",
+    "description": "Six amis, une banane gonflable géante et un bateau qui adore les virages serrés. Le banana boat, c'est l'activité la plus simple, la plus folle et la plus racontée de la plage — et elle se termine presque toujours avec tout le monde dans l'eau chaude et turquoise.\n\n**Les temps forts :**\n• Un remorquage à vive allure dans la baie de Bávaro, avec de grands virages\n• La chute inévitable (et facultative, si vous vous accrochez bien) dans la mer des Caraïbes\n• Toute la côte bordée de palmiers vue depuis l'eau\n• Du temps sur la plage ensuite pour sécher au soleil\n\n**Durée :** environ 15 minutes de ride, autour de 2 heures au total avec les transferts et la plage\n\n**Inclus :**\n• Transport aller-retour depuis l'hôtel\n• Tour de banana boat tracté par un pilote professionnel\n• Gilet de sauvetage pour chacun et consignes de sécurité\n• Eau\n\n**Bon à savoir :** C'est encore mieux en groupe — la banane accueille 5 à 8 personnes, et plus vous êtes nombreux, plus ça crie. Il faut savoir nager, et les enfants montent avec un adulte. Lunettes de soleil et téléphone restent sur le sable : la banane ne fait pas de quartier.",
+    "pricing": [
+      {
+        "tier": "Personnes",
+        "price": "$70"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_banana_boat_detail_1.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_banana_boat_detail_2.jpg"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/tours/tour_banana_boat_detail_3.jpg"
+      }
+    ]
+  },
+  {
+    "title": "Safari en jet ski : balade guidée le long de la côte caraïbe",
+    "description": "Mettez les gaz et regardez les Caraïbes défiler. Pendant ce safari guidé, vous pilotez votre propre jet ski dans un petit convoi derrière un moniteur, en filant sur l'eau turquoise jusqu'à un banc de sable et une piscine naturelle inaccessibles depuis la plage.\n\n**Les temps forts :**\n• Votre propre jet ski — seul ou à deux, en changeant de pilote à l'arrêt\n• Un convoi guidé le long d'une côte sauvage, avec des arrêts photo\n• Une baignade dans une piscine naturelle peu profonde, loin de la foule\n• Environ une heure de vraie conduite, pas dix minutes à tourner dans un carré\n\n**Durée :** environ 5 heures au total, dont près d'une heure sur le jet ski\n\n**Inclus :**\n• Transport aller-retour de l'hôtel jusqu'au point de départ\n• Jet ski avec carburant et assurance\n• Moniteur-guide bilingue et briefing de sécurité complet\n• Gilet de sauvetage pour chacun\n• Eau et boissons fraîches\n\n**Bon à savoir :** Le prix est par jet ski, pour une ou deux personnes. Les jet skis sont interdits devant les plages de baignade de Bávaro : la sortie part donc d'un point de départ situé à quelques minutes de route — et c'est justement pour ça que l'eau y est si tranquille. Le pilote doit être majeur ; les enfants montent comme passagers.",
+    "pricing": [
+      {
+        "tier": "Jet ski (1–2 personnes)",
+        "price": "$270"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_jetski_detail_1.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_jetski_detail_2.jpg"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/tours/tour_jetski_detail_3.jpg"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/tours/tour_jetski_detail_4.jpg"
+      }
+    ]
   }
 ]

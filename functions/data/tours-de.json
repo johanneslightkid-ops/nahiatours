@@ -337,7 +337,7 @@
     "pricing": [
       {
         "tier": "Personen",
-        "price": "$60"
+        "price": "$80"
       }
     ],
     "images": [
@@ -397,7 +397,7 @@
     "pricing": [
       {
         "tier": "Personen",
-        "price": "$60"
+        "price": "$80"
       }
     ],
     "images": [
@@ -601,9 +601,134 @@
     "pricing": [
       {
         "tier": "Personen",
-        "price": "$110"
+        "price": "$120"
       }
     ],
-    "images": []
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_dolphin_detail_2.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_dolphin_detail_3.jpg"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/tours/tour_dolphin_detail_4.jpg"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/tours/tour_dolphin_detail_5.jpg"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/tours/tour_dolphin_detail_6.jpg"
+      }
+    ]
+  },
+  {
+    "title": "Scuba Doo: Mit dem Unterwasser-Scooter übers Riff",
+    "description": "Kein Tauchschein, keine schwere Flasche, keine nassen Haare: Der Scuba Doo ist ein Unterwasser-Scooter mit einer klaren Luftkuppel über dem Kopf. Du atmest und sprichst ganz normal, während du ein paar Meter unter der Oberfläche über Bávaros Korallengarten gleitest.\n\n**Highlights:**\n• Kurze Fahrt mit dem Glasbodenboot hinaus zum Riff\n• Rund 15–20 Minuten am Steuer deines eigenen Scooters in etwa 3–4 Metern Tiefe, immer mit einem Tauchguide an deiner Seite\n• Papageifische, Sergeant-Majors und Hirnkorallen zum Greifen nah (bitte trotzdem nicht anfassen!)\n• Danach ein Schnorchelstopp, um dasselbe Riff von oben zu sehen\n\n**Dauer:** ca. 3,5 Stunden inklusive Hoteltransfer\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Sicherheitseinweisung auf Englisch und Spanisch\n• Scuba-Doo-Scooter mit Tauchguide an deiner Seite\n• Fahrt mit dem Glasbodenboot und Schnorchelausrüstung\n• Schwimmweste, Wasser und Softdrinks\n\n**Gut zu wissen:** Tauchen musst du nicht können – du solltest dich nur im Wasser wohlfühlen. Schwangere und Gäste mit Ohren- oder Herzproblemen fragen uns bitte vorher. Unterwasserfotos und Videos werden vor Ort gegen Aufpreis angeboten.",
+    "pricing": [
+      {
+        "tier": "Personen",
+        "price": "$70"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_1.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_2.jpg"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_3.jpg"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_4.jpg"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/tours/tour_scuba_doo_detail_5.jpg"
+      }
+    ]
+  },
+  {
+    "title": "Hochseeangeln: Marlin, Mahi-Mahi & Wahoo vor Bávaro",
+    "description": "Nur wenige Meilen vor Bávaro fällt der Meeresboden steil ins tiefe Blau ab – und genau dort jagen die großen Sportfische. Du fährst auf einem kleinen, geteilten Angelboot mit erfahrenem dominikanischem Kapitän und Crew hinaus, die Schleppleinen gehen ins Wasser, und dann heißt es warten, bis die Rolle kreischt.\n\n**Highlights:**\n• Schleppangeln an der Abbruchkante auf Mahi-Mahi (Dorade), Wahoo, Thunfisch, Barrakuda und in der Saison Blauen und Weißen Marlin sowie Segelfisch\n• Jeder kommt an die Rute – die Crew bereitet die Köder vor und hilft beim Drill und beim Landen\n• Die Küste von Bávaro und Cabeza de Toro vom Wasser aus\n• Nur wenige Angler pro Boot, damit niemand lange warten muss\n\n**Dauer:** ca. 4 Stunden auf dem Wasser plus Hoteltransfer\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Sportangelboot mit Kapitän und Crew\n• Ruten, Rollen, Köder und Zubehör\n• Wasser, Softdrinks und einheimischer Rum\n\n**Gut zu wissen:** Einen Fang kann niemand garantieren – das ist Angeln –, aber die Crew kennt diese Gewässer. Begleitpersonen, die nicht angeln, können als Zuschauer mitfahren. Wer leicht seekrank wird, nimmt vorher am besten etwas ein: Draußen ist mehr Seegang als in der Lagune.",
+    "pricing": [
+      {
+        "tier": "Personen",
+        "price": "$120"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_fishing_detail_1.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_fishing_detail_2.jpg"
+      }
+    ]
+  },
+  {
+    "title": "Bananenboot: Spritzen, Lachen, Wiederholen am Strand von Bávaro",
+    "description": "Sechs Freunde, eine riesige aufblasbare Banane und ein Motorboot, das richtig gut enge Kurven fahren kann. Das Bananenboot ist die einfachste, albernste und meistbelachte Fahrt am Strand – und sie endet fast immer damit, dass alle im warmen, türkisfarbenen Wasser landen.\n\n**Highlights:**\n• Rasante Fahrt im Schlepptau quer durch die Bucht von Bávaro, mit weit ausgeschwungenen Kurven\n• Der unvermeidliche (und optionale, wenn du dich gut festhältst) Sturz in die Karibik\n• Die ganze palmengesäumte Küste vom Wasser aus\n• Danach Zeit am Strand, um in der Sonne zu trocknen\n\n**Dauer:** ca. 15 Minuten Fahrt, insgesamt rund 2 Stunden mit Transfer und Strandzeit\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Bananenbootfahrt mit professionellem Bootsführer\n• Schwimmweste für alle und Sicherheitseinweisung\n• Wasser\n\n**Gut zu wissen:** Am schönsten in der Gruppe – die Banane fasst etwa 5 bis 8 Personen, und je mehr ihr seid, desto lauter wird es. Alle müssen schwimmen können, Kinder fahren mit einem Erwachsenen. Sonnenbrille und Handy bleiben am Strand: Die Banane kennt keine Gnade.",
+    "pricing": [
+      {
+        "tier": "Personen",
+        "price": "$70"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_banana_boat_detail_1.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_banana_boat_detail_2.jpg"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/tours/tour_banana_boat_detail_3.jpg"
+      }
+    ]
+  },
+  {
+    "title": "Jetski-Safari: Geführte Tour entlang der Karibikküste",
+    "description": "Gas geben und die Karibik vorbeifliegen lassen: Bei dieser geführten Jetski-Safari fährst du deinen eigenen Jetski in einem kleinen Konvoi hinter einem Instruktor her – über türkisfarbenes Wasser zu einer Sandbank und einem Naturpool, die du vom Strand aus nie erreichen würdest.\n\n**Highlights:**\n• Dein eigener Jetski – allein oder zu zweit, getauscht wird beim Stopp\n• Geführter Konvoi entlang eines unbebauten Küstenabschnitts mit Fotostopps\n• Baden in einem flachen Naturpool, weit weg vom Trubel\n• Rund eine Stunde echte Fahrzeit, keine zehn Minuten im abgesperrten Viereck\n\n**Dauer:** ca. 5 Stunden insgesamt, davon etwa eine Stunde auf dem Jetski\n\n**Inklusive:**\n• Hin- und Rücktransfer vom Hotel zum Startpunkt\n• Jetski inklusive Treibstoff und Versicherung\n• Zweisprachiger Instruktor und ausführliche Sicherheitseinweisung\n• Schwimmwesten für alle\n• Wasser und Softdrinks\n\n**Gut zu wissen:** Der Preis gilt pro Jetski, für eine oder zwei Personen. Vor den Badestränden von Bávaro sind Jetskis nicht erlaubt, deshalb startet die Tour an einem Anleger in kurzer Fahrdistanz – genau deshalb ist das Wasser dort so leer. Fahren darf nur ein Erwachsener; Kinder fahren als Beifahrer mit.",
+    "pricing": [
+      {
+        "tier": "Jetski (1–2 Personen)",
+        "price": "$270"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/tours/tour_jetski_detail_1.jpg"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/tours/tour_jetski_detail_2.jpg"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/tours/tour_jetski_detail_3.jpg"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/tours/tour_jetski_detail_4.jpg"
+      }
+    ]
   }
 ]

@@ -134,7 +134,7 @@
     "title": "Speed Boat: Sea su Propio Capitán",
     "description": "Tome el control de su propia lancha rápida y surque las aguas de Bávaro. Combine la velocidad con la paz de hacer snorkel en una zona de corales rodeada de peces tropicales. ¡Diversión garantizada para parejas y amigos!\n\n**Incluye:**\n• Traslados cada hora desde su hotel\n• 1 lancha rápida por pareja\n• Equipo de snorkel y guía acompañante\n• Parada en la piscina natural de Bávaro",
     "pricing": [
-      { "tier": "Personas", "price": "$60" }
+      { "tier": "Personas", "price": "$80" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216232/tours/fadp6ka0fejf3iqffy0k.webp" },
@@ -155,7 +155,7 @@
     "title": "Parasailing: Vuelo Sobre el Caribe",
     "description": "¿Busca adrenalina? Vuele sobre la costa de Punta Cana y disfrute de las mejores vistas de la isla desde el aire. Una experiencia segura y emocionante, solo para valientes.",
     "pricing": [
-      { "tier": "Personas", "price": "$60" }
+      { "tier": "Personas", "price": "$80" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "imgs/tours/tour_parasail_detail_7.jpg" },
@@ -242,8 +242,64 @@
     "title": "Dolphin: Nadar con Delfines",
     "description": "Viva el sueño de conocer de cerca a los mamíferos marinos más inteligentes. Disfrute de besos, abrazos y juegos en un encuentro interactivo inolvidable.",
     "pricing": [
-      { "tier": "Personas", "price": "$110" }
+      { "tier": "Personas", "price": "$120" }
     ],
-    "images": []
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_dolphin_detail_2.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_dolphin_detail_3.jpg" },
+      { "role": "detail_3", "localPath": "imgs/tours/tour_dolphin_detail_4.jpg" },
+      { "role": "detail_4", "localPath": "imgs/tours/tour_dolphin_detail_5.jpg" },
+      { "role": "detail_5", "localPath": "imgs/tours/tour_dolphin_detail_6.jpg" }
+    ]
+  },
+  {
+    "title": "Scuba Doo: Recorre el arrecife en scooter submarino",
+    "description": "Sin licencia de buceo, sin tanque pesado y sin mojarte el pelo: el Scuba Doo es un scooter submarino con una burbuja transparente de aire fresco sobre tu cabeza, así que respiras y hasta hablas con normalidad mientras te deslizas sobre el jardín de corales de Bávaro, a pocos metros bajo la superficie.\n\n**Lo mejor:**\n• Un corto paseo en barco con fondo de cristal hasta el arrecife\n• Unos 15–20 minutos manejando tu propio scooter a unos 3–4 metros, siempre junto a un guía buzo\n• Peces loro, sargentos mayores y coral cerebro tan cerca que parece que puedes tocarlos (¡pero no se tocan!)\n• Una parada de snorkel para ver el mismo arrecife desde arriba\n\n**Duración:** unas 3,5 horas con traslados incluidos\n\n**Incluye:**\n• Transporte ida y vuelta desde el hotel\n• Charla de seguridad en español e inglés\n• Scooter Scuba Doo con un guía buzo a tu lado en todo momento\n• Paseo en barco con fondo de cristal y equipo de snorkel\n• Chaleco salvavidas, agua y refrescos\n\n**Bueno saber:** No necesitas saber bucear, solo sentirte cómodo en el agua. Si estás embarazada o tienes problemas de oídos o del corazón, consúltanos antes. Las fotos y videos bajo el agua se ofrecen allí con costo adicional.",
+    "pricing": [
+      { "tier": "Personas", "price": "$70" }
+    ],
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_scuba_doo_detail_1.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_scuba_doo_detail_2.jpg" },
+      { "role": "detail_3", "localPath": "imgs/tours/tour_scuba_doo_detail_3.jpg" },
+      { "role": "detail_4", "localPath": "imgs/tours/tour_scuba_doo_detail_4.jpg" },
+      { "role": "detail_5", "localPath": "imgs/tours/tour_scuba_doo_detail_5.jpg" }
+    ]
+  },
+  {
+    "title": "Pesca de altura: marlín, dorado y peto frente a Bávaro",
+    "description": "A pocas millas de Bávaro el fondo se desploma hacia el azul profundo, y ahí es donde cazan los grandes peces de pesca deportiva. Súbete a un barco de pesca compartido con un capitán dominicano y su tripulación, echa los curricanes y espera a que el carrete empiece a cantar.\n\n**Lo mejor:**\n• Pesca al curricán en el veril: dorado, peto (wahoo), atún, barracuda y, en temporada, marlín azul y blanco y pez vela\n• Todos se turnan en las cañas — la tripulación prepara la carnada y te ayuda a pelear y subir el pez\n• La costa de Bávaro y Cabeza de Toro vista desde el mar\n• Pocas personas por barco, así que nunca hay que hacer fila para pescar\n\n**Duración:** unas 4 horas en el mar, más los traslados\n\n**Incluye:**\n• Transporte ida y vuelta desde el hotel\n• Barco de pesca deportiva con capitán y tripulación\n• Cañas, carretes, carnada y aparejos\n• Agua, refrescos y ron dominicano\n\n**Bueno saber:** La pesca nunca está garantizada — así es la pesca — pero la tripulación conoce estas aguas como nadie. Los acompañantes que no pescan pueden venir como observadores. Si te mareas fácilmente, toma algo antes de salir: mar adentro hay más movimiento.",
+    "pricing": [
+      { "tier": "Personas", "price": "$120" }
+    ],
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_fishing_detail_1.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_fishing_detail_2.jpg" }
+    ]
+  },
+  {
+    "title": "Banana Boat: chapuzón y risas en la playa de Bávaro",
+    "description": "Seis amigos, una banana inflable gigante y una lancha que sabe girar muy rápido. El banana boat es el paseo más sencillo, más loco y del que más se habla en la playa — y casi siempre termina con todos dentro del agua tibia y turquesa.\n\n**Lo mejor:**\n• Un remolque a toda velocidad por la bahía de Bávaro, con curvas bien abiertas\n• La caída inevitable (y opcional, si te agarras fuerte) al mar Caribe\n• Toda la costa llena de palmeras vista desde el agua\n• Tiempo en la playa después para secarte al sol\n\n**Duración:** unos 15 minutos de paseo, unas 2 horas en total con traslados y tiempo de playa\n\n**Incluye:**\n• Transporte ida y vuelta desde el hotel\n• Paseo en banana boat remolcado por un conductor profesional\n• Chaleco salvavidas para cada persona y charla de seguridad\n• Agua\n\n**Bueno saber:** Es mejor en grupo — la banana lleva de 5 a 8 personas, y mientras más sean, más ruido hay. Hay que saber nadar y los niños van acompañados de un adulto. Deja los lentes de sol y el celular en la arena: la banana no perdona.",
+    "pricing": [
+      { "tier": "Personas", "price": "$70" }
+    ],
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_banana_boat_detail_1.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_banana_boat_detail_2.jpg" },
+      { "role": "detail_3", "localPath": "imgs/tours/tour_banana_boat_detail_3.jpg" }
+    ]
+  },
+  {
+    "title": "Safari en Jet Ski: recorrido guiado por la costa caribeña",
+    "description": "Acelera y siente el Caribe pasar volando. En este safari guiado manejas tu propio jet ski en un pequeño convoy detrás de un instructor, saltando sobre el agua turquesa hasta un banco de arena y una piscina natural a los que nunca llegarías desde la playa.\n\n**Lo mejor:**\n• Tu propio jet ski — solo o compartido con tu pareja, y se turnan en la parada\n• Un convoy guiado por una costa virgen, con paradas para fotos\n• Un baño en una piscina natural poco profunda, lejos de la gente\n• Alrededor de una hora real de manejo, no diez minutos dando vueltas en un cuadrado\n\n**Duración:** unas 5 horas en total, con cerca de una hora en el jet ski\n\n**Incluye:**\n• Transporte ida y vuelta desde el hotel hasta el punto de salida\n• Jet ski con combustible y seguro\n• Instructor-guía bilingüe y charla de seguridad completa\n• Chaleco salvavidas para cada persona\n• Agua y refrescos\n\n**Bueno saber:** El precio es por jet ski, para una o dos personas. Los jet skis no están permitidos frente a las playas de baño de Bávaro, por eso el tour sale desde un punto cercano en carro — y justo por eso el agua está tan vacía. Quien maneja debe ser adulto; los niños pueden ir de pasajeros.",
+    "pricing": [
+      { "tier": "Jet ski (1–2 personas)", "price": "$270" }
+    ],
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_jetski_detail_1.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_jetski_detail_2.jpg" },
+      { "role": "detail_3", "localPath": "imgs/tours/tour_jetski_detail_3.jpg" },
+      { "role": "detail_4", "localPath": "imgs/tours/tour_jetski_detail_4.jpg" }
+    ]
   }
 ]

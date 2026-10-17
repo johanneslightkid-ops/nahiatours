@@ -134,7 +134,7 @@
     "title": "Speed Boat & Snorkel Adventure",
     "description": "Be the captain of your own adventure! Pilot your own speedboat across the turquoise waters of Bávaro. This high-speed thrill is paired with a peaceful snorkeling session in a protected coral reef teeming with tropical fish.\n\n**Included:**\n• Hourly hotel transfers for maximum flexibility\n• Private speedboat (1 per couple)\n• Professional snorkeling gear\n• Stop at the Bávaro Natural Pool for a refreshing ocean dip\n• Expert guide in a lead boat",
     "pricing": [
-      { "tier": "Persons", "price": "$60" }
+      { "tier": "Persons", "price": "$80" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216232/tours/fadp6ka0fejf3iqffy0k.webp" },
@@ -155,7 +155,7 @@
     "title": "Parasailing: Sky-High Adventure",
     "description": "Ready for the ultimate bird's-eye view? Soar high above the Punta Cana coastline and witness the stunning contrast of the turquoise sea and white sands. Secure, thrilling, and absolutely unforgettable—this is the best way to see the island.\n\n**Duration:** 25 minutes\n\n**Included:**\n• Round-trip hotel transportation\n• Speedboat ride to the flight zone\n• All safety equipment and bilingual instruction\n• High-altitude parasailing flight",
     "pricing": [
-      { "tier": "Persons", "price": "$60" }
+      { "tier": "Persons", "price": "$80" }
     ],
     "images": [
       { "role": "detail_1", "localPath": "imgs/tours/tour_parasail_detail_7.jpg" },
@@ -242,8 +242,64 @@
     "title": "Dolphin Encounter: Swim with the Stars",
     "description": "Make a dream come true by meeting the ocean's most intelligent creatures. Enjoy an interactive swim where you can experience the joy of a dolphin's hug, kiss, and handshake. This educational and emotional encounter is a highlight for any Punta Cana visitor.\n\n**Duration:** 1 hour\n\n**Included:**\n• Transfer from your resort to the aquatic center\n• Guided interactive session with dolphins\n• Safety briefing and educational talk",
     "pricing": [
-      { "tier": "Persons", "price": "$110" }
+      { "tier": "Persons", "price": "$120" }
     ],
-    "images": []
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_dolphin_detail_2.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_dolphin_detail_3.jpg" },
+      { "role": "detail_3", "localPath": "imgs/tours/tour_dolphin_detail_4.jpg" },
+      { "role": "detail_4", "localPath": "imgs/tours/tour_dolphin_detail_5.jpg" },
+      { "role": "detail_5", "localPath": "imgs/tours/tour_dolphin_detail_6.jpg" }
+    ]
+  },
+  {
+    "title": "Scuba Doo: Ride the Reef on an Underwater Scooter",
+    "description": "No diving licence, no heavy tank, no wet hair: the Scuba Doo is an underwater scooter with a clear dome of fresh air over your head, so you breathe and even talk normally while you glide over Bávaro's coral garden a few metres below the surface.\n\n**Highlights:**\n• A short glass-bottom boat ride out to the reef, watching it pass under your feet\n• About 15–20 minutes driving your own scooter at roughly 3–4 metres, side by side with a guide diver\n• Parrotfish, sergeant majors and brain coral close enough to touch (please don't!)\n• A snorkelling stop afterwards to see the same reef from the surface\n\n**Duration:** about 3.5 hours including hotel transfers\n\n**Included:**\n• Round-trip hotel transportation\n• Safety briefing in English and Spanish\n• Scuba Doo scooter with a dive guide at your side the whole time\n• Glass-bottom boat ride and snorkelling equipment\n• Life vest, water and soft drinks\n\n**Good to know:** You don't need to be able to dive, only to be comfortable in the water. Pregnant guests and anyone with ear or heart problems should ask us first. Underwater photos and video are offered on site at an extra cost.",
+    "pricing": [
+      { "tier": "Persons", "price": "$70" }
+    ],
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_scuba_doo_detail_1.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_scuba_doo_detail_2.jpg" },
+      { "role": "detail_3", "localPath": "imgs/tours/tour_scuba_doo_detail_3.jpg" },
+      { "role": "detail_4", "localPath": "imgs/tours/tour_scuba_doo_detail_4.jpg" },
+      { "role": "detail_5", "localPath": "imgs/tours/tour_scuba_doo_detail_5.jpg" }
+    ]
+  },
+  {
+    "title": "Deep Sea Fishing: Marlin, Mahi-Mahi & Wahoo off Bávaro",
+    "description": "Just a few miles off Bávaro the seabed drops away into deep blue water, and that is where the big game fish hunt. Join a small shared sport-fishing boat with an experienced Dominican captain and crew, set the trolling lines, and wait for the reel to scream.\n\n**Highlights:**\n• Trolling the drop-off for mahi-mahi (dorado), wahoo, tuna, barracuda and, in season, blue and white marlin and sailfish\n• Every angler gets turns on the rods — the crew rigs the bait and helps you fight and land the fish\n• The Bávaro and Cabeza de Toro coastline from the water on the way out and back\n• A boat capped at a handful of anglers, so the rods are never crowded\n\n**Duration:** about 4 hours on the water, plus hotel transfers\n\n**Included:**\n• Round-trip hotel transportation\n• Sport-fishing boat with captain and crew\n• Rods, reels, bait and tackle\n• Bottled water, soft drinks and local rum\n\n**Good to know:** Catches are never guaranteed — that's fishing — but the crew knows these waters. Non-fishing companions can come along as observers. If you're prone to seasickness, take something beforehand: the ocean is livelier than the lagoon.",
+    "pricing": [
+      { "tier": "Persons", "price": "$120" }
+    ],
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_fishing_detail_1.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_fishing_detail_2.jpg" }
+    ]
+  },
+  {
+    "title": "Banana Boat: Splash, Laugh, Repeat on Bávaro Beach",
+    "description": "Six friends, one giant inflatable banana, one speedboat that is very good at sharp turns. The banana boat is the simplest, silliest and most-laughed-about ride on the beach — and it almost always ends with everybody in the warm turquoise water.\n\n**Highlights:**\n• A high-speed tow across Bávaro's bay, with the boat swinging wide on the turns\n• The inevitable (and optional, if you hold on tight) tumble into the Caribbean\n• Views of the whole palm-lined shoreline from the water\n• Time on the beach afterwards to dry off in the sun\n\n**Duration:** about 15 minutes of riding, around 2 hours in total with transfers and beach time\n\n**Included:**\n• Round-trip hotel transportation\n• Banana-boat ride towed by a professional driver\n• Life vest for every rider and a safety briefing\n• Bottled water\n\n**Good to know:** Best with a group — the banana seats about 5 to 8, and the more of you there are, the louder it gets. Riders must be able to swim and children ride with an adult. Leave sunglasses and phones on the beach: the banana takes no prisoners.",
+    "pricing": [
+      { "tier": "Persons", "price": "$70" }
+    ],
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_banana_boat_detail_1.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_banana_boat_detail_2.jpg" },
+      { "role": "detail_3", "localPath": "imgs/tours/tour_banana_boat_detail_3.jpg" }
+    ]
+  },
+  {
+    "title": "Jet Ski Safari: Guided Ride along the Caribbean Coast",
+    "description": "Open the throttle and feel the Caribbean fly past. On this guided jet-ski safari you ride your own machine in a small convoy behind an instructor, skipping across turquoise water to a sandbank and a natural pool you would never reach from the beach.\n\n**Highlights:**\n• Your own jet ski — ride solo, or share it with a partner and swap at the stop\n• A guided convoy along an undeveloped stretch of coast, with stops for photos\n• A swim in a shallow natural pool far from the crowds\n• About an hour of real riding time, not ten minutes in a roped-off box\n\n**Duration:** about 5 hours in total, with around one hour on the jet ski\n\n**Included:**\n• Round-trip hotel transportation to the launch point\n• Jet ski with fuel and insurance\n• Bilingual instructor-guide and full safety briefing\n• Life vests for every rider\n• Water and soft drinks\n\n**Good to know:** The price is per jet ski, for one or two riders. Jet skis aren't allowed off Bávaro's swimming beaches, so the tour leaves from a launch point a short drive away — which is exactly why the water is so empty. The driver must be an adult; children can ride as passengers.",
+    "pricing": [
+      { "tier": "Jet ski (1–2 riders)", "price": "$270" }
+    ],
+    "images": [
+      { "role": "detail_1", "localPath": "imgs/tours/tour_jetski_detail_1.jpg" },
+      { "role": "detail_2", "localPath": "imgs/tours/tour_jetski_detail_2.jpg" },
+      { "role": "detail_3", "localPath": "imgs/tours/tour_jetski_detail_3.jpg" },
+      { "role": "detail_4", "localPath": "imgs/tours/tour_jetski_detail_4.jpg" }
+    ]
   }
 ]
