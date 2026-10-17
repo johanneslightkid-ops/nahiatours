@@ -7,6 +7,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToHash from './components/ScrollToHash';
 import IllustratedBackdrop from './components/ui/IllustratedBackdrop';
 import { PlannerProvider } from './contexts/PlannerContext';
+// Asks how it went when a guest comes back from WhatsApp; the prompt itself
+// is only fetched when there is something to ask.
+import WhatsAppReturnGate from './components/WhatsAppReturnGate';
 
 /**
  * Every route but the home page is split out.
@@ -69,6 +72,7 @@ const App = () => {
 
           <ScrollToHash />
           <PaymentReturnGate />
+          <WhatsAppReturnGate />
           <Header />
           <main id="top" className="relative z-20 flex-grow">
             <Suspense fallback={<RouteFallback />}>

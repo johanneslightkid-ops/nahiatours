@@ -10,7 +10,10 @@ import { getAdminPassword } from './authStore';
  */
 
 export interface CheckoutBooking {
-  /** 'tours' | 'transport' — decides which catalogue the server prices from. */
+  /**
+   * 'tours' | 'transport' — decides which catalogue the server prices from;
+   * 'custom' is an agreed amount with no catalogue item behind it.
+   */
   category: string;
   /** Positional catalogue id, used as a fallback match after the title. */
   serviceId?: number | string;
