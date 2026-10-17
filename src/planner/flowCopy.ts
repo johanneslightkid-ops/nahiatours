@@ -36,6 +36,8 @@ export interface FlowCopy {
     title: string;
     blurb: string;
     privacy: string;
+    /** Disclosure shown when recorded clips are playing. */
+    aiVoice: string;
     tapToSpeak: string;
     listening: string;
     speaking: string;
@@ -113,6 +115,7 @@ const en: FlowCopy = {
     off: 'Voice guide',
     title: 'Plan hands-free',
     blurb: 'I read each question aloud and you just say one of the options.',
+    aiVoice: 'The voice is AI-generated.',
     privacy: 'Your phone’s own speech service turns your words into text; nothing is recorded here.',
     tapToSpeak: 'Tap to answer by voice',
     listening: 'Listening — say an option',
@@ -191,6 +194,7 @@ const es: FlowCopy = {
     off: 'Guía por voz',
     title: 'Planeen con la voz',
     blurb: 'Leo cada pregunta en voz alta y ustedes solo dicen una de las opciones.',
+    aiVoice: 'La voz es generada por IA.',
     privacy: 'El servicio de voz de su teléfono convierte sus palabras en texto; aquí no se graba nada.',
     tapToSpeak: 'Toquen para responder con la voz',
     listening: 'Escuchando — digan una opción',
@@ -269,6 +273,7 @@ const de: FlowCopy = {
     off: 'Sprachführung',
     title: 'Freihändig planen',
     blurb: 'Ich lese jede Frage vor, und du sagst einfach eine der Antworten.',
+    aiVoice: 'Die Stimme ist KI-generiert.',
     privacy: 'Der Sprachdienst deines Handys wandelt deine Worte in Text um; hier wird nichts aufgezeichnet.',
     tapToSpeak: 'Tippen und per Stimme antworten',
     listening: 'Ich höre zu — sag eine Antwort',
@@ -347,6 +352,7 @@ const fr: FlowCopy = {
     off: 'Guide vocal',
     title: 'Planifier à la voix',
     blurb: 'Je lis chaque question à voix haute et vous dites simplement une des réponses.',
+    aiVoice: 'La voix est générée par IA.',
     privacy: 'Le service vocal de votre téléphone transforme vos mots en texte ; rien n’est enregistré ici.',
     tapToSpeak: 'Touchez pour répondre à la voix',
     listening: 'J’écoute — dites une réponse',
