@@ -1737,3 +1737,117 @@ select:focus {
     padding: 0.7rem 0.85rem;
   }
 }
+
+/* ── Planner: stepping stones, fine-tune cards, voice guide ──────────────── */
+
+.planner-stones {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* The track and its fill sit behind the stones; the fill grows by scaleX so
+   the browser never re-lays it out. */
+.planner-stones::before,
+.planner-stones-fill {
+  content: '';
+  position: absolute;
+  left: 1.1rem;
+  right: 1.1rem;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 9999px;
+}
+
+.planner-stones::before {
+  background: rgb(14 59 54 / 0.12);
+}
+
+.planner-stones-fill {
+  background: linear-gradient(90deg, var(--lagoon-light), var(--lagoon), var(--jungle));
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.planner-stone {
+  position: relative;
+  display: grid;
+  height: 2.2rem;
+  width: 2.2rem;
+  place-items: center;
+  border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
+  background: var(--paper);
+  font-size: 1rem;
+  box-shadow: 0 0 0 2px rgb(14 59 54 / 0.12);
+  transition: transform 0.35s var(--ease-spring), opacity 0.3s ease;
+}
+
+.planner-stone[data-state='ahead'] {
+  opacity: 0.55;
+}
+
+.planner-stone[data-state='done'] {
+  background: var(--mango-light);
+}
+
+.planner-stone[data-state='here'] {
+  background: var(--mango);
+  transform: scale(1.18);
+}
+
+.planner-refine {
+  border-radius: 20px 12px 20px 12px;
+  border: 1px dashed rgb(251 245 232 / 0.3);
+  background: rgb(255 255 255 / 0.05);
+  padding: 0.85rem 0.9rem;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.planner-refine[data-set='true'] {
+  border-style: solid;
+  border-color: var(--mango);
+  background: rgb(247 178 59 / 0.12);
+}
+
+.planner-refine:active {
+  transform: scale(0.97);
+}
+
+.voice-pill {
+  border-radius: 22px 14px 22px 14px;
+  border: 1px solid rgb(251 245 232 / 0.22);
+  background: rgb(255 255 255 / 0.07);
+}
+
+/* A ring that breathes while the guide listens — opacity and scale only. */
+.voice-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 2px solid var(--mango-light);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.voice-mic[data-phase='listening'] .voice-ring {
+  animation: voice-breathe 1.4s var(--ease-out) infinite;
+}
+
+.voice-mic[data-phase='speaking'] .voice-ring {
+  animation: voice-breathe 2.2s ease-in-out infinite;
+}
+
+@keyframes voice-breathe {
+  0% { opacity: 0.9; transform: scale(0.92); }
+  100% { opacity: 0; transform: scale(1.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-ring { animation: none !important; opacity: 0.6; }
+  .planner-stones-fill, .planner-stone { transition: none; }
+}

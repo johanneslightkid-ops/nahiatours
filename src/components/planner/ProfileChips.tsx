@@ -64,7 +64,9 @@ export const ProfileChips: React.FC<{ compact?: boolean }> = ({ compact = false 
       text: copy.questions.dayShape.options[profile.dayShape].label,
     });
   }
-  chips.push({ step: 'days', emoji: '🗓️', text: `${profile.days} ${copy.questions.days.unit}` });
+  // "days" / "días" / "Tage" / "jours" → "day" / "día" / "Tag" / "jour" for one.
+  const dayUnit = profile.days === 1 ? copy.questions.days.unit.replace(/(s|e)$/, '') : copy.questions.days.unit;
+  chips.push({ step: 'days', emoji: '🗓️', text: `${profile.days} ${dayUnit}` });
   if (profile.budget) {
     chips.push({
       step: 'budget',

@@ -10,9 +10,26 @@ import { PlanResult } from '../components/planner/PlanResult';
 import { ProfileChips } from '../components/planner/ProfileChips';
 import FABWhatsApp from '../components/FABWhatsApp';
 import { useBrand } from '../contexts/BrandContext';
+import type { StepId } from '../planner/questions';
+
+const STEP_EMOJI: Record<StepId, string> = {
+  partyType: '👥',
+  headcount: '🔢',
+  interests: '💚',
+  energy: '🌡️',
+  adultAge: '🎂',
+  days: '🗓️',
+  occasion: '🎉',
+  constraints: '🛟',
+  budget: '💵',
+  dayShape: '⚖️',
+  aim: '🧭',
+  transport: '🚐',
+  logistics: '📍',
+};
 
 const PlanMyDay: React.FC = () => {
-  const { stage, progress, steps, stepIndex, loading } = usePlanner();
+  const { stage, steps, stepIndex, loading, refining, hasProgress } = usePlanner();
   const copy = usePlannerCopy();
   const { locale } = useI18n();
   const { brandSettings } = useBrand();
@@ -58,19 +75,25 @@ const PlanMyDay: React.FC = () => {
       </div>
 
       <div className="relative mx-auto w-full max-w-5xl">
-        {/* Progress rail — only while answering */}
-        {stage === 'questions' && (
+        {/* Progress — one stepping stone per question, only while answering */}
+        {stage === 'questions' && !refining && (
           <div className="mb-6 space-y-4">
             <div className="flex items-center justify-between gap-4">
               <span className="font-display text-lg font-extrabold text-ink">{copy.tab}</span>
-              <span className="text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-ink-soft">
-                {copy.ui.stepOf(stepIndex + 1, steps.length)}
-              </span>
             </div>
-            <div className="planner-rail">
-              <div className="planner-rail-fill" style={{ width: `${progress * 100}%` }} />
-            </div>
-            <ProfileChips compact />
+            <ol className="planner-stones" aria-hidden="true">
+              <li className="planner-stones-fill" style={{ transform: `scaleX(${steps.length > 1 ? stepIndex / (steps.length - 1) : 1})` }} />
+              {steps.map((step, index) => (
+                <li
+                  key={step.id}
+                  className="planner-stone"
+                  data-state={index < stepIndex ? 'done' : index === stepIndex ? 'here' : 'ahead'}
+                >
+                  {STEP_EMOJI[step.id]}
+                </li>
+              ))}
+            </ol>
+            {hasProgress && <ProfileChips compact />}
           </div>
         )}
 

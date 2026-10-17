@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
+import { HiArrowLeft, HiArrowRight, HiLightBulb } from 'react-icons/hi';
 import { usePlanner } from '../../contexts/PlannerContext';
+import { useI18n } from '../../contexts/I18nContext';
 import { usePlannerCopy } from '../../planner/usePlannerCopy';
+import { getFlowCopy } from '../../planner/flowCopy';
 import {
   ADULT_AGES,
   AIMS,
@@ -13,12 +15,14 @@ import {
   KID_AGES,
   MAX_INTERESTS,
   OCCASIONS,
-  PARTY_TYPES,
+  partyOrder,
   TRANSPORTS,
 } from '../../planner/questions';
 import type { ConstraintKey, KidAgeBand, TravelProfile } from '../../planner/types';
 import type { InterestKey } from '../../planner/tourProfiles';
+import { spokenList, VoiceMatch, VoiceOption } from '../../planner/voice';
 import { ChipToggle, CountStepper, EnergyScale, OptionCard } from './PlannerControls';
+import { VoiceGuide, VoiceOutcome } from './VoiceGuide';
 import { playClickFx } from '../../lib/soundEngine';
 
 interface OptionEntry {
@@ -28,10 +32,53 @@ interface OptionEntry {
   emoji: string;
 }
 
+/** "Saona Island: Paradise Found" → "Saona Island". */
+const shortTitle = (title: string) => title.split(/\s*[:–—]\s+/)[0] || title;
+
+/**
+ * The plan as it stands, under the question. Every answer visibly moves it,
+ * which is the whole reason to keep answering.
+ */
+const TakingShape: React.FC<{ spark?: string }> = ({ spark }) => {
+  const { plan, profile } = usePlanner();
+  const { locale } = useI18n();
+  const flow = getFlowCopy(locale);
+  const items = profile.partyType ? (plan?.days.flatMap((day) => day.items) ?? []).slice(0, 4) : [];
+
+  return (
+    <div className="planner-panel-soft mt-7 px-4 py-4 sm:px-5">
+      <p className="text-[0.66rem] font-extrabold uppercase tracking-[0.18em] text-lagoon-light">
+        {flow.takingShape}
+      </p>
+      {items.length === 0 ? (
+        <p className="mt-2 text-sm text-paper/70">{flow.takingShapeEmpty}</p>
+      ) : (
+        <div className="mt-2.5 flex flex-wrap gap-2">
+          {items.map((item, index) => (
+            <motion.span
+              key={item.entry.profile.key}
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.35, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-paper/10 px-3 py-1.5 text-xs font-bold text-paper"
+            >
+              <span className="text-base leading-none">{item.entry.profile.emoji}</span>
+              <span className="truncate">{shortTitle(item.entry.tour.title)}</span>
+            </motion.span>
+          ))}
+        </div>
+      )}
+      {spark && <p className="mt-3 border-t border-paper/15 pt-3 text-xs leading-relaxed text-paper/75">🌴 {spark}</p>}
+    </div>
+  );
+};
+
 export const QuestionStep: React.FC = () => {
-  const { profile, currentStep, setAnswer, patchProfile, goNext, goBack, stepIndex, steps } =
+  const { profile, currentStep, setAnswer, patchProfile, goNext, goBack, stepIndex, steps, refining } =
     usePlanner();
   const copy = usePlannerCopy();
+  const { locale } = useI18n();
+  const flow = getFlowCopy(locale);
 
   const stepId = currentStep?.id;
   const questionCopy = stepId ? (copy.questions as Record<string, any>)[stepId] : undefined;
@@ -48,7 +95,7 @@ export const QuestionStep: React.FC = () => {
     switch (stepId) {
       case 'partyType':
         return {
-          entries: build(PARTY_TYPES, copy.questions.partyType.options),
+          entries: build(partyOrder(locale), copy.questions.partyType.options),
           value: profile.partyType,
           select: (id) => setAnswer('partyType', id as TravelProfile['partyType']),
         };
@@ -91,7 +138,7 @@ export const QuestionStep: React.FC = () => {
       default:
         return null;
     }
-  }, [stepId, copy, profile, setAnswer]);
+  }, [stepId, copy, profile, setAnswer, locale]);
 
   const toggleInterest = useCallback(
     (key: InterestKey) => {
@@ -163,6 +210,11 @@ export const QuestionStep: React.FC = () => {
     [choice, currentStep, goNext, clearAdvance]
   );
 
+  const finishWithNothing = useCallback(() => {
+    setAnswer('constraints', []);
+    advance();
+  }, [advance, setAnswer]);
+
   // Keyboard: 1–9 picks an option, Enter continues, ← goes back.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -179,7 +231,7 @@ export const QuestionStep: React.FC = () => {
       }
       if (typing) return;
 
-      if (event.key === 'ArrowLeft' && stepIndex > 0) {
+      if (event.key === 'ArrowLeft' && (stepIndex > 0 || refining)) {
         event.preventDefault();
         clearAdvance();
         goBack();
@@ -204,9 +256,110 @@ export const QuestionStep: React.FC = () => {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [advance, canContinue, choice, clearAdvance, goBack, handleSelect, stepId, stepIndex, toggleConstraint, toggleInterest]);
+  }, [advance, canContinue, choice, clearAdvance, goBack, handleSelect, refining, stepId, stepIndex, toggleConstraint, toggleInterest]);
+
+  // ── Voice: what to read, what to listen for, what an answer does ─────────
+  const voice = useMemo((): { script: string; options: VoiceOption[]; wantsNumber?: boolean } => {
+    if (!stepId || !questionCopy) return { script: '', options: [] };
+    const say = (labels: string[]) => `${flow.voice.youCanSay}: ${spokenList(labels, flow.voice.or)}.`;
+    const title = String(questionCopy.title);
+
+    if (choice) {
+      const options = choice.entries.map((entry) => ({ id: entry.id, label: entry.label }));
+      return { script: `${title} ${say(options.map((o) => o.label))}`, options };
+    }
+    switch (stepId) {
+      case 'interests': {
+        const options = INTERESTS.map((key) => ({ id: key, label: copy.interests[key].label }));
+        return { script: `${title} ${say(options.map((o) => o.label))} ${flow.voice.multiDone}`, options };
+      }
+      case 'constraints': {
+        const options = CONSTRAINTS.map((key) => ({ id: key, label: copy.questions.constraints.options[key].label }));
+        return { script: `${title} ${say(options.map((o) => o.label))} ${flow.voice.constraintsNone}`, options };
+      }
+      case 'energy': {
+        const options = copy.questions.energy.scale.map((step, index) => ({ id: String(index + 1), label: step.label }));
+        return { script: `${title} ${say(options.map((o) => o.label))}`, options, wantsNumber: true };
+      }
+      case 'days':
+        return { script: `${title} ${flow.voice.days}`, options: [], wantsNumber: true };
+      case 'headcount':
+        return { script: `${title} ${flow.voice.counts}`, options: [] };
+      default:
+        return { script: `${title} ${flow.voice.logistics}`, options: [] };
+    }
+  }, [stepId, questionCopy, choice, copy, flow]);
+
+  const onVoice = useCallback(
+    (match: VoiceMatch): VoiceOutcome => {
+      const multi = stepId === 'interests' || stepId === 'constraints';
+
+      if (match.kind === 'command') {
+        if (match.command === 'back') {
+          clearAdvance();
+          goBack();
+          return { listenAgain: false };
+        }
+        if (match.command === 'none') {
+          if (stepId === 'constraints') {
+            finishWithNothing();
+            return { listenAgain: false };
+          }
+          if (stepId === 'occasion') {
+            handleSelect('none');
+            return { listenAgain: false };
+          }
+        }
+        if (match.command === 'next' || match.command === 'none') {
+          if (canContinue) {
+            advance();
+            return { listenAgain: false };
+          }
+          return { listenAgain: true, say: copy.ui.pickAtLeastOne };
+        }
+        return { listenAgain: true };
+      }
+
+      if (match.kind === 'number') {
+        if (stepId === 'days') {
+          setAnswer('days', Math.min(5, Math.max(1, match.value)));
+          advance();
+          return { listenAgain: false };
+        }
+        if (stepId === 'energy' && match.value >= 1 && match.value <= 5) {
+          setAnswer('energy', match.value);
+          advance();
+          return { listenAgain: false };
+        }
+        return { listenAgain: true, say: flow.voice.didntCatch };
+      }
+
+      // An option, by name or by number.
+      if (choice) {
+        handleSelect(match.id);
+        return { listenAgain: false };
+      }
+      if (stepId === 'energy') {
+        setAnswer('energy', Number(match.id));
+        advance();
+        return { listenAgain: false };
+      }
+      if (multi) {
+        const label = voice.options.find((option) => option.id === match.id)?.label ?? '';
+        if (stepId === 'interests') toggleInterest(match.id as InterestKey);
+        else toggleConstraint(match.id as ConstraintKey);
+        return { listenAgain: true, say: label };
+      }
+      return { listenAgain: false };
+    },
+    [advance, canContinue, choice, clearAdvance, copy.ui.pickAtLeastOne, finishWithNothing, flow.voice.didntCatch, goBack, handleSelect, setAnswer, stepId, toggleConstraint, toggleInterest, voice.options]
+  );
 
   if (!currentStep || !questionCopy) return null;
+
+  const why = flow.why[currentStep.id];
+  const spark = refining ? undefined : flow.spark[currentStep.id];
+  const isLast = refining || stepIndex === steps.length - 1;
 
   return (
     <motion.div
@@ -216,10 +369,18 @@ export const QuestionStep: React.FC = () => {
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       className="planner-panel px-5 py-7 sm:px-9 sm:py-10"
     >
+      <VoiceGuide
+        stepKey={`${refining ?? 'core'}-${currentStep.id}`}
+        script={voice.script}
+        options={voice.options}
+        wantsNumber={voice.wantsNumber}
+        onMatch={onVoice}
+      />
+
       <header className="mb-7">
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <span className="rounded-full border-2 border-lagoon-light/50 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
-            {copy.ui.stepOf(stepIndex + 1, steps.length)}
+            {refining ? flow.fineTune : copy.ui.stepOf(stepIndex + 1, steps.length)}
           </span>
           {currentStep.optional && (
             <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-paper/60">
@@ -233,6 +394,15 @@ export const QuestionStep: React.FC = () => {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-paper/85 sm:text-base">
           {questionCopy.hint}
         </p>
+        {why && (
+          <p className="mt-3 flex max-w-2xl items-start gap-2 rounded-2xl bg-mango/15 px-3.5 py-2.5 text-xs leading-relaxed text-paper/90 sm:text-sm">
+            <HiLightBulb className="mt-0.5 h-4 w-4 shrink-0 text-mango-light" />
+            <span>
+              <span className="font-extrabold text-mango-light">{flow.whyLabel}: </span>
+              {why}
+            </span>
+          </p>
+        )}
       </header>
 
       {/* ── Single choice ─────────────────────────────────────────────── */}
@@ -277,18 +447,32 @@ export const QuestionStep: React.FC = () => {
 
       {/* ── Constraints ───────────────────────────────────────────────── */}
       {stepId === 'constraints' && (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {CONSTRAINTS.map((key, index) => (
-            <OptionCard
-              key={key}
-              emoji={copy.questions.constraints.options[key].emoji}
-              label={copy.questions.constraints.options[key].label}
-              description={copy.questions.constraints.options[key].desc}
-              index={index + 1}
-              selected={profile.constraints.includes(key)}
-              onSelect={() => toggleConstraint(key)}
-            />
-          ))}
+        <div className="space-y-4">
+          {profile.constraints.length === 0 && !refining && (
+            <button
+              type="button"
+              onClick={() => {
+                playClickFx();
+                finishWithNothing();
+              }}
+              className="planner-cta w-full !py-4 !text-base sm:w-auto"
+            >
+              ✨ {flow.nothingApplies}
+            </button>
+          )}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {CONSTRAINTS.map((key, index) => (
+              <OptionCard
+                key={key}
+                emoji={copy.questions.constraints.options[key].emoji}
+                label={copy.questions.constraints.options[key].label}
+                description={copy.questions.constraints.options[key].desc}
+                index={index + 1}
+                selected={profile.constraints.includes(key)}
+                onSelect={() => toggleConstraint(key)}
+              />
+            ))}
+          </div>
         </div>
       )}
 
@@ -392,6 +576,12 @@ export const QuestionStep: React.FC = () => {
         </div>
       )}
 
+      {/* ── What the answers have built so far ────────────────────────── */}
+      {!refining && stepIndex > 0 && <TakingShape spark={spark} />}
+      {!refining && stepIndex === 0 && spark && (
+        <p className="mt-6 text-xs leading-relaxed text-paper/70">🌴 {spark}</p>
+      )}
+
       {/* ── Footer nav ────────────────────────────────────────────────── */}
       <footer className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-paper/20 pt-6">
         <button
@@ -401,7 +591,7 @@ export const QuestionStep: React.FC = () => {
             clearAdvance();
             goBack();
           }}
-          disabled={stepIndex === 0}
+          disabled={stepIndex === 0 && !refining}
           className="planner-cta-ghost disabled:cursor-not-allowed disabled:opacity-30"
         >
           <HiArrowLeft className="h-4 w-4" /> {copy.ui.back}
@@ -420,7 +610,7 @@ export const QuestionStep: React.FC = () => {
             disabled={!canContinue}
             className="planner-cta disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {stepIndex === steps.length - 1 ? copy.ui.seePlan : copy.ui.next}
+            {refining ? flow.updatePlan : isLast ? copy.ui.seePlan : copy.ui.next}
             <HiArrowRight className="h-4 w-4" />
           </button>
         </div>
