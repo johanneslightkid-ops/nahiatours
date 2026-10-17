@@ -12,7 +12,7 @@ import FABWhatsApp from '../components/FABWhatsApp';
 import { useBrand } from '../contexts/BrandContext';
 
 const PlanMyDay: React.FC = () => {
-  const { stage, progress, steps, stepIndex, loading } = usePlanner();
+  const { stage, progress, steps, stepIndex, loading, refining } = usePlanner();
   const copy = usePlannerCopy();
   const { locale } = useI18n();
   const { brandSettings } = useBrand();
@@ -59,7 +59,7 @@ const PlanMyDay: React.FC = () => {
 
       <div className="relative mx-auto w-full max-w-5xl">
         {/* Progress rail — only while answering */}
-        {stage === 'questions' && (
+        {stage === 'questions' && !refining && (
           <div className="mb-6 space-y-4">
             <div className="flex items-center justify-between gap-4">
               <span className="font-display text-lg font-extrabold text-ink">{copy.tab}</span>

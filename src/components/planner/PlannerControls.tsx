@@ -1,6 +1,7 @@
 import React from 'react';
 import { HiCheck, HiMinus, HiPlus } from 'react-icons/hi';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
+import { haptic, HAPTIC } from '../../planner/haptics';
 
 interface OptionCardProps {
   emoji: string;
@@ -26,6 +27,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
     onMouseEnter={() => playHoverFx()}
     onClick={() => {
       playClickFx();
+      haptic(HAPTIC.tap);
       onSelect();
     }}
     aria-pressed={selected}
@@ -80,6 +82,7 @@ export const ChipToggle: React.FC<ChipToggleProps> = ({
     onMouseEnter={() => playHoverFx()}
     onClick={() => {
       playClickFx();
+      haptic(HAPTIC.tap);
       onToggle();
     }}
     aria-pressed={selected}
@@ -108,6 +111,7 @@ export const CountStepper: React.FC<CountStepperProps> = ({
 }) => {
   const set = (next: number) => {
     playClickFx();
+      haptic(HAPTIC.tap);
     onChange(Math.min(max, Math.max(min, next)));
   };
 
@@ -166,6 +170,7 @@ export const EnergyScale: React.FC<EnergyScaleProps> = ({ value, steps, onChange
               onMouseEnter={() => playHoverFx()}
               onClick={() => {
                 playClickFx();
+      haptic(HAPTIC.tap);
                 onChange(level);
               }}
               aria-label={step.label}

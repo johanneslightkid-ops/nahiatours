@@ -77,6 +77,11 @@ export interface TourProfile {
   occasion?: Partial<Record<OccasionKey, number>>;
   /** Never place these two in the same plan (same destination twice). */
   conflicts?: string[];
+  /**
+   * Priced per vehicle rather than per head — a jet ski carries two. The
+   * catalogue rate is then charged once for every this-many travellers.
+   */
+  seatsPerUnit?: number;
 }
 
 export type OccasionKey =
@@ -90,7 +95,7 @@ export type OccasionKey =
 export const TOUR_PROFILES: TourProfile[] = [
   {
     key: 'saona_lobster',
-    match: [/saona.*(lobster|langosta)/i, /(lobster|langosta).*saona/i],
+    match: [/saona.*(lobster|langosta|hummer|homard|exclusiv)/i, /(lobster|langosta|hummer|homard).*saona/i],
     emoji: '🦞',
     durationHours: 10,
     slot: 'full',
@@ -154,7 +159,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'party_boat',
-    match: [/party ?boat/i, /fiesta en el mar/i],
+    match: [/party ?bo[ao]t/i, /fiesta en el mar/i],
     emoji: '🛥️',
     durationHours: 4,
     slot: 'half',
@@ -213,7 +218,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'santo_domingo',
-    match: [/santo domingo/i],
+    match: [/santo domingo/i, /saint-domingue/i],
     emoji: '🏛️',
     durationHours: 10,
     slot: 'full',
@@ -233,7 +238,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'cultural_safari',
-    match: [/safari/i],
+    match: [/^(?!.*jet ?-?ski).*safari/i],
     emoji: '🚜',
     durationHours: 8,
     slot: 'full',
@@ -252,7 +257,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'speed_boat',
-    match: [/speed ?boat/i],
+    match: [/speed ?bo[ao]t/i, /hors-bord/i, /lancha/i],
     emoji: '⚡',
     durationHours: 3,
     slot: 'half',
@@ -271,7 +276,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'parasailing',
-    match: [/parasail/i],
+    match: [/parasail/i, /parachute ascensionnel/i],
     emoji: '🪂',
     durationHours: 2,
     slot: 'short',
@@ -312,7 +317,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'imagine_cave',
-    match: [/imagine/i],
+    match: [/imagin[ea]/i],
     emoji: '🕳️',
     durationHours: 4,
     slot: 'evening',
@@ -373,7 +378,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'zipline',
-    match: [/zip ?line/i, /zipline/i, /tirolina/i],
+    match: [/zip ?line/i, /zipline/i, /tirolina/i, /tiroles/i, /tyrolienne/i],
     emoji: '🌿',
     durationHours: 5,
     slot: 'half',
@@ -393,7 +398,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'dolphin',
-    match: [/dolphin/i, /delfin/i],
+    match: [/dolphin/i, /delfin/i, /dauphin/i],
     emoji: '🐬',
     durationHours: 3,
     slot: 'short',
@@ -409,6 +414,84 @@ export const TOUR_PROFILES: TourProfile[] = [
     tags: { wildlife: 3, relax: 1, views_photo: 2 },
     audience: { solo: 2, couple: 3, family: 3, friends: 2, multigen: 3 },
     occasion: { honeymoon: 2, birthday: 3, reunion: 2 },
+  },
+  {
+    key: 'scuba_doo',
+    match: [/scuba ?doo/i],
+    emoji: '🫧',
+    durationHours: 3.5,
+    slot: 'half',
+    categoryGroup: 'watersport',
+    intensity: 3,
+    water: 3,
+    boat: 1,
+    mobility: 2,
+    minAge: 10,
+    kidJoy: 3,
+    luxury: 2,
+    signature: 2,
+    tags: { snorkel_reef: 3, wildlife: 2, adrenaline: 1, views_photo: 2 },
+    audience: { solo: 2, couple: 3, family: 3, friends: 3, multigen: 1 },
+    occasion: { honeymoon: 2, birthday: 2, anniversary: 1 },
+  },
+  {
+    key: 'deep_sea_fishing',
+    match: [/fishing/i, /pesca/i, /angeln/i, /p[eê]che/i],
+    emoji: '🎣',
+    durationHours: 5,
+    slot: 'half',
+    categoryGroup: 'watersport',
+    intensity: 2,
+    water: 0,
+    boat: 3,
+    mobility: 2,
+    minAge: 5,
+    kidJoy: 2,
+    servesAlcohol: true,
+    luxury: 2,
+    signature: 1,
+    tags: { wildlife: 2, relax: 2, adrenaline: 1, food_drink: 1, views_photo: 1 },
+    audience: { solo: 2, couple: 1, family: 2, friends: 3, multigen: 3 },
+    occasion: { bachelor: 2, birthday: 2, reunion: 2 },
+  },
+  {
+    key: 'banana_boat',
+    match: [/banan/i],
+    emoji: '🍌',
+    durationHours: 2,
+    slot: 'short',
+    categoryGroup: 'watersport',
+    intensity: 3,
+    water: 3,
+    boat: 1,
+    mobility: 2,
+    minAge: 6,
+    kidJoy: 3,
+    luxury: 1,
+    signature: 1,
+    tags: { adrenaline: 2, beach_island: 2 },
+    audience: { solo: 1, couple: 1, family: 3, friends: 3, multigen: 2 },
+    occasion: { bachelor: 3, birthday: 2, reunion: 3 },
+  },
+  {
+    key: 'jet_ski',
+    match: [/jet ?-?ski/i],
+    emoji: '🌊',
+    durationHours: 5,
+    slot: 'half',
+    categoryGroup: 'watersport',
+    intensity: 5,
+    water: 2,
+    boat: 2,
+    mobility: 2,
+    minAge: 6,
+    kidJoy: 2,
+    luxury: 3,
+    signature: 2,
+    tags: { adrenaline: 3, beach_island: 2, views_photo: 2, snorkel_reef: 1 },
+    audience: { solo: 2, couple: 3, family: 1, friends: 3, multigen: 1 },
+    occasion: { honeymoon: 2, bachelor: 3, birthday: 2 },
+    seatsPerUnit: 2,
   },
 ];
 

@@ -116,6 +116,20 @@ export const priceTour = (
     return { lines: [], total: 0, perPerson: 0, childrenAtAdultRate: false };
   }
 
+  // A jet ski is one price for one or two riders, so the group pays per
+  // machine and the per-person figure is what that works out to.
+  const seats = entry.profile.seatsPerUnit ?? 1;
+  if (seats > 1) {
+    const unit = options[0].amount ?? 0;
+    const qty = Math.ceil(heads / seats);
+    return {
+      lines: [{ label: options[0].tier, qty, unit, total: unit * qty }],
+      total: unit * qty,
+      perPerson: Math.round((unit * qty) / heads),
+      childrenAtAdultRate: false,
+    };
+  }
+
   const adultOption = options.find((option) => isAdultTier(option.tier));
   const childOption = options.find((option) => isChildTier(option.tier));
 
