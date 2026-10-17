@@ -378,7 +378,7 @@ export const TOUR_PROFILES: TourProfile[] = [
   },
   {
     key: 'zipline',
-    match: [/zip ?line/i, /zipline/i, /tirolina/i, /tyrolienne/i],
+    match: [/zip ?line/i, /zipline/i, /tirolina/i, /tiroles/i, /tyrolienne/i],
     emoji: '🌿',
     durationHours: 5,
     slot: 'half',

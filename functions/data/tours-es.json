@@ -1,6 +1,6 @@
 [
   {
-    "title": "Isla Saona: El Paraíso Caribeño",
+    "title": "Isla Saona: el paraíso caribeño",
     "description": "Descubra la esencia del Caribe en una emocionante excursión que combina lancha rápida y catamarán. Relájese en la famosa Piscina Natural del Parque Nacional Cotubanamá, donde podrá admirar estrellas de mar gigantes en aguas cristalinas. \n\n¿Qué hace diferente a nuestra Saona VIP? Disfrutará de un ambiente festivo con animación a bordo y un área exclusiva en Playa Abanico.\n\n**Duración:** 10 horas\n\n**Incluye:**\n• Traslado ida y vuelta desde su hotel\n• Paseo en lancha y catamarán con barra libre (ron, refrescos y agua)\n• 3 horas en Isla Saona (Piscina Natural y Playa Abanico)\n• Área VIP exclusiva con tumbonas frente al mar\n• Almuerzo buffet con carnes y pescados a la parrilla\n• Guía profesional certificado por el Ministerio de Turismo",
     "pricing": [
       { "tier": "Personas", "price": "$60" }
@@ -21,7 +21,7 @@
     ]
   },
   {
-    "title": "Saona Exclusive: Banquete de Langosta",
+    "title": "Isla Saona Exclusiva: banquete de langosta",
     "description": "Eleve su experiencia al máximo nivel. Este paquete premium incluye todas las bondades de nuestro tour clásico con un toque de lujo gastronómico para los paladares más exigentes.\n\n**Incluye:**\n• Recogida y regreso al hotel\n• Fiesta en catamarán con animación y barra libre\n• Estancia en la Piscina Natural y Playa Abanico\n• Área VIP con tumbonas preferenciales\n• **Extra Premium:** Cerveza Presidente fría y 1 libra (0.45kg) de langosta a la parrilla\n• Buffet completo y guía experto",
     "pricing": [
       { "tier": "Personas", "price": "$119" }
@@ -42,7 +42,7 @@
     ]
   },
   {
-    "title": "Catalina Exclusive: El Paraíso del Snorkel",
+    "title": "Isla Catalina Exclusiva: snorkel entre arrecifes",
     "description": "A diferencia de otras islas, Isla Catalina es el destino soñado para los amantes del mundo submarino. Sumérjase en sus arrecifes de coral repletos de vida y color. Disfrute de un día de paz en una de las joyas más hermosas del Caribe.\n\n**Duración:** 12 horas\n\n**Incluye:**\n• Traslado desde/hacia su hotel\n• Visita a tienda de artesanía local\n• Transporte en barco hacia la isla (25-30 min)\n• Bebidas a bordo y almuerzo buffet en la playa\n• Equipo completo de snorkel (máscara, tubo y chaleco)",
     "pricing": [
       { "tier": "Personas", "price": "$70" }
@@ -57,7 +57,7 @@
     ]
   },
   {
-    "title": "Party Boat: Fiesta en el Mar",
+    "title": "Party Boat en Bávaro: a bailar sobre las olas",
     "description": "Baile sobre las olas en el catamarán más alegre de Bávaro. Disfrute de la mejor música, haga snorkel en arrecifes tropicales y brinde con un trago en la Piscina Natural. ¡La mejor fiesta bajo el sol dominicano!\n\n**Duración:** 4 horas\n\n**Incluye:**\n• Traslado privado con aire acondicionado\n• Barco con barra libre de marcas premium\n• Música, animación y parada en la Piscina Natural\n• Sesión de snorkel con equipo incluido",
     "pricing": [
       { "tier": "Personas", "price": "$50" }
@@ -71,7 +71,7 @@
     ]
   },
   {
-    "title": "Montaña Redonda: Vistas de Ensueño",
+    "title": "Montaña Redonda: vistas y sabores",
     "description": "Un lugar mágico donde la tierra toca el cielo. A 300 metros de altura, disfrute de vistas panorámicas de 360 grados. Colúmprese sobre el paisaje y viva una experiencia gastronómica auténticamente dominicana en la cima.\n\n**Duración:** 4-5 horas\n\n**Incluye:**\n• Traslado desde su hotel\n• Ascenso a la cima en Camión Safari\n• Uso de los famosos columpios y escobas 'voladoras'\n• Almuerzo típico dominicano en la montaña\n• Tiempo libre para fotos y visita a Playa Macao",
     "pricing": [
       { "tier": "Personas", "price": "$90" }
@@ -86,7 +86,7 @@
     ]
   },
   {
-    "title": "Buggies: Aventura Todo Terreno",
+    "title": "Buggies Evolution: aventura todoterreno",
     "description": "Sienta la adrenalina conduciendo por senderos rurales. Visitaremos la mística cueva de Macao para un chapuzón en su cenote subterráneo y terminaremos en las impresionantes aguas de Playa Macao. ¡Prepárese para ensuciarse y divertirse!\n\n**Incluye:**\n• Recogida y regreso al hotel\n• Buggy y equipo de seguridad\n• Baño en cenote natural y tiempo en Playa Macao\n• Visita a rancho típico (café, cacao y tabaco)\n• Guía certificado",
     "pricing": [
       { "tier": "Personas", "price": "$50" }
@@ -103,7 +103,7 @@
     ]
   },
   {
-    "title": "Santo Domingo: Primada de América",
+    "title": "Santo Domingo: la Primada de América",
     "description": "Explore la historia viva en la capital dominicana. Caminaremos por la Zona Colonial, visitaremos el Alcázar de Colón y la Catedral Primada de América. Un recorrido esencial para entender el alma de la República Dominicana.\n\n**Duración:** 10 horas\n\n**Incluye:**\n• Autobús privado con aire acondicionado\n• Entradas a monumentos y al Parque Los Tres Ojos\n• Visita guiada por calles históricas y Museo del Cacao\n• Almuerzo típico dominicano y bebidas\n• Seguro de responsabilidad civil",
     "pricing": [
       { "tier": "Personas", "price": "$70" }
@@ -117,7 +117,7 @@
     ]
   },
   {
-    "title": "Safari Cultural: La Vida Local en 4x4",
+    "title": "Safari cultural: el campo dominicano en 4x4",
     "description": "Descubra la verdadera República Dominicana más allá de los hoteles. En nuestros camiones 4x4, visitará escuelas, plantaciones de café y cacao, y disfrutará de un paseo a caballo por senderos tropicales.\n\n**Duración:** 8 horas\n\n**Incluye:**\n• Transporte en camión safari con guía experto\n• Visita a plantaciones con degustación de productos locales\n• Recorrido por Higüey y su famosa Basílica\n• Almuerzo buffet en rancho típico y baño en el río Maimón\n• Paseo a caballo y tiempo en Playa Macao",
     "pricing": [
       { "tier": "Personas", "price": "$90" }
@@ -131,7 +131,7 @@
     ]
   },
   {
-    "title": "Speed Boat: Sea su Propio Capitán",
+    "title": "Lancha rápida y snorkel: sean sus propios capitanes",
     "description": "Tome el control de su propia lancha rápida y surque las aguas de Bávaro. Combine la velocidad con la paz de hacer snorkel en una zona de corales rodeada de peces tropicales. ¡Diversión garantizada para parejas y amigos!\n\n**Incluye:**\n• Traslados cada hora desde su hotel\n• 1 lancha rápida por pareja\n• Equipo de snorkel y guía acompañante\n• Parada en la piscina natural de Bávaro",
     "pricing": [
       { "tier": "Personas", "price": "$80" }
@@ -152,7 +152,7 @@
     ]
   },
   {
-    "title": "Parasailing: Vuelo Sobre el Caribe",
+    "title": "Parasailing: vuelo sobre el Caribe",
     "description": "¿Busca adrenalina? Vuele sobre la costa de Punta Cana y disfrute de las mejores vistas de la isla desde el aire. Una experiencia segura y emocionante, solo para valientes.",
     "pricing": [
       { "tier": "Personas", "price": "$80" }
@@ -166,7 +166,7 @@
     ]
   },
   {
-    "title": "Coco Bongo: El Mejor Show del Mundo",
+    "title": "Coco Bongo: el mejor show del mundo",
     "description": "Mucho más que una discoteca, es un espectáculo de clase mundial. Con más de 15 shows por noche, acróbatas y efectos visuales, Coco Bongo es la experiencia nocturna definitiva en Punta Cana.",
     "pricing": [
       { "tier": "Personas", "price": "$90" }
@@ -180,7 +180,7 @@
     ]
   },
   {
-    "title": "Imagine: Fiesta en una Cueva",
+    "title": "Imagine: fiesta en una cueva",
     "description": "Baile en el interior de una impresionante cueva natural. Con una acústica única y diferentes salas de música internacional, Imagine es el lugar donde comienza la fiesta segura y divertida en Punta Cana.",
     "pricing": [
       { "tier": "Personas", "price": "$85" }
@@ -195,7 +195,7 @@
     ]
   },
   {
-    "title": "Monkeyland: Encuentro con Monos",
+    "title": "Monkeyland: conozcan a los monos ardilla",
     "description": "Interactúe con encantadores monos ardilla en su hábitat natural. Una experiencia educativa y divertida donde podrá conocer sus hábitos y disfrutar de la naturaleza dominicana.",
     "pricing": [
       { "tier": "Personas", "price": "$110" }
@@ -209,7 +209,7 @@
     ]
   },
   {
-    "title": "Scape Park: Aventura Natural",
+    "title": "Scape Park: parque de aventura natural",
     "description": "Vuele en tirolesas, nade en el místico Hoyo Azul y descubra cuevas culturales. Un parque de aventuras naturales que ofrece la combinación perfecta de emoción y paisajes.",
     "pricing": [
       { "tier": "Personas", "price": "$129" }
@@ -225,7 +225,7 @@
     ]
   },
   {
-    "title": "Zipline: Adrenalina en la Selva",
+    "title": "Tirolesa: adrenalina sobre la selva",
     "description": "Deslícese por uno de los circuitos de tirolesas más largos del Caribe. 12 líneas y 18 plataformas en el corazón de la montaña Anamuya para un día de pura emoción.",
     "pricing": [
       { "tier": "Personas", "price": "$70" }
@@ -239,7 +239,7 @@
     ]
   },
   {
-    "title": "Dolphin: Nadar con Delfines",
+    "title": "Nado con delfines: un encuentro inolvidable",
     "description": "Viva el sueño de conocer de cerca a los mamíferos marinos más inteligentes. Disfrute de besos, abrazos y juegos en un encuentro interactivo inolvidable.",
     "pricing": [
       { "tier": "Personas", "price": "$120" }
