@@ -1,13 +1,13 @@
 /**
  * Start a card payment with whichever processor the operator chose.
  *
- * A guest pays BY CARD; whether Stripe, AZUL (Banco Popular) or CARDNET
- * charges that card is the operator's business, set in the admin, and never
+ * A guest pays BY CARD; whether Stripe, AZUL (Banco Popular), CARDNET or
+ * Verifone (2Checkout) charges that card is the operator's business, set in the admin, and never
  * reaches the storefront. So the browser asks one endpoint, /api/card-checkout,
  * and gets back one of two instructions it can follow without knowing who is
  * behind them:
  *
- *   { kind: 'redirect', url }           — go to this hosted page (Stripe)
+ *   { kind: 'redirect', url }           — go to this hosted page (Stripe, Verifone)
  *   { kind: 'form', action, fields }    — post these fields there (the banks)
  *
  * Every processor prices through shared/bookingPrice.ts, so the amount does
@@ -20,6 +20,7 @@ import {
   resolveCardProcessor,
   isAzulReady,
   isCardnetReady,
+  isVerifoneReady,
   stripeApiBase,
   PaymentEnv,
   PaymentSecrets,
@@ -28,6 +29,7 @@ import {
 import { priceBooking, BookingRequest, PricedBooking } from './bookingPrice';
 import {
   buildAzulForm,
+  buildVerifoneLink,
   newOrderId,
   openCardnetSession,
   saveOrder,
@@ -125,11 +127,12 @@ export const startStripe = async (
 };
 
 const newOrder = (
-  provider: 'azul' | 'cardnet',
+  provider: 'azul' | 'cardnet' | 'verifone',
   booking: PricedBooking,
   secrets: PaymentSecrets
 ): PaymentOrder => {
-  const currency = provider === 'azul' ? secrets.azulCurrency : secrets.cardnetCurrency;
+  const currency =
+    provider === 'azul' ? secrets.azulCurrency : provider === 'cardnet' ? secrets.cardnetCurrency : secrets.verifoneCurrency;
   const now = new Date().toISOString();
   return {
     id: newOrderId(),
@@ -194,6 +197,22 @@ export const startCardnet = async (
 };
 
 /**
+ * VERIFONE (2Checkout) — a signed dynamic buy-link. Built here, no call to
+ * anyone: the guest's browser goes straight to the link.
+ */
+export const startVerifone = async (
+  env: PaymentEnv,
+  secrets: PaymentSecrets,
+  booking: PricedBooking,
+  origin: string
+): Promise<CardCheckout> => {
+  const order = newOrder('verifone', booking, secrets);
+  const url = await buildVerifoneLink(order, secrets, origin);
+  if (!(await saveOrder(env, order))) return { ok: false, status: 503, error: FAILED };
+  return { ok: true, kind: 'redirect', url, ref: order.id, processor: 'verifone' };
+};
+
+/**
  * Price a booking and start it with the processor the operator chose — or
  * with `force`, a specific one (the processor-named endpoints, kept for the
  * operator's own testing).
@@ -209,6 +228,7 @@ export const startCardCheckout = async (
     stripe: secrets.stripeSecretKey.length > 0,
     azul: isAzulReady(secrets),
     cardnet: isCardnetReady(secrets),
+    verifone: isVerifoneReady(secrets),
   };
   const processor = force ? (ready[force] ? force : null) : resolveCardProcessor(secrets);
   if (!processor) {
@@ -220,6 +240,7 @@ export const startCardCheckout = async (
 
   const origin = new URL(request.url).origin;
   if (processor === 'azul') return startAzul(env, secrets, priced.booking, origin);
+  if (processor === 'verifone') return startVerifone(env, secrets, priced.booking, origin);
   if (processor === 'cardnet') {
     return startCardnet(env, secrets, priced.booking, origin, request.headers.get('CF-Connecting-IP') ?? '');
   }

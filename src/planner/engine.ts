@@ -114,12 +114,16 @@ export const priceTour = (
   }
 
   const unit = rate.amount ?? 0;
-  const total = unit * heads;
+  // A jet ski is one price for one or two riders, so the group pays per
+  // machine and the per-person figure is what that works out to.
+  const seats = entry.profile.seatsPerUnit ?? 1;
+  const qty = seats > 1 ? Math.ceil(heads / seats) : heads;
+  const total = unit * qty;
 
   return {
-    lines: [{ label: rate.tier, qty: heads, unit, total }],
+    lines: [{ label: rate.tier, qty, unit, total }],
     total,
-    perPerson: unit,
+    perPerson: Math.round(total / heads),
   };
 };
 

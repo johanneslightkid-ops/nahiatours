@@ -59,9 +59,9 @@ export type GatewayMode = 'test' | 'live';
  * is purely the operator's choice, made in the admin. 'auto' takes the first
  * one that is configured, in CARD_PROCESSOR_ORDER.
  */
-export type CardProcessor = 'stripe' | 'azul' | 'cardnet';
+export type CardProcessor = 'stripe' | 'azul' | 'cardnet' | 'verifone';
 export type CardProcessorChoice = 'auto' | CardProcessor;
-export const CARD_PROCESSOR_ORDER: CardProcessor[] = ['stripe', 'azul', 'cardnet'];
+export const CARD_PROCESSOR_ORDER: CardProcessor[] = ['stripe', 'azul', 'cardnet', 'verifone'];
 /** What a Dominican acquirer charges in. The catalogue itself is priced in USD. */
 export type LocalCurrency = 'USD' | 'DOP';
 
@@ -102,6 +102,20 @@ export interface PaymentSecrets {
   cardnetMerchantName: string;
   cardnetAcquirer: string;
   cardnetCurrency: LocalCurrency;
+
+  /**
+   * VERIFONE, through its online checkout 2Checkout (a Verifone company):
+   * a ConvertPlus "dynamic" buy-link, signed here with the Buy-Link Secret
+   * Word. No API call and no login — the amount, the tour and the return
+   * address travel in the link, and the signature is what stops anyone
+   * editing them. See shared/bankGateways.ts.
+   */
+  verifoneMode: GatewayMode;
+  /** The 2Checkout merchant (vendor) code, e.g. "250123456789". */
+  verifoneMerchantCode: string;
+  /** Buy-Link Secret Word (Integrations → Webhooks & API). Never leaves the server. */
+  verifoneSecretWord: string;
+  verifoneCurrency: LocalCurrency;
 }
 
 /** What the admin panel is allowed to know about the above. */
@@ -137,6 +151,13 @@ export interface PaymentConfigStatus {
     acquirer: string;
     currency: LocalCurrency;
   };
+  verifone: {
+    ready: boolean;
+    mode: GatewayMode;
+    merchantCode: string;
+    currency: LocalCurrency;
+    secretWordConfigured: boolean;
+  };
 }
 
 const DEFAULTS: PaymentSecrets = {
@@ -159,7 +180,14 @@ const DEFAULTS: PaymentSecrets = {
   cardnetMerchantName: '',
   cardnetAcquirer: '349',
   cardnetCurrency: 'DOP',
+  verifoneMode: 'test',
+  verifoneMerchantCode: '',
+  verifoneSecretWord: '',
+  verifoneCurrency: 'USD',
 };
+
+/** 2Checkout's hosted ConvertPlus cart — where a Verifone buy-link points. */
+export const VERIFONE_CHECKOUT_URL = 'https://secure.2checkout.com/checkout/buy';
 
 /**
  * CardNET publishes these for its certification lab, so an operator can walk a
@@ -195,6 +223,8 @@ export interface PaymentEnv {
   STRIPE_SECRET_KEY?: string;
   /** Same escape hatch for the Azul AuthKey. */
   AZUL_AUTH_KEY?: string;
+  /** And for Verifone's (2Checkout's) Buy-Link Secret Word. */
+  VERIFONE_SECRET_WORD?: string;
   /**
    * Where Stripe's API lives. Overridable so the payment flow can be exercised
    * end to end against a stub — including in environments whose egress policy
@@ -241,7 +271,9 @@ const normalize = (input: unknown): PaymentSecrets => {
   const choice = source.cardProcessor;
   return {
     cardProcessor:
-      choice === 'stripe' || choice === 'azul' || choice === 'cardnet' ? choice : 'auto',
+      choice === 'stripe' || choice === 'azul' || choice === 'cardnet' || choice === 'verifone'
+        ? choice
+        : 'auto',
     stripeSecretKey: text(source.stripeSecretKey, 400),
     stripeCurrency,
     dopPerUsd: Number.isFinite(rate) && rate > 0 && rate < 10_000 ? rate : 0,
@@ -262,6 +294,11 @@ const normalize = (input: unknown): PaymentSecrets => {
     cardnetMerchantName: text(source.cardnetMerchantName, 40).toUpperCase(),
     cardnetAcquirer: text(source.cardnetAcquirer, 3) || DEFAULTS.cardnetAcquirer,
     cardnetCurrency: currency(source.cardnetCurrency, DEFAULTS.cardnetCurrency),
+
+    verifoneMode: mode(source.verifoneMode),
+    verifoneMerchantCode: text(source.verifoneMerchantCode, 40).replace(/\s+/g, ''),
+    verifoneSecretWord: text(source.verifoneSecretWord, 400),
+    verifoneCurrency: currency(source.verifoneCurrency, DEFAULTS.verifoneCurrency),
   };
 };
 
@@ -287,6 +324,10 @@ export const readPaymentSecrets = async (env: PaymentEnv): Promise<PaymentSecret
   const azulFromEnv = typeof env.AZUL_AUTH_KEY === 'string' ? env.AZUL_AUTH_KEY.trim() : '';
   if (azulFromEnv) {
     stored.azulAuthKey = azulFromEnv;
+  }
+  const verifoneFromEnv = typeof env.VERIFONE_SECRET_WORD === 'string' ? env.VERIFONE_SECRET_WORD.trim() : '';
+  if (verifoneFromEnv) {
+    stored.verifoneSecretWord = verifoneFromEnv;
   }
 
   return stored;
@@ -339,10 +380,18 @@ export const isCardnetReady = (secrets: PaymentSecrets): boolean =>
       currencyUsable(secrets.cardnetCurrency, secrets)
   );
 
-const processorReady = (secrets: PaymentSecrets): Record<CardProcessor, boolean> => ({
+export const isVerifoneReady = (secrets: PaymentSecrets): boolean =>
+  Boolean(
+    secrets.verifoneMerchantCode &&
+      secrets.verifoneSecretWord &&
+      currencyUsable(secrets.verifoneCurrency, secrets)
+  );
+
+export const processorReady = (secrets: PaymentSecrets): Record<CardProcessor, boolean> => ({
   stripe: secrets.stripeSecretKey.length > 0,
   azul: isAzulReady(secrets),
   cardnet: isCardnetReady(secrets),
+  verifone: isVerifoneReady(secrets),
 });
 
 /**
@@ -363,6 +412,7 @@ export const resolveCardProcessor = (secrets: PaymentSecrets): CardProcessor | n
 export const cardChargeCurrency = (secrets: PaymentSecrets, processor: CardProcessor | null): string => {
   if (processor === 'azul') return secrets.azulCurrency;
   if (processor === 'cardnet') return secrets.cardnetCurrency;
+  if (processor === 'verifone') return secrets.verifoneCurrency;
   return secrets.stripeCurrency.toUpperCase();
 };
 
@@ -397,6 +447,13 @@ export const describePaymentConfig = async (env: PaymentEnv): Promise<PaymentCon
       merchantName: secrets.cardnetMerchantName,
       acquirer: secrets.cardnetAcquirer,
       currency: secrets.cardnetCurrency,
+    },
+    verifone: {
+      ready: isVerifoneReady(secrets),
+      mode: secrets.verifoneMode,
+      merchantCode: secrets.verifoneMerchantCode,
+      currency: secrets.verifoneCurrency,
+      secretWordConfigured: secrets.verifoneSecretWord.length > 0,
     },
   };
 };

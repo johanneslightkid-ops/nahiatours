@@ -29,6 +29,7 @@
 
 import {
   AZUL_HOSTS,
+  VERIFONE_CHECKOUT_URL,
   PaymentEnv,
   PaymentSecrets,
   LocalCurrency,
@@ -37,7 +38,7 @@ import {
 } from './paymentConfig';
 import type { PricedBooking } from './bookingPrice';
 
-export type BankProvider = 'azul' | 'cardnet';
+export type BankProvider = 'azul' | 'cardnet' | 'verifone';
 export type OrderStatus = 'pending' | 'paid' | 'declined' | 'cancelled' | 'unverified';
 
 export interface PaymentOrder {
@@ -54,6 +55,8 @@ export interface PaymentOrder {
   amountMinor: number;
   /** ITBIS included in `amountMinor`, in minor units. */
   itbisMinor: number;
+  /** Verifone only: the price exactly as it was signed into the buy-link. */
+  signedPrice?: string;
   /** CardNET only. */
   session?: string;
   sessionKey?: string;
@@ -379,4 +382,114 @@ export const readCardnetResult = async (
     console.warn('[cardnet] result lookup failed', error);
     return { known: false, approved: false };
   }
+};
+
+
+// ── VERIFONE (2Checkout ConvertPlus) ────────────────────────────────────────
+//
+// Verifone's online checkout is 2Checkout ("2Checkout, a Verifone company").
+// Its ConvertPlus cart takes a DYNAMIC buy-link: the product name, price and
+// currency travel in the URL, and a signature over them stops anyone editing
+// the amount on the way. Building one needs no API call and no login — only
+// the merchant code and the Buy-Link Secret Word.
+//
+// Signature (2Checkout, "ConvertPlus Buy-Links signature for dynamic
+// products"): take the signed parameters present in the link, sort them by
+// name, prefix each VALUE with its length in UTF-8 bytes, concatenate, and
+// HMAC-SHA256 the result with the Secret Word; hex. `merchant` and `dynamic`
+// are never signed. Checked against the worked example in that document
+// (prod=Software, price=10, currency=USD, qty=1, type=digital,
+// expiration=1893456000, key "secret_wordbuylink" → c2225743…5762).
+//
+// On a completed order 2Checkout redirects to `return-url` with the buy-link
+// parameters plus its own (refno among them), signed the same way over every
+// parameter but `signature`. 2Checkout's published example for the RETURN
+// signature does not reproduce, so a return that does not verify is not
+// treated as a failure but as "unverified": the operator confirms it in the
+// 2Checkout control panel, where every order also lands by e-mail.
+
+/** Parameters ConvertPlus signs, as listed for dynamic products and for every checkout. */
+const VERIFONE_SIGNED = new Set([
+  'currency', 'prod', 'price', 'qty', 'type', 'opt', 'description', 'recurrence', 'duration',
+  'renewal-price', 'item-ext-ref', 'return-url', 'return-type', 'expiration', 'order-ext-ref',
+  'customer-ref', 'customer-ext-ref', 'lock', 'coupon',
+]);
+
+const utf8Length = (value: string) => new TextEncoder().encode(value).length;
+
+export const verifoneSignature = async (params: Record<string, string>, secretWord: string): Promise<string> => {
+  const serialized = Object.keys(params)
+    .sort()
+    .map((name) => `${utf8Length(params[name])}${params[name]}`)
+    .join('');
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secretWord),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  return hex(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(serialized)));
+};
+
+/** The buy-link for one order. The guest's browser simply goes there. */
+export const buildVerifoneLink = async (order: PaymentOrder, secrets: PaymentSecrets, origin: string): Promise<string> => {
+  const { booking } = order;
+  const price = order.amount.toFixed(2);
+  const people = booking.breakdown ?? `${booking.persons} ${booking.persons === 1 ? 'person' : 'persons'}`;
+  const signed: Record<string, string> = {
+    prod: plainText(booking.title, 100) || 'Excursion',
+    price,
+    qty: '1',
+    type: 'digital',
+    currency: order.currency,
+    description: plainText(`${people}${booking.date ? ` - ${booking.date}` : ''}`, 200),
+    'order-ext-ref': order.id,
+    'return-url': returnUrl(origin, 'verifone', order.id, 'approved'),
+    'return-type': 'redirect',
+    // The link stops working after a day, so an old one cannot be replayed.
+    expiration: String(Math.floor(Date.now() / 1000) + 24 * 60 * 60),
+  };
+  for (const name of Object.keys(signed)) {
+    if (!VERIFONE_SIGNED.has(name)) throw new Error(`unsigned parameter ${name}`);
+  }
+  const signature = await verifoneSignature(signed, secrets.verifoneSecretWord);
+  const query = new URLSearchParams({
+    merchant: secrets.verifoneMerchantCode,
+    dynamic: '1',
+    ...signed,
+    language: booking.locale,
+    ...(secrets.verifoneMode === 'test' ? { test: '1' } : {}),
+    signature,
+  });
+  order.signedPrice = price;
+  return `${VERIFONE_CHECKOUT_URL}?${query.toString()}`;
+};
+
+/**
+ * Did 2Checkout really send this guest back from a completed order — for this
+ * order and this price? `authentic` is false when the signature cannot be
+ * confirmed; the caller then records the order as unverified, not as failed.
+ */
+export const verifyVerifoneReturn = async (
+  params: URLSearchParams,
+  order: PaymentOrder,
+  secretWord: string
+): Promise<{ authentic: boolean; sameOrder: boolean; reference: string }> => {
+  const received = (params.get('signature') ?? '').toLowerCase();
+  const all: Record<string, string> = {};
+  params.forEach((value, name) => {
+    if (name !== 'signature') all[name] = value;
+  });
+  let authentic = false;
+  if (/^[0-9a-f]{64}$/.test(received) && secretWord) {
+    authentic = (await verifoneSignature(all, secretWord)) === received;
+  }
+  const refOk = !params.has('order-ext-ref') || params.get('order-ext-ref') === order.id;
+  const priceOk = !params.has('price') || params.get('price') === order.signedPrice;
+  return {
+    authentic,
+    sameOrder: refOk && priceOk,
+    reference: (params.get('refno') ?? params.get('REFNO') ?? '').slice(0, 40),
+  };
 };
