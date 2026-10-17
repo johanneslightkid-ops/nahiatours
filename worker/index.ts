@@ -40,6 +40,7 @@ import { onRequest as handleVerifoneCheckout } from '../functions/api/verifone-c
 import { onRequest as handleCardnetCheckout } from '../functions/api/cardnet-checkout';
 import { onRequest as handlePayReturn } from '../functions/api/pay-return';
 import { onRequest as handlePaymentResult } from '../functions/api/payment-result';
+import { onRequest as handleContactRequest } from '../functions/api/contact-request';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
 
 export interface Env {
@@ -81,6 +82,7 @@ const ROUTES: Record<string, RouteHandler> = {
   '/api/verifone-checkout': handleVerifoneCheckout,
   '/api/cardnet-checkout': handleCardnetCheckout,
   '/api/payment-result': handlePaymentResult,
+  '/api/contact-request': handleContactRequest,
   '/api/cf-ai': handleCfAi,
   '/api/upload': handleUpload,
   '/api/social-publish': handleSocialPublish,

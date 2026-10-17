@@ -14,6 +14,7 @@ import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
 import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
 import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
+import ContactRequestsPanel from '../components/admin/ContactRequestsPanel';
 import SiteTextsAdmin from '../components/admin/SiteTextsAdmin';
 import { FaVideo, FaShareAlt, FaBook, FaRobot, FaMagic } from 'react-icons/fa';
 import { useSearchParams } from 'react-router-dom';
@@ -70,6 +71,9 @@ const Admin: React.FC = () => {
   return (
     <div className="min-h-screen bg-paper-warm py-6">
       <div className="container mx-auto space-y-8 px-4">
+        {/* What guests asked for outside WhatsApp, on the page the operator opens first. */}
+        {activeSection === 'brand' && <ContactRequestsPanel />}
+
         {/* Brand Settings Section */}
         {activeSection === 'brand' && (
           <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
