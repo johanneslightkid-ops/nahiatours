@@ -87,6 +87,10 @@ binding = "AI"
 # another site's namespace. Once the namespace exists its id is pinned here,
 # so a build without an API token cannot bind the wrong one.
 
+[[kv_namespaces]]
+binding = "DATA_KV_F"
+id = "54f379d5f9fb47209fa78b819bccc834"
+
 # ==============================================================================
 # Environment variables
 # ==============================================================================
