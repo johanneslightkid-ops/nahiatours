@@ -90,9 +90,6 @@ const buildSeoBlock = ({ siteUrl, brandName, description, shortDescription, loca
     inLanguage: locales,
   };
 
-  const alternates = locales
-    .map((lang) => `    <link rel="alternate" hreflang="${lang}" href="${attr(`${siteUrl}/?lang=${lang}`)}" />`)
-    .join('\n');
 
   return `${BEGIN}
     <title>${attr(title)}</title>
@@ -105,8 +102,6 @@ const buildSeoBlock = ({ siteUrl, brandName, description, shortDescription, loca
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
     <link rel="canonical" href="${attr(siteUrl)}" />
-${alternates}
-    <link rel="alternate" hreflang="x-default" href="${attr(siteUrl)}" />
 
     <meta property="og:title" content="${attr(title)}" />
     <meta property="og:description" content="${attr(shortDescription)}" />
