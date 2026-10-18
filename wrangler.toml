@@ -130,6 +130,12 @@ id = "39da5ca1858a4251a3130eaf7b8f2172"
 # settings — nothing reads them but the health endpoint.
 SITE = "ldvip"
 SITE_BRANCH = "ldvip"
+# The address search engines should find this site under: every canonical
+# link, sitemap entry and social card points here (shared/seo.ts), and a
+# workers.dev host that is not this address is kept out of the index.
+SITE_URL = "https://ldvip.johannes-neugschwentner.workers.dev"
+# The language the site opens in, and so the language of its page titles.
+SITE_LOCALE = "en"
 
 ADMIN_PASSWORD = "admin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
