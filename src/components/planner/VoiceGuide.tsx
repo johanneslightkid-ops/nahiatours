@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { HiMicrophone, HiRefresh, HiVolumeOff, HiVolumeUp } from 'react-icons/hi';
 import { useI18n } from '../../contexts/I18nContext';
-import { useMediaQuery } from '../../lib/useMediaQuery';
 import { getFlowCopy } from '../../planner/flowCopy';
 import { haptic, HAPTIC } from '../../planner/haptics';
 import { lineHash, VoiceSegment } from '../../planner/voiceScript';
 import {
   matchUtterance,
+  normalize,
   pickVoice,
   RECOGNITION_LANG,
   speakable,
@@ -30,8 +30,6 @@ interface VoiceGuideProps {
   onMatch: (match: VoiceMatch) => VoiceOutcome;
 }
 
-type Phase = 'idle' | 'speaking' | 'listening';
-
 // The recogniser is still vendor-prefixed in Chrome and Safari.
 type Recognition = {
   lang: string;
@@ -53,23 +51,106 @@ const recognitionCtor = (): (new () => Recognition) | null => {
 
 const STORAGE_KEY = 'planner_voice';
 
+/** Listening goes on this long after the last word was read, then the mic closes. */
+const LISTEN_AFTER_MS = 15000;
+/** The guide's own voice, picked up by the mic, can arrive this long after it stopped. */
+const ECHO_TAIL_MS = 1500;
+/** A breath between segments. The clips carry almost no silence of their own. */
+const GAP_AFTER_OPTION_MS = 40;
+const GAP_AFTER_LINE_MS = 120;
+
 /**
  * Recorded clips, when someone has made them. The manifest lists which ids
  * exist per language, so a missing recording costs no failed request — the
  * device's synthesiser simply reads that line instead.
  */
 const CLIP_ROOT = '/audio/planner';
-/** { en: { 'q-partyType': '<fingerprint of the recorded words>' }, … } */
-let manifest: Promise<Record<string, Record<string, string>>> | null = null;
+type Manifest = Record<string, Record<string, string>>;
+let manifest: Promise<Manifest> | null = null;
 // Kept once loaded: each question mounts a fresh guide, and it must know the
 // clips before it starts reading, not a network round trip later.
-let manifestLoaded: Record<string, Record<string, string>> | null = null;
-type Manifest = Record<string, Record<string, string>>;
+let manifestLoaded: Manifest | null = null;
 const loadManifest = (): Promise<Manifest> =>
   (manifest ??= fetch(`${CLIP_ROOT}/manifest.json`, { cache: 'no-cache' })
     .then((response): Promise<unknown> => (response.ok ? response.json() : Promise.resolve({})))
     .catch((): unknown => ({}))
     .then((list) => (manifestLoaded = list && typeof list === 'object' ? (list as Manifest) : {})));
+
+/**
+ * Clips already downloaded, as object URLs. A question's clips are fetched
+ * the moment it appears, so moving from one option to the next is instant
+ * rather than a download each time.
+ */
+const clipUrls = new Map<string, string>();
+const clipLoads = new Map<string, Promise<void>>();
+const preloadClip = (lang: string, id: string) => {
+  const key = `${lang}/${id}`;
+  if (clipUrls.has(key) || clipLoads.has(key)) return;
+  clipLoads.set(
+    key,
+    fetch(`${CLIP_ROOT}/${key}.mp3`)
+      .then((response) => (response.ok ? response.blob() : Promise.reject(new Error(String(response.status)))))
+      .then((blob) => void clipUrls.set(key, URL.createObjectURL(blob)))
+      .catch(() => void clipLoads.delete(key))
+  );
+};
+
+/**
+ * One player for the whole visit: once iOS has let it play from a tap, it
+ * may play again without one — including on the next question, which mounts
+ * a fresh guide.
+ */
+let sharedPlayer: HTMLAudioElement | null = null;
+const player = () => (sharedPlayer ??= new Audio());
+
+/**
+ * Keep the loudspeaker. With the microphone open, iOS Safari otherwise picks
+ * a call-style audio route and the voice moves to the earpiece. Asking for
+ * "play-and-record" explicitly makes WebKit default to the speaker (a headset
+ * still wins). A no-op where the Audio Session API does not exist.
+ */
+let sessionResetTimer: number | undefined;
+const setAudioSession = (type: 'play-and-record' | 'auto') => {
+  if (sessionResetTimer !== undefined) window.clearTimeout(sessionResetTimer);
+  sessionResetTimer = undefined;
+  try {
+    const session = (navigator as any).audioSession;
+    if (session && session.type !== type) session.type = type;
+  } catch {
+    /* not supported */
+  }
+};
+// Each question remounts the guide; only a real exit gives the route back.
+const releaseAudioSessionSoon = () => {
+  if (sessionResetTimer !== undefined) window.clearTimeout(sessionResetTimer);
+  sessionResetTimer = window.setTimeout(() => setAudioSession('auto'), 1500);
+};
+
+/**
+ * Whether this device lets the voice keep playing while the mic is open.
+ * Some phones hand the audio to the recogniser and silence the page; when
+ * that is seen once, the guide listens after reading instead, as before.
+ */
+const BARGE_IN_KEY = 'planner_voice_bargein_off';
+const bargeInAllowed = () => {
+  try {
+    return sessionStorage.getItem(BARGE_IN_KEY) !== '1';
+  } catch {
+    return true;
+  }
+};
+// Once can be the permission dialog pausing the sound; twice is the device.
+let interruptions = 0;
+const noteInterruption = () => {
+  interruptions += 1;
+  if (interruptions < 2) return false;
+  try {
+    sessionStorage.setItem(BARGE_IN_KEY, '1');
+  } catch {
+    /* only for this page then */
+  }
+  return true;
+};
 
 const readEnabled = () => {
   try {
@@ -79,32 +160,82 @@ const readEnabled = () => {
   }
 };
 
+/** A twentieth of a second of silence, as a WAV, to unlock the player inside a tap. */
+let silence: string | null = null;
+const silentClip = () => {
+  if (silence) return silence;
+  const rate = 8000;
+  const samples = rate / 20;
+  const bytes = new Uint8Array(44 + samples);
+  const view = new DataView(bytes.buffer);
+  const text = (offset: number, value: string) => [...value].forEach((char, i) => view.setUint8(offset + i, char.charCodeAt(0)));
+  text(0, 'RIFF');
+  view.setUint32(4, 36 + samples, true);
+  text(8, 'WAVEfmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, rate, true);
+  view.setUint32(28, rate, true);
+  view.setUint16(32, 1, true);
+  view.setUint16(34, 8, true);
+  text(36, 'data');
+  view.setUint32(40, samples, true);
+  bytes.fill(128, 44);
+  let binary = '';
+  bytes.forEach((byte) => (binary += String.fromCharCode(byte)));
+  return (silence = `data:audio/wav;base64,${btoa(binary)}`);
+};
+
 /**
- * The hands-free guide, phones and tablets only.
+ * For the planner's start button: when the guide was left on, take the tap
+ * that starts the questions to claim the loudspeaker and unlock the player.
+ */
+export const primeVoiceGuide = () => {
+  if (!readEnabled()) return;
+  setAudioSession('play-and-record');
+  const audio = player();
+  try {
+    audio.muted = true;
+    audio.src = silentClip();
+    void audio.play().then(() => audio.pause()).catch(() => undefined).finally(() => {
+      audio.muted = false;
+    });
+  } catch {
+    /* the guide's own tap will try again */
+  }
+};
+
+/** The words of a phrase, for comparing what was heard with what was read. */
+const words = (text: string) => normalize(text).split(' ').filter((word) => word.length > 1);
+
+/**
+ * The hands-free guide, on every device that can speak.
  *
- * Reads each question with the device's own speech synthesiser, then listens
- * once through the browser's recogniser and matches what it hears against the
- * answers on screen (see planner/voice.ts). Nothing leaves the page except
- * what the browser's speech service itself does with the audio. Where the
- * browser can speak but not listen, it reads aloud and the guest taps; where
- * it can do neither, the guide does not appear at all.
+ * Reads each question — a recording where there is one, the device's own
+ * synthesiser otherwise — while listening the whole time through the
+ * browser's recogniser, so the guest can answer the moment they hear the
+ * option they want instead of waiting for the list to end. What is heard is
+ * matched against the answers on screen (see planner/voice.ts); the guide's
+ * own voice coming back through the mic is recognised and ignored. Nothing
+ * leaves the page except what the browser's speech service itself does with
+ * the audio. Where the browser can speak but not listen, it reads aloud and
+ * the guest taps.
  */
 export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSegment, options, wantsNumber, onMatch }) => {
   const { locale } = useI18n();
   const flow = getFlowCopy(locale);
   const lang = voiceLocale(locale);
-  const touch = useMediaQuery('(pointer: coarse)');
 
   const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
   const Ctor = recognitionCtor();
 
   const [enabled, setEnabled] = useState(readEnabled);
-  const [phase, setPhase] = useState<Phase>('idle');
+  const [speaking, setSpeaking] = useState(false);
+  const [listening, setListening] = useState(false);
   const [heard, setHeard] = useState('');
   const [problem, setProblem] = useState<'blocked' | null>(null);
 
-  const recognition = useRef<Recognition | null>(null);
-  const audio = useRef<HTMLAudioElement | null>(null);
   const [clips, setClips] = useState<Record<string, string>>(() => manifestLoaded?.[voiceLocale(locale)] ?? {});
   // Set when the tap that switched the guide on already started reading.
   const startedByTap = useRef(false);
@@ -114,8 +245,20 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
   // question that has already left the screen.
   const latest = useRef({ options, wantsNumber, onMatch, segments, onSegment });
   latest.current = { options, wantsNumber, onMatch, segments, onSegment };
-  // Bumped by every stop, so a sequence that was interrupted stops advancing.
-  const sequence = useRef(0);
+  // Bumped by every stop, so a reading that was interrupted stops advancing.
+  const speech = useRef(0);
+  const speakingNow = useRef(false);
+  const ourPause = useRef(false);
+  // What was read and when, to tell an echo of the guide from the guest.
+  const spoken = useRef<{ words: Set<string>; end?: number }[]>([]);
+  const lastSpokeAt = useRef(0);
+
+  const recognition = useRef<Recognition | null>(null);
+  const wantListening = useRef(false);
+  const listenUntil = useRef(0);
+  const restarts = useRef(0);
+  const handledResults = useRef(0);
+  const listenRef = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     let current = true;
@@ -125,8 +268,20 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
     };
   }, [lang]);
 
-  const stopAll = useCallback(() => {
-    sequence.current += 1;
+  const hasClip = useCallback((part: VoiceSegment) => Boolean(clips[part.id] && clips[part.id] === lineHash(part.text)), [clips]);
+
+  // Fetch this question's clips (and the "didn't catch" line) straight away.
+  useEffect(() => {
+    if (!enabled) return;
+    [...segments, { id: 'fb-didnt-catch', text: flow.voice.didntCatch }].forEach((part) => {
+      if (hasClip(part)) preloadClip(lang, part.id);
+    });
+  }, [enabled, segments, hasClip, lang, flow.voice.didntCatch]);
+
+  const stopSpeaking = useCallback(() => {
+    speech.current += 1;
+    if (speakingNow.current) lastSpokeAt.current = Date.now();
+    speakingNow.current = false;
     latest.current.onSegment?.(null);
     if (speakTimer.current !== null) window.clearTimeout(speakTimer.current);
     speakTimer.current = null;
@@ -135,58 +290,90 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
     } catch {
       /* nothing to cancel */
     }
-    if (audio.current) {
-      audio.current.onended = null;
-      audio.current.onerror = null;
-      audio.current.pause();
+    const audio = sharedPlayer;
+    if (audio) {
+      audio.onended = null;
+      audio.onerror = null;
+      audio.onpause = null;
+      ourPause.current = true;
+      audio.pause();
+      ourPause.current = false;
     }
-    if (recognition.current) {
-      recognition.current.onend = null;
-      recognition.current.onresult = null;
-      recognition.current.onerror = null;
+    setSpeaking(false);
+  }, [synth]);
+
+  const stopListening = useCallback(() => {
+    wantListening.current = false;
+    const rec = recognition.current;
+    recognition.current = null;
+    if (rec) {
+      rec.onend = null;
+      rec.onresult = null;
+      rec.onerror = null;
       try {
-        recognition.current.abort();
+        rec.abort();
       } catch {
         /* already stopped */
       }
-      recognition.current = null;
     }
-    setPhase('idle');
-  }, [synth]);
+    setListening(false);
+  }, []);
+
+  const stopAll = useCallback(() => {
+    stopSpeaking();
+    stopListening();
+  }, [stopListening, stopSpeaking]);
 
   /**
-   * Read segments one after another — a recording where there is one for
-   * exactly these words, the synthesiser otherwise — telling the page which
-   * option each one is, then hand over to `then` (usually: listen).
+   * Read segments one after another, telling the page which option each one
+   * is, then hand over to `then`. Listening is left alone: the guest may
+   * answer at any point.
    */
   const speak = useCallback(
     (parts: VoiceSegment[], then?: () => void) => {
-      stopAll();
-      const run = sequence.current;
+      stopSpeaking();
+      const run = speech.current;
       let index = 0;
+      speakingNow.current = true;
+      setSpeaking(true);
 
       const finish = () => {
-        if (run !== sequence.current) return;
+        if (run !== speech.current) return;
+        speakingNow.current = false;
+        lastSpokeAt.current = Date.now();
         latest.current.onSegment?.(null);
-        setPhase('idle');
-        // A short gap so the recogniser does not hear the end of the voice.
-        if (then) window.setTimeout(() => run === sequence.current && then(), 250);
+        setSpeaking(false);
+        then?.();
       };
 
       const next = () => {
-        if (run !== sequence.current) return;
+        if (run !== speech.current) return;
         const part = parts[index++];
         if (!part) return finish();
         latest.current.onSegment?.(part.optionId ?? null);
+        const line: { words: Set<string>; end?: number } = { words: new Set(words(part.text)) };
+        spoken.current = [...spoken.current.filter((entry) => entry.end === undefined || Date.now() - entry.end < 20000), line];
 
         let ended = false;
         const done = () => {
-          if (ended || run !== sequence.current) return;
+          if (ended || run !== speech.current) return;
           ended = true;
+          line.end = Date.now();
           if (speakTimer.current !== null) window.clearTimeout(speakTimer.current);
           speakTimer.current = null;
-          // A breath between options, as a person reading a list would take.
-          window.setTimeout(next, part.optionId ? 90 : 160);
+          lastSpokeAt.current = Date.now();
+          window.setTimeout(next, part.optionId ? GAP_AFTER_OPTION_MS : GAP_AFTER_LINE_MS);
+        };
+
+        // The sound was taken away while the mic was open: read this line
+        // again, and if it keeps happening, stop listening during reading on
+        // this device (it listens after reading instead, as before).
+        const interrupted = () => {
+          if (ended || run !== speech.current || !wantListening.current) return done();
+          ended = true;
+          if (noteInterruption()) stopListening();
+          index -= 1;
+          window.setTimeout(next, 150);
         };
 
         const synthesise = () => {
@@ -197,7 +384,7 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
           if (voice) utterance.voice = voice;
           utterance.rate = 1.02;
           utterance.onend = done;
-          utterance.onerror = done;
+          utterance.onerror = (event: any) => (event?.error === 'interrupted' ? interrupted() : done());
           // Some Android builds never fire `end`; don't wait on them forever.
           speakTimer.current = window.setTimeout(done, 2500 + part.text.length * 75);
           synth.speak(utterance);
@@ -205,89 +392,177 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
 
         // Only a recording of exactly these words: after a copy edit the old
         // clip would say something the screen no longer does.
-        if (clips[part.id] && clips[part.id] === lineHash(part.text)) {
-          // One element for the whole session: once iOS has let it play from
-          // a tap, it may play again without one.
-          const player = (audio.current ??= new Audio());
-          player.onended = done;
-          player.onerror = synthesise;
-          player.src = `${CLIP_ROOT}/${lang}/${part.id}.mp3`;
-          player.play().catch(synthesise);
+        if (hasClip(part)) {
+          const audio = player();
+          audio.muted = false;
+          audio.onended = done;
+          audio.onerror = synthesise;
+          audio.onpause = () => {
+            if (!ourPause.current && !audio.ended) interrupted();
+          };
+          audio.src = clipUrls.get(`${lang}/${part.id}`) ?? `${CLIP_ROOT}/${lang}/${part.id}.mp3`;
+          audio.play().catch(synthesise);
           return;
         }
         synthesise();
       };
 
-      setPhase('speaking');
       next();
     },
-    [clips, lang, stopAll, synth]
+    [hasClip, lang, stopListening, stopSpeaking, synth]
   );
 
+  /**
+   * Whether what was heard is the guide itself, coming back through the mic.
+   *
+   * The guest's answer is always words the guide has just read (an option's
+   * name), so "said by the guide" alone proves nothing. What gives an echo
+   * away is length and timing: a run of the guide's sentence is longer than
+   * any answer, and a short phrase that is the line being read right now —
+   * or the one that ended a moment ago — is the guide hearing itself. An
+   * option named while a later one is being read is the guest choosing it.
+   */
+  const isEcho = (alternatives: string[]) => {
+    const heardWords = words(alternatives[0] ?? '');
+    if (heardWords.length === 0) return true;
+    const now = Date.now();
+    const recent = spoken.current.filter((line) => line.end === undefined || now - line.end < 15000);
+    if (recent.length === 0) return false;
+    const share = (set: Set<string>) => heardWords.filter((word) => set.has(word)).length / heardWords.length;
+    if (share(new Set(recent.flatMap((line) => [...line.words]))) < 0.75) return false;
+    const longestAnswer = Math.max(2, ...latest.current.options.map((option) => words(option.label).length));
+    if (heardWords.length > longestAnswer + 2) return true;
+    return recent.some((line) => (line.end === undefined || now - line.end < ECHO_TAIL_MS) && share(line.words) >= 0.75);
+  };
+
+  const handleHeard = (alternatives: string[]) => {
+    if (isEcho(alternatives)) return;
+    const busy = speakingNow.current || Date.now() - lastSpokeAt.current < ECHO_TAIL_MS;
+    const { options: opts, wantsNumber: number, onMatch: handle } = latest.current;
+    const match = matchUtterance(alternatives, opts, lang, { wantsNumber: number });
+
+    if (!match) {
+      // Half-heard words over the reading are not worth interrupting for.
+      if (busy) return;
+      setHeard(alternatives[0] ?? '');
+      haptic(HAPTIC.miss);
+      if (retries.current < 1) {
+        retries.current += 1;
+        listenUntil.current = Date.now() + LISTEN_AFTER_MS;
+        speak([{ id: 'fb-didnt-catch', text: flow.voice.didntCatch }], () => {
+          listenUntil.current = Date.now() + LISTEN_AFTER_MS;
+        });
+      }
+      return;
+    }
+
+    setHeard(alternatives[0] ?? '');
+    haptic(HAPTIC.heard);
+    retries.current = 0;
+    stopSpeaking();
+    if (match.kind === 'command' && match.command === 'repeat') {
+      speak(latest.current.segments, () => {
+        listenUntil.current = Date.now() + LISTEN_AFTER_MS;
+      });
+      return;
+    }
+    if (match.kind === 'command' && match.command === 'stop') {
+      stopAll();
+      setEnabled(false);
+      return;
+    }
+    const outcome = handle(match);
+    if (!outcome.listenAgain) stopListening();
+    else listenUntil.current = Date.now() + LISTEN_AFTER_MS;
+    if (outcome.say) {
+      speak([outcome.say], () => {
+        if (outcome.listenAgain) listenUntil.current = Date.now() + LISTEN_AFTER_MS;
+      });
+    }
+  };
+  const handleHeardRef = useRef(handleHeard);
+  handleHeardRef.current = handleHeard;
+
+  /** Open the mic (if it is not open already) and keep it open while it is wanted. */
   const listen = useCallback(() => {
     if (!Ctor || problem === 'blocked') return;
-    stopAll();
+    wantListening.current = true;
+    if (recognition.current) return;
     const rec = new Ctor();
     rec.lang = RECOGNITION_LANG[lang];
     rec.interimResults = false;
     rec.maxAlternatives = 5;
-    rec.continuous = false;
+    // One session across the whole reading, rather than one per option.
+    rec.continuous = true;
+    handledResults.current = 0;
 
-    let gotResult = false;
     rec.onresult = (event: any) => {
-      gotResult = true;
-      const result = event.results?.[0];
-      const alternatives: string[] = [];
-      for (let i = 0; i < (result?.length ?? 0); i += 1) alternatives.push(result[i].transcript);
-      setHeard(alternatives[0] ?? '');
-
-      const { options: opts, wantsNumber: number, onMatch: handle } = latest.current;
-      const match = matchUtterance(alternatives, opts, lang, { wantsNumber: number });
-
-      if (!match) {
-        haptic(HAPTIC.miss);
-        if (retries.current < 1) {
-          retries.current += 1;
-          speak([{ id: 'fb-didnt-catch', text: flow.voice.didntCatch }], listen);
-        } else {
-          setPhase('idle');
-        }
-        return;
+      const results = event.results ?? [];
+      // Safari repeats earlier results in each event; only new finals count.
+      for (let i = Math.max(event.resultIndex ?? 0, handledResults.current); i < results.length; i += 1) {
+        const result = results[i];
+        if (!result || result.isFinal === false) continue;
+        handledResults.current = i + 1;
+        const alternatives: string[] = [];
+        for (let j = 0; j < (result.length ?? 0); j += 1) alternatives.push(result[j].transcript);
+        handleHeardRef.current(alternatives);
       }
-
-      haptic(HAPTIC.heard);
-      retries.current = 0;
-      if (match.kind === 'command' && match.command === 'repeat') {
-        speak(latest.current.segments, listen);
-        return;
-      }
-      if (match.kind === 'command' && match.command === 'stop') {
-        stopAll();
-        setEnabled(false);
-        return;
-      }
-      const outcome = handle(match);
-      if (outcome.say) speak([outcome.say], outcome.listenAgain ? listen : undefined);
-      else if (outcome.listenAgain) listen();
-      else setPhase('idle');
     };
     rec.onerror = (event: any) => {
-      if (event?.error === 'not-allowed' || event?.error === 'service-not-allowed') setProblem('blocked');
+      if (event?.error === 'not-allowed' || event?.error === 'service-not-allowed') {
+        setProblem('blocked');
+        wantListening.current = false;
+      }
     };
     rec.onend = () => {
-      if (!gotResult) setPhase('idle');
       if (recognition.current === rec) recognition.current = null;
+      // Recognisers stop on their own after a pause; reopen while the guest
+      // is still being read to or was just asked, a limited number of times.
+      const stillWanted =
+        wantListening.current && (speakingNow.current || Date.now() < listenUntil.current) && !document.hidden;
+      if (stillWanted && restarts.current < 12) {
+        restarts.current += 1;
+        window.setTimeout(() => wantListening.current && listenRef.current(), 120);
+        return;
+      }
+      wantListening.current = false;
+      setListening(false);
     };
 
     recognition.current = rec;
-    setHeard('');
-    setPhase('listening');
+    setListening(true);
     try {
       rec.start();
     } catch {
-      setPhase('idle');
+      recognition.current = null;
+      setListening(false);
     }
-  }, [Ctor, flow.voice.didntCatch, lang, problem, speak, stopAll]);
+  }, [Ctor, lang, problem]);
+  listenRef.current = listen;
+
+  // Close the mic once the reading is long over and nobody spoke.
+  useEffect(() => {
+    if (!listening) return undefined;
+    const timer = window.setInterval(() => {
+      if (!speakingNow.current && listenUntil.current && Date.now() > listenUntil.current) stopListening();
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [listening, stopListening]);
+
+  /** Read the question and listen — during the reading where the device allows. */
+  const readAndListen = useCallback(
+    (parts: VoiceSegment[]) => {
+      retries.current = 0;
+      restarts.current = 0;
+      listenUntil.current = Date.now() + 60000;
+      if (Ctor && bargeInAllowed()) listen();
+      speak(parts, () => {
+        listenUntil.current = Date.now() + LISTEN_AFTER_MS;
+        if (Ctor) listen();
+      });
+    },
+    [Ctor, listen, speak]
+  );
 
   // Persist the choice, so the guide stays on from question to question and
   // across visits on this device.
@@ -297,35 +572,38 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
     } catch {
       /* private mode */
     }
+    if (enabled) setAudioSession('play-and-record');
   }, [enabled]);
+
+  // Leaving the planner gives the audio route back.
+  useEffect(() => () => releaseAudioSessionSoon(), []);
 
   // Voices load asynchronously on Chrome; asking once wakes the list up.
   useEffect(() => {
     synth?.getVoices();
   }, [synth]);
 
-  // A new question: read it, then listen.
+  // A new question: read it, listening throughout.
   useEffect(() => {
     if (!enabled) return undefined;
-    retries.current = 0;
     if (startedByTap.current) {
       startedByTap.current = false;
       return stopAll;
     }
-    speak(latest.current.segments, Ctor ? listen : undefined);
+    readAndListen(latest.current.segments);
     return stopAll;
     // Only when the question changes or the guide is switched on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepKey, enabled]);
 
-  // Leaving the tab silences it.
+  // Leaving the tab silences it and closes the mic.
   useEffect(() => {
     const onHide = () => document.hidden && stopAll();
     document.addEventListener('visibilitychange', onHide);
     return () => document.removeEventListener('visibilitychange', onHide);
   }, [stopAll]);
 
-  if (!touch || !synth) return null;
+  if (!synth) return null;
 
   if (!enabled) {
     return (
@@ -333,11 +611,12 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
         type="button"
         onClick={() => {
           haptic(HAPTIC.tap);
-          // iOS only lets a page make sound that a tap started, so the first
-          // question is read right here rather than after the next render.
-          retries.current = 0;
+          // All inside the tap: iOS only lets a page make sound — and keep
+          // the loudspeaker — when a tap started it, and the microphone is
+          // asked for right now rather than after the first list is read.
+          setAudioSession('play-and-record');
           startedByTap.current = true;
-          speak(latest.current.segments, Ctor ? listen : undefined);
+          readAndListen(latest.current.segments);
           setEnabled(true);
         }}
         className="voice-pill mb-5 flex w-full items-center gap-3 px-4 py-3 text-left"
@@ -353,18 +632,20 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
     );
   }
 
-  const status =
-    phase === 'speaking'
-      ? flow.voice.speaking
-      : phase === 'listening'
-      ? flow.voice.listening
-      : problem === 'blocked'
-      ? flow.voice.micBlocked
-      : !Ctor
-      ? flow.voice.noMic
-      : heard
-      ? flow.voice.heard(heard)
-      : flow.voice.tapToSpeak;
+  const phase = speaking ? 'speaking' : listening ? 'listening' : 'idle';
+  const status = speaking
+    ? listening
+      ? flow.voice.speakingListening
+      : flow.voice.speaking
+    : listening
+    ? flow.voice.listening
+    : problem === 'blocked'
+    ? flow.voice.micBlocked
+    : !Ctor
+    ? flow.voice.noMic
+    : heard
+    ? flow.voice.heard(heard)
+    : flow.voice.tapToSpeak;
 
   return (
     <div className="voice-pill mb-5 px-3 py-2.5" aria-live="polite">
@@ -374,23 +655,33 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
           disabled={!Ctor || problem === 'blocked'}
           onClick={() => {
             haptic(HAPTIC.tap);
-            if (phase === 'listening') stopAll();
-            else listen();
+            if (speaking) {
+              // Answering now: stop reading, keep the mic open.
+              stopSpeaking();
+              listenUntil.current = Date.now() + LISTEN_AFTER_MS;
+              listen();
+            } else if (listening) {
+              stopListening();
+            } else {
+              retries.current = 0;
+              restarts.current = 0;
+              listenUntil.current = Date.now() + LISTEN_AFTER_MS;
+              listen();
+            }
           }}
           aria-label={flow.voice.tapToSpeak}
           className="voice-mic relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-mango text-ink disabled:opacity-40"
-          data-phase={phase}
+          data-phase={listening ? 'listening' : phase}
         >
           <span className="voice-ring" aria-hidden="true" />
-          {phase === 'speaking' ? <HiVolumeUp className="h-5 w-5" /> : <HiMicrophone className="h-5 w-5" />}
+          {speaking && !listening ? <HiVolumeUp className="h-5 w-5" /> : <HiMicrophone className="h-5 w-5" />}
         </button>
         <span className="min-w-0 flex-1 text-sm font-semibold leading-snug text-paper">{status}</span>
         <button
           type="button"
           onClick={() => {
             haptic(HAPTIC.tap);
-            retries.current = 0;
-            speak(latest.current.segments, Ctor ? listen : undefined);
+            readAndListen(latest.current.segments);
           }}
           aria-label={flow.voice.repeat}
           className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-paper/30 text-paper"
@@ -403,6 +694,7 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
             haptic(HAPTIC.tap);
             stopAll();
             setEnabled(false);
+            setAudioSession('auto');
           }}
           aria-label={flow.voice.off}
           className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-paper/30 text-paper"
