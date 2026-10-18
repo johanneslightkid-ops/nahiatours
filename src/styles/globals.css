@@ -538,9 +538,13 @@ select:focus {
 .brand-name-crystal,
 .desktop-brand-name {
   font-family: 'DM Serif Display', Georgia, serif;
-  font-size: 1.65rem;
   line-height: 1;
   color: var(--ink);
+}
+
+/* Size comes from the sign's own classes (compact on phones), never from here. */
+.desktop-brand-name {
+  font-size: 1.65rem;
 }
 
 /* ── Navigation: the shutters of a colonial street ──────────────────────── */
