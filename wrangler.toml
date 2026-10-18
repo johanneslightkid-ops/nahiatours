@@ -1,5 +1,5 @@
 # ==============================================================================
-# El Cortecito Tours — Cloudflare Worker (static assets + API routes)
+# Willy Tours — Cloudflare Worker (static assets + API routes)
 # ==============================================================================
 #
 # A SEPARATE SITE out of the same repository, not a change to any existing one:

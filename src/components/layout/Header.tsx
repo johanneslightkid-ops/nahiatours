@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks, MdShoppingCart } from 'react-icons/md';
+import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks, MdShoppingCart, MdPlace } from 'react-icons/md';
+import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi';
 import AdminNav from './AdminNav';
 import CartBadge from '../cart/CartBadge';
@@ -15,6 +16,10 @@ import { useI18n } from '../../contexts/I18nContext';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 import { getAdminPassword, clearAdminPassword } from '../../services/authStore';
+import { localeText } from '../../lib/localeText';
+import { track } from '../../lib/activity';
+import { generateWhatsAppMessage } from '../../utils/whatsapp';
+import { Butterflies, ColourPools, PatioWall } from './PatioScene';
 
 /**
  * A street in the Zona Colonial.
@@ -25,9 +30,11 @@ import { getAdminPassword, clearAdminPassword } from '../../services/authStore';
  * its window box. The logo hangs at the corner like the medallion over a
  * shop door.
  *
- * On a phone the street folds into a small double door in the corner. Open
- * it and two tall shutters swing apart onto a patio where every page is a
- * door of its own.
+ * On a phone — and on a wide screen once the street has scrolled away — the
+ * street folds into a small double door in the corner. Open it and two tall
+ * shutters swing apart onto the wall of an old house, every page a window in
+ * it, with the logo and the language compass on one side and a way to reach
+ * a person on the other.
  */
 
 interface NavItem {
@@ -172,20 +179,110 @@ const DoorButton: React.FC<{ open: boolean; onClick: () => void; label: string }
   </button>
 );
 
-/* ── The patio: the menu on a phone ────────────────────────────────────── */
+/* ── Contact, on the right of the patio ─────────────────────────────────── */
 
-const Patio: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+const PatioContact: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+  const { brandSettings } = useBrand();
+  const { locale } = useI18n();
+  const say = (texts: { en: string; es: string; de: string; fr: string }) => localeText(locale, texts);
+  const name = brandSettings.contactName || brandSettings.brandName;
+  const whatsapp = generateWhatsAppMessage(
+    brandSettings.phoneNumber,
+    say({ en: 'Hello! A question about your tours:', es: '¡Hola! Una pregunta sobre sus tours:', de: 'Hallo! Eine Frage zu euren Touren:', fr: 'Bonjour ! Une question sur vos excursions :' })
+  );
+  const tel = brandSettings.phoneNumber.replace(/[^\d+]/g, '');
+
+  if (compact) {
+    return (
+      <div className="flex flex-col items-stretch gap-2.5">
+        {whatsapp && (
+          <a href={whatsapp} target="_blank" rel="noreferrer" onClick={() => track('whatsapp', { source: 'menu' })} className="inline-flex items-center gap-2 rounded-full border-[3px] border-ink bg-jungle px-4 py-2 font-bold text-paper no-underline shadow-ink-sm">
+            <FaWhatsapp /> WhatsApp
+          </a>
+        )}
+        {tel && (
+          <a href={`tel:${tel}`} className="inline-flex items-center gap-2 rounded-full border-[3px] border-ink bg-paper-card px-4 py-2 font-bold text-ink no-underline shadow-ink-sm">
+            <FaPhoneAlt /> {say({ en: 'Call', es: 'Llamar', de: 'Anrufen', fr: 'Appeler' })}
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full max-w-[19rem] -rotate-1 rounded-[1.6rem_0.8rem_1.6rem_0.8rem] border-[3px] border-ink bg-paper-card/95 p-6 shadow-ink">
+      <p className="hand-note !text-[1.5rem] leading-none">{say({ en: `talk to ${name}`, es: `habla con ${name}`, de: `sprich mit ${name}`, fr: `parlez à ${name}` })}</p>
+      <p className="mt-2 text-sm font-semibold text-ink-soft">
+        {say({
+          en: 'A real person answers — usually within minutes.',
+          es: 'Contesta una persona de verdad — casi siempre en minutos.',
+          de: 'Es antwortet ein echter Mensch — meist in wenigen Minuten.',
+          fr: 'Une vraie personne répond — en général en quelques minutes.',
+        })}
+      </p>
+
+      {whatsapp && (
+        <div className="relative mt-6">
+          {/* The button stays still; the sun behind it turns and a ring goes out from it. */}
+          <svg className="contact-rays pointer-events-none absolute -left-5 -top-6 h-24 w-24" viewBox="0 0 100 100" aria-hidden="true">
+            {Array.from({ length: 12 }, (_, i) => (
+              <path key={i} d="M50 4V18" transform={`rotate(${i * 30} 50 50)`} stroke="#F5B921" strokeWidth={6} strokeLinecap="round" />
+            ))}
+          </svg>
+          <span className="contact-ping pointer-events-none absolute inset-0 rounded-full border-[3px] border-jungle" aria-hidden="true" />
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => track('whatsapp', { source: 'menu' })}
+            className="relative flex items-center justify-center gap-3 rounded-full border-[3px] border-ink bg-jungle px-5 py-3.5 text-lg font-extrabold text-paper no-underline shadow-ink-sm"
+          >
+            <FaWhatsapp className="h-6 w-6" /> WhatsApp
+          </a>
+        </div>
+      )}
+
+      {tel && (
+        <a href={`tel:${tel}`} className="mt-4 flex items-center gap-3 rounded-full border-[3px] border-ink bg-mango-light px-5 py-2.5 font-bold text-ink no-underline shadow-ink-sm">
+          <span className="contact-ring inline-block" aria-hidden="true">
+            <FaPhoneAlt />
+          </span>
+          <span className="tabular-nums">{brandSettings.phoneNumber}</span>
+        </a>
+      )}
+
+      <Link to="/contact#top" className="mt-4 flex items-center gap-3 rounded-full border-[3px] border-ink bg-paper px-5 py-2.5 font-bold text-ink no-underline shadow-ink-sm">
+        <MdEmail className="h-5 w-5" />
+        {say({ en: 'Write to us', es: 'Escríbenos', de: 'Schreib uns', fr: 'Écrivez-nous' })}
+        <span className="contact-spark ml-auto text-mango-dark" aria-hidden="true">✦</span>
+      </Link>
+
+      <p className="mt-5 flex items-center gap-2 text-sm font-semibold text-ink-soft">
+        <MdPlace className="h-5 w-5 text-hibiscus" /> El Cortecito · Bávaro, Punta Cana
+      </p>
+    </div>
+  );
+};
+
+/* ── The patio: the menu ───────────────────────────────────────────────── */
+
+const Patio: React.FC<{ onClose: () => void; wide: boolean }> = ({ onClose, wide }) => {
   const location = useLocation();
   const { locale } = useI18n();
   const reduced = useReducedMotion();
 
   useEffect(() => {
-    const previous = document.body.style.overflow;
+    // Both the page and the document: locking only <body> leaves the root
+    // scrollbar standing next to the menu's own on a desktop browser.
+    const root = document.documentElement;
+    const previous = { body: document.body.style.overflow, root: root.style.overflow };
     document.body.style.overflow = 'hidden';
+    root.style.overflow = 'hidden';
     const onKey = (event: KeyboardEvent) => event.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
     return () => {
-      document.body.style.overflow = previous;
+      document.body.style.overflow = previous.body;
+      root.style.overflow = previous.root;
       window.removeEventListener('keydown', onKey);
     };
   }, [onClose]);
@@ -208,58 +305,91 @@ const Patio: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     />
   );
 
+  const question =
+    locale === 'es' ? '¿Qué ventana abrimos?' : locale === 'fr' ? 'Quelle fenêtre ouvrir ?' : locale === 'de' ? 'Welches Fenster öffnen wir?' : 'Which window shall we open?';
+
+  const windows = (columns: string) => (
+    <div className={`grid ${columns} justify-items-center ${wide ? 'gap-x-4 gap-y-7' : 'gap-x-1 gap-y-5'}`}>
+      {NAV.map((item, i) => (
+        <motion.div
+          key={item.to}
+          className="flex justify-center"
+          initial={reduced ? false : { opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 + i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Ventana
+            item={item}
+            active={item.match(location.pathname)}
+            locale={locale}
+            big={wide}
+            onClick={(event) => {
+              playClickFx();
+              onNavLinkClick(event, item.to, location.pathname);
+              onClose();
+            }}
+          />
+        </motion.div>
+      ))}
+    </div>
+  );
+
   return (
     <motion.div
-      className="fixed inset-0 z-[60] overflow-y-auto"
+      className={`fixed inset-0 z-[60] ${wide ? 'overflow-hidden' : 'overflow-y-auto overscroll-contain'}`}
       style={{ perspective: 900 }}
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { delay: 0.45, duration: 0.15 } }}
       role="dialog"
       aria-modal="true"
+      aria-label={question}
     >
-      {/* The patio wall: lime-washed, with a band of azulejo blue at the foot. */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(180deg, #FFDD6E 0%, #F7EFE1 34%, #F7EFE1 82%, #2F4FD1 82%, #2F4FD1 100%)',
-        }}
-        onClick={onClose}
-      />
-      {shutter('l')}
-      {shutter('r')}
-
-      <div className="relative z-20 mx-auto flex min-h-full max-w-md flex-col px-6 pb-10 pt-24">
-        <p className="hand-note mb-5 text-center">
-          {locale === 'es' ? '¿Qué puerta abrimos?' : locale === 'fr' ? 'Quelle porte ouvrir ?' : locale === 'de' ? 'Welche Tür öffnen wir?' : 'Which door shall we open?'}
-        </p>
-        <div className="grid grid-cols-3 gap-x-3 gap-y-6">
-          {NAV.map((item, i) => (
-            <motion.div
-              key={item.to}
-              className="flex justify-center"
-              initial={reduced ? false : { opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 + i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <Ventana
-                item={item}
-                active={item.match(location.pathname)}
-                locale={locale}
-                big
-                onClick={(event) => {
-                  playClickFx();
-                  onNavLinkClick(event, item.to, location.pathname);
-                  onClose();
-                }}
-              />
-            </motion.div>
-          ))}
-        </div>
-        <div className="mt-10 flex justify-center">
-          <LanguageSwitcher />
-        </div>
+      <PatioWall narrow={!wide} />
+      <Butterflies />
+      {/* Clipped, so the swung-open shutters cannot make the menu scroll. */}
+      <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden" style={{ perspective: 900 }}>
+        {shutter('l')}
+        {shutter('r')}
       </div>
+
+      {wide ? (
+        /* Wide screens: logo and compass on the left, the windows in the
+           middle of the wall, a way to reach a person on the right — all of
+           it inside the viewport, nothing to scroll. */
+        <div className="relative z-20 grid h-[100dvh] grid-cols-[minmax(17rem,24rem)_1fr_minmax(17rem,22rem)] items-center gap-6 px-[4vw] py-10">
+          <div className="relative mx-auto h-[min(30rem,80dvh)] w-[19rem]">
+            <ColourPools />
+            <Link to="/" onClick={(event) => { playClickFx(); onNavLinkClick(event, '/', location.pathname); onClose(); }} className="wobble-a absolute left-6 top-6 flex flex-col items-center gap-2 no-underline">
+              <Logo className="h-[9.5rem] w-[9.5rem] border-[4px] border-ink shadow-ink" />
+              <BrandSign />
+            </Link>
+            <div className="wobble-b absolute bottom-8 right-6">
+              <LanguageSwitcher />
+            </div>
+          </div>
+
+          {/* A freshly plastered stretch of the old wall, around the windows. */}
+          <div className="mx-auto flex min-w-0 flex-col items-center rounded-[2.4rem_1.2rem_2.8rem_1.4rem] border-[3px] border-dashed border-[#E99876] bg-[#FBD5C0]/90 px-[3vw] pb-10 pt-7">
+            <p className="hand-note mb-8 text-center !text-[1.7rem]">{question}</p>
+            {windows('grid-cols-4')}
+          </div>
+
+          <div className="flex justify-center">
+            <PatioContact />
+          </div>
+        </div>
+      ) : (
+        <div className="relative z-20 mx-auto flex min-h-full max-w-md flex-col px-3 pb-8 pt-24">
+          <p className="hand-note mx-auto mb-4 rounded-full bg-paper-card/85 px-4 text-center">{question}</p>
+          {windows('grid-cols-4')}
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <div className="wobble-b shrink-0">
+              <LanguageSwitcher />
+            </div>
+            <PatioContact compact />
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
@@ -396,7 +526,7 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      <AnimatePresence>{menuOpen && <Patio onClose={closeMenu} />}</AnimatePresence>
+      <AnimatePresence>{menuOpen && <Patio onClose={closeMenu} wide={wide} />}</AnimatePresence>
     </>
   );
 };

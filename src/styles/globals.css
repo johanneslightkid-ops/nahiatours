@@ -1775,3 +1775,130 @@ select:focus {
     animation: none;
   }
 }
+
+/* ── The patio: the menu, opened onto an old house in the Zona Colonial ─── */
+/*
+ * Everything here moves by transform alone. The wall itself is a static SVG
+ * (src/components/layout/PatioScene.tsx), drawn only while the menu is open.
+ */
+
+.frond-sway {
+  transform-box: fill-box;
+  transform-origin: 0% 0%;
+  animation: frondHang 7s ease-in-out infinite;
+}
+.frond-sway-slow {
+  animation-duration: 9.5s;
+  animation-delay: -3s;
+}
+@keyframes frondHang {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(2.6deg); }
+}
+
+.mariposa {
+  position: absolute;
+  display: block;
+  will-change: transform;
+}
+.mariposa-a { animation: mariposaA 17s ease-in-out infinite; }
+.mariposa-b { animation: mariposaB 21s ease-in-out infinite; }
+.mariposa-c { animation: mariposaC 19s ease-in-out infinite; }
+.mariposa-wing {
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+  animation: mariposaFlap 0.34s ease-in-out infinite alternate;
+}
+.mariposa-wing-r {
+  transform-origin: 0% 50%;
+}
+@keyframes mariposaFlap {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.25); }
+}
+@keyframes mariposaA {
+  0%, 100% { transform: translate(0, 0) rotate(-8deg); }
+  25% { transform: translate(9vw, -6vh) rotate(14deg); }
+  50% { transform: translate(4vw, 9vh) rotate(-6deg); }
+  75% { transform: translate(-5vw, 3vh) rotate(10deg); }
+}
+@keyframes mariposaB {
+  0%, 100% { transform: translate(0, 0) rotate(12deg) scale(0.9); }
+  30% { transform: translate(-8vw, 8vh) rotate(-10deg) scale(0.9); }
+  60% { transform: translate(-3vw, 22vh) rotate(8deg) scale(0.9); }
+  80% { transform: translate(4vw, 10vh) rotate(-14deg) scale(0.9); }
+}
+@keyframes mariposaC {
+  0%, 100% { transform: translate(0, 0) rotate(6deg) scale(0.8); }
+  35% { transform: translate(10vw, -10vh) rotate(-12deg) scale(0.8); }
+  65% { transform: translate(-6vw, -16vh) rotate(10deg) scale(0.8); }
+}
+
+/* Pools of colour behind the logo and the compass, each turning on its own. */
+.pool { will-change: transform; }
+.pool-a { animation: poolTurn 46s linear infinite; }
+.pool-b { animation: poolTurn 58s linear infinite reverse; }
+.pool-c { animation: poolTurn 34s linear infinite; }
+@keyframes poolTurn {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.06); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Logo and compass, carried along a wobbly path — never quite on a grid. */
+.wobble-a { animation: wobbleA 9s ease-in-out infinite; }
+.wobble-b { animation: wobbleB 11.5s ease-in-out infinite; }
+@keyframes wobbleA {
+  0%, 100% { transform: translate(0, 0) rotate(-3deg); }
+  20% { transform: translate(7px, -9px) rotate(1.5deg); }
+  45% { transform: translate(-3px, -14px) rotate(-1deg); }
+  70% { transform: translate(-9px, -4px) rotate(3deg); }
+  85% { transform: translate(-2px, 5px) rotate(-1deg); }
+}
+@keyframes wobbleB {
+  0%, 100% { transform: translate(0, 0) rotate(4deg); }
+  25% { transform: translate(-8px, 6px) rotate(-2deg); }
+  50% { transform: translate(5px, 12px) rotate(2deg); }
+  75% { transform: translate(10px, -3px) rotate(-3deg); }
+}
+
+/* The contact buttons stay put; what is around them moves. */
+.contact-rays {
+  animation: poolTurn 24s linear infinite;
+}
+.contact-ping {
+  animation: contactPing 2.6s ease-out infinite;
+}
+@keyframes contactPing {
+  0% { transform: scale(1); opacity: 0.55; }
+  80%, 100% { transform: scale(1.35); opacity: 0; }
+}
+.contact-ring {
+  transform-origin: 50% 0%;
+  animation: contactRing 3.2s ease-in-out infinite;
+}
+@keyframes contactRing {
+  0%, 70%, 100% { transform: rotate(0deg); }
+  74% { transform: rotate(-16deg); }
+  78% { transform: rotate(14deg); }
+  82% { transform: rotate(-10deg); }
+  86% { transform: rotate(6deg); }
+}
+.contact-spark {
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frond-sway,
+  .mariposa,
+  .mariposa-wing,
+  .pool,
+  .wobble-a,
+  .wobble-b,
+  .contact-rays,
+  .contact-ping,
+  .contact-ring,
+  .contact-spark {
+    animation: none !important;
+  }
+}

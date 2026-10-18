@@ -9,6 +9,10 @@
  *
  *   BRAND_PATCH        JSON object merged over the stored `brand`
  *   SOCIAL_RESET=true  store an empty `social-media` (no accounts, no videos)
+ *   ONLY_IF_BRAND_NAME apply the patch only while the stored brand is still
+ *                      called exactly this — a one-time rename that leaves a
+ *                      name the operator has since chosen alone. With it set,
+ *                      nothing is written unless the stored brand was read.
  *   DEST_KV_TITLE / KV_NAMESPACE_TITLE, CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
  *
  * Run only on a site's first deploy (the workflow checks); afterwards the
@@ -48,6 +52,11 @@ const main = async () => {
 
   const current = await cf(`/storage/kv/namespaces/${namespace.id}/values/brand`);
   const brand = current.ok ? await current.json().catch(() => ({})) : {};
+  const onlyIf = (process.env.ONLY_IF_BRAND_NAME || '').trim();
+  if (onlyIf && (!current.ok || String(brand?.brandName ?? '').trim() !== onlyIf)) {
+    log(`brand is "${brand?.brandName ?? '(unreadable)'}", not "${onlyIf}" — left as it is`);
+    return;
+  }
   await put('brand', { ...brand, ...patch });
   log(`brand: ${Object.keys(patch).join(', ')} set`);
 

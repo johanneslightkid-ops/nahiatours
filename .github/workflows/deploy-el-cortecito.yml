@@ -1,4 +1,4 @@
-# Deploys El Cortecito Tours — the gallery design — to its own Worker.
+# Deploys Willy Tours (branch el-cortecito) — the gallery design — to its own Worker.
 #
 # A SEPARATE SITE out of the same repository, branched from `elcortecito`
 # and never merged into any other branch (see CLAUDE.md). Its own Worker,
@@ -25,7 +25,7 @@
 # THE TOKEN is the repository's CLOUDFLARE_API_TOKEN secret (Workers Scripts:
 # Edit + Workers KV Storage: Edit), the same one every site branch uses.
 
-name: Deploy El Cortecito Tours
+name: Deploy Willy Tours (el-cortecito)
 
 # `push` is the trigger that matters. GitHub registers a `workflow_dispatch`
 # workflow only once its file has appeared on the DEFAULT branch — and `main`
@@ -235,8 +235,17 @@ jobs:
         env:
           SOCIAL_RESET: 'true'
           BRAND_PATCH: >-
-            {"brandName":"El Cortecito Tours","contactName":"Willy","phoneNumber":"+1 (809) 123 4567",
+            {"brandName":"Willy Tours","contactName":"Willy","phoneNumber":"+1 (809) 123 4567",
             "paypalMeLink":"","verifoneLink":"","azulLink":"","cardnetLink":"","brandicon":"","stripeEnabled":false}
+
+      # The site was first stubbed as "El Cortecito Tours" and is called
+      # "Willy Tours" now. Renames the stored brand only while it still has the
+      # old stub name, so a name chosen later in the admin is never overwritten.
+      - name: Rename the brand to Willy Tours (once)
+        run: node scripts/stub-brand.mjs
+        env:
+          ONLY_IF_BRAND_NAME: El Cortecito Tours
+          BRAND_PATCH: '{"brandName":"Willy Tours"}'
 
       # provision-kv → populate-local-data → sitemap → SEO → vite build.
       # provision-kv.mjs finds the namespace clone-kv just filled, by title.
@@ -340,7 +349,7 @@ jobs:
       - name: Report where it landed
         run: |
           {
-            echo "### El Cortecito Tours deployed"
+            echo "### Willy Tours (el-cortecito) deployed"
             echo ""
             echo "<https://el-cortecito.johannes-neugschwentner.workers.dev>"
             echo ""
@@ -352,6 +361,6 @@ jobs:
               echo "> [!WARNING]"
               echo "> **KV was not copied.** The site is up, reading the seed data bundled at \`/data/*.json\`."
             else
-              echo "KV: ${{ steps.kv.outputs.keys_copied }} key(s) seeded from \`${{ steps.kv.outputs.source_title }}\` into \`el-cortecito-data\` (\`${{ steps.kv.outputs.namespace_id }}\`), the other site's guests, payments and credentials withheld; brand set to El Cortecito Tours."
+              echo "KV: ${{ steps.kv.outputs.keys_copied }} key(s) seeded from \`${{ steps.kv.outputs.source_title }}\` into \`el-cortecito-data\` (\`${{ steps.kv.outputs.namespace_id }}\`), the other site's guests, payments and credentials withheld; brand set to Willy Tours."
             fi
           } >> "$GITHUB_STEP_SUMMARY"

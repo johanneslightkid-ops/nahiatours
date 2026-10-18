@@ -1,5 +1,5 @@
 /**
- * El Cortecito Tours — "La Galería".
+ * Willy Tours — "La Galería".
  *
  * The site is a walk through a painter's gallery in a colonial street. The
  * palette is borrowed from the Dominican masters rather than from a travel
