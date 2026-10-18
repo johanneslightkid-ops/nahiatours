@@ -8,7 +8,7 @@ import { ProfileChips } from './ProfileChips';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 import { useI18n } from '../../contexts/I18nContext';
 import { getFlowCopy } from '../../planner/flowCopy';
-import { useMediaQuery } from '../../lib/useMediaQuery';
+import { primeVoiceGuide } from './VoiceGuide';
 
 /** Slow drifting strip of real catalogue photography behind the intro. */
 const CatalogueDrift: React.FC<{ images: string[] }> = ({ images }) => {
@@ -36,7 +36,6 @@ export const PlannerIntro: React.FC = () => {
   const copy = usePlannerCopy();
   const { locale } = useI18n();
   const flow = getFlowCopy(locale);
-  const touch = useMediaQuery('(pointer: coarse)');
   const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
   const images = catalogue.slice(0, 10).map((entry) => entry.tour.image).filter(Boolean);
@@ -69,6 +68,8 @@ export const PlannerIntro: React.FC = () => {
               onMouseEnter={() => playHoverFx()}
               onClick={() => {
                 playClickFx();
+                // The guide left on last time: this tap claims the speaker.
+                primeVoiceGuide();
                 start();
               }}
               className="planner-cta !px-8 !py-4 !text-base"
@@ -81,6 +82,7 @@ export const PlannerIntro: React.FC = () => {
                 type="button"
                 onClick={() => {
                   playClickFx();
+                  primeVoiceGuide();
                   resume();
                 }}
                 className="planner-cta-ghost"
@@ -98,7 +100,7 @@ export const PlannerIntro: React.FC = () => {
             {flow.minutes('6–8')}
           </p>
 
-          {touch && canSpeak && (
+          {canSpeak && (
             <p className="mt-3 flex max-w-xl items-start gap-2 text-sm leading-snug text-paper/80">
               <span aria-hidden="true">🎙️</span>
               {flow.voiceTeaser}
