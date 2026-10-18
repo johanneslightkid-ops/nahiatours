@@ -56,8 +56,9 @@ const NightSky: React.FC = () => (
   </div>
 );
 
-const HERO_BACKGROUND_IMAGE = '/imgs/tours/tour_saona_island_detail_12.jpg';
-const HERO_BACKGROUND_VIDEO = '/buggy.mp4';
+// The poster is the video's own first frame, so nothing jumps when it starts.
+const HERO_BACKGROUND_IMAGE = '/videos/partyboat-poster.jpg';
+const HERO_BACKGROUND_VIDEO = '/videos/partyboat.webm';
 
 const Home: React.FC = () => {
   const { brandSettings } = useBrand();

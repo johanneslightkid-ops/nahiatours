@@ -13,6 +13,11 @@
  *                      called exactly this — a one-time rename that leaves a
  *                      name the operator has since chosen alone. With it set,
  *                      nothing is written unless the stored brand was read.
+ *   ONLY_IF_HERO_URLS  comma-separated: apply the patch only while the stored
+ *                      heroMedia still begins with exactly these URLs — a
+ *                      one-time swap of seeded media that leaves anything
+ *                      chosen since in the admin alone. Same rule: nothing is
+ *                      written unless the stored brand was read.
  *   DEST_KV_TITLE / KV_NAMESPACE_TITLE, CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
  *
  * Run only on a site's first deploy (the workflow checks); afterwards the
@@ -56,6 +61,14 @@ const main = async () => {
   if (onlyIf && (!current.ok || String(brand?.brandName ?? '').trim() !== onlyIf)) {
     log(`brand is "${brand?.brandName ?? '(unreadable)'}", not "${onlyIf}" — left as it is`);
     return;
+  }
+  const heroUrls = (process.env.ONLY_IF_HERO_URLS || '').split(',').map((url) => url.trim()).filter(Boolean);
+  if (heroUrls.length) {
+    const stored = current.ok && Array.isArray(brand?.heroMedia) ? brand.heroMedia.map((item) => String(item?.url ?? '').trim()) : null;
+    if (!stored || heroUrls.some((url, index) => stored[index] !== url)) {
+      log(`hero media is ${stored ? stored.join(', ') : '(unreadable)'}, not ${heroUrls.join(', ')} — left as it is`);
+      return;
+    }
   }
   await put('brand', { ...brand, ...patch });
   log(`brand: ${Object.keys(patch).join(', ')} set`);

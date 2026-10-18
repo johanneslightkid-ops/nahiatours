@@ -346,6 +346,22 @@ jobs:
           # not substituted for them.
           command: deploy --var BUILD_COMMIT:${{ github.sha }} --var BUILD_TIME:${{ github.event.repository.updated_at }}
 
+      # The hero was seeded with the buggy footage and a Saona shore photo
+      # every site started from. Swaps them for this site's own: the painted
+      # party boat, and the real boat on the water beside it. Only while the
+      # stored hero still holds exactly those seeded two, so media chosen in
+      # the admin is never overwritten; after the deploy, so the new files are
+      # already served when the stored brand starts naming them.
+      - name: Put the party boat in the hero (once)
+        run: node scripts/stub-brand.mjs
+        env:
+          ONLY_IF_HERO_URLS: /buggy.mp4,/imgs/tours/tour_saona_island_detail_9.jpg
+          BRAND_PATCH: >-
+            {"heroMedia":[
+            {"url":"/videos/partyboat.webm","type":"video","alt":"A party boat off El Cortecito, painted"},
+            {"url":"/imgs/tours/tour_party_boat_detail_9.jpg","type":"image","alt":"The party boat, Bávaro"},
+            {"url":"/imgs/tours/tour_speed_boat_detail_5.jpg","type":"image","alt":"Caribbean speedboat"}]}
+
       - name: Report where it landed
         run: |
           {

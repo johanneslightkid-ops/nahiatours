@@ -8,7 +8,8 @@
   "cardnetLink": "",
   "brandicon": "",
   "heroMedia": [
-    { "url": "/imgs/tours/tour_saona_island_detail_9.jpg", "type": "image", "alt": "Saona Island shore" },
+    { "url": "/videos/partyboat.webm", "type": "video", "alt": "A party boat off El Cortecito, painted" },
+    { "url": "/imgs/tours/tour_party_boat_detail_9.jpg", "type": "image", "alt": "The party boat, Bávaro" },
     { "url": "/imgs/tours/tour_speed_boat_detail_5.jpg", "type": "image", "alt": "Caribbean speedboat" }
   ]
 }

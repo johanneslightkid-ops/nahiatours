@@ -43,7 +43,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
       ? brandSettings.heroMedia
       : [
           { url: backgroundImage, type: 'image', alt: 'Saona Island shore' },
-          ...(backgroundVideo ? [{ url: backgroundVideo, type: 'video' as const, alt: 'Adventure in Punta Cana' }] : []),
+          ...(backgroundVideo ? [{ url: backgroundVideo, type: 'video' as const, alt: 'A party boat off El Cortecito, painted' }] : []),
         ];
   const showVideo = useDeferredVideo(media.some((item) => item.type === 'video'));
   const [ratingBadge, setRatingBadge] = useState<{ average: number } | null>(null);
@@ -71,9 +71,21 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
   const image = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
   const frames = media.slice(0, 3);
 
+  // A WebM gets an MP4 beside it for the Safaris that cannot play one; a
+  // missing MP4 costs nothing where the WebM plays. Keyed by URL because a
+  // <video> does not reload when only its <source> children change.
   const renderMedia = (item: HeroMediaItem, className: string) =>
     item.type === 'video' && showVideo ? (
-      <video className={className} src={item.url} autoPlay muted loop playsInline preload="metadata" poster={image} aria-label={item.alt || undefined} />
+      <video key={item.url} className={className} autoPlay muted loop playsInline preload="metadata" poster={image} aria-label={item.alt || undefined}>
+        {/\.webm$/i.test(item.url) ? (
+          <>
+            <source src={item.url} type="video/webm" />
+            <source src={item.url.replace(/\.webm$/i, '.mp4')} type="video/mp4" />
+          </>
+        ) : (
+          <source src={item.url} />
+        )}
+      </video>
     ) : (
       <img src={item.type === 'video' ? image : item.url} alt={item.alt || ''} className={className} />
     );
