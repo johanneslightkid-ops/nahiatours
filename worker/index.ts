@@ -46,6 +46,7 @@ import { onRequest as handlePayAttempt, sweepOverdue } from '../functions/api/pa
 import { onRequest as handleActivity } from '../functions/api/activity';
 import { onRequest as handleSendSummary } from '../functions/api/send-summary';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
+import { robotsResponse, sitemapResponse, withPageSeo } from '../shared/seo';
 
 export interface Env {
   /** Static assets binding, declared in wrangler.toml. */
@@ -145,19 +146,26 @@ export default {
       return redirect;
     }
 
+    // Built from live data, so a tour added in the admin is in the sitemap
+    // at once, and both always name the site's own address (SITE_URL).
+    if (url.pathname === '/sitemap.xml') return withPreviewHeaders(await sitemapResponse(env, url), url.hostname, env);
+    if (url.pathname === '/robots.txt') return robotsResponse(env, url);
+
     const serveAsset = () => env.ASSETS.fetch(request);
     const waitUntil = ctx ? (promise: Promise<unknown>) => ctx.waitUntil(promise) : undefined;
     const handler = resolveHandler(url);
+    // Pages get their own title, description, canonical and structured data
+    // (shared/seo.ts); API responses and files pass through untouched.
     const response = handler
       ? await handler({ request, env, next: serveAsset, waitUntil })
-      : await serveAsset();
+      : await withPageSeo(request, await serveAsset(), env);
 
     if (ctx && handler && Date.now() - lastSweep > SWEEP_EVERY_MS) {
       lastSweep = Date.now();
       ctx.waitUntil(sweepOverdue(env).catch((error) => console.warn('[sweep]', error)));
     }
 
-    return withPreviewHeaders(response, url.hostname);
+    return withPreviewHeaders(response, url.hostname, env);
   },
 
   /** For a `[triggers] crons` entry, should one ever be added to wrangler.toml. */

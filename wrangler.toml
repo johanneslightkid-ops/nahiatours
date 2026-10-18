@@ -117,6 +117,12 @@ id = "54f379d5f9fb47209fa78b819bccc834"
 # settings — nothing reads them but the health endpoint.
 SITE = "el-cortecito"
 SITE_BRANCH = "el-cortecito"
+# The address search engines should find this site under: every canonical
+# link, sitemap entry and social card points here (shared/seo.ts), and a
+# workers.dev host that is not this address is kept out of the index.
+SITE_URL = "https://el-cortecito.johannes-neugschwentner.workers.dev"
+# The language the site opens in, and so the language of its page titles.
+SITE_LOCALE = "en"
 
 ADMIN_PASSWORD = "admin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"
