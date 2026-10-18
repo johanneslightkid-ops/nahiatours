@@ -15,6 +15,8 @@ import PlaceAutocomplete from '../components/PlaceAutocomplete';
 import DateTimePicker from '../components/ui/DateTimePicker';
 import MobileNumberPicker from '../components/ui/MobileNumberPicker';
 import RouteMap from '../components/RouteMap';
+import AddToCartButton from '../components/cart/AddToCartButton';
+import { startAttempt } from '../lib/paymentAttempt';
 import { getPaymentsReady, postToGateway, startCardCheckout } from '../services/paymentService';
 import { isPaymentMethodVisible } from '../utils/paymentMethods';
 
@@ -248,6 +250,11 @@ const Transport: React.FC = () => {
   const cardVisible = isPaymentMethodVisible(brandSettings, 'card', stripeReady);
   const paypalVisible = isPaymentMethodVisible(brandSettings, 'paypal');
 
+  const shortPlace = (label: string) => label.split(',')[0].trim();
+  const transferTitle = priceResult
+    ? `${locale === 'es' ? 'Traslado' : locale === 'de' ? 'Transfer' : locale === 'fr' ? 'Transfert' : 'Transfer'}: ${shortPlace(priceResult.originLabel)} → ${shortPlace(priceResult.destinationLabel)}`
+    : '';
+
   const handlePayWithPayPal = useCallback(() => {
     if (!priceResult) return;
     const total = priceResult.estimatedPrice;
@@ -257,8 +264,17 @@ const Transport: React.FC = () => {
     if (!paypalUrl) return;
     const separator = paypalUrl.endsWith('/') ? '' : '/';
     const url = total > 0 ? `${paypalUrl}${separator}${total}` : paypalUrl;
+    startAttempt({
+      method: 'paypal',
+      source: 'direct',
+      total,
+      items: [{ title: transferTitle, date: [departureDate, departureTime].filter(Boolean).join(' '), persons: form.passengers, total, category: 'transport' }],
+      contact: { whatsapp: true, email: false, call: false },
+      locale,
+      retryUrl: url,
+    });
     window.open(url, '_blank');
-  }, [priceResult, brandSettings.paypalMeLink]);
+  }, [priceResult, brandSettings.paypalMeLink, transferTitle, departureDate, departureTime, form.passengers, locale]);
 
   /**
    * Pay for a transfer by card.
@@ -286,13 +302,21 @@ const Transport: React.FC = () => {
         locale,
         returnPath: '/transport',
       });
+      startAttempt({
+        method: 'card',
+        source: 'direct',
+        total: priceResult.estimatedPrice,
+        items: [{ title: transferTitle, date: [departureDate, departureTime].filter(Boolean).join(' '), persons: form.passengers, total: priceResult.estimatedPrice, category: 'transport' }],
+        contact: { whatsapp: true, email: false, call: false },
+        locale,
+      });
       if (start.kind === 'redirect') window.location.href = start.url;
       else postToGateway(start.action, start.fields);
     } catch (error: any) {
       setStartingCard(false);
       setCardError(error?.message || 'Could not start the card payment.');
     }
-  }, [priceResult, originAddress, destAddress, departureDate, locale]);
+  }, [priceResult, originAddress, destAddress, departureDate, departureTime, form.passengers, transferTitle, locale]);
 
   const handleOriginSelect = useCallback((place: { placeId: string; address: string; lat: number; lng: number }) => {
     setOriginAddress(place.address);
@@ -771,6 +795,24 @@ const Transport: React.FC = () => {
                   >
                     📱 <FormattedMessage id="transport.bookNow" defaultMessage="Book via WhatsApp" />
                   </button>
+
+                  {priceResult && !priceError && (
+                    <AddToCartButton
+                      locale={locale}
+                      item={() => ({
+                        category: 'transport',
+                        title: transferTitle,
+                        detailsPath: '/transport',
+                        date: departureDate || undefined,
+                        time: departureTime || undefined,
+                        persons: Math.max(1, form.passengers),
+                        fixedTotal: priceResult.estimatedPrice,
+                        place: `${shortPlace(priceResult.originLabel)} → ${shortPlace(priceResult.destinationLabel)}`,
+                        duration: priceResult.durationMinutes ? `${Math.floor(priceResult.durationMinutes / 60) ? `${Math.floor(priceResult.durationMinutes / 60)} h ` : ''}${Math.round(priceResult.durationMinutes % 60)} min` : undefined,
+                        key: `transport:${shortPlace(priceResult.originLabel)}>${shortPlace(priceResult.destinationLabel)}:${tripType}:${departureDate || 'any'}`.toLowerCase(),
+                      })}
+                    />
+                  )}
 
                   {priceResult && !priceError && cardVisible && (
                     <button

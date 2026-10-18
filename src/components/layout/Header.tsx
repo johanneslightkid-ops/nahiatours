@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import AdminNav from './AdminNav';
+import CartBadge from '../cart/CartBadge';
 import { showsBrandName } from '../../lib/brandDisplay';
 import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
-import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks, MdSettings } from 'react-icons/md';
+import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks, MdShoppingCart, MdSettings } from 'react-icons/md';
 import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaSignOutAlt } from 'react-icons/fa';
 import LanguageSwitcher from '../LanguageSwitcher';
 import SoundToggle from '../SoundToggle';
@@ -116,13 +117,14 @@ const Header: React.FC = () => {
         </Link>
 
         <button
-          className="grid h-11 w-11 place-items-center rounded-full border border-[rgba(150,112,31,0.5)] bg-gradient-to-br from-canvas-lift to-mango-light text-ink shadow-oil-sm transition hover:from-mango-light hover:to-ochre md:hidden"
+          className="relative grid h-11 w-11 place-items-center rounded-full border border-[rgba(150,112,31,0.5)] bg-gradient-to-br from-canvas-lift to-mango-light text-ink shadow-oil-sm transition hover:from-mango-light hover:to-ochre md:hidden"
           onClick={() => {
             playClickFx();
             setIsMenuOpen(!isMenuOpen);
           }}
           aria-label="Toggle navigation"
         >
+          <CartBadge className="absolute -right-1 -top-1" />
           {isMenuOpen ? <HiX className="h-8 w-8" /> : <HiMenu className="h-8 w-8" />}
         </button>
 
@@ -172,6 +174,13 @@ const Header: React.FC = () => {
               <NavLink to="/contact#top" onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
                 <MdEmail />
                 <FormattedMessage id="nav.contact" />
+              </NavLink>
+              <NavLink to="/cart#top" onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
+                <span className="relative inline-flex">
+                  <MdShoppingCart />
+                  <CartBadge className="absolute -right-3 -top-3" />
+                </span>
+                <FormattedMessage id="nav.cart" defaultMessage="Cart" />
               </NavLink>
             </>
           )}

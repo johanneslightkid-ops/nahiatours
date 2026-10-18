@@ -10,6 +10,8 @@ import { PlannerProvider } from './contexts/PlannerContext';
 // Asks how it went when a guest comes back from WhatsApp; the prompt itself
 // is only fetched when there is something to ask.
 import WhatsAppReturnGate from './components/WhatsAppReturnGate';
+// Asks "did the payment go through?" when a guest comes back from paying.
+import PaymentConfirmGate from './components/payment/PaymentConfirmGate';
 
 /**
  * Every route but the home page is split out.
@@ -30,6 +32,7 @@ const Blog = lazy(() => import('./pages/Blog'));
 const ServiceDetails = lazy(() => import('./pages/ServiceDetails'));
 const AdminTransport = lazy(() => import('./pages/AdminTransport'));
 const PlanMyDay = lazy(() => import('./pages/PlanMyDay'));
+const Cart = lazy(() => import('./pages/Cart'));
 // The receipt shown when a guest comes back from Stripe, AZUL or CardNET.
 // Lazy like every other non-home route: nobody lands here first.
 const PaymentReturn = lazy(() => import('./components/PaymentReturn'));
@@ -72,6 +75,7 @@ const App = () => {
 
           <ScrollToHash />
           <PaymentReturnGate />
+          <PaymentConfirmGate />
           <WhatsAppReturnGate />
           <Header />
           <main id="top" className="relative z-20 flex-grow">
@@ -84,6 +88,7 @@ const App = () => {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/details/:category/:id" element={<ServiceDetails />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/cart" element={<Cart />} />
                 <Route path="/payment/return" element={<PaymentReturn />} />
                 <Route path="/admin" element={<ProtectedRoute component={Admin} />} />
                 <Route path="/admin/transport" element={<ProtectedRoute component={AdminTransport} />} />

@@ -34,6 +34,11 @@ export interface BookingRequest {
   locale?: string;
   /** Where to send the guest back to, e.g. "/tours". Path only. */
   returnPath?: string;
+  /**
+   * A whole shopping cart in one payment. Each item is priced exactly as a
+   * booking of its own would be, and the payment is their sum.
+   */
+  items?: BookingRequest[];
 }
 
 export interface PricedBooking {
@@ -189,6 +194,7 @@ export const priceBooking = async (
   env: CatalogueEnv,
   body: BookingRequest
 ): Promise<{ ok: true; booking: PricedBooking } | { ok: false; error: string }> => {
+  if (Array.isArray(body.items) && body.items.length > 0) return priceCart(env, body);
   let persons = Math.max(1, Math.min(60, Math.floor(Number(body.persons) || 1)));
   const title = String(body.title ?? '').trim().slice(0, 120) || 'Excursion';
 
@@ -234,6 +240,59 @@ export const priceBooking = async (
       total,
       priceSource: recordUnit || byRate ? 'catalogue' : 'client',
       ...(byRate ? { breakdown: byRate.breakdown } : {}),
+    },
+  };
+};
+
+/** Most a single cart can hold; a person planning a holiday has a handful. */
+export const MAX_CART_ITEMS = 12;
+
+/**
+ * Price a cart: every item through priceBooking on its own (so a cart can
+ * never be cheaper than the same bookings made one by one), summed.
+ */
+const priceCart = async (
+  env: CatalogueEnv,
+  body: BookingRequest
+): Promise<{ ok: true; booking: PricedBooking } | { ok: false; error: string }> => {
+  const items = (body.items ?? []).slice(0, MAX_CART_ITEMS + 1);
+  if (items.length > MAX_CART_ITEMS) return { ok: false, error: 'That is more items than one payment can take.' };
+
+  let total = 0;
+  let persons = 0;
+  let allCatalogue = true;
+  const lines: string[] = [];
+  const dates: string[] = [];
+  for (const item of items) {
+    const priced = await priceBooking(env, { ...item, items: undefined, locale: body.locale ?? item.locale });
+    if (!priced.ok) return { ok: false, error: `${String(item.title ?? 'An item').slice(0, 60)}: ${priced.error}` };
+    total += priced.booking.total;
+    persons += priced.booking.persons;
+    if (priced.booking.priceSource !== 'catalogue') allCatalogue = false;
+    if (priced.booking.date) dates.push(priced.booking.date);
+    lines.push(`${priced.booking.title} (${priced.booking.persons} × US$${priced.booking.unitPrice.toFixed(2)})`);
+  }
+  total = Math.round(total * 100) / 100;
+  if (total < MIN_TOTAL || total > MAX_TOTAL) {
+    return { ok: false, error: 'That total is outside the range this site can charge.' };
+  }
+
+  const title =
+    String(body.title ?? '').trim().slice(0, 120) ||
+    (items.length === 1 ? lines[0] : `${items.length} bookings`).slice(0, 120);
+  return {
+    ok: true,
+    booking: {
+      title,
+      persons,
+      date: [...new Set(dates)].join(', ').slice(0, 80),
+      category: 'cart',
+      locale: ['es', 'de', 'fr'].includes(String(body.locale)) ? String(body.locale) : 'en',
+      returnPath: safeReturnPath(body.returnPath),
+      unitPrice: persons ? Math.round((total / persons) * 100) / 100 : total,
+      total,
+      priceSource: allCatalogue ? 'catalogue' : 'client',
+      breakdown: lines.join(' · ').slice(0, 480),
     },
   };
 };
