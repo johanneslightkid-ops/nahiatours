@@ -8,6 +8,7 @@ import { useI18n } from '../contexts/I18nContext';
 import { localeText } from '../lib/localeText';
 import { readGuest, rememberGuest } from '../lib/guestMemory';
 import { submitContactRequest } from '../services/contactRequestService';
+import { openWhatsAppQuietly } from '../lib/whatsappReturn';
 
 /**
  * The contact form keeps the message first and talks second.
@@ -45,10 +46,11 @@ const ContactForm = () => {
     setError('');
     rememberGuest({ name, email, phone });
 
-    // WhatsApp first, inside the click, so the browser does not block it.
+    // WhatsApp first, inside the click, so the browser does not block it —
+    // quietly: the message is stored, so there is nothing to ask on return.
     const text = `${localeText(locale, { en: 'Hello, my name is', es: 'Hola, mi nombre es', de: 'Hallo, ich heiße', fr: 'Bonjour, je m’appelle' })} ${name}. Email: ${email}. ${localeText(locale, { en: 'Phone', es: 'Teléfono', de: 'Telefon', fr: 'Téléphone' })}: ${phone}.\n\n${message}`;
     const whatsappUrl = generateWhatsAppMessage(brandSettings.phoneNumber, text);
-    if (whatsappUrl) window.open(whatsappUrl, '_blank');
+    if (whatsappUrl) openWhatsAppQuietly(whatsappUrl);
 
     submitContactRequest({ kind: 'message', name, email, phone, message, website, locale })
       .then(() => setState(whatsappUrl ? 'sent' : 'stored'))
