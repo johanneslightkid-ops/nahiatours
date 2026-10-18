@@ -271,23 +271,54 @@ jobs:
       # every existing site takes. Does nothing once the Worker exists.
       - name: Make sure the Worker exists
         run: |
-          node --input-type=module -e '
-            const token = process.env.CLOUDFLARE_API_TOKEN;
-            const account = process.env.CLOUDFLARE_ACCOUNT_ID;
-            const name = "el-cortecito";
-            const base = `https://api.cloudflare.com/client/v4/accounts/${account}/workers/scripts/${name}`;
-            const head = await fetch(`${base}/settings`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
-            if (head.success) { console.log(`${name} exists.`); process.exit(0); }
-            console.log(`${name} not found (${JSON.stringify(head.errors)}); creating a placeholder.`);
-            const form = new FormData();
-            form.append("metadata", new Blob([JSON.stringify({ main_module: "index.js", compatibility_date: "2024-05-01" })], { type: "application/json" }));
-            form.append("index.js", new Blob(["export default { fetch() { return new Response(\"El Cortecito Tours is on its way.\"); } };"], { type: "application/javascript+module" }), "index.js");
-            const put = await fetch(base, { method: "PUT", headers: { Authorization: `Bearer ${token}` }, body: form }).then((r) => r.json());
-            console.log(JSON.stringify({ success: put.success, errors: put.errors, messages: put.messages }));
-            if (!put.success) process.exit(1);
-            const sub = await fetch(`${base}/subdomain`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ enabled: true }) }).then((r) => r.json());
-            console.log("workers.dev:", JSON.stringify({ success: sub.success, errors: sub.errors }));
-          '
+          cat > /tmp/ensure-worker.mjs <<'JS'
+          const token = process.env.CLOUDFLARE_API_TOKEN;
+          const account = process.env.CLOUDFLARE_ACCOUNT_ID;
+          const name = 'el-cortecito';
+          const api = `https://api.cloudflare.com/client/v4/accounts/${account}`;
+          const call = async (path, init = {}) => {
+            const response = await fetch(`${api}${path}`, { ...init, headers: { Authorization: `Bearer ${token}`, ...(init.headers || {}) } });
+            const body = await response.json().catch(() => ({}));
+            console.log(`${init.method || 'GET'} ${path} → ${response.status} ${JSON.stringify({ success: body.success, errors: body.errors })}`);
+            return body;
+          };
+          const placeholder = 'export default { fetch() { return new Response("El Cortecito Tours is on its way."); } };';
+
+          const settings = await call(`/workers/scripts/${name}/settings`);
+          if (settings.success) { console.log(`${name} exists with content.`); process.exit(0); }
+
+          // A Worker with no versions: a shell left by an earlier failed
+          // deploy. Remove it so the name can be created cleanly.
+          const list = await call('/workers/workers?per_page=100');
+          const shell = (list.result || []).find((worker) => worker.name === name);
+          if (shell) {
+            console.log(`shell: ${JSON.stringify({ id: shell.id, created_on: shell.created_on, deployed_on: shell.deployed_on })}`);
+            if (!shell.deployed_on) await call(`/workers/workers/${shell.id}`, { method: 'DELETE' });
+          }
+
+          const form = new FormData();
+          form.append('metadata', new Blob([JSON.stringify({ main_module: 'index.js', compatibility_date: '2024-05-01' })], { type: 'application/json' }));
+          form.append('index.js', new Blob([placeholder], { type: 'application/javascript+module' }), 'index.js');
+          const put = await call(`/workers/scripts/${name}`, { method: 'PUT', body: form });
+          if (!put.success) {
+            // The new Workers API: create the Worker, give it a version, deploy it.
+            let worker = (await call('/workers/workers?per_page=100')).result?.find((w) => w.name === name);
+            if (!worker) worker = (await call('/workers/workers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) })).result;
+            if (!worker) process.exit(1);
+            const version = await call(`/workers/workers/${worker.id}/versions?deploy=true`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                compatibility_date: '2024-05-01',
+                main_module: 'index.js',
+                modules: [{ name: 'index.js', content_type: 'application/javascript+module', content_base64: Buffer.from(placeholder).toString('base64') }],
+              }),
+            });
+            if (!version.success) process.exit(1);
+          }
+          await call(`/workers/scripts/${name}/subdomain`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: true }) });
+          JS
+          node /tmp/ensure-worker.mjs
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
