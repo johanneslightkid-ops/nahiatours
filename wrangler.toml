@@ -119,6 +119,12 @@ id = "9f66ad41f7c0469fb1178d3de75b0e68"
 # settings — nothing reads them but the health endpoint.
 SITE = "transporturist"
 SITE_BRANCH = "transporturist"
+# The address search engines should find this site under: every canonical
+# link, sitemap entry and social card points here (shared/seo.ts), and a
+# workers.dev host that is not this address is kept out of the index.
+SITE_URL = "https://transporturist.johannes-neugschwentner.workers.dev"
+# The language the site opens in, and so the language of its page titles.
+SITE_LOCALE = "en"
 
 ADMIN_PASSWORD = "admin"
 CLOUDINARY_CLOUD_NAME = "dkxlhxpe4"

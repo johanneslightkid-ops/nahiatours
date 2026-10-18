@@ -40,9 +40,27 @@ export const canonicalRedirect = (url: URL, env: CanonicalEnv = {}): Response | 
   return Response.redirect(`https://${configured}${url.pathname}${url.search}`, 301);
 };
 
-/** Keep preview deployments out of search results. */
-export const withPreviewHeaders = (response: Response, hostname: string): Response => {
-  if (!isPreviewHost(hostname)) {
+/**
+ * Keep previews and duplicates out of search results.
+ *
+ * A local or pages.dev host is always a preview. A workers.dev host is the
+ * site itself for a site that has no domain of its own — and those used to be
+ * marked noindex like any preview, which kept four of the sites out of search
+ * altogether. Now a workers.dev host is kept out only when SITE_URL names a
+ * different address for the site (its own domain): there it is a duplicate.
+ */
+export const withPreviewHeaders = (response: Response, hostname: string, env: CanonicalEnv & { SITE_URL?: string } = {}): Response => {
+  let siteHost = '';
+  try {
+    siteHost = env.SITE_URL ? new URL(/^https?:\/\//i.test(env.SITE_URL) ? env.SITE_URL : `https://${env.SITE_URL}`).hostname : '';
+  } catch {
+    siteHost = '';
+  }
+  const preview =
+    LOCAL_HOSTS.has(hostname) ||
+    hostname.endsWith('.pages.dev') ||
+    (hostname.endsWith('.workers.dev') && Boolean(siteHost) && hostname !== siteHost);
+  if (!preview) {
     return response;
   }
   const headers = new Headers(response.headers);
