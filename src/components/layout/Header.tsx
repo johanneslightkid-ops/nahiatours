@@ -2,9 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks } from 'react-icons/md';
+import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks, MdShoppingCart } from 'react-icons/md';
 import { HiSparkles } from 'react-icons/hi';
 import AdminNav from './AdminNav';
+import CartBadge from '../cart/CartBadge';
 import { onNavLinkClick } from '../../lib/navScroll';
 import { showsBrandName } from '../../lib/brandDisplay';
 import AdminLanguageSelect from '../admin/AdminLanguageSelect';
@@ -53,6 +54,16 @@ const NAV: NavItem[] = [
   { to: '/blog', id: 'nav.blog', fallback: 'Blog', icon: <MdLibraryBooks />, note: { en: 'stories', es: 'historias', fr: 'histoires', de: 'Geschichten' }, match: (p) => p.startsWith('/blog') },
   { to: '/contact', id: 'nav.contact', fallback: 'Contact', icon: <MdEmail />, note: { en: 'say hola', es: 'di hola', fr: 'dites hola', de: 'sag hallo' }, match: (p) => p.startsWith('/contact') },
 ];
+
+/** The cart hangs at the end of the vine, a little shorter than the rest. */
+const CART: NavItem = {
+  to: '/cart',
+  id: 'nav.cart',
+  fallback: 'Cart',
+  icon: <MdShoppingCart />,
+  note: { en: 'my trip', es: 'mi viaje', fr: 'mon voyage', de: 'meine Reise' },
+  match: (p) => p.startsWith('/cart'),
+};
 
 const STRINGS = [22, 40, 28, 46, 30, 38];
 
@@ -195,7 +206,7 @@ const Signpost: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           transition={{ type: 'spring', stiffness: 120, damping: 18 }}
         />
         <div className="relative z-10 flex w-full flex-col gap-4">
-          {NAV.map((item, i) => {
+          {[...NAV, CART].map((item, i) => {
             const pointsRight = i % 2 === 0;
             const active = item.match(location.pathname);
             return (
@@ -238,6 +249,7 @@ const Signpost: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     <span className="flex flex-col leading-none">
                       <span className="font-display text-xl font-bold">
                         <FormattedMessage id={item.id} defaultMessage={item.fallback} />
+                        {item === CART && <CartBadge className="ml-2 align-middle" />}
                       </span>
                       <span className={`font-accent text-base ${active ? 'text-white/85' : 'text-ink/60'}`}>{item.note[locale]}</span>
                     </span>
@@ -401,6 +413,38 @@ const Header: React.FC = () => {
                   </motion.div>
                 );
               })}
+              <motion.div
+                className="flex flex-col items-center"
+                style={{ transformOrigin: '50% 0%', marginTop: ROPE_LIFT }}
+                initial={reduced ? false : { y: -140 }}
+                animate={{ y: 0 }}
+                transition={{ type: 'spring', stiffness: 110, damping: 10, delay: 0.1 + NAV.length * 0.07 }}
+              >
+                <motion.div
+                  className="flex flex-col items-center"
+                  style={{ transformOrigin: '50% 0%' }}
+                  whileHover={reduced ? undefined : { rotate: [0, 9, -7, 4, -2, 0], transition: { duration: 1.6 } }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="rope-string" style={{ height: `calc(18px + ${ROPE_EXTRA})` }} />
+                  <Link
+                    to={CART.to}
+                    onClick={(event) => {
+                      playClickFx();
+                      onNavLinkClick(event, CART.to, location.pathname);
+                    }}
+                    onMouseEnter={() => playHoverFx()}
+                    aria-current={CART.match(location.pathname) ? 'page' : undefined}
+                    data-active={CART.match(location.pathname)}
+                    className="vine-tag vine-tag-item-1 relative"
+                  >
+                    <span className="vine-tag-icon">{CART.icon}</span>
+                    <FormattedMessage id={CART.id} defaultMessage={CART.fallback} />
+                    <span className="vine-tag-note">{CART.note[locale]}</span>
+                    <CartBadge className="absolute -right-2 -top-2" />
+                  </Link>
+                </motion.div>
+              </motion.div>
               <div className="ml-2 mt-4 flex items-center gap-2">
                 <LanguageSwitcher />
               </div>
@@ -412,6 +456,11 @@ const Header: React.FC = () => {
       {/* The full-page signpost remains a mobile-only menu. */}
       <div className="fixed right-3 top-3 z-[70] lg:hidden">
         <LifeRing open={menuOpen} label={ringLabel} onClick={() => { playClickFx(); setMenuOpen((v) => !v); }} />
+        {!menuOpen && (
+          <Link to="/cart" aria-label="Cart" className="absolute -left-1 top-0 no-underline" onClick={() => playClickFx()}>
+            <CartBadge />
+          </Link>
+        )}
       </div>
 
       <AnimatePresence>{menuOpen && <Signpost onClose={closeMenu} />}</AnimatePresence>

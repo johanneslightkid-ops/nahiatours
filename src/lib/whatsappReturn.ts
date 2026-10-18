@@ -9,6 +9,8 @@
  * the message it carried; the return prompt reads that note.
  */
 
+import { track } from './activity';
+
 export interface WhatsAppDeparture {
   at: number;
   /** The message the guest set off with, decoded. */
@@ -33,6 +35,8 @@ const messageOf = (url: string): string => {
 export const noteDeparture = (url: string) => {
   try {
     const departure: WhatsAppDeparture = { at: Date.now(), text: messageOf(url).slice(0, 1500), path: window.location.pathname };
+    // Every conversation started from the site, for the admin's activity log.
+    track('whatsapp', { from: departure.path, text: departure.text.replace(/\s+/g, ' ').slice(0, 140) });
     sessionStorage.setItem(KEY, JSON.stringify(departure));
   } catch {
     /* storage blocked: no prompt, nothing else lost */

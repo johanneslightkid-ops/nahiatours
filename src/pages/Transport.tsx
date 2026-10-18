@@ -16,6 +16,7 @@ import DateTimePicker from '../components/ui/DateTimePicker';
 import MobileNumberPicker from '../components/ui/MobileNumberPicker';
 import RouteMap from '../components/RouteMap';
 import PaymentDropdown from '../components/ui/PaymentDropdown';
+import AddToCartButton from '../components/cart/AddToCartButton';
 
 /**
  * Airport transfers — El Cortecito's own page.
@@ -739,6 +740,25 @@ const Transport: React.FC = () => {
                         buttonLabel={t('payNow', 'Book & pay now')}
                         className="w-full"
                         buttonClassName="flex w-full items-center justify-between gap-2.5 rounded-full bg-lagoon px-6 py-4 font-extrabold text-white shadow-[var(--shade)] transition hover:-translate-y-0.5 hover:bg-lagoon-dark active:translate-y-0"
+                      />
+                    )}
+                    {quoteReady && priceResult && (
+                      <AddToCartButton
+                        locale={locale}
+                        item={() => ({
+                          category: 'transport',
+                          title: paymentTitle,
+                          description: `${vehicleLabel} · ${tripLabel}`,
+                          detailsPath: '/transport',
+                          date: departureDate || undefined,
+                          time: departureTime || undefined,
+                          persons: Math.max(1, form.passengers),
+                          fixedTotal: priceResult.estimatedPrice,
+                          tier: vehicleLabel,
+                          place: `${shortPlace(priceResult.originLabel)} → ${shortPlace(priceResult.destinationLabel)}`,
+                          duration: formatDuration(priceResult.durationMinutes),
+                          key: `transport:${shortPlace(priceResult.originLabel)}>${shortPlace(priceResult.destinationLabel)}:${tripType}:${departureDate || 'any'}`.toLowerCase(),
+                        })}
                       />
                     )}
                     <button

@@ -6,6 +6,8 @@ import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { useBrand } from '../contexts/BrandContext';
 import { PricingOption, perPersonTier } from '../services/toursService';
 import PaymentDropdown from './ui/PaymentDropdown';
+import AddToCartButton from './cart/AddToCartButton';
+import { summariseDescription } from '../lib/cart';
 import MarkdownRenderer from './ui/MarkdownRenderer';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
 
@@ -60,6 +62,24 @@ const TourCard: React.FC<TourCardProps> = ({
       dateStyle: 'full',
     }).format(new Date(`${selectedDate}T00:00:00`))
     : '';
+
+  const facts = useMemo(() => summariseDescription(description), [description]);
+  /** This tour as the guest has set it up right now: day, head count, price. */
+  const cartItem = () => ({
+    category: 'tours',
+    serviceId: /\/(\d+)$/.exec(detailsPath)?.[1],
+    title,
+    image,
+    description: facts.intro,
+    detailsPath,
+    date: selectedDate || undefined,
+    persons: Math.max(1, persons),
+    unitPrice: rate.amount ?? null,
+    tier: rate.tier,
+    duration: facts.duration || undefined,
+    included: facts.included,
+    goodToKnow: facts.goodToKnow,
+  });
 
   const handlePersonsChange = (nextValue: string) => {
     setPersons(Math.max(0, Number(nextValue) || 0));
@@ -202,6 +222,7 @@ const TourCard: React.FC<TourCardProps> = ({
                   className="w-full"
                 />
               </div>
+              <AddToCartButton item={cartItem} locale={intl.locale} />
             </div>
           </div>
         )}

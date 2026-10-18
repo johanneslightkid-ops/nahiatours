@@ -41,6 +41,10 @@ import { onRequest as handleCardnetCheckout } from '../functions/api/cardnet-che
 import { onRequest as handlePayReturn } from '../functions/api/pay-return';
 import { onRequest as handlePaymentResult } from '../functions/api/payment-result';
 import { onRequest as handleContactRequest } from '../functions/api/contact-request';
+import { onRequest as handleNotifyConfig } from '../functions/api/notify-config';
+import { onRequest as handlePayAttempt, sweepOverdue } from '../functions/api/pay-attempt';
+import { onRequest as handleActivity } from '../functions/api/activity';
+import { onRequest as handleSendSummary } from '../functions/api/send-summary';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
 
 export interface Env {
@@ -49,10 +53,16 @@ export interface Env {
   [key: string]: unknown;
 }
 
+interface ExecutionContext {
+  waitUntil: (promise: Promise<unknown>) => void;
+}
+
 type RouteHandler = (context: {
   request: Request;
   env: Env;
   next: () => Promise<Response>;
+  /** Work that may outlive the response (a notification); absent in tests. */
+  waitUntil?: (promise: Promise<unknown>) => void;
 }) => Promise<Response>;
 
 const ROUTES: Record<string, RouteHandler> = {
@@ -83,6 +93,12 @@ const ROUTES: Record<string, RouteHandler> = {
   '/api/cardnet-checkout': handleCardnetCheckout,
   '/api/payment-result': handlePaymentResult,
   '/api/contact-request': handleContactRequest,
+  // The shopping cart's side of things: who to tell (and how), payment
+  // presses and their answers, what guests did, a summary by email.
+  '/api/notify-config': handleNotifyConfig,
+  '/api/pay-attempt': handlePayAttempt,
+  '/api/activity': handleActivity,
+  '/api/send-summary': handleSendSummary,
   '/api/cf-ai': handleCfAi,
   '/api/upload': handleUpload,
   '/api/social-publish': handleSocialPublish,
@@ -110,8 +126,18 @@ const resolveHandler = (url: URL): RouteHandler | undefined => {
   return undefined;
 };
 
+/**
+ * When this isolate last looked for payments nobody confirmed. There is no
+ * cron on the free plan for six sites, so the look happens in the background
+ * of ordinary API traffic, at most every few minutes per isolate. Being late
+ * by a few minutes is fine for a 30-minute timeout; a site nobody visits has
+ * nobody paying either.
+ */
+let lastSweep = 0;
+const SWEEP_EVERY_MS = 3 * 60 * 1000;
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     const redirect = canonicalRedirect(url, env);
@@ -120,11 +146,22 @@ export default {
     }
 
     const serveAsset = () => env.ASSETS.fetch(request);
+    const waitUntil = ctx ? (promise: Promise<unknown>) => ctx.waitUntil(promise) : undefined;
     const handler = resolveHandler(url);
     const response = handler
-      ? await handler({ request, env, next: serveAsset })
+      ? await handler({ request, env, next: serveAsset, waitUntil })
       : await serveAsset();
 
+    if (ctx && handler && Date.now() - lastSweep > SWEEP_EVERY_MS) {
+      lastSweep = Date.now();
+      ctx.waitUntil(sweepOverdue(env).catch((error) => console.warn('[sweep]', error)));
+    }
+
     return withPreviewHeaders(response, url.hostname);
+  },
+
+  /** For a `[triggers] crons` entry, should one ever be added to wrangler.toml. */
+  async scheduled(_event: unknown, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(sweepOverdue(env));
   },
 };

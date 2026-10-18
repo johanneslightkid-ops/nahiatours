@@ -28,6 +28,8 @@ export interface CheckoutBooking {
   locale?: string;
   /** Path on this site to come back to. Defaults to wherever we are now. */
   returnPath?: string;
+  /** A whole cart in one payment; each item is priced by the server on its own. */
+  items?: Array<Omit<CheckoutBooking, 'items' | 'locale' | 'returnPath'>>;
 }
 
 /** What Stripe says happened, as reported by /api/stripe-session. */
