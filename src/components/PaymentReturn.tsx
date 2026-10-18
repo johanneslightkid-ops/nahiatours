@@ -9,6 +9,20 @@ import {
   CheckoutResult,
   BankPaymentResult,
 } from '../services/paymentService';
+import { answerAttempt, readPendingAttempt } from '../lib/paymentAttempt';
+import { clearCart } from '../lib/cart';
+
+/**
+ * The card payment this tab set off to make, settled by the gateway's own
+ * verdict — so the "did it go through?" prompt is not asked on top of a
+ * receipt, and the operator hears the bank's answer rather than the guest's.
+ */
+const settleAttempt = (outcome: 'verified' | 'paid' | 'problem' | 'cancelled', reference: string) => {
+  const attempt = readPendingAttempt();
+  if (!attempt || !attempt.method.startsWith('card')) return;
+  void answerAttempt(attempt, outcome, { reference, sendReceipt: outcome === 'verified' && attempt.contact.email });
+  if ((outcome === 'verified' || outcome === 'paid') && attempt.clearsCart) clearCart('paid');
+};
 
 /**
  * Where the guest lands after paying.
@@ -129,6 +143,7 @@ const PaymentReturn: React.FC = () => {
   useEffect(() => {
     if (paidFlag === '0') {
       setState('cancelled');
+      settleAttempt('cancelled', incomingSession);
       return;
     }
 
@@ -151,11 +166,13 @@ const PaymentReturn: React.FC = () => {
         if (!current) return;
         if (payment === 'cancelled') {
           setState('cancelled');
+          settleAttempt('cancelled', id);
           return;
         }
         setResult(payment);
         const settled = payment.paid || payment.unverified;
         setState(settled ? 'done' : 'failed');
+        settleAttempt(payment.paid && !payment.unverified ? 'verified' : settled ? 'paid' : 'problem', id);
         if (settled && !wasNotified(id)) {
           setCountdown(COUNTDOWN_SECONDS);
         }

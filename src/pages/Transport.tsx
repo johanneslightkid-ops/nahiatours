@@ -15,6 +15,8 @@ import PlaceAutocomplete from '../components/PlaceAutocomplete';
 import DateTimePicker from '../components/ui/DateTimePicker';
 import MobileNumberPicker from '../components/ui/MobileNumberPicker';
 import RouteMap from '../components/RouteMap';
+import AddToCartButton from '../components/cart/AddToCartButton';
+import { startAttempt } from '../lib/paymentAttempt';
 
 type TripType = 'one-way' | 'round-trip';
 
@@ -228,14 +230,28 @@ const Transport: React.FC = () => {
     window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   }, [priceResult, form, hotelName, departureDate, locale, waPhone]);
 
+  const shortPlace = (label: string) => label.split(',')[0].trim();
+  const transferTitle = priceResult
+    ? `${locale === 'es' ? 'Traslado' : locale === 'de' ? 'Transfer' : locale === 'fr' ? 'Transfert' : 'Transfer'}: ${shortPlace(priceResult.originLabel)} → ${shortPlace(priceResult.destinationLabel)}`
+    : '';
+
   const handlePayWithPayPal = useCallback(() => {
     if (!priceResult) return;
     const total = priceResult.estimatedPrice;
     const paypalUrl = brandSettings.paypalMeLink || 'https://www.paypal.com/paypalme/carlostours';
     const separator = paypalUrl.endsWith('/') ? '' : '/';
     const url = total > 0 ? `${paypalUrl}${separator}${total}` : paypalUrl;
+    startAttempt({
+      method: 'paypal',
+      source: 'direct',
+      total,
+      items: [{ title: transferTitle, date: [departureDate, departureTime].filter(Boolean).join(' '), persons: form.passengers, total, category: 'transport' }],
+      contact: { whatsapp: true, email: false, call: false },
+      locale,
+      retryUrl: url,
+    });
     window.open(url, '_blank');
-  }, [priceResult, brandSettings.paypalMeLink]);
+  }, [priceResult, brandSettings.paypalMeLink, transferTitle, departureDate, departureTime, form.passengers, locale]);
 
   const handleOriginSelect = useCallback((place: { placeId: string; address: string; lat: number; lng: number }) => {
     setOriginAddress(place.address);
@@ -714,6 +730,24 @@ const Transport: React.FC = () => {
                   >
                     📱 <FormattedMessage id="transport.bookNow" defaultMessage="Book via WhatsApp" />
                   </button>
+
+                  {priceResult && !priceError && (
+                    <AddToCartButton
+                      locale={locale}
+                      item={() => ({
+                        category: 'transport',
+                        title: transferTitle,
+                        detailsPath: '/transport',
+                        date: departureDate || undefined,
+                        time: departureTime || undefined,
+                        persons: Math.max(1, form.passengers),
+                        fixedTotal: priceResult.estimatedPrice,
+                        place: `${shortPlace(priceResult.originLabel)} → ${shortPlace(priceResult.destinationLabel)}`,
+                        duration: priceResult.durationMinutes ? `${Math.floor(priceResult.durationMinutes / 60) ? `${Math.floor(priceResult.durationMinutes / 60)} h ` : ''}${Math.round(priceResult.durationMinutes % 60)} min` : undefined,
+                        key: `transport:${shortPlace(priceResult.originLabel)}>${shortPlace(priceResult.destinationLabel)}:${tripType}:${departureDate || 'any'}`.toLowerCase(),
+                      })}
+                    />
+                  )}
 
                   {priceResult && !priceError && brandSettings.paypalMeLink && (
                     <button

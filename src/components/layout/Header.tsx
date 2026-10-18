@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import AdminNav from './AdminNav';
+import CartBadge from '../cart/CartBadge';
 import { showsBrandName } from '../../lib/brandDisplay';
 import { Link, NavLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { HiMenu, HiX, HiSparkles } from 'react-icons/hi';
-import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks, MdSettings } from 'react-icons/md';
+import { MdHome, MdTour, MdLocalTaxi, MdEmail, MdLibraryBooks, MdShoppingCart, MdSettings } from 'react-icons/md';
 import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaSignOutAlt } from 'react-icons/fa';
 import LanguageSwitcher from '../LanguageSwitcher';
 import SoundToggle from '../SoundToggle';
@@ -90,7 +91,7 @@ const Header: React.FC = () => {
         </Link>
 
         <button
-          className="grid h-11 w-11 place-items-center rounded-full border border-ink/15 bg-paper-warm text-ink transition hover:border-sea md:hidden"
+          className="relative grid h-11 w-11 place-items-center rounded-full border border-ink/15 bg-paper-warm text-ink transition hover:border-sea md:hidden"
           onClick={() => {
             playClickFx();
             setIsMenuOpen(!isMenuOpen);
@@ -98,6 +99,7 @@ const Header: React.FC = () => {
           aria-label="Toggle navigation"
           aria-expanded={isMenuOpen}
         >
+          <CartBadge className="absolute -right-1 -top-1" />
           {isMenuOpen ? <HiX className="h-6 w-6" /> : <HiMenu className="h-6 w-6" />}
         </button>
 
@@ -150,6 +152,13 @@ const Header: React.FC = () => {
               <NavLink to="/contact#top" onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
                 <MdEmail className="h-4 w-4" />
                 <FormattedMessage id="nav.contact" />
+              </NavLink>
+              <NavLink to="/cart#top" onClick={handleNavClick} onMouseEnter={() => playHoverFx()} className={navClass}>
+                <span className="relative inline-flex">
+                  <MdShoppingCart className="h-4 w-4" />
+                  <CartBadge className="absolute -right-3 -top-3" />
+                </span>
+                <FormattedMessage id="nav.cart" defaultMessage="Cart" />
               </NavLink>
             </>
           )}

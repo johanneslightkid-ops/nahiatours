@@ -14,6 +14,8 @@ import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
 import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
 import ContactRequestsPanel from '../components/admin/ContactRequestsPanel';
+import NotifySettingsPanel from '../components/admin/NotifySettingsPanel';
+import SalesActivityPanel from '../components/admin/SalesActivityPanel';
 import SiteTextsAdmin from '../components/admin/SiteTextsAdmin';
 import { FaVideo, FaShareAlt, FaBook, FaRobot, FaMagic } from 'react-icons/fa';
 import { useSearchParams } from 'react-router-dom';
@@ -72,6 +74,13 @@ const Admin: React.FC = () => {
       <div className="container mx-auto space-y-8 px-4">
         {/* What guests asked for outside WhatsApp, on the page the operator opens first. */}
         {activeSection === 'brand' && <ContactRequestsPanel />}
+        {activeSection === 'sales' && (
+          <>
+            <SalesActivityPanel />
+            <ContactRequestsPanel />
+            <NotifySettingsPanel />
+          </>
+        )}
 
         {/* Brand Settings Section */}
         {activeSection === 'brand' && (
