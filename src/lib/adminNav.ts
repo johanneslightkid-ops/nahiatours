@@ -1,6 +1,6 @@
 import type { IconType } from 'react-icons';
 import { MdSettings, MdTour, MdLocalTaxi } from 'react-icons/md';
-import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaQuoteRight, FaLanguage } from 'react-icons/fa';
+import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaQuoteRight, FaLanguage, FaCashRegister } from 'react-icons/fa';
 
 /**
  * The admin menu, in one place.
@@ -33,6 +33,8 @@ export interface AdminNavItem {
 
 export const ADMIN_NAV: AdminNavItem[] = [
   { section: 'brand', icon: MdSettings, label: { en: 'Brand', es: 'Marca', fr: 'Marque', de: 'Marke' } },
+  // Payment attempts, cart activity, contact requests, and who gets told.
+  { section: 'sales', icon: FaCashRegister, label: { en: 'Sales', es: 'Ventas', fr: 'Ventes', de: 'Verkauf' } },
   { section: 'story', icon: FaBook, label: { en: 'Home', es: 'Inicio', fr: 'Accueil', de: 'Start' } },
   { section: 'tours', icon: MdTour, label: { en: 'Tours', es: 'Tours', fr: 'Tours', de: 'Touren' } },
   { section: null, path: '/admin/transport', icon: MdLocalTaxi, label: { en: 'Transport', es: 'Transporte', fr: 'Transport', de: 'Transport' } },

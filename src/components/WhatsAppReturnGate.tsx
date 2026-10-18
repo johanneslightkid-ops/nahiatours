@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { clearDeparture, installWhatsAppWatch, readDeparture, WhatsAppDeparture } from '../lib/whatsappReturn';
+import { readPendingAttempt } from '../lib/paymentAttempt';
 
 const WhatsAppReturnPrompt = lazy(() => import('./WhatsAppReturnPrompt'));
 
@@ -25,6 +26,11 @@ const WhatsAppReturnGate: React.FC = () => {
       if (document.visibilityState !== 'visible') return;
       const trip = readDeparture();
       if (!trip) return;
+      // Back from paying: the payment prompt asks the one question that matters.
+      if (readPendingAttempt()) {
+        clearDeparture();
+        return;
+      }
       const away = Date.now() - trip.at;
       if (away < MIN_AWAY_MS) return;
       clearDeparture();

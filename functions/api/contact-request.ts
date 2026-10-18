@@ -1,4 +1,5 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
+import { notifyOperator, readNotify } from '../../shared/notify';
 
 /**
  * What guests ask for outside WhatsApp: a message from the contact form, a
@@ -71,7 +72,29 @@ const readAll = async (kv: any): Promise<ContactRequest[]> => {
   }
 };
 
-export async function onRequest(context: { request: Request; env: Env }) {
+const KIND_LABEL: Record<ContactRequestKind, string> = {
+  callback: '📞 Llamar de vuelta / Call back',
+  message: '✉️ Mensaje / Message',
+  payment: '💳 Intención de pago / Payment note',
+};
+
+/** The operator's copy of a new request, on whatever channel is set up. */
+const tellOperator = async (env: Env, entry: ContactRequest) => {
+  const { config } = await readNotify(env);
+  if (!config.notifyOnRequest) return;
+  const lines = [
+    entry.name && `Nombre / Name: ${entry.name}`,
+    entry.phone && `Tel: ${entry.phone}`,
+    entry.email && `Email: ${entry.email}`,
+    entry.when && `Cuándo / When: ${entry.when}`,
+    entry.amount && `US$ ${entry.amount.toFixed(2)}`,
+    entry.context && `Sobre / About: ${entry.context}`,
+    entry.message && `\n${entry.message}`,
+  ].filter(Boolean);
+  await notifyOperator(env, `${KIND_LABEL[entry.kind]}${entry.name ? ` — ${entry.name}` : ''}`, lines.join('\n'));
+};
+
+export async function onRequest(context: { request: Request; env: Env; waitUntil?: (promise: Promise<unknown>) => void }) {
   const { request, env } = context;
   const kv = kvOf(env);
   if (!kv) return json({ error: 'Requests cannot be stored on this deployment.' }, 503);
@@ -121,6 +144,9 @@ export async function onRequest(context: { request: Request; env: Env }) {
 
     const list = await readAll(kv);
     await kv.put(KEY, JSON.stringify([entry, ...list].slice(0, KEEP)));
+    const notice = tellOperator(env, entry).catch(() => undefined);
+    if (context.waitUntil) context.waitUntil(notice);
+    else await notice;
     return json({ ok: true, id: entry.id });
   }
 
