@@ -5,7 +5,8 @@
     "tours": "Tours",
     "transport": "Transport",
     "blog": "Blog",
-    "contact": "Contact"
+    "contact": "Contact",
+    "cart": "Cart"
   },
   "hero": {
     "title": "Discover {brand}",

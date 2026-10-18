@@ -16,6 +16,8 @@ import {
 } from '../../services/paymentService';
 import { submitContactRequest } from '../../services/contactRequestService';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
+import { startAttempt } from '../../lib/paymentAttempt';
+import { getNotifyFlags } from '../../services/notifyService';
 
 /**
  * Pay an amount, any amount.
@@ -57,8 +59,11 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
   const [error, setError] = useState('');
   const [left, setLeft] = useState<'' | 'card' | 'paypal'>('');
 
+  const [guestEmail, setGuestEmail] = useState(false);
+
   useEffect(() => {
     getPaymentsReady().then(setReady);
+    getNotifyFlags().then((flags) => setGuestEmail(flags.guestEmail));
   }, []);
 
   // Arriving with an amount in the link: bring the widget into view.
@@ -92,6 +97,12 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
     opened: localeText(locale, { en: 'The payment page opened in a new tab. When you are done, let us know so we can confirm right away.', es: 'La página de pago se abrió en otra pestaña. Cuando termines, avísanos y confirmamos enseguida.', de: 'Die Zahlungsseite ist in einem neuen Tab offen. Sag uns danach Bescheid, dann bestätigen wir sofort.', fr: 'La page de paiement s’est ouverte dans un nouvel onglet. Une fois terminé, prévenez-nous pour une confirmation immédiate.' }),
     approx: (value: string) => localeText(locale, { en: `Charged as about ${value}`, es: `Se cobra aprox. ${value}`, de: `Belastet als ca. ${value}`, fr: `Débité environ ${value}` }),
     payFor: localeText(locale, { en: 'Payment', es: 'Pago', de: 'Zahlung', fr: 'Paiement' }),
+    tips: localeText(locale, {
+      en: '🧾 Keep the receipt · 📸 take a screenshot of it · ↩️ then come back to this tab and tell us it worked.',
+      es: '🧾 Guarda el recibo · 📸 hazle una captura de pantalla · ↩️ luego vuelve a esta pestaña y dinos si funcionó.',
+      de: '🧾 Beleg aufbewahren · 📸 Screenshot machen · ↩️ dann zu diesem Tab zurückkommen und Bescheid geben.',
+      fr: '🧾 Gardez le reçu · 📸 faites-en une capture · ↩️ puis revenez sur cet onglet nous dire si c’est bon.',
+    }),
   };
 
   const cardReady = Boolean(ready?.card);
@@ -121,6 +132,21 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
     }).catch(() => undefined);
   };
 
+  /** The payment the guest is leaving to make, so the site can ask how it went. */
+  const attempt = (method: string, retryUrl?: string) =>
+    startAttempt({
+      method,
+      source: 'contact',
+      total: value,
+      items: [{ title: reference.trim() || t.payFor, persons: 1, total: value, category: 'custom' }],
+      name: name.trim(),
+      email: email.trim(),
+      phone: guest.phone ?? '',
+      contact: { whatsapp: true, email: guestEmail && /@/.test(email), call: false },
+      locale,
+      retryUrl,
+    });
+
   const payByCard = async () => {
     if (!valid) return setError(t.badAmount);
     setError('');
@@ -129,7 +155,9 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
       // A payment link pasted in the admin: opened inside the click, before
       // any await, so the browser does not block it.
       if (cardLink) {
-        window.open(fillPaymentLink(cardLink, { amount: value, currency: 'USD', reference: label }).url, '_blank', 'noopener');
+        const url = fillPaymentLink(cardLink, { amount: value, currency: 'USD', reference: label }).url;
+        attempt('card-link', url);
+        window.open(url, '_blank', 'noopener');
         setLeft('card');
       }
       return;
@@ -144,6 +172,7 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
         locale,
         returnPath: '/contact',
       });
+      attempt('card');
       if (start.kind === 'redirect') window.location.href = start.url;
       else postToGateway(start.action, start.fields);
     } catch (failure: any) {
@@ -158,6 +187,7 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
     record('PayPal');
     const url = payPalUrl(brandSettings.paypalMeLink ?? '', value);
     if (url) {
+      attempt('paypal', url);
       window.open(url, '_blank', 'noopener');
       setLeft('paypal');
     }
@@ -261,6 +291,7 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
               )}
             </div>
             {error && <p className="mt-3 text-sm font-semibold text-hibiscus-dark">{error}</p>}
+            <p className="mt-3 rounded-2xl border border-mango/40 bg-mango-light/40 px-3 py-2 text-xs text-ink">{t.tips}</p>
             <p className="mt-3 flex items-start gap-1.5 text-xs text-ink-soft">
               <MdLockOutline className="mt-0.5 h-4 w-4 shrink-0" /> {t.secure}
             </p>

@@ -40,14 +40,23 @@ export const PAYMENT_SECRETS_KEY = 'payment-secrets';
  * Resources the generic data endpoint must never read or write, whatever it is
  * asked for. Everything in here holds a credential.
  */
-export const PROTECTED_RESOURCES = new Set([PAYMENT_SECRETS_KEY, 'admin-password']);
+export const PROTECTED_RESOURCES = new Set([
+  PAYMENT_SECRETS_KEY,
+  'admin-password',
+  // Guests' names, numbers and addresses, and the notification keys.
+  'contact-requests',
+  'notify-config',
+  'pay-attempts',
+]);
 
 /**
  * KV key prefixes the generic data endpoint must never name either. Pending
  * bank payments are kept under `payment-order:<id>` — they hold the CardNET
  * session key and the booking — and are read only by the payment endpoints.
+ * Payment attempts (`pay:`), the activity log (`act:`) and rate-limit counters
+ * (`rl:`) are guests' own details and stay with their endpoints too.
  */
-export const PROTECTED_PREFIXES = ['payment-order:'];
+export const PROTECTED_PREFIXES = ['payment-order:', 'pay:', 'act:', 'rl:'];
 
 export const isProtectedResource = (key: string): boolean =>
   PROTECTED_RESOURCES.has(key) || PROTECTED_PREFIXES.some((prefix) => key.startsWith(prefix));

@@ -6,6 +6,8 @@ import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { useBrand } from '../contexts/BrandContext';
 import { PricingOption, perPersonTier } from '../services/toursService';
 import PaymentDropdown from './ui/PaymentDropdown';
+import AddToCartButton from './cart/AddToCartButton';
+import { summariseDescription } from '../lib/cart';
 import MarkdownRenderer from './ui/MarkdownRenderer';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
 
@@ -90,6 +92,24 @@ const TourCard: React.FC<TourCardProps> = ({
     : index % 3 === 1
     ? 'rounded-[20px_30px_20px_28px]'
     : 'rounded-[26px_22px_30px_18px]';
+
+  const facts = useMemo(() => summariseDescription(description), [description]);
+  /** This tour as the guest has set it up right now: day, head count, price. */
+  const cartItem = () => ({
+    category: 'tours',
+    serviceId: /\/(\d+)$/.exec(detailsPath)?.[1],
+    title,
+    image,
+    description: facts.intro,
+    detailsPath,
+    date: selectedDate || undefined,
+    duration: facts.duration || undefined,
+    included: facts.included,
+    goodToKnow: facts.goodToKnow,
+    persons: Math.max(1, persons),
+    unitPrice: rate.amount ?? null,
+    tier: rate.tier,
+  });
 
   return (
     <article
@@ -198,6 +218,7 @@ const TourCard: React.FC<TourCardProps> = ({
                   className="w-full"
                 />
               </div>
+              <AddToCartButton item={cartItem} locale={intl.locale} />
             </div>
           </div>
         )}

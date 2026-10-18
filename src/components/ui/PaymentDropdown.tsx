@@ -12,6 +12,11 @@ import {
   fillPaymentLink,
   PaymentsReady,
 } from '../../services/paymentService';
+import { getNotifyFlags, NotifyFlags } from '../../services/notifyService';
+import { AttemptLine, startAttempt } from '../../lib/paymentAttempt';
+import { rememberGuest } from '../../lib/guestMemory';
+import { track } from '../../lib/activity';
+import PrePayDetails, { initialPrePay, PrePayState, prePayProblem } from '../payment/PrePayDetails';
 
 /**
  * How a guest pays: by card, by PayPal, or in person through the concierge.
@@ -25,6 +30,11 @@ import {
  * With no processor configured but a payment link pasted from a processor's
  * portal, the link is opened instead: with the amount filled in when the link
  * has an {amount} slot, and with the amount shown to enter when it has not.
+ *
+ * BEFORE LEAVING to pay, the guest says how they want the booking confirmed
+ * and is told to keep the receipt (PrePayDetails), and the payment is
+ * recorded as an attempt (lib/paymentAttempt.ts): the operator hears about it
+ * at once, and the guest is asked on return whether it went through.
  *
  * WHICH BUTTONS APPEAR is decided by paymentMethods.ts: a method shows only
  * when it is both configured and switched on. If the operator has configured
@@ -64,6 +74,17 @@ interface PaymentDropdownProps {
   methods?: PaymentMethodId[];
   /** Render nothing, rather than a WhatsApp fallback, when no method is offered. */
   hideWhenEmpty?: boolean;
+  /**
+   * Pay for several things at once (the cart). The card payment is priced by
+   * the server item by item; the title and amount are the cart's.
+   */
+  items?: AttemptLine[];
+  /** Where the payment started, for the operator: 'direct' or 'cart'. */
+  source?: string;
+  /** Empty the cart once the guest confirms the payment. */
+  clearsCart?: boolean;
+  /** Contact details already given on the page (the cart), to start from. */
+  prePayDefaults?: PrePayState;
 }
 
 type Lang = 'en' | 'es' | 'de' | 'fr';
@@ -98,6 +119,9 @@ const COPY: Record<Lang, Record<string, string>> = {
     copied: 'Copied',
     close: 'Close',
     failed: 'Could not open the secure payment page.',
+    paypalTitle: 'Pay with PayPal',
+    paypalGo: 'Continue to PayPal',
+    paypalNote: 'PayPal opens in a new tab. Come back here afterwards.',
   },
   es: {
     trigger: 'Reservar y pagar',
@@ -128,6 +152,9 @@ const COPY: Record<Lang, Record<string, string>> = {
     copied: 'Copiado',
     close: 'Cerrar',
     failed: 'No se pudo abrir la página de pago segura.',
+    paypalTitle: 'Pagar con PayPal',
+    paypalGo: 'Continuar a PayPal',
+    paypalNote: 'PayPal se abre en otra pestaña. Vuelve aquí después.',
   },
   de: {
     trigger: 'Buchen & bezahlen',
@@ -158,6 +185,9 @@ const COPY: Record<Lang, Record<string, string>> = {
     copied: 'Kopiert',
     close: 'Schließen',
     failed: 'Die sichere Zahlungsseite konnte nicht geöffnet werden.',
+    paypalTitle: 'Mit PayPal bezahlen',
+    paypalGo: 'Weiter zu PayPal',
+    paypalNote: 'PayPal öffnet sich in einem neuen Tab. Kommen Sie danach hierher zurück.',
   },
   fr: {
     trigger: 'Réserver et payer',
@@ -188,6 +218,9 @@ const COPY: Record<Lang, Record<string, string>> = {
     copied: 'Copié',
     close: 'Fermer',
     failed: 'Impossible d’ouvrir la page de paiement sécurisée.',
+    paypalTitle: 'Payer avec PayPal',
+    paypalGo: 'Continuer vers PayPal',
+    paypalNote: 'PayPal s’ouvre dans un nouvel onglet. Revenez ici ensuite.',
   },
 };
 
@@ -230,6 +263,10 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   buttonClassName,
   methods: allowedMethods,
   hideWhenEmpty = false,
+  items,
+  source = 'direct',
+  clearsCart = false,
+  prePayDefaults,
 }) => {
   const lang: Lang = (['es', 'de', 'fr'].includes(locale) ? locale : 'en') as Lang;
   const t = COPY[lang];
@@ -239,6 +276,10 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   const [cardError, setCardError] = useState('');
   const [copied, setCopied] = useState(false);
   const [ready, setReady] = useState<PaymentsReady | null>(null);
+  const [paypalModalOpen, setPaypalModalOpen] = useState(false);
+  const [prePay, setPrePay] = useState<PrePayState>(initialPrePay);
+  const [prePayError, setPrePayError] = useState('');
+  const [flags, setFlags] = useState<NotifyFlags>({ guestEmail: false, operatorAlerts: false });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [dropdownCoords, setDropdownCoords] = useState<{ top: number; left: number } | null>(null);
@@ -250,6 +291,9 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     let current = true;
     getPaymentsReady().then((next) => {
       if (current) setReady(next);
+    });
+    getNotifyFlags().then((next) => {
+      if (current) setFlags(next);
     });
     return () => {
       current = false;
@@ -333,17 +377,64 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     }
   };
 
+  /** What is being paid for, line by line, for the operator and the return prompt. */
+  const attemptItems: AttemptLine[] =
+    items && items.length > 0
+      ? items
+      : [{ title: excursionTitle, date: bookingDate, persons, total: totalUsd, category, serviceId, quantities }];
+
+  /** Checked inside the click, so a missing email is said before the guest leaves. */
+  const prePayOk = () => {
+    const problem = prePayProblem(prePay, lang);
+    setPrePayError(problem);
+    if (problem) return false;
+    rememberGuest({ name: prePay.name, phone: prePay.phone, email: prePay.email });
+    return true;
+  };
+
+  const recordAttempt = (method: string, retryUrl?: string) =>
+    startAttempt({
+      method,
+      source,
+      total: totalUsd,
+      items: attemptItems,
+      name: prePay.name.trim(),
+      phone: prePay.phone.trim(),
+      email: prePay.email.trim(),
+      contact: { ...prePay.contact, email: prePay.contact.email && flags.guestEmail },
+      locale: lang,
+      retryUrl,
+      clearsCart,
+    });
+
+  /** Start from what the guest last typed anywhere on the site. */
+  const refreshPrePay = () => setPrePay((current) => prePayDefaults ?? { ...initialPrePay(), contact: current.contact });
+
   const handlePayPal = () => {
     playClickFx();
     setIsOpen(false);
+    setPrePayError('');
+    refreshPrePay();
+    track('pay_click', { method: 'paypal', title: excursionTitle, total: totalUsd ?? 0, source, locale: lang });
+    setPaypalModalOpen(true);
+  };
+
+  const handlePayPalProceed = () => {
+    playClickFx();
+    if (!prePayOk()) return;
     const targetUrl = buildDynamicPayPalUrl(brandSettings.paypalMeLink, totalUsd);
+    recordAttempt('paypal', targetUrl || undefined);
     if (targetUrl) window.open(targetUrl, '_blank');
-    openWhatsAppConfirmation('PayPal');
+    // The server tells the operator when it can; otherwise the guest's own
+    // WhatsApp does, as it always has.
+    if (!flags.operatorAlerts) openWhatsAppConfirmation('PayPal');
+    setPaypalModalOpen(false);
   };
 
   const handleWhatsApp = () => {
     playClickFx();
     setIsOpen(false);
+    track('reserve', { method: 'whatsapp', title: excursionTitle, total: totalUsd ?? 0, persons, date: bookingDate, source, locale: lang });
     openWhatsAppConfirmation('VIP Concierge / Cash');
   };
 
@@ -351,7 +442,10 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     playClickFx();
     setIsOpen(false);
     setCardError('');
+    setPrePayError('');
+    refreshPrePay();
     setCopied(false);
+    track('pay_click', { method: 'card', title: excursionTitle, total: totalUsd ?? 0, source, locale: lang });
     setCardModalOpen(true);
   };
 
@@ -371,12 +465,14 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
    */
   const handleCardProceed = async () => {
     playClickFx();
+    if (!prePayOk()) return;
 
     if (!cardReady) {
       // A pasted link: no await before the open, so it stays inside the click.
       if (link?.url) {
+        recordAttempt('card-link', link.url);
         window.open(link.url, '_blank', 'noopener');
-        openWhatsAppConfirmation('Tarjeta / Card (link)');
+        if (!flags.operatorAlerts) openWhatsAppConfirmation('Tarjeta / Card (link)');
         setCardModalOpen(false);
       }
       return;
@@ -394,7 +490,22 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
         date: bookingDate,
         amount: totalUsd ?? undefined,
         locale: lang,
+        ...(items && items.length > 0
+          ? {
+              items: items.map((line) => ({
+                category: line.category ?? 'tours',
+                serviceId: line.serviceId,
+                title: line.title,
+                persons: Math.max(1, line.persons ?? 1),
+                quantities: line.quantities,
+                date: line.date,
+                amount: line.total ?? undefined,
+              })),
+            }
+          : {}),
       });
+      // Recorded once the payment page is certain, right before leaving for it.
+      recordAttempt('card');
       if (start.kind === 'redirect') window.location.href = start.url;
       else postToGateway(start.action, start.fields);
     } catch (error: any) {
@@ -490,7 +601,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
 
       {cardModalOpen && createPortal(
         <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true">
-          <div className="relative w-full max-w-md rounded-[28px] border border-[rgba(150,112,31,0.4)] bg-[#17313F] p-7 text-paper shadow-ink-lg animate-in zoom-in-95">
+          <div className="relative max-h-[94vh] w-full max-w-md overflow-y-auto rounded-[28px] border border-[rgba(150,112,31,0.4)] bg-[#17313F] p-7 text-paper shadow-ink-lg animate-in zoom-in-95">
             <button
               onClick={() => {
                 playClickFx();
@@ -563,9 +674,21 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
               </div>
             )}
 
-            {cardError && (
+            {(cardReady || link?.url) && (
+              <div className="mt-4">
+                <PrePayDetails
+                  value={prePay}
+                  onChange={setPrePay}
+                  locale={lang}
+                  emailAvailable={flags.guestEmail}
+                  method={cardReady ? 'card' : 'card-link'}
+                />
+              </div>
+            )}
+
+            {(cardError || prePayError) && (
               <div className="mt-4 rounded-xl border-2 border-mango-light/50 bg-mango/20 p-3 text-xs text-mango-light">
-                {cardError}
+                {cardError || prePayError}
               </div>
             )}
 
@@ -582,6 +705,79 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
                   : t.continue}
               </button>
               <p className="text-center text-[0.65rem] text-paper/60">{cardReady ? t.note : t.linkNote}</p>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {paypalModalOpen && createPortal(
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true">
+          <div className="relative max-h-[94vh] w-full max-w-md overflow-y-auto rounded-[28px] border border-[rgba(150,112,31,0.4)] bg-[#17313F] p-7 text-paper shadow-ink-lg animate-in zoom-in-95">
+            <button
+              onClick={() => {
+                playClickFx();
+                setPaypalModalOpen(false);
+              }}
+              className="absolute right-4 top-4 text-paper/70 hover:text-paper"
+              aria-label={t.close}
+            >
+              ✕
+            </button>
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky/25 text-sky-light">
+                <FaPaypal />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">{t.paypalTitle}</h3>
+                <p className="text-xs text-paper/70">{excursionTitle}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 rounded-2xl border-2 border-paper/20 bg-paper/5 p-4 text-xs">
+              {items && items.length > 1 ? (
+                items.map((line, index) => (
+                  <div key={index} className="flex justify-between gap-4">
+                    <span className="text-paper/80">{line.title}{line.persons ? ` · ${line.persons}` : ''}</span>
+                    <span className="shrink-0 font-bold text-white">{line.total ? formatMoney(line.total, 'USD', lang) : '—'}</span>
+                  </div>
+                ))
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-paper/70">{t.people}:</span>
+                    <span className="font-bold text-white">{persons}</span>
+                  </div>
+                  {bookingDate && (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-paper/70">{t.date}:</span>
+                      <span className="text-right font-bold text-white">{bookingDate}</span>
+                    </div>
+                  )}
+                </>
+              )}
+              <div className="flex justify-between border-t border-paper/15 pt-2">
+                <span className="text-paper/70">{t.total}:</span>
+                <span className="text-sm font-bold text-mango-light">{displayPrice}</span>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <PrePayDetails value={prePay} onChange={setPrePay} locale={lang} emailAvailable={flags.guestEmail} method="paypal" />
+            </div>
+
+            {prePayError && (
+              <div className="mt-4 rounded-xl border-2 border-mango-light/50 bg-mango/20 p-3 text-xs text-mango-light">{prePayError}</div>
+            )}
+
+            <div className="mt-5 space-y-3">
+              <button
+                onClick={handlePayPalProceed}
+                className="w-full rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon-light py-3 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:bg-mango-light"
+              >
+                {t.paypalGo} · {displayPrice}
+              </button>
+              <p className="text-center text-[0.65rem] text-paper/60">{t.paypalNote}</p>
             </div>
           </div>
         </div>,
