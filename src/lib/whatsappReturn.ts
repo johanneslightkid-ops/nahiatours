@@ -20,6 +20,9 @@ export interface WhatsAppDeparture {
 }
 
 const KEY = 'wa_departure_v1';
+const ANSWERED_KEY = 'wa_prompt_answered_v1';
+/** After an answer, the next trips to WhatsApp are the conversation it led to. */
+const QUIET_AFTER_ANSWER_MS = 20 * 60 * 1000;
 const WHATSAPP = /^(https?:\/\/(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com|chat\.whatsapp\.com)\/|whatsapp:\/\/)/i;
 
 export const isWhatsAppUrl = (url: string) => WHATSAPP.test(String(url ?? '').trim());
@@ -32,11 +35,12 @@ const messageOf = (url: string): string => {
   }
 };
 
-export const noteDeparture = (url: string) => {
+export const noteDeparture = (url: string, ask = true) => {
   try {
     const departure: WhatsAppDeparture = { at: Date.now(), text: messageOf(url).slice(0, 1500), path: window.location.pathname };
     // Every conversation started from the site, for the admin's activity log.
     track('whatsapp', { from: departure.path, text: departure.text.replace(/\s+/g, ' ').slice(0, 140) });
+    if (!ask) return;
     sessionStorage.setItem(KEY, JSON.stringify(departure));
   } catch {
     /* storage blocked: no prompt, nothing else lost */
@@ -61,7 +65,38 @@ export const clearDeparture = () => {
   }
 };
 
+/** The guest answered (or closed) the return prompt: let them be for a while. */
+export const markPromptAnswered = () => {
+  try {
+    sessionStorage.setItem(ANSWERED_KEY, String(Date.now()));
+  } catch {
+    /* asked again next time, which is the old behaviour */
+  }
+};
+
+export const recentlyAnswered = () => {
+  try {
+    return Date.now() - Number(sessionStorage.getItem(ANSWERED_KEY) || 0) < QUIET_AFTER_ANSWER_MS;
+  } catch {
+    return false;
+  }
+};
+
 let installed = false;
+let quiet = false;
+
+/**
+ * Open WhatsApp for something already recorded — a contact-form message, a
+ * payment already confirmed — so coming back is not a question.
+ */
+export const openWhatsAppQuietly = (url: string) => {
+  quiet = true;
+  try {
+    return window.open(url, '_blank');
+  } finally {
+    quiet = false;
+  }
+};
 
 /** Watch every way the site opens WhatsApp. Safe to call more than once. */
 export const installWhatsAppWatch = () => {
@@ -76,7 +111,7 @@ export const installWhatsAppWatch = () => {
       const anchor = (event.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
       // A link that only reports something already done ("I just paid")
       // opts out: there is nothing to ask about when the guest returns.
-      if (anchor && isWhatsAppUrl(anchor.href) && !anchor.closest('[data-no-return-prompt]')) noteDeparture(anchor.href);
+      if (anchor && isWhatsAppUrl(anchor.href)) noteDeparture(anchor.href, !anchor.closest('[data-no-return-prompt]'));
     },
     true
   );
@@ -84,7 +119,7 @@ export const installWhatsAppWatch = () => {
   // Buttons that call window.open with a wa.me URL (the booking menus do).
   const open = window.open.bind(window);
   window.open = ((url?: string | URL, target?: string, features?: string) => {
-    if (url && isWhatsAppUrl(String(url))) noteDeparture(String(url));
+    if (url && isWhatsAppUrl(String(url))) noteDeparture(String(url), !quiet);
     return open(url as any, target, features);
   }) as typeof window.open;
 };

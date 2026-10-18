@@ -1,6 +1,13 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { clearDeparture, installWhatsAppWatch, readDeparture, WhatsAppDeparture } from '../lib/whatsappReturn';
+import {
+  clearDeparture,
+  installWhatsAppWatch,
+  markPromptAnswered,
+  readDeparture,
+  recentlyAnswered,
+  WhatsAppDeparture,
+} from '../lib/whatsappReturn';
 import { readPendingAttempt } from '../lib/paymentAttempt';
 
 const WhatsAppReturnPrompt = lazy(() => import('./WhatsAppReturnPrompt'));
@@ -27,7 +34,8 @@ const WhatsAppReturnGate: React.FC = () => {
       const trip = readDeparture();
       if (!trip) return;
       // Back from paying: the payment prompt asks the one question that matters.
-      if (readPendingAttempt()) {
+      // Just answered: this trip is the conversation the answer led to.
+      if (readPendingAttempt() || recentlyAnswered()) {
         clearDeparture();
         return;
       }
@@ -55,7 +63,13 @@ const WhatsAppReturnGate: React.FC = () => {
 
   return (
     <Suspense fallback={null}>
-      <WhatsAppReturnPrompt departure={departure} onClose={() => setDeparture(null)} />
+      <WhatsAppReturnPrompt
+        departure={departure}
+        onClose={() => {
+          markPromptAnswered();
+          setDeparture(null);
+        }}
+      />
     </Suspense>
   );
 };
