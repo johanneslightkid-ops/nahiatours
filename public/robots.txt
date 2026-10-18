@@ -1,28 +1,11 @@
-# robots.txt for Caribbean Tours & Excursions Site
-
-# Allow all search engines to crawl the site
+# Served by the Worker from live data (shared/seo.ts robotsResponse); this
+# copy is only the fallback, and says the same.
 User-agent: *
-Allow: /
-
-# Disallow admin and private areas
-Disallow: /admin/
+Allow: /api/data
+Allow: /api/blog
 Disallow: /api/
-Disallow: /private/
-
-# Disallow checkout and cart pages (optional - prevents indexing of dynamic cart states)
-Disallow: /checkout
+Disallow: /admin
 Disallow: /cart
+Disallow: /payment
 
-# Allow crawling of images
-Allow: /images/
-Allow: *.jpg
-Allow: *.jpeg
-Allow: *.png
-Allow: *.gif
-Allow: *.webp
-
-# Crawl delay (optional - helps prevent server overload)
-Crawl-delay: 1
-
-# Sitemap location
-Sitemap: https://nahiatours.workers.dev/sitemap.xml
+Sitemap: https://amigotours.vip/sitemap.xml
