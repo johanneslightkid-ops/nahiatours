@@ -8,6 +8,7 @@
  */
 
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -28,8 +29,25 @@ export const normalizeSiteUrl = (value) => {
  * a real domain exists; the Cloudflare-provided values are used as a fallback
  * so a preview still produces coherent absolute URLs.
  */
+/**
+ * SITE_URL as declared in wrangler.toml [vars] — the same value the Worker
+ * reads at runtime (shared/seo.ts), so a build that was given no SITE_URL in
+ * its environment (Cloudflare's own git build, a local build) still names the
+ * site's real address instead of the fallback below.
+ */
+const wranglerSiteUrl = () => {
+  try {
+    const toml = readFileSync(join(ROOT, 'wrangler.toml'), 'utf-8');
+    const match = /^SITE_URL\s*=\s*"([^"]+)"/m.exec(toml);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+};
+
 export const resolveSiteUrl = () =>
   normalizeSiteUrl(process.env.SITE_URL) ||
+  normalizeSiteUrl(wranglerSiteUrl()) ||
   normalizeSiteUrl(process.env.CF_PAGES_URL) ||
   normalizeSiteUrl(process.env.CLOUDFLARE_PAGES_URL) ||
   normalizeSiteUrl(process.env.CLOUDFLARE_DOMAIN) ||
