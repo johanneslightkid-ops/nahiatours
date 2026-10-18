@@ -265,6 +265,30 @@ jobs:
             fi
           done
 
+      # A brand-new Worker name is refused by `wrangler deploy` here with
+      # "This Worker does not exist on your account [10007]". Creating it first
+      # with a placeholder through the API, then deploying over it, is the path
+      # every existing site takes. Does nothing once the Worker exists.
+      - name: Make sure the Worker exists
+        run: |
+          node --input-type=module -e '
+            const token = process.env.CLOUDFLARE_API_TOKEN;
+            const account = process.env.CLOUDFLARE_ACCOUNT_ID;
+            const name = "el-cortecito";
+            const base = `https://api.cloudflare.com/client/v4/accounts/${account}/workers/scripts/${name}`;
+            const head = await fetch(`${base}/settings`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
+            if (head.success) { console.log(`${name} exists.`); process.exit(0); }
+            console.log(`${name} not found (${JSON.stringify(head.errors)}); creating a placeholder.`);
+            const form = new FormData();
+            form.append("metadata", new Blob([JSON.stringify({ main_module: "index.js", compatibility_date: "2024-05-01" })], { type: "application/json" }));
+            form.append("index.js", new Blob(["export default { fetch() { return new Response(\"El Cortecito Tours is on its way.\"); } };"], { type: "application/javascript+module" }), "index.js");
+            const put = await fetch(base, { method: "PUT", headers: { Authorization: `Bearer ${token}` }, body: form }).then((r) => r.json());
+            console.log(JSON.stringify({ success: put.success, errors: put.errors, messages: put.messages }));
+            if (!put.success) process.exit(1);
+            const sub = await fetch(`${base}/subdomain`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ enabled: true }) }).then((r) => r.json());
+            console.log("workers.dev:", JSON.stringify({ success: sub.success, errors: sub.errors }));
+          '
+
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
