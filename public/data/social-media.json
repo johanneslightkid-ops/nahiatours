@@ -1,17 +1,4 @@
 {
-  "accounts": [
-    {
-      "platform": "instagram",
-      "username": "@yohantourspuntacana",
-      "url": "https://instagram.com/yohantourspuntacana",
-      "enabled": true
-    },
-    {
-      "platform": "facebook",
-      "username": "@yohantourspuntacana",
-      "url": "https://www.facebook.com/profile.php?id=61573413249374",
-      "enabled": true
-    }
-  ],
+  "accounts": [],
   "videos": []
 }

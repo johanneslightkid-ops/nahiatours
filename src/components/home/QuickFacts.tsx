@@ -50,7 +50,7 @@ const QuickFacts: React.FC = () => {
     value: ratingValue,
     label: say({ en: 'average guest rating', es: 'valoración media', de: 'durchschnittliche Gästebewertung', fr: 'note moyenne des voyageurs' }),
     art: <Starfish className="h-11 w-11" />,
-    tone: 'from-[#E3FBF7] to-[#93ECE1]',
+    tone: 'from-[#E6F6F9] to-[#A9E4EE]',
   };
 
   const facts = [
@@ -58,20 +58,20 @@ const QuickFacts: React.FC = () => {
       value: catalogue.length > 0 ? String(catalogue.length) : '—',
       label: say({ en: 'curated excursions', es: 'excursiones seleccionadas', de: 'ausgewählte Ausflüge', fr: 'excursions sélectionnées' }),
       art: <Sailboat className="h-12 w-12" />,
-      tone: 'from-[#FFF1CF] to-[#FFD47E]',
+      tone: 'from-[#FFF3B0] to-[#FFDD6E]',
     },
     ...(ratingValue !== '—' ? [ratingFact] : []),
     {
       value: '24/7',
       label: say({ en: 'WhatsApp response', es: 'respuesta por WhatsApp', de: 'Antwort per WhatsApp', fr: 'réponse sur WhatsApp' }),
       art: <Cocktail className="h-11 w-11" />,
-      tone: 'from-[#FFE9E4] to-[#FFB1A6]',
+      tone: 'from-[#FFE4DC] to-[#FF9E8A]',
     },
     {
       value: say({ en: 'Included', es: 'Incluido', de: 'Inklusive', fr: 'Inclus' }),
       label: say({ en: 'hotel pick-up & drop-off', es: 'recogida en el hotel', de: 'Abholung & Rückfahrt zum Hotel', fr: 'aller-retour depuis l’hôtel' }),
       art: <Hibiscus className="h-11 w-11" />,
-      tone: 'from-[#EDF8E6] to-[#A3DB93]',
+      tone: 'from-[#EEF7E2] to-[#B4D98A]',
     },
   ];
 
@@ -86,7 +86,7 @@ const QuickFacts: React.FC = () => {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ type: 'spring', stiffness: 120, damping: 14, delay: index * 0.08 }}
             whileHover={{ y: -6, rotate: index % 2 ? 2 : -2 }}
-            className={`flex aspect-[1.15] flex-col items-center justify-center bg-gradient-to-br ${fact.tone} ${SHAPES[index]} px-3 text-center shadow-ink`}
+            className={`flex aspect-[1.15] flex-col items-center justify-center bg-gradient-to-br ${fact.tone} ${SHAPES[index]} border-[3px] border-ink px-3 text-center shadow-ink`}
           >
             <span className="mb-1.5">{fact.art}</span>
             <div className="font-display text-2xl font-bold leading-none text-ink sm:text-3xl">{fact.value}</div>

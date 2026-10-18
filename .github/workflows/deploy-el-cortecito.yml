@@ -1,44 +1,31 @@
-# Deploys the El Cortecito design to its own Cloudflare Worker.
+# Deploys El Cortecito Tours — the gallery design — to its own Worker.
 #
-# This is a SEPARATE SITE out of the same repository, not a change to any
-# existing one, and it is never merged into another branch. `nahiatours` is
-# production; this is the living-water design (WebGL water, botanical
-# illustration, the vine-and-signpost navigation).
+# A SEPARATE SITE out of the same repository, branched from `elcortecito`
+# and never merged into any other branch (see CLAUDE.md). Its own Worker,
+# `el-cortecito`, its own KV namespace, `el-cortecito-data`.
 #
-# Three things keep it away from the live site, and all three would have to
-# fail at once for a run here to touch it:
+# Three things keep it away from every other site, and all three would have
+# to fail at once for a run here to touch one:
 #
-#   • wrangler.toml on this branch names the Worker `elcortecito`, and
-#     `wrangler deploy` addresses a Worker by name — never by id;
-#   • this workflow only runs on the `elcortecito` branch;
-#   • the KV namespace is `elcortecito-data`, created by the first run.
+#   • wrangler.toml on this branch names the Worker `el-cortecito`, and the
+#     deploy asserts that name before it uploads anything;
+#   • this workflow only runs on the `el-cortecito` branch;
+#   • the KV binding is asserted to be `el-cortecito-data`, never the
+#     namespace it was seeded from.
 #
-# THE DATA is a copy, taken once. scripts/clone-kv.mjs reads every key out of
-# `nahiatours-data` and writes the ones `elcortecito-data` is missing, so the
-# new site opens with the real catalogue rather than the seed JSON — and from
-# that moment the two namespaces are independent. Editing a tour here cannot
-# reach the live site, and vice versa.
+# THE DATA is seeded once, from `elcortecito-data`, on the very first deploy
+# (the namespace does not exist or is empty), and only the content: the
+# catalogue, blog, story and reviews. Guests' requests and payments, payment
+# credentials and notification keys are the other site's and are withheld
+# (EXCLUDE_KEYS). The brand is then given this site's own identity
+# (scripts/stub-brand.mjs) — name, owner, WhatsApp — with every payment link
+# and social account left empty for the operator to fill in. From then on
+# the two namespaces are independent, and a push never copies anything again.
 #
-# WHEN IT COPIES. Seeding is opt-in on every site (see CLAUDE.md): on an
-# established site it would quietly restore content deleted on purpose. The
-# one exception here is a namespace that does not exist yet or holds no keys
-# at all — a brand-new site, which is exactly the one-time bootstrap the
-# script exists for. Once this site has a single key of its own, a push never
-# copies anything again; only the manual switch below does.
-#
-# That copy is also how the AI settings arrive: `ai-settings` is one of the
-# keys, so whatever provider and credentials production already has come with
-# it. The Worker does not depend on that, though — wrangler.toml binds the
-# account's own Workers AI as `AI`, and /api/cf-ai uses the binding whenever no
-# token has been entered, so the blog generator works on a deployment whose KV
-# copy never happened.
-#
-# THE TOKEN comes from a repository secret. It needs:
-#   • Workers Scripts: Edit    — to deploy
-#   • Workers KV Storage: Edit — to create `elcortecito-data` and fill it
-# Add it under Settings → Secrets and variables → Actions.
+# THE TOKEN is the repository's CLOUDFLARE_API_TOKEN secret (Workers Scripts:
+# Edit + Workers KV Storage: Edit), the same one every site branch uses.
 
-name: Deploy El Cortecito
+name: Deploy El Cortecito Tours
 
 # `push` is the trigger that matters. GitHub registers a `workflow_dispatch`
 # workflow only once its file has appeared on the DEFAULT branch — and `main`
@@ -47,7 +34,7 @@ name: Deploy El Cortecito
 # such requirement; it runs from whichever branch it lives on.
 on:
   push:
-    branches: [elcortecito]
+    branches: [el-cortecito]
   workflow_dispatch:
     inputs:
       cloudflare_api_token:
@@ -60,7 +47,7 @@ on:
       source_kv_title:
         description: >-
           Title of the KV namespace to copy data from. Leave empty to use
-          nahiatours-data.
+          elcortecito-data.
         required: false
         default: ''
       seed_kv_from_source:
@@ -84,7 +71,7 @@ on:
 
 # One deploy at a time; a newer run supersedes an in-flight one.
 concurrency:
-  group: deploy-elcortecito
+  group: deploy-el-cortecito
   cancel-in-progress: true
 
 jobs:
@@ -101,8 +88,11 @@ jobs:
       # by listing /accounts and wrangler by reading /memberships — an endpoint
       # a Workers-scoped token cannot read.
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID || 'd5272033401c64f8cc6ce650a8321cb2' }}
-      KV_NAMESPACE_TITLE: elcortecito-data
-      SOURCE_KV_TITLE: ${{ inputs.source_kv_title || 'nahiatours-data' }}
+      KV_NAMESPACE_TITLE: el-cortecito-data
+      SOURCE_KV_TITLE: ${{ inputs.source_kv_title || 'elcortecito-data' }}
+      # The source site's own business, never copied: its guests' requests,
+      # payments and activity, its payment and notification credentials.
+      EXCLUDE_KEYS: 'payment-secrets,payment-order:,contact-requests,pay-attempts,pay:,act:,rl:,notify-config,social-api-settings'
       # Seed, do not sync. clone-kv.mjs leaves every key the destination
       # already has exactly as it is unless this says otherwise, so a redeploy
       # cannot roll a site back to production's content. It used to be the
@@ -111,7 +101,7 @@ jobs:
       OVERWRITE: ${{ inputs.overwrite_existing == true && 'true' || 'false' }}
       # So the sitemap, canonical URLs and OpenGraph tags point at this
       # deployment rather than at production's domain.
-      SITE_URL: ${{ vars.ELCORTECITO_SITE_URL || 'https://elcortecito.johannes-neugschwentner.workers.dev' }}
+      SITE_URL: ${{ vars.EL_CORTECITO_SITE_URL || 'https://el-cortecito.johannes-neugschwentner.workers.dev' }}
 
     steps:
       # First thing in the job, before the token can reach any other output: a
@@ -166,12 +156,12 @@ jobs:
       # A deploy that reached the wrong Worker would be the one unrecoverable
       # mistake here, so the name is asserted before anything is uploaded
       # rather than read out of the log afterwards.
-      - name: Check this branch deploys to elcortecito
+      - name: Check this branch deploys to el-cortecito
         run: |
           name="$(grep -m1 '^name *= *' wrangler.toml | sed 's/.*= *"\(.*\)"/\1/')"
           echo "wrangler.toml names the Worker: $name"
-          if [ "$name" != "elcortecito" ]; then
-            echo "::error::wrangler.toml names \"$name\", not \"elcortecito\". Refusing to deploy."
+          if [ "$name" != "el-cortecito" ]; then
+            echo "::error::wrangler.toml names \"$name\", not \"el-cortecito\". Refusing to deploy."
             exit 1
           fi
 
@@ -219,7 +209,7 @@ jobs:
             appendFileSync(process.env.GITHUB_OUTPUT, `fresh=${fresh}\n`);
           '
 
-      # Create elcortecito-data if needed and fill it from the source. This runs
+      # Create el-cortecito-data if needed and fill it from the source. This runs
       # BEFORE the build, because `npm run build` invokes provision-kv.mjs,
       # which resolves the same namespace title and writes the binding into
       # wrangler.toml — so by deploy time the binding points at a namespace
@@ -237,12 +227,23 @@ jobs:
         continue-on-error: true
         run: node scripts/clone-kv.mjs
 
+      # This site's own identity, over the brand that came with the copy.
+      # First deploy only: afterwards the brand is edited in the admin.
+      - name: Give the brand its own identity
+        if: steps.fresh.outputs.fresh == 'true' && steps.kv.outcome == 'success'
+        run: node scripts/stub-brand.mjs
+        env:
+          SOCIAL_RESET: 'true'
+          BRAND_PATCH: >-
+            {"brandName":"El Cortecito Tours","contactName":"Willy","phoneNumber":"+1 (809) 123 4567",
+            "paypalMeLink":"","verifoneLink":"","azulLink":"","cardnetLink":"","brandicon":"","stripeEnabled":false}
+
       # provision-kv → populate-local-data → sitemap → SEO → vite build.
       # provision-kv.mjs finds the namespace clone-kv just filled, by title.
       - name: Inventory the KV namespaces
         run: node scripts/kv-inventory.mjs
         env:
-          KV_INVENTORY_TITLES: nahiatours-data,beautiful-tours-data,transporturist-data,ldvip-data,amigotours-data,elcortecito-data
+          KV_INVENTORY_TITLES: elcortecito-data,el-cortecito-data
 
       - name: Build
         run: npm run build
@@ -250,11 +251,19 @@ jobs:
       - name: Show the resolved KV binding
         run: |
           echo "wrangler.toml KV binding after the build:"
-          grep -n -A2 '^\[\[kv_namespaces\]\]' wrangler.toml
-          if ! grep -q 'id = "5026f24391e24f13b76f5e4918d6d72d"' wrangler.toml || [ "$(grep -c '^\[\[kv_namespaces\]\]' wrangler.toml)" != 1 ]; then
-            echo "::error::DATA_KV_F must be bound once, to elcortecito-data. Refusing to deploy."
+          grep -n -A2 '^\[\[kv_namespaces\]\]' wrangler.toml || true
+          count="$(grep -c '^\[\[kv_namespaces\]\]' wrangler.toml || true)"
+          if [ "$count" != 1 ]; then
+            echo "::error::DATA_KV_F must be bound exactly once (found $count). Refusing to deploy."
             exit 1
           fi
+          # Never the namespace this site was seeded from, nor any other site's.
+          for other in 5026f24391e24f13b76f5e4918d6d72d b4e2637d5f45438aac8e504353a92a9f b866189176fb46188c10240cdce3bf9d 9f66ad41f7c0469fb1178d3de75b0e68 39da5ca1858a4251a3130eaf7b8f2172 03cc4cd848174de1bfdbd8009b9a3cc0 373ab3472b5c4565a76e3bc9363fe25b; do
+            if grep -q "id = \"$other\"" wrangler.toml; then
+              echo "::error::DATA_KV_F is bound to another site's namespace ($other). Refusing to deploy."
+              exit 1
+            fi
+          done
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
@@ -276,23 +285,18 @@ jobs:
       - name: Report where it landed
         run: |
           {
-            echo "### El Cortecito deployed"
+            echo "### El Cortecito Tours deployed"
             echo ""
-            echo "<https://elcortecito.johannes-neugschwentner.workers.dev>"
+            echo "<https://el-cortecito.johannes-neugschwentner.workers.dev>"
             echo ""
-            echo "Worker \`elcortecito\`, from branch \`elcortecito\` at \`${GITHUB_SHA::7}\`."
+            echo "Worker \`el-cortecito\`, from branch \`el-cortecito\` at \`${GITHUB_SHA::7}\`."
             echo ""
             if [ "${{ inputs.seed_kv_from_source }}" != "true" ] && [ "${{ steps.fresh.outputs.fresh }}" != "true" ]; then
-              echo "KV: nothing copied. This site reads its own namespace, and keys it does not have fall back to the bundled \`/data/*.json\`."
+              echo "KV: nothing copied. This site reads its own namespace."
             elif [ "${{ steps.kv.outcome }}" != "success" ]; then
               echo "> [!WARNING]"
-              echo "> **KV was not copied.** The deploy went ahead and the site is up, but it"
-              echo "> is reading the seed data bundled at \`/data/*.json\`, not the live"
-              echo "> catalogue. See the *Clone the KV data* step for the reason."
+              echo "> **KV was not copied.** The site is up, reading the seed data bundled at \`/data/*.json\`."
             else
-              echo "KV: ${{ steps.kv.outputs.keys_copied }} missing key(s) seeded from \`${{ steps.kv.outputs.source_title }}\` into \`elcortecito-data\` (\`${{ steps.kv.outputs.namespace_id }}\`)."
+              echo "KV: ${{ steps.kv.outputs.keys_copied }} key(s) seeded from \`${{ steps.kv.outputs.source_title }}\` into \`el-cortecito-data\` (\`${{ steps.kv.outputs.namespace_id }}\`), the other site's guests, payments and credentials withheld; brand set to El Cortecito Tours."
             fi
-            echo ""
-            echo "Workers AI is bound as \`AI\` in wrangler.toml, so the blog generator"
-            echo "runs without any key being entered in the admin panel."
           } >> "$GITHUB_STEP_SUMMARY"

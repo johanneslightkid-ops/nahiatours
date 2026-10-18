@@ -17,10 +17,44 @@ import { useBlog } from '../contexts/BlogContext';
 import QuickFacts from '../components/home/QuickFacts';
 import PathwaysSection from '../components/home/PathwaysSection';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
-import CaribbeanSea from '../components/water/CaribbeanSea';
-import ReefLight from '../components/water/ReefLight';
-import { GlidingBirds, LeafCanopy, Reveal, RisingBubbles, SwimmingSchool } from '../components/nature/Nature';
-import { Coral, EagleRay, Hibiscus, PalmTree, Sailboat, SeaFan, SeaTurtle, Seaweed } from '../components/ui/Illustrations';
+import IslandRooms from '../components/home/IslandRooms';
+import { GlidingBirds, LeafCanopy, Reveal, SwimmingSchool } from '../components/nature/Nature';
+import { Hibiscus, PalmTree, Sailboat, SeaTurtle } from '../components/ui/Illustrations';
+
+/** The sun going down behind the bay: a disc half under the sea line. */
+const SettingSun: React.FC = () => (
+  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[55%]" aria-hidden="true">
+    <div className="absolute bottom-[12%] left-1/2 h-44 w-44 -translate-x-1/2 sm:h-64 sm:w-64">
+      <div className="sol inset-0 !bg-[radial-gradient(circle,#FFF3B0_0_30%,#FFDD6E_31%_62%,#EE7A3C_63%_100%)]">
+        <div className="sol-rays" />
+      </div>
+    </div>
+    <svg className="absolute inset-x-0 bottom-0 h-[34%] w-full" viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0 20 C200 6 400 30 600 18 C800 6 1000 30 1200 16 L1200 120 L0 120 Z" fill="#1A2F94" stroke="#1D2346" strokeWidth={4} />
+      <path d="M80 40 L260 40 M420 58 L640 58 M760 36 L980 36 M300 82 L520 82 M700 92 L900 92" stroke="#FFDD6E" strokeWidth={4} strokeLinecap="round" />
+    </svg>
+  </div>
+);
+
+/** A painted moon and a few stars that breathe, for the night room. */
+const NightSky: React.FC = () => (
+  <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+    <svg className="absolute right-[8%] top-16 h-28 w-28 sm:h-36 sm:w-36" viewBox="0 0 100 100">
+      <path d="M62 8 C36 12 20 36 24 60 C28 84 52 98 76 92 C56 86 42 68 44 48 C46 28 58 14 62 8 Z" fill="#FFF3B0" stroke="#FFDD6E" strokeWidth={3} />
+    </svg>
+    {[
+      [10, 20, 0], [24, 12, 1.2], [42, 26, 2.1], [60, 10, 0.6], [74, 30, 1.7], [88, 52, 2.6], [16, 48, 3.1],
+    ].map(([left, top, delay], i) => (
+      <span
+        key={i}
+        className="absolute text-mango-light"
+        style={{ left: `${left}%`, top: `${top}%`, fontSize: i % 2 ? '0.9rem' : '1.2rem', animation: `twinkle 3.4s ease-in-out ${delay}s infinite` }}
+      >
+        ✦
+      </span>
+    ))}
+  </div>
+);
 
 const HERO_BACKGROUND_IMAGE = '/imgs/tours/tour_saona_island_detail_12.jpg';
 const HERO_BACKGROUND_VIDEO = '/buggy.mp4';
@@ -93,7 +127,9 @@ const Home: React.FC = () => {
       <Hero backgroundImage={HERO_BACKGROUND_IMAGE} backgroundVideo={HERO_BACKGROUND_VIDEO} />
 
       {/* Hard facts, straight from the live catalogue */}
-      <QuickFacts />
+      <div id="highlights" className="scroll-mt-24">
+        <QuickFacts />
+      </div>
 
       {seoArticles.length > 0 && (
         <section aria-hidden="true" style={hiddenBlogStyle}>
@@ -186,23 +222,26 @@ const Home: React.FC = () => {
         )}
       </div>
 
+      {/* The island beyond the beach */}
+      <IslandRooms />
+
       {/* Call-to-Action Banner: prefer dynamic CTAs from storyData.callToActions */}
       {!storyData ? null : storyData.callToActions && storyData.callToActions.length > 0 ? (
         <section id="perfect-day" ref={sunsetRef} className="home-section sunset-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
-          <CaribbeanSea className="z-0" pointerTarget={sunsetRef} />
-          <GlidingBirds className="z-[1]" tone="text-[#2a1d3a]/70" count={4} />
-          <div className="pointer-events-none absolute -bottom-6 -left-16 z-[1] h-80 w-56 opacity-90 sm:h-[28rem] sm:w-80" aria-hidden="true">
-            <PalmTree className="h-full w-full brightness-[0.25] saturate-50" />
+          <SettingSun />
+          <GlidingBirds className="z-[1]" tone="text-ink/80" count={4} />
+          <div className="pointer-events-none absolute -bottom-6 -left-16 z-[1] h-80 w-56 sm:h-[28rem] sm:w-80" aria-hidden="true">
+            <PalmTree className="h-full w-full" />
           </div>
           <div className="pointer-events-none absolute -bottom-10 -right-20 z-[1] hidden h-[30rem] w-80 -scale-x-100 md:block" aria-hidden="true">
-            <PalmTree className="h-full w-full brightness-[0.22] saturate-50" />
+            <PalmTree className="h-full w-full" />
           </div>
           <div className="relative z-10 max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <h2 className="page-title-dark mb-6 font-display text-4xl leading-tight sm:text-5xl md:text-6xl">
               {storyData.storyTitle || 'Ready for Your Perfect Day in Paradise?'}
             </h2>
             {storyData.storyTagline && (
-              <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
+              <p className="page-title-dark mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 sm:text-xl">
                 {storyData.storyTagline}
               </p>
             )}
@@ -229,22 +268,21 @@ const Home: React.FC = () => {
         </section>
       ) : (
         <section id="perfect-day" ref={sunsetRef} className="home-section sunset-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
-          <CaribbeanSea className="z-0" pointerTarget={sunsetRef} />
-          <GlidingBirds className="z-[1]" tone="text-[#2a1d3a]/70" count={4} />
-          <div className="pointer-events-none absolute -bottom-6 -left-16 z-[1] h-80 w-56 opacity-90 sm:h-[28rem] sm:w-80" aria-hidden="true">
-            <PalmTree className="h-full w-full brightness-[0.25] saturate-50" />
+          <SettingSun />
+          <GlidingBirds className="z-[1]" tone="text-ink/80" count={4} />
+          <div className="pointer-events-none absolute -bottom-6 -left-16 z-[1] h-80 w-56 sm:h-[28rem] sm:w-80" aria-hidden="true">
+            <PalmTree className="h-full w-full" />
           </div>
           <div className="pointer-events-none absolute -bottom-10 -right-20 z-[1] hidden h-[30rem] w-80 -scale-x-100 md:block" aria-hidden="true">
-            <PalmTree className="h-full w-full brightness-[0.22] saturate-50" />
+            <PalmTree className="h-full w-full" />
           </div>
           <div className="relative z-10 max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
+            <h2 className="page-title-dark mb-6 font-display text-4xl leading-tight sm:text-5xl md:text-6xl">
               Ready for Your Perfect Day in Paradise?
             </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
+            <p className="page-title-dark mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 sm:text-xl">
               Your adventure is just one click away. Contact us on WhatsApp or choose your adventure below.
             </p>
-            <p className="mb-6 font-accent text-xl text-white/80">{localeText(locale, { en: 'move the sun with your pointer', es: 'mueve el sol con el cursor', de: 'bewege die Sonne mit dem Zeiger', fr: 'déplacez le soleil avec le curseur' })}</p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <button
                 onMouseEnter={() => playHoverFx()}
@@ -282,21 +320,7 @@ const Home: React.FC = () => {
 
       {/* Why Choose Us Section - Enhanced */}
       <section ref={reefRef} className="home-section reef-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
-        <ReefLight className="z-0" pointerTarget={reefRef} />
-        <RisingBubbles className="z-[1]" />
-        <div className="pointer-events-none absolute left-0 top-[14%] z-[1] opacity-80" style={{ animation: 'swimRight 60s linear infinite', animationDelay: '-12s' }} aria-hidden="true">
-          <EagleRay className="h-20 w-28 rotate-90 sm:h-28 sm:w-40" />
-        </div>
-        <div className="pointer-events-none absolute left-0 top-[60%] z-[1] hidden opacity-80 md:block" style={{ animation: 'swimLeft 75s linear infinite', animationDelay: '-30s' }} aria-hidden="true">
-          <SeaTurtle className="h-24 w-20 rotate-90" />
-        </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-36" aria-hidden="true">
-          <Seaweed className="absolute bottom-0 left-[3%] h-36 w-16" />
-          <Coral className="absolute -bottom-3 left-[12%] h-28 w-28" />
-          <SeaFan className="absolute bottom-0 right-[22%] hidden h-32 w-32 md:block" />
-          <Coral tone="orchid" className="absolute -bottom-3 right-[4%] h-32 w-32" />
-          <Seaweed tone="gold" className="absolute bottom-0 right-[14%] hidden h-28 w-14 sm:block" />
-        </div>
+        <NightSky />
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
             <h2 className="mb-4 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">

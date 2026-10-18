@@ -55,6 +55,20 @@ const token = (process.env.CLOUDFLARE_API_TOKEN || '').trim();
 // Opt in, never opt out. See the note at the top of this file for what the
 // other default cost.
 const OVERWRITE = process.env.OVERWRITE === 'true';
+/**
+ * Keys never to copy, comma-separated. An entry ending in `:` or `*` is a
+ * prefix. For seeding a site that belongs to somebody else: the source's
+ * payment credentials, its guests' requests and payments, its notification
+ * keys are the source operator's, not the new site's. Empty by default.
+ */
+const EXCLUDE = (process.env.EXCLUDE_KEYS || '')
+  .split(',')
+  .map((entry) => entry.trim())
+  .filter(Boolean);
+const excluded = (key) =>
+  EXCLUDE.some((entry) =>
+    entry.endsWith('*') ? key.startsWith(entry.slice(0, -1)) : entry.endsWith(':') ? key.startsWith(entry) : key === entry
+  );
 const DEST_TITLE =
   process.env.DEST_KV_TITLE || process.env.KV_NAMESPACE_TITLE || 'ldvip-data';
 
@@ -286,9 +300,14 @@ const main = async () => {
 
   let copied = 0;
   let skipped = 0;
+  let withheld = 0;
   for (const key of sourceKeys) {
     if (existing.has(key)) {
       skipped += 1;
+      continue;
+    }
+    if (excluded(key)) {
+      withheld += 1;
       continue;
     }
     const value = await readValue(accountId, source.id, key);
@@ -298,7 +317,8 @@ const main = async () => {
   }
 
   log(
-    `done — ${copied} copied${skipped ? `, ${skipped} left alone (already in the destination)` : ''}`
+    `done — ${copied} copied${skipped ? `, ${skipped} left alone (already in the destination)` : ''}` +
+      (withheld ? `, ${withheld} withheld by EXCLUDE_KEYS` : '')
   );
   // Hand the id back so the deploy can bind exactly what was just filled.
   if (process.env.GITHUB_OUTPUT) {

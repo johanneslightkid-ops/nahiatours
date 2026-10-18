@@ -1,11 +1,13 @@
 /**
- * El Cortecito — the living-water design system.
+ * El Cortecito Tours — "La Galería".
  *
- * Where the other sites are posters or paintings, this one is a naturalist's
- * field book laid open on the sand at El Cortecito: botanical leaves, reef
- * fish, birds of the Hispaniolan coast, and real moving water underneath it
- * all (src/components/water/*, WebGL). Shapes are organic — leaves, pebbles,
- * currents — never boxes with hard offset shadows.
+ * The site is a walk through a painter's gallery in a colonial street. The
+ * palette is borrowed from the Dominican masters rather than from a travel
+ * brochure: Cándido Bidó's ultramarine skies, his dark indigo contours and
+ * the big yellow sun; Ada Balcácer's layered colour fields; the larimar
+ * stone found only on this island; flamboyán in bloom, sugar cane, mamey and
+ * bougainvillea on a whitewashed wall. Shapes are flat colour with a confident
+ * outline and a small offset — a painted panel, not a glass card.
  *
  * The nine colour families every branch defines are all here, under the same
  * names, so the shared admin and planner code keeps resolving. Only their
@@ -18,141 +20,141 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Mangrove ink: a deep green-teal that reads as near-black on sand.
+        // The painter's contour: deep indigo, almost night.
         ink: {
-          DEFAULT: '#0E3B36',
-          soft: '#3E615B',
-          light: '#7D9A94',
+          DEFAULT: '#1D2346',
+          soft: '#4A5175',
+          light: '#8A8FAD',
         },
-        // Sand, from dry dune to wet shoreline.
+        // Primed canvas, from fresh gesso to an old wall.
         paper: {
-          DEFAULT: '#FBF5E8',
-          warm: '#F5EAD3',
-          deep: '#E9D8B6',
-          card: '#FFFDF8',
+          DEFAULT: '#F7EFE1',
+          warm: '#F0E2C8',
+          deep: '#E2CDA6',
+          card: '#FFFBF3',
         },
-        // Papaya and morning sun.
+        // The sun Bidó paints over every village.
         mango: {
-          light: '#FFD47E',
-          DEFAULT: '#F7B23B',
-          dark: '#D98612',
+          light: '#FFDD6E',
+          DEFAULT: '#F5B921',
+          dark: '#C98A06',
         },
-        // Hibiscus and coral reef.
+        // Flamboyán in June.
         hibiscus: {
-          light: '#FFB1A6',
-          DEFAULT: '#F2675C',
-          dark: '#CF453E',
+          light: '#FF9E8A',
+          DEFAULT: '#E5482F',
+          dark: '#B3301D',
         },
-        // Caribbean turquoise.
+        // Larimar, the island's own blue stone.
         lagoon: {
-          light: '#93ECE1',
-          DEFAULT: '#17B5AC',
-          dark: '#0A7C76',
+          light: '#A9E4EE',
+          DEFAULT: '#3FAFC9',
+          dark: '#1F7D94',
         },
+        // Bidó's ultramarine sky.
         sky: {
-          light: '#BDE9FA',
-          DEFAULT: '#4DB6E5',
-          dark: '#197DB1',
+          light: '#A9BAF5',
+          DEFAULT: '#2F4FD1',
+          dark: '#1A2F94',
         },
-        // Leaf greens, from new fern to old palm.
+        // Cane field and royal palm.
         jungle: {
-          light: '#A3DB93',
-          DEFAULT: '#3E9B50',
-          dark: '#1E6A3B',
+          light: '#B4D98A',
+          DEFAULT: '#4F9136',
+          dark: '#2F611E',
         },
-        // Flamboyán blossom.
+        // Mamey and late afternoon.
         sunset: {
-          light: '#FFB592',
-          DEFAULT: '#F2723C',
-          dark: '#C7491C',
+          light: '#FFC09A',
+          DEFAULT: '#EE7A3C',
+          dark: '#BF5218',
         },
-        // Wild orchid.
+        // Bougainvillea on a white wall.
         grape: {
-          light: '#D9BAF2',
-          DEFAULT: '#9C6CD0',
-          dark: '#6E45A3',
+          light: '#F2AEDB',
+          DEFAULT: '#BF3A8F',
+          dark: '#8A2266',
         },
         // Roles the admin panel is written against.
         coral: {
-          deep: '#CF453E',
+          deep: '#B3301D',
         },
         sea: {
-          deep: '#0A7C76',
+          deep: '#1F7D94',
         },
-        // Deep water, for the footer and the reef.
+        // Night over the Malecón, for the footer and the night planner.
         abyss: {
-          DEFAULT: '#06323D',
-          light: '#0B4F5C',
+          DEFAULT: '#141A3C',
+          light: '#263068',
         },
 
-        tropicalGreen: '#3E9B50',
-        tropicalBlue: '#4DB6E5',
-        sandyBeige: '#F5EAD3',
-        sunsetOrange: '#F2723C',
-        oceanWave: '#17B5AC',
+        tropicalGreen: '#4F9136',
+        tropicalBlue: '#2F4FD1',
+        sandyBeige: '#F0E2C8',
+        sunsetOrange: '#EE7A3C',
+        oceanWave: '#3FAFC9',
       },
-      // `border-ink` is everywhere in the shared markup. Here it is a soft
-      // hairline the colour of wet leaves rather than a black pen outline —
-      // the field-book page has pencil edges, not sticker outlines.
+      // `border-ink` is everywhere in the shared markup: here it is the
+      // painter's line — indigo, and confident.
       borderColor: {
         ink: {
-          DEFAULT: 'rgb(14 59 54 / 0.16)',
-          soft: 'rgb(14 59 54 / 0.24)',
-          light: 'rgb(14 59 54 / 0.1)',
+          DEFAULT: '#1D2346',
+          soft: 'rgb(29 35 70 / 0.45)',
+          light: 'rgb(29 35 70 / 0.18)',
         },
       },
       fontFamily: {
-        heading: ['Fraunces', 'Georgia', 'serif'],
-        display: ['Fraunces', 'Georgia', 'serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        body: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        heading: ['"DM Serif Display"', 'Georgia', 'serif'],
+        display: ['"DM Serif Display"', 'Georgia', 'serif'],
+        serif: ['"DM Serif Display"', 'Georgia', 'serif'],
+        sans: ['Figtree', 'system-ui', 'sans-serif'],
+        body: ['Figtree', 'system-ui', 'sans-serif'],
         accent: ['Caveat', 'cursive'],
         script: ['Caveat', 'cursive'],
       },
       backgroundImage: {
-        'sun-rays': 'radial-gradient(circle at 50% 50%, rgba(255,212,126,0.55) 0%, transparent 60%)',
-        'sky-wash': 'linear-gradient(180deg, #BDE9FA 0%, #E3F6FB 50%, #FBF5E8 100%)',
-        'sunset-wash': 'linear-gradient(180deg, #FFD47E 0%, #F7965C 55%, #F2675C 100%)',
-        'lagoon-wash': 'linear-gradient(180deg, #93ECE1 0%, #17B5AC 60%, #0A7C76 100%)',
-        'jungle-wash': 'linear-gradient(180deg, #A3DB93 0%, #3E9B50 60%, #1E6A3B 100%)',
-        'paper-wash': 'linear-gradient(180deg, #FBF5E8 0%, #F5EAD3 100%)',
-        'abyss-wash': 'linear-gradient(180deg, #0B4F5C 0%, #06323D 100%)',
+        'sun-rays': 'radial-gradient(circle at 50% 50%, rgba(255,221,110,0.6) 0%, transparent 60%)',
+        'sky-wash': 'linear-gradient(180deg, #2F4FD1 0%, #4F6FE0 55%, #A9BAF5 100%)',
+        'sunset-wash': 'linear-gradient(180deg, #F5B921 0%, #EE7A3C 55%, #E5482F 100%)',
+        'lagoon-wash': 'linear-gradient(180deg, #A9E4EE 0%, #3FAFC9 60%, #1F7D94 100%)',
+        'jungle-wash': 'linear-gradient(180deg, #B4D98A 0%, #4F9136 60%, #2F611E 100%)',
+        'paper-wash': 'linear-gradient(180deg, #F7EFE1 0%, #F0E2C8 100%)',
+        'abyss-wash': 'linear-gradient(180deg, #263068 0%, #141A3C 100%)',
       },
       boxShadow: {
-        // Soft, green-tinted daylight shadows. The names are kept because the
-        // shared markup asks for them; the look is leaf-shade, not ink.
-        'ink-sm': '0 3px 10px -4px rgba(14, 59, 54, 0.22)',
-        'ink': '0 10px 26px -12px rgba(14, 59, 54, 0.32)',
-        'ink-lg': '0 18px 42px -16px rgba(14, 59, 54, 0.36)',
-        'ink-xl': '0 30px 60px -22px rgba(14, 59, 54, 0.42)',
-        'mango': '0 12px 28px -12px rgba(217, 134, 18, 0.55)',
-        'lagoon': '0 12px 28px -12px rgba(10, 124, 118, 0.55)',
-        'hibiscus': '0 12px 28px -12px rgba(207, 69, 62, 0.5)',
-        'lift': '0 14px 30px -14px rgba(14, 59, 54, 0.45)',
-        'glow': '0 0 0 6px rgba(147, 236, 225, 0.35)',
+        // A painted panel lifts off the wall by a small, hard offset in the
+        // contour colour — the names are the shared markup's.
+        'ink-sm': '3px 3px 0 0 rgba(29, 35, 70, 0.9)',
+        'ink': '5px 5px 0 0 rgba(29, 35, 70, 0.9)',
+        'ink-lg': '8px 8px 0 0 rgba(29, 35, 70, 0.9)',
+        'ink-xl': '12px 12px 0 0 rgba(29, 35, 70, 0.9)',
+        'mango': '5px 5px 0 0 #C98A06',
+        'lagoon': '5px 5px 0 0 #1F7D94',
+        'hibiscus': '5px 5px 0 0 #B3301D',
+        'lift': '0 14px 30px -14px rgba(29, 35, 70, 0.45)',
+        'glow': '0 0 0 6px rgba(255, 221, 110, 0.45)',
       },
       borderRadius: {
-        'sm': '10px',
-        'md': '14px',
-        'lg': '20px',
-        'xl': '26px',
-        '2xl': '32px',
-        '3xl': '40px',
-        'blob': '46% 54% 52% 48% / 52% 46% 54% 48%',
-        // A leaf lying on its side, and a pebble.
-        'leaf': '72% 12% 72% 12% / 72% 12% 72% 12%',
-        'pebble': '58% 42% 55% 45% / 48% 56% 44% 52%',
+        'sm': '8px',
+        'md': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        '2xl': '24px',
+        '3xl': '30px',
+        // A hand-cut paper shape and a sun.
+        'blob': '42% 58% 55% 45% / 50% 44% 56% 50%',
+        'leaf': '70% 14% 70% 14% / 70% 14% 70% 14%',
+        'pebble': '55% 45% 52% 48% / 46% 56% 44% 54%',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
         'sway': 'sway 7s ease-in-out infinite',
-        'spin-slow': 'spin 40s linear infinite',
-        'bob': 'bob 4.5s ease-in-out infinite',
+        'spin-slow': 'spin 60s linear infinite',
+        'bob': 'bob 4.8s ease-in-out infinite',
         'fade-in': 'fadeIn 0.7s ease-out forwards',
         'slide-up': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'drift': 'drift 60s linear infinite',
-        'flutter': 'flutter 0.18s ease-in-out infinite alternate',
+        'drift': 'drift 70s linear infinite',
+        'flutter': 'flutter 0.22s ease-in-out infinite alternate',
       },
       keyframes: {
         float: {
@@ -164,8 +166,8 @@ module.exports = {
           '50%': { transform: 'rotate(3deg)' },
         },
         bob: {
-          '0%, 100%': { transform: 'translateY(0) rotate(-1.5deg)' },
-          '50%': { transform: 'translateY(-9px) rotate(1.5deg)' },
+          '0%, 100%': { transform: 'translateY(0) rotate(-2deg)' },
+          '50%': { transform: 'translateY(-8px) rotate(2deg)' },
         },
         fadeIn: {
           '0%': { opacity: '0' },
@@ -181,7 +183,7 @@ module.exports = {
         },
         flutter: {
           from: { transform: 'scaleY(1)' },
-          to: { transform: 'scaleY(0.35)' },
+          to: { transform: 'scaleY(0.4)' },
         },
       },
       maxWidth: {

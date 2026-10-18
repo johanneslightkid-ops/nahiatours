@@ -1,72 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Yeseva+One&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ══════════════════════════════════════════════════════════════════════════
-   EL CORTECITO — LIVING WATER
+   EL CORTECITO TOURS — LA GALERÍA
    ──────────────────────────────────────────────────────────────────────────
-   A naturalist's field book open on the beach. Three rules hold it together:
+   A walk through a painter's gallery on a colonial street. Three rules:
 
-     1. Organic shapes. Leaves, pebbles and currents — radii are uneven on
-        purpose, edges are waves, nothing is a plain box.
-     2. Leaf shade, not ink. Depth comes from soft, green-tinted daylight
-        shadows and hairline pencil edges, never from hard offset blocks.
-     3. Real water. The big water surfaces are WebGL (src/components/water);
-        CSS only frames them. Every animation here moves `transform` or
-        `opacity` and nothing else.
+     1. Painted, not printed. Flat fields of colour with a confident indigo
+        contour and a small hard offset — the way Cándido Bidó outlines a
+        sun, a house, a bird. No glass, no blur.
+     2. The palette is the island's: Bidó's ultramarine and sun yellow,
+        larimar, flamboyán, cane, mamey, bougainvillea, on primed canvas.
+     3. Everything that moves moves `transform` or `opacity`, slowly, like
+        shutters in a breeze or a sun turning. Nothing repaints per frame.
 
    The class names are the ones every branch's shared markup asks for — only
    what they look like is this site's own.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --ink: #0e3b36;
-  --ink-soft: #3e615b;
-  --ink-light: #7d9a94;
+  --ink: #1d2346;
+  --ink-soft: #4a5175;
+  --ink-light: #8a8fad;
 
-  --paper: #fbf5e8;
-  --paper-warm: #f5ead3;
-  --paper-deep: #e9d8b6;
-  --card: #fffdf8;
+  --paper: #f7efe1;
+  --paper-warm: #f0e2c8;
+  --paper-deep: #e2cda6;
+  --card: #fffbf3;
 
-  --mango: #f7b23b;
-  --mango-light: #ffd47e;
-  --mango-dark: #d98612;
+  --mango: #f5b921;
+  --mango-light: #ffdd6e;
+  --mango-dark: #c98a06;
 
-  --hibiscus: #f2675c;
-  --hibiscus-light: #ffb1a6;
-  --hibiscus-dark: #cf453e;
+  --hibiscus: #e5482f;
+  --hibiscus-light: #ff9e8a;
+  --hibiscus-dark: #b3301d;
 
-  --lagoon: #17b5ac;
-  --lagoon-light: #93ece1;
-  --lagoon-dark: #0a7c76;
+  --lagoon: #3fafc9;
+  --lagoon-light: #a9e4ee;
+  --lagoon-dark: #1f7d94;
 
-  --sky: #4db6e5;
-  --sky-light: #bde9fa;
-  --sky-dark: #197db1;
+  --sky: #2f4fd1;
+  --sky-light: #a9baf5;
+  --sky-dark: #1a2f94;
 
-  --jungle: #3e9b50;
-  --jungle-light: #a3db93;
-  --jungle-dark: #1e6a3b;
+  --jungle: #4f9136;
+  --jungle-light: #b4d98a;
+  --jungle-dark: #2f611e;
 
-  --sunset: #f2723c;
-  --grape: #9c6cd0;
-  --abyss: #06323d;
+  --sunset: #ee7a3c;
+  --grape: #bf3a8f;
+  --abyss: #141a3c;
 
-  --line: rgb(14 59 54 / 0.14);
-  --shade-sm: 0 3px 10px -4px rgb(14 59 54 / 0.22);
-  --shade: 0 12px 28px -14px rgb(14 59 54 / 0.34);
-  --shade-lg: 0 22px 48px -20px rgb(14 59 54 / 0.4);
+  --line: rgb(29 35 70 / 0.18);
+  /* The painter's offset, in three sizes. */
+  --shade-sm: 3px 3px 0 0 rgb(29 35 70 / 0.9);
+  --shade: 5px 5px 0 0 rgb(29 35 70 / 0.9);
+  --shade-lg: 8px 8px 0 0 rgb(29 35 70 / 0.9);
 
-  /* Organic radii, reused so the whole site has the same handful of pebbles. */
-  --pebble-a: 34px 22px 38px 18px / 26px 34px 20px 36px;
-  --pebble-b: 22px 36px 20px 34px / 34px 22px 36px 20px;
-  --leaf: 48px 10px 48px 10px;
+  /* Hand-cut paper: corners that are almost, never exactly, square. */
+  --cut-a: 14px 20px 12px 18px / 18px 12px 20px 14px;
+  --cut-b: 20px 12px 18px 14px / 12px 18px 14px 20px;
+  --pebble-a: var(--cut-a);
+  --pebble-b: var(--cut-b);
+  --leaf: 40px 8px 40px 8px;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* A brushed edge, used as a mask on colour bands (top and bottom). */
+  --brush-edge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V14c40-6 70 4 118 1s70-12 122-8 64 10 112 9 88-14 140-11 58 12 104 10 82-13 132-10 76 11 126 9 66-9 118-8 70 9 118 6 52-6 70-5L1200 12V40z' fill='black'/%3E%3C/svg%3E");
 }
 
 * {
@@ -85,26 +89,24 @@ body {
 
 body {
   min-height: 100vh;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Figtree', system-ui, sans-serif;
   font-weight: 500;
   color: var(--ink);
   background-color: transparent;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Sand grain, faint. Two sparse dot layers — no image request. */
+/* The canvas weave, faint: two crossing hairline patterns, no image request. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.6;
   background-image:
-    radial-gradient(circle at 50% 50%, rgb(14 59 54 / 0.07) 1px, transparent 1.5px),
-    radial-gradient(circle at 50% 50%, rgb(217 134 18 / 0.08) 1px, transparent 1.5px);
-  background-size: 19px 19px, 31px 31px;
-  background-position: 0 0, 9px 13px;
+    repeating-linear-gradient(0deg, rgb(29 35 70 / 0.028) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgb(201 138 6 / 0.035) 0 1px, transparent 1px 5px);
 }
 
 h1,
@@ -114,42 +116,62 @@ h4,
 h5,
 h6,
 .font-lobster {
-  font-family: 'Fraunces', Georgia, serif;
-  font-variation-settings: 'SOFT' 100, 'opsz' 96;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  line-height: 1.08;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 1.06;
   color: var(--ink);
 }
 
-/* Fraunces at 800 is a slab; the markup asks for `font-extrabold` everywhere,
-   so pull it back to a softer 700 on display copy. */
+/* DM Serif Display has one weight; the shared markup asks for extrabold
+   everywhere, and faux-bold would smear it. */
+.font-display,
 .font-display.font-extrabold,
+.font-display.font-bold,
 h1.font-extrabold,
 h2.font-extrabold,
-h3.font-extrabold {
-  font-weight: 700;
+h3.font-extrabold,
+h1.font-bold,
+h2.font-bold,
+h3.font-bold {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-weight: 400;
 }
 
 a {
-  color: var(--lagoon-dark);
+  color: var(--sky-dark);
   font-weight: 700;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--jungle-dark);
+  color: var(--hibiscus-dark);
 }
 
 ::selection {
-  background: var(--lagoon-light);
+  background: var(--mango-light);
   color: var(--ink);
 }
 
 :focus-visible {
-  outline: 3px solid var(--lagoon);
+  outline: 3px solid var(--sky);
   outline-offset: 3px;
-  border-radius: 12px;
+}
+
+input,
+textarea,
+select {
+  color: var(--ink);
+  background: var(--card);
+  border-color: rgb(29 35 70 / 0.28);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--sky);
+  box-shadow: 0 0 0 3px rgb(47 79 209 / 0.18);
 }
 
 .section-shell {
@@ -158,821 +180,657 @@ a:hover {
 
 /* ── Type accents ───────────────────────────────────────────────────────── */
 
-/* A field-book note above a headline. */
+/* A painter's signature in the corner: the handwritten note. */
 .hand-note {
   font-family: 'Caveat', cursive;
   font-weight: 700;
-  font-size: 1.7rem;
-  line-height: 1;
-  color: var(--jungle);
-  transform: rotate(-3deg);
-  display: inline-block;
+  font-size: 1.35rem;
+  line-height: 1.1;
+  color: var(--hibiscus-dark);
 }
 
-/* A brush of shallow-water turquoise under the words. */
+/* A stroke of yellow paint under the words, laid on at an angle. */
 .marker-highlight {
-  display: inline;
-  padding: 0 0.06em;
-  background-image: linear-gradient(
-    to bottom,
-    transparent 62%,
-    rgb(147 236 225 / 0.85) 62%,
-    rgb(147 236 225 / 0.85) 90%,
-    transparent 90%
-  );
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+  background-image: linear-gradient(100deg, transparent 2%, rgb(255 221 110 / 0.95) 4%, rgb(255 221 110 / 0.9) 94%, transparent 97%);
+  background-size: 100% 0.5em;
+  background-position: 0 88%;
+  background-repeat: no-repeat;
+  padding: 0 0.1em;
 }
 
-/* A current sweeping under a story heading. */
+/* Section titles sit on a cut-paper scrap of colour. */
 .scribble-title-bg {
   position: relative;
   display: inline-block;
-  padding-bottom: 0.25em;
+  isolation: isolate;
 }
 
 .scribble-title-bg::after {
   content: '';
   position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: -0.1em;
-  height: 0.55rem;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C22 2 38 12 58 7 C78 2 94 12 114 7 C134 2 150 12 170 7 C182 4 192 6 198 7' stroke='%2317B5AC' stroke-width='4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  z-index: -1;
+  left: -0.25em;
+  right: -0.25em;
+  bottom: 0.02em;
+  height: 0.45em;
+  border-radius: 6px 14px 8px 12px;
+  background: var(--mango-light);
+  transform: rotate(-1.2deg);
 }
 
-/* ── Section bands ──────────────────────────────────────────────────────── */
+/* The emoji above a section heading: a small framed painting. */
+.section-icon {
+  display: grid;
+  place-items: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  font-size: 2rem;
+  background: var(--card);
+  border: 3px solid var(--ink);
+  border-radius: var(--cut-a);
+  box-shadow: var(--shade-sm), inset 0 0 0 5px var(--mango-light);
+  transform: rotate(-3deg);
+}
+
+.lobster-header {
+  font-family: 'DM Serif Display', Georgia, serif;
+  color: var(--ink);
+}
+
+/* ── Section bands: colour fields with a brushed edge ───────────────────── */
 
 .home-section {
+  position: relative;
   isolation: isolate;
 }
 
-/* A faint pressed-leaf print on the dry-sand bands. */
 .shore-section {
+  background: var(--paper);
+}
+
+.lagoon-section {
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%233E9B50' stroke-opacity='0.07' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M30 190 C60 150 70 110 110 80'/%3E%3Cpath d='M48 166 C40 150 30 146 22 148 M62 146 C56 128 46 122 36 124 M76 126 C72 108 64 100 54 100 M58 162 C72 162 82 156 88 146 M74 140 C88 140 98 132 102 122 M90 118 C104 116 112 108 114 98'/%3E%3Cpath d='M160 60 C168 40 186 32 204 36 C196 54 180 62 160 60 Z'/%3E%3Cpath d='M164 58 L196 40'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 220px 220px,
-    var(--paper) !important;
+    radial-gradient(120% 70% at 10% 0%, rgb(255 221 110 / 0.35), transparent 60%),
+    linear-gradient(180deg, #e8f3f5 0%, var(--lagoon-light) 100%);
 }
 
 .cove-section {
-  background: linear-gradient(180deg, #f8eedb 0%, var(--paper-warm) 100%) !important;
-}
-
-/* Shallow water, lit from above: a soft caustic net over pale turquoise. */
-.lagoon-section {
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='200' viewBox='0 0 260 200'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.5' stroke-width='2'%3E%3Cpath d='M0 40 C30 30 50 60 80 50 C110 40 120 10 150 20 C180 30 200 60 230 50 C245 45 255 40 260 42'/%3E%3Cpath d='M20 120 C40 100 70 110 90 130 C110 150 140 140 160 120 C180 100 210 110 240 130'/%3E%3Cpath d='M80 50 C70 80 90 100 90 130 M150 20 C160 60 150 90 160 120 M230 50 C220 80 240 100 240 130'/%3E%3Cpath d='M0 180 C40 170 60 190 100 182 C140 174 160 190 200 184 C230 180 250 186 260 184'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 260px 200px,
-    linear-gradient(180deg, #def7f3 0%, #c6efea 100%) !important;
+  background: linear-gradient(180deg, var(--paper-warm) 0%, #f3dcc4 100%);
 }
 
 .bay-section {
-  background: linear-gradient(180deg, #eaf6e4 0%, #d9efd4 100%) !important;
+  background:
+    radial-gradient(90% 60% at 90% 10%, rgb(169 186 245 / 0.45), transparent 60%),
+    var(--paper);
 }
 
 .dawn-section {
-  background: linear-gradient(180deg, #fbf5e8 0%, #fde5cf 100%) !important;
+  background: linear-gradient(180deg, #ffe6a8 0%, var(--paper) 100%);
 }
 
+/* Late afternoon over the bay: Bidó's blue going to mamey. */
 .sunset-section {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #4b3a6b 0%, #c7586a 45%, #f7965c 80%, #ffd47e 100%) !important;
+  background: linear-gradient(180deg, var(--sky-dark) 0%, var(--sky) 38%, #7a5bc4 62%, var(--sunset) 100%);
+  color: #fff;
 }
 
+/* Night: the deep indigo of the contour, with a sky of stars. */
 .reef-section {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #0f7d82 0%, #0a5d6a 50%, #06323d 100%) !important;
+  background:
+    radial-gradient(2px 2px at 12% 18%, rgb(255 255 255 / 0.85), transparent 60%),
+    radial-gradient(1.5px 1.5px at 32% 8%, rgb(255 255 255 / 0.7), transparent 60%),
+    radial-gradient(2px 2px at 58% 22%, rgb(255 255 255 / 0.8), transparent 60%),
+    radial-gradient(1.5px 1.5px at 76% 12%, rgb(255 255 255 / 0.7), transparent 60%),
+    radial-gradient(2px 2px at 88% 30%, rgb(255 255 255 / 0.8), transparent 60%),
+    linear-gradient(180deg, var(--abyss) 0%, #263068 70%, #33407f 100%);
+  color: #fff;
 }
 
-.sunset-section p {
-  text-shadow: 0 1px 14px rgb(42 29 58 / 0.65), 0 0 2px rgb(42 29 58 / 0.4);
-}
-
-.sunset-section h2,
-.sunset-section h3,
-.reef-section h2,
-.reef-section h3 {
-  color: #ffffff;
-  text-shadow: 0 2px 18px rgb(6 50 61 / 0.45);
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
-   Wavy section edges — a slow, uneven swell rather than a regular sine.
-   ══════════════════════════════════════════════════════════════════════════ */
-
-:root {
-  --wave-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C90,40 170,92 290,74 C420,54 470,18 600,30 C720,42 770,96 900,90 C1010,84 1080,40 1200,48 L1200,120 L0,120 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,70 C1090,92 1010,40 890,48 C770,56 720,104 600,96 C470,88 420,40 300,46 C170,52 90,96 0,64 Z' fill='%23000'/%3E%3C/svg%3E");
-  --wave-height: 3.5rem;
-}
-
+/* The brushed edge, top and bottom: a static mask, nothing animates. */
 .wavy-band,
 .wavy-band-top,
 .wavy-band-bottom {
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-}
-
-.wavy-band {
-  -webkit-mask-image: var(--wave-top), linear-gradient(#000, #000), var(--wave-bottom);
-  -webkit-mask-size: 100% var(--wave-height), 100% calc(100% - var(--wave-height) * 2), 100% var(--wave-height);
-  -webkit-mask-position: top center, center, bottom center;
-  mask-image: var(--wave-top), linear-gradient(#000, #000), var(--wave-bottom);
-  mask-size: 100% var(--wave-height), 100% calc(100% - var(--wave-height) * 2), 100% var(--wave-height);
-  mask-position: top center, center, bottom center;
-}
-
-.wavy-band-top {
-  -webkit-mask-image: var(--wave-top), linear-gradient(#000, #000);
-  -webkit-mask-size: 100% var(--wave-height), 100% calc(100% - var(--wave-height));
-  -webkit-mask-position: top center, bottom center;
-  mask-image: var(--wave-top), linear-gradient(#000, #000);
-  mask-size: 100% var(--wave-height), 100% calc(100% - var(--wave-height));
-  mask-position: top center, bottom center;
-}
-
-.wavy-band-bottom {
-  -webkit-mask-image: linear-gradient(#000, #000), var(--wave-bottom);
-  -webkit-mask-size: 100% calc(100% - var(--wave-height)), 100% var(--wave-height);
-  -webkit-mask-position: top center, bottom center;
-  mask-image: linear-gradient(#000, #000), var(--wave-bottom);
-  mask-size: 100% calc(100% - var(--wave-height)), 100% var(--wave-height);
-  mask-position: top center, bottom center;
-}
-
-@media (max-width: 640px) {
-  :root {
-    --wave-height: 2.1rem;
-  }
-}
-
-/* ── Surfaces ───────────────────────────────────────────────────────────── */
-
-/*
- * The card recipe. The lift on hover is a transform; the deeper shade is a
- * pseudo-element whose opacity fades in — a box-shadow transition would be
- * repainted every frame of the hover.
- */
-.sticker-card,
-.artsy-glass-card,
-.glass-card {
   position: relative;
-  background: var(--card);
-  border: 1px solid var(--line);
-  box-shadow: var(--shade);
-  transition: transform 0.45s var(--ease-out);
 }
 
-.sticker-card::after,
-.artsy-glass-card::after,
-.glass-card::after,
-.home-feature-card::after,
-.story-copy-card::after,
-.pathway-card::after {
+.wavy-band::before,
+.wavy-band-top::before,
+.wavy-band::after,
+.wavy-band-bottom::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: var(--shade-lg);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.45s var(--ease-out);
-}
-
-.sticker-card:hover,
-.artsy-glass-card:hover,
-.glass-card:hover {
-  transform: translateY(-6px);
-}
-
-.sticker-card:hover::after,
-.artsy-glass-card:hover::after,
-.glass-card:hover::after,
-.home-feature-card:hover::after,
-.story-copy-card:hover::after,
-.pathway-card:hover::after {
-  opacity: 1;
-}
-
-/* Feature cards float on the reef band like translucent sea glass. */
-.home-feature-card {
-  position: relative;
-  border-radius: var(--pebble-a);
-  border: 1px solid rgb(255 255 255 / 0.22);
-  background: rgb(255 253 248 / 0.94);
-  color: var(--ink);
-  box-shadow: 0 20px 44px -24px rgb(0 20 26 / 0.7);
-  transition: transform 0.45s var(--ease-out);
-}
-
-.home-feature-card:nth-child(3n + 2) {
-  border-radius: var(--pebble-b);
-}
-
-.home-feature-card:hover {
-  transform: translateY(-8px);
-}
-
-.home-feature-card h3,
-.home-feature-card p {
-  color: var(--ink);
-  text-shadow: none;
-}
-
-.story-copy-card {
-  position: relative;
-  border-radius: var(--pebble-a);
-  border: 1px solid var(--line);
-  background: var(--card);
-  padding: 1.75rem;
-  box-shadow: var(--shade);
-  transition: transform 0.45s var(--ease-out);
-}
-
-.story-copy-card:hover {
-  transform: translateY(-4px);
-}
-
-/* Photographs sit in pebble frames with a thin sand mat. */
-.story-media-frame {
-  position: relative;
-}
-
-.story-media-frame img,
-.story-media-frame iframe {
-  border-radius: 46% 54% 42% 58% / 34% 38% 62% 66% !important;
-  border: 6px solid var(--card);
-  box-shadow: var(--shade-lg);
-}
-
-.photo-sticker {
-  border: 4px solid var(--card);
-}
-
-.photo-pop {
-  filter: saturate(1.1) contrast(1.03);
-}
-
-/* The home welcome uses a deliberately imperfect stack of printed snapshots.
-   The translucent wash and tape keep every source — image or video — feeling
-   like part of one small travel album. */
-.hero-polaroid {
-  position: relative;
-  overflow: hidden;
-  padding: 0.65rem;
-  border: 1px solid rgb(255 255 255 / 0.75);
-  border-radius: 0.45rem 0.85rem 0.5rem 0.7rem;
-  background: #fffaf0;
-  box-shadow: 0 16px 30px rgb(6 50 61 / 0.3), 0 3px 0 rgb(105 75 38 / 0.1);
-}
-
-.hero-polaroid::before {
-  content: '';
-  position: absolute;
+  left: 0;
+  right: 0;
+  height: 26px;
   z-index: 2;
-  top: -0.6rem;
-  left: 50%;
-  width: 4.5rem;
-  height: 1.35rem;
-  transform: translateX(-50%) rotate(-2deg);
-  background: repeating-linear-gradient(135deg, rgb(255 228 151 / 0.78) 0 7px, rgb(255 239 186 / 0.72) 7px 14px);
-  box-shadow: 0 1px 3px rgb(73 48 19 / 0.16);
-}
-
-.hero-polaroid-main::after,
-.hero-polaroid-small::after {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  inset: 0.65rem;
   pointer-events: none;
-  background: linear-gradient(135deg, rgb(255 242 196 / 0.16), transparent 36%, rgb(15 125 130 / 0.12));
-  mix-blend-mode: soft-light;
+  background: var(--paper);
+  -webkit-mask: var(--brush-edge) center / 100% 100% no-repeat;
+  mask: var(--brush-edge) center / 100% 100% no-repeat;
 }
 
-.hero-media-window {
-  position: relative;
-  overflow: hidden;
-  border-radius: 0.22rem 0.5rem 0.28rem 0.42rem;
-  background: var(--paper-deep);
+.wavy-band::before,
+.wavy-band-top::before {
+  top: -1px;
+  transform: scaleY(-1);
 }
 
-.hero-polaroid-caption {
-  margin: 0.55rem 0.2rem 0.05rem;
-  color: var(--ink);
-  font-family: 'Caveat', cursive;
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1;
+.wavy-band::after,
+.wavy-band-bottom::after {
+  bottom: -1px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-polaroid {
-    animation: none !important;
-  }
-}
-
-.hero-glass {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--pebble-a);
-  background: var(--card);
-  border: 1px solid var(--line);
-  box-shadow: var(--shade-lg);
-}
-
-/* A pebble holding a section's emoji. */
-.section-icon {
-  display: inline-grid;
-  width: 78px;
-  height: 78px;
-  place-items: center;
-  border-radius: 58% 42% 55% 45% / 48% 56% 44% 52%;
-  background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--lagoon-light) 70%);
-  box-shadow: var(--shade);
-  font-size: 2.2rem;
-  line-height: 1;
-  transition: transform 0.6s var(--ease-spring);
-}
-
-.section-icon:hover {
-  transform: rotate(-8deg) scale(1.08);
-}
-
-/* Soft washes of colour behind sections — like light through leaves. */
+/* Soft colour washes behind a band, like a background scumbled in. */
 .parallax-wash {
   position: absolute;
-  z-index: -1;
-  width: min(42vw, 480px);
-  aspect-ratio: 1;
-  border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
-  opacity: 0.4;
+  z-index: 0;
+  width: 46vw;
+  height: 46vw;
+  max-width: 560px;
+  max-height: 560px;
+  border-radius: var(--cut-a);
   pointer-events: none;
-  background: radial-gradient(circle, var(--mango-light) 0%, transparent 68%);
+  opacity: 0.45;
 }
 
 .parallax-wash-left {
-  left: -14%;
+  left: -14vw;
   top: 8%;
-  background: radial-gradient(circle, var(--lagoon-light) 0%, transparent 68%);
+  background: radial-gradient(circle, rgb(255 221 110 / 0.8), transparent 65%);
 }
 
 .parallax-wash-right {
-  right: -14%;
+  right: -12vw;
   bottom: 6%;
-  background: radial-gradient(circle, var(--jungle-light) 0%, transparent 68%);
+  background: radial-gradient(circle, rgb(191 58 143 / 0.28), transparent 65%);
+}
+
+/* ── Surfaces: painted panels ───────────────────────────────────────────── */
+
+.glass-card,
+.artsy-glass-card,
+.sticker-card,
+.story-copy-card,
+.home-feature-card,
+.hero-glass {
+  background: var(--card);
+  border: 3px solid var(--ink);
+  border-radius: var(--cut-a);
+  box-shadow: var(--shade);
+}
+
+.artsy-glass-card {
+  border-radius: var(--cut-b);
+  transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+}
+
+.artsy-glass-card:hover {
+  transform: translate(-2px, -3px) rotate(-0.3deg);
+  box-shadow: var(--shade-lg);
+}
+
+/* Feature cards on the night band: little paintings on the wall. */
+.home-feature-card {
+  position: relative;
+  border-radius: var(--cut-b);
+  box-shadow: 6px 6px 0 0 var(--mango);
+  transition: transform 0.35s var(--ease-out);
+}
+
+.home-feature-card:hover {
+  transform: translateY(-4px) rotate(0.4deg);
+}
+
+.home-feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1.5px dashed rgb(29 35 70 / 0.25);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.sticker-card {
+  transform: rotate(-1.2deg);
+}
+
+.story-copy-card {
+  padding: 2rem;
+}
+
+/* Photographs are hung in a frame with a mat, slightly askew. */
+.story-media-frame,
+.photo-sticker {
+  position: relative;
+  overflow: hidden;
+  background: var(--card);
+  border: 3px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: var(--shade), inset 0 0 0 8px var(--card);
+  padding: 8px;
+}
+
+.story-media-frame img,
+.story-media-frame video,
+.story-media-frame iframe {
+  border-radius: 2px;
+}
+
+.photo-pop {
+  transition: transform 0.7s var(--ease-out);
+}
+
+.stamp-edge {
+  border: 3px dashed var(--ink);
+  border-radius: 6px;
+}
+
+.artsy-title-card,
+.artsy-title-card-light {
+  position: relative;
+  display: inline-block;
+  padding: 0.55rem 1.1rem;
+  border: 3px solid var(--ink);
+  border-radius: var(--cut-b);
+  box-shadow: var(--shade-sm);
+  background: var(--mango-light);
+}
+
+.artsy-title-card-light {
+  background: var(--card);
 }
 
 /* ── Buttons ────────────────────────────────────────────────────────────── */
 
-button {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-weight: 700;
-  border-radius: 9999px;
-}
-
-/*
- * The primary button is a ripe papaya pebble. Hover lifts it and sweeps a
- * glint of sunlight across — both transforms.
- */
 .tropical-button,
 .tropical-button-outline,
-.planner-cta {
+.btn-lagoon,
+.btn-hibiscus {
   position: relative;
-  overflow: hidden;
-  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: var(--shade-sm);
+  transition: transform 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out), background-color 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .tropical-button {
-  @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-extrabold tracking-wide;
-  border-radius: 999px 999px 999px 999px / 999px 999px 999px 999px;
-  background: linear-gradient(135deg, #ffd47e 0%, #f7b23b 55%, #f29a3b 100%);
+  background: var(--mango);
   color: var(--ink);
-  border: 0;
-  box-shadow: 0 10px 24px -12px rgb(217 134 18 / 0.75), inset 0 -3px 0 rgb(14 59 54 / 0.12);
-  transition: transform 0.35s var(--ease-spring);
-}
-
-.tropical-button::before,
-.tropical-button-outline::before,
-.planner-cta::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(105deg, transparent 30%, rgb(255 255 255 / 0.55) 50%, transparent 70%);
-  transform: translateX(-120%);
-  transition: transform 0.7s var(--ease-out);
-}
-
-.tropical-button:hover,
-.tropical-button-outline:hover,
-.planner-cta:hover {
-  transform: translateY(-3px) scale(1.02);
-}
-
-.tropical-button:hover::before,
-.tropical-button-outline:hover::before,
-.planner-cta:hover::before {
-  transform: translateX(120%);
 }
 
 .tropical-button:hover {
+  transform: translate(-1px, -2px);
+  box-shadow: 5px 5px 0 0 var(--ink);
+  background: var(--mango-light);
   color: var(--ink);
 }
 
 .tropical-button:active,
 .tropical-button-outline:active,
-.planner-cta:active {
-  transform: translateY(1px) scale(0.98);
+.btn-lagoon:active,
+.btn-hibiscus:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--ink);
 }
 
 .tropical-button-outline {
-  @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-extrabold tracking-wide;
-  border-radius: 999px;
-  background: rgb(255 253 248 / 0.92);
+  background: var(--card);
   color: var(--ink);
-  border: 1.5px solid rgb(14 59 54 / 0.18);
-  box-shadow: var(--shade-sm);
-  transition: transform 0.35s var(--ease-spring), background 0.25s ease;
 }
 
 .tropical-button-outline:hover {
-  background: #ffffff;
+  transform: translate(-1px, -2px);
+  box-shadow: 5px 5px 0 0 var(--ink);
+  background: var(--lagoon-light);
   color: var(--ink);
 }
 
 .btn-lagoon {
-  background: linear-gradient(135deg, #2fd1c5 0%, var(--lagoon) 55%, var(--lagoon-dark) 100%);
-  color: #ffffff;
-  border-color: transparent;
+  background: var(--sky);
+  color: #fff;
 }
 
 .btn-lagoon:hover {
-  background: linear-gradient(135deg, #2fd1c5 0%, var(--lagoon) 55%, var(--lagoon-dark) 100%);
-  color: #ffffff;
+  background: var(--sky-dark);
+  color: #fff;
+  transform: translate(-1px, -2px);
 }
 
 .btn-hibiscus {
-  background: linear-gradient(135deg, var(--hibiscus-light) 0%, var(--hibiscus) 60%, var(--hibiscus-dark) 100%);
-  color: #ffffff;
-  border-color: transparent;
+  background: var(--hibiscus);
+  color: #fff;
 }
 
 .btn-hibiscus:hover {
-  color: #ffffff;
+  background: var(--hibiscus-dark);
+  color: #fff;
+  transform: translate(-1px, -2px);
 }
 
-button,
-input,
-textarea,
-select {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+/* On a dark band the offset is sun-yellow, not ink. */
+.sunset-section .tropical-button-outline,
+.reef-section .tropical-button-outline {
+  box-shadow: 3px 3px 0 0 var(--mango);
 }
 
-input:not([type='range']),
-textarea,
-select {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-input[type='text'],
-input[type='email'],
-input[type='tel'],
-input[type='number'],
-input[type='date'],
-input[type='time'],
-input[type='search'],
-input[type='password'],
-textarea,
-select {
-  border: 1.5px solid rgb(14 59 54 / 0.18);
-  border-radius: 16px;
-  background: #ffffff;
-}
-
-input[type='text']:focus,
-input[type='email']:focus,
-input[type='tel']:focus,
-input[type='number']:focus,
-input[type='date']:focus,
-input[type='time']:focus,
-input[type='search']:focus,
-input[type='password']:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: var(--lagoon);
-  background: #f2fdfb;
-}
-
-::placeholder {
-  color: var(--ink-light);
-  font-weight: 500;
-}
-
-/* ── Navigation: the vine and its tags ──────────────────────────────────── */
-
-/* Used only by the admin bar now; the public site hangs its links from a
-   vine (src/components/layout/Header.tsx). */
-.lobster-header {
-  background: var(--paper);
-  border-bottom: 1px solid var(--line);
-}
-
-.nav-link-pill {
-  @apply flex items-center gap-2 rounded-full px-4 py-2 font-bold;
-  color: var(--ink);
-  transition: background 0.2s ease, transform 0.3s var(--ease-spring);
-}
-
-.nav-link-pill:hover {
-  background: var(--lagoon-light);
-  color: var(--ink);
-  transform: translateY(-1px);
-}
-
-.nav-link-pill-active {
-  background: var(--lagoon-light);
-}
-
-/* ── Rope string that holds nav tags to the vine ────────────────────────── */
-
-/*
- * Thick twisted rope — two overlapping linear gradients give the dark/light
- * strand effect. The rope runs from the very top of the header element to
- * the top of each luggage tag, so its container must start at y=0.
- */
-.rope-string {
-  width: 7px;
-  flex-shrink: 0;
-  border-radius: 3px;
-  background:
-    repeating-linear-gradient(
-      160deg,
-      #7a4e2a 0px,
-      #c4894f 3px,
-      #8a5e3b 6px,
-      #5a3518 9px,
-      #a06c3a 12px,
-      #7a4e2a 15px
-    );
-  box-shadow: inset 1px 0 2px rgb(255 220 170 / 0.35), inset -1px 0 2px rgb(30 10 0 / 0.3);
-}
-
-/* ── A luggage tag hanging off the vine ─────────────────────────────────── */
-
-/*
- * The fishernet overlay is a repeating SVG diamond grid — just enough to add
- * subtle texture without overwhelming the warm cream background. A second
- * layer handles the actual gradient fill so neither fights the other.
- */
-.vine-tag {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 0.95rem 1.05rem 0.7rem;
-  min-width: 5.6rem;
-  border-radius: 16px 16px 22px 22px / 26px 26px 18px 18px;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cpath d='M0 9 L9 0 L18 9 L9 18 Z' fill='none' stroke='%230e3b36' stroke-width='0.7' stroke-opacity='0.09'/%3E%3Cpath d='M0 9 L9 18 M9 0 L18 9' fill='none' stroke='%230e3b36' stroke-width='0.5' stroke-opacity='0.05'/%3E%3C/svg%3E"),
-    linear-gradient(180deg, #fffdf8 0%, #f8eedb 100%);
-  /* drop shadow for depth */
-  filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2));
-  color: var(--ink);
-  font-weight: 800;
-  font-size: 0.86rem;
-  line-height: 1;
-  text-decoration: none;
-  /* default glow animation — overridden per-item below */
-  animation: nav-breeze 5.8s ease-in-out infinite, vine-glow-0 3.4s ease-in-out infinite;
-}
-
-.vine-tag:hover {
-  color: var(--ink);
-  animation-play-state: paused;
-}
-
-@keyframes nav-breeze { 0%,100% { translate: 0 0; rotate: -.35deg; } 50% { translate: 0 -3px; rotate: .35deg; } }
-
-/* Pulsating outer glow — each tag beats in a different rhythm that still
-   feels like one living colony: periods share a common factor of ~0.9s. */
-@keyframes vine-glow-0 {
-  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(147 236 225 / 0)); }
-  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 12px rgb(147 236 225 / 0.55)); }
-}
-@keyframes vine-glow-1 {
-  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(247 178 59 / 0)); }
-  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 14px rgb(247 178 59 / 0.6)); }
-}
-@keyframes vine-glow-2 {
-  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(23 181 172 / 0)); }
-  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 16px rgb(23 181 172 / 0.55)); }
-}
-@keyframes vine-glow-3 {
-  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(242 103 92 / 0)); }
-  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 13px rgb(242 103 92 / 0.5)); }
-}
-@keyframes vine-glow-4 {
-  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(62 155 80 / 0)); }
-  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 15px rgb(62 155 80 / 0.55)); }
-}
-@keyframes vine-glow-5 {
-  0%, 100% { filter: drop-shadow(0 8px 14px rgb(14 59 54 / 0.38)) drop-shadow(0 2px 3px rgb(14 59 54 / 0.2)) drop-shadow(0 0 0px rgb(77 182 229 / 0)); }
-  50% { filter: drop-shadow(0 8px 18px rgb(14 59 54 / 0.45)) drop-shadow(0 2px 4px rgb(14 59 54 / 0.25)) drop-shadow(0 0 14px rgb(77 182 229 / 0.55)); }
-}
-
-/* Assign glows + breeze per item index — periods are related but never sync. */
-.vine-tag-item-0 { animation: nav-breeze 5.4s ease-in-out infinite, vine-glow-0 3.1s ease-in-out infinite; animation-delay: 0s, 0s; }
-.vine-tag-item-1 { animation: nav-breeze 6.2s ease-in-out infinite, vine-glow-1 4.3s ease-in-out infinite; animation-delay: -1.8s, -0.9s; }
-.vine-tag-item-2 { animation: nav-breeze 5.8s ease-in-out infinite, vine-glow-2 3.7s ease-in-out infinite; animation-delay: -3.1s, -1.6s; }
-.vine-tag-item-3 { animation: nav-breeze 6.6s ease-in-out infinite, vine-glow-3 5.1s ease-in-out infinite; animation-delay: -0.7s, -2.4s; }
-.vine-tag-item-4 { animation: nav-breeze 5.1s ease-in-out infinite, vine-glow-4 4.8s ease-in-out infinite; animation-delay: -4.2s, -0.4s; }
-.vine-tag-item-5 { animation: nav-breeze 6.9s ease-in-out infinite, vine-glow-5 3.9s ease-in-out infinite; animation-delay: -2.0s, -3.2s; }
-
-/* The eyelet the string goes through. */
-.vine-tag::after {
-  content: '';
-  position: absolute;
-  top: 0.38rem;
-  left: 50%;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-left: -0.25rem;
-  border-radius: 9999px;
-  background: var(--paper-deep);
-  box-shadow: inset 0 1px 2px rgb(14 59 54 / 0.35);
-}
-
-.vine-tag-icon {
-  font-size: 1.15rem;
-  margin-top: 0.25rem;
-  color: var(--lagoon-dark);
-}
-
-.vine-tag-note {
-  font-family: 'Caveat', cursive;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--ink-light);
-  letter-spacing: 0;
-}
-
-.vine-tag[data-active='true'] {
-  background: linear-gradient(180deg, #2fd1c5 0%, var(--lagoon-dark) 100%);
-  color: #ffffff;
-}
-
-.vine-tag[data-active='true'] .vine-tag-icon,
-.vine-tag[data-active='true'] .vine-tag-note {
-  color: #e6fffb;
-}
-
-.vine-tag[data-accent='mango'] {
-  background: linear-gradient(180deg, #ffe3a6 0%, var(--mango) 100%);
-}
-
-/* The public masthead floats above the shore at every scroll position. */
-.desktop-brand-name {
-  font-size: clamp(2.35rem, 3.4vw, 4.4rem);
-  letter-spacing: -0.055em;
-  line-height: 0.9;
-}
-
-.brand-name-crystal {
-  display: inline-block;
-  font-family: 'Shrikhand', 'Yeseva One', cursive;
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  background: linear-gradient(105deg, #ffffff 0%, #bffdff 19%, #24e0d2 43%, #117aef 65%, #d8ffff 82%, #2bcabd 100%);
-  background-size: 240% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-stroke: 0.45px rgb(255 255 255 / 0.4);
-  filter: drop-shadow(0 2px 3px rgb(5 81 116 / 0.5));
-  animation: crystal-sea-shimmer 7s ease-in-out infinite, crystal-sea-glow 3.8s ease-in-out infinite;
-}
+/* ── The brand ──────────────────────────────────────────────────────────── */
 
 .brand-logo {
-  isolation: isolate;
-  background: conic-gradient(from 10deg, #d8ffff, #14d6ce, #2978e6, #9c6cd0, #ffb1a6, #d8ffff);
-  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.85), 0 10px 18px rgb(5 63 80 / 0.32);
-  transform-origin: 50% 0%;
-  animation: logo-tide-sway 6.4s ease-in-out infinite, logo-edge-pulse 3.6s ease-in-out infinite;
-}
-
-.brand-logo::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: -0.55rem;
-  border-radius: inherit;
-  background: conic-gradient(from 180deg, #9dfff7, #1a91ed, #c588f4, #ffb1a6, #ffd47e, #9dfff7);
-  filter: blur(0.45rem);
-  opacity: 0.72;
-  animation: logo-aura 4.5s ease-in-out infinite;
+  position: relative;
+  border: 3px solid var(--ink);
+  background: var(--mango-light);
+  box-shadow: var(--shade-sm);
 }
 
 .brand-logo-image {
-  position: relative;
-  z-index: 1;
-  border: 3px solid rgb(255 255 255 / 0.74);
-  background: linear-gradient(135deg, var(--lagoon-light), var(--sky));
+  background: var(--card);
 }
 
-@keyframes crystal-sea-shimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-@keyframes crystal-sea-glow { 0%, 100% { text-shadow: 0 0 7px rgb(132 255 250 / 0.65), 0 0 18px rgb(32 166 235 / 0.32); } 50% { text-shadow: 0 0 12px rgb(205 255 253 / 0.95), 0 0 31px rgb(24 208 195 / 0.68), 0 0 46px rgb(49 137 235 / 0.35); } }
-@keyframes logo-tide-sway { 0%, 100% { transform: rotate(-2.25deg) translateY(0); } 50% { transform: rotate(2.25deg) translateY(-2px); } }
-@keyframes logo-edge-pulse { 0%, 100% { box-shadow: 0 0 0 3px rgb(255 255 255 / 0.8), 0 10px 18px rgb(5 63 80 / 0.28); } 50% { box-shadow: 0 0 0 4px rgb(180 255 250 / 0.9), 0 0 20px rgb(45 214 217 / 0.72), 0 12px 23px rgb(30 99 196 / 0.32); } }
-@keyframes logo-aura { 0%, 100% { opacity: 0.42; transform: scale(0.94) rotate(0deg); } 50% { opacity: 0.85; transform: scale(1.08) rotate(18deg); } }
+.brand-name-crystal,
+.desktop-brand-name {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.65rem;
+  line-height: 1;
+  color: var(--ink);
+}
 
-/* ── Language compass — 3-D wobble animation ────────────────────────────── */
-
+/* ── Navigation: the shutters of a colonial street ──────────────────────── */
 /*
- * The compass tilts and turns in cheap 3-D space — like a real compass
- * bobbing on a wrist strap. perspective() lives on the *parent* in a real DOM
- * context, but because we apply it via transform it still gives depth.
- * will-change keeps it on the GPU so it does not cause layout jitter on phones.
+ * Each destination is a painted window with a pair of wooden persianas.
+ * On hover (or when it is the page you are on) the shutters swing open on
+ * their hinges and the room behind shows its colour and its name. The
+ * swing is a 3-D rotate of each leaf — transform only.
  */
-@keyframes compass-wobble-3d {
-  0%   { transform: rotate(-4deg) perspective(220px) rotateX(6deg) rotateY(-5deg) rotateZ(-2deg); }
-  14%  { transform: rotate(-1deg) perspective(220px) rotateX(-4deg) rotateY(7deg) rotateZ(1deg); }
-  28%  { transform: rotate(3deg) perspective(220px) rotateX(5deg) rotateY(3deg) rotateZ(-3deg); }
-  42%  { transform: rotate(-2deg) perspective(220px) rotateX(-6deg) rotateY(-4deg) rotateZ(2deg); }
-  57%  { transform: rotate(4deg) perspective(220px) rotateX(3deg) rotateY(8deg) rotateZ(-1deg); }
-  71%  { transform: rotate(-3deg) perspective(220px) rotateX(-5deg) rotateY(-6deg) rotateZ(3deg); }
-  85%  { transform: rotate(1deg) perspective(220px) rotateX(7deg) rotateY(2deg) rotateZ(-2deg); }
-  100% { transform: rotate(-4deg) perspective(220px) rotateX(6deg) rotateY(-5deg) rotateZ(-2deg); }
+
+.ventana {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 5.6rem;
+  text-decoration: none;
+  color: var(--ink);
+  perspective: 420px;
 }
 
-/* Water-colour Trash Polka: rough ink edges, overspray and a bright sea core. */
-.language-compass {
+.ventana-frame {
   position: relative;
-  width: 6.4rem;
-  height: 6.4rem;
-  flex: none;
-  border: 3px solid #052e43;
-  border-radius: 47% 53% 44% 56% / 54% 44% 56% 46%;
-  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18) 0%, rgba(36,221,208,0.24) 18%, rgba(20,126,197,0.72) 42%, rgba(6,62,99,0.96) 100%);
-  box-shadow: 5px 4px 0 #052e43, -3px -2px 0 rgb(126 255 247 / .8), 0 0 18px rgb(27 189 225 / .55);
-  will-change: transform;
-  animation: compass-wobble-3d 7.4s ease-in-out infinite;
+  width: 4.6rem;
+  height: 4.4rem;
+  border: 3px solid var(--ink);
+  border-radius: 2.2rem 2.2rem 4px 4px;
+  background: var(--room, var(--mango-light));
+  box-shadow: var(--shade-sm);
   overflow: hidden;
 }
-.language-compass::before,
-.language-compass::after { content:''; position:absolute; z-index:-1; border-radius:999px; background:#0a5476; opacity:.72; }
-.language-compass::before { width:1.2rem; height:.32rem; right:-.55rem; top:1.15rem; transform:rotate(-28deg); box-shadow:-5.5rem 3.9rem 0 -.03rem rgba(27,224,210,0.88), -3.4rem 4.6rem 0 -.08rem rgba(10,84,118,0.85), 1.2rem 3.5rem 0 -.09rem rgba(27,224,210,0.75); }
-.language-compass::after { width:.5rem; height:.5rem; left:-.5rem; bottom:1.35rem; box-shadow:1.05rem -3.8rem 0 -.08rem rgba(127,252,243,0.75), 6rem -1.65rem 0 -.03rem rgba(44,169,229,0.8), 5.2rem 2.2rem 0 -.1rem rgba(127,252,243,0.65); }
-.compass-rings { position: absolute; inset: .48rem; border: 1px dashed rgb(233 255 253 / .92); border-radius: 46% 54% 49% 51% / 53% 45% 55% 47%; pointer-events: none; transform:rotate(7deg); }
-.compass-rings::before,.compass-rings::after { content:''; position:absolute; left:50%; top:50%; width:1px; height:100%; background:rgb(231 255 252 / .76); transform:translate(-50%,-50%) rotate(17deg); }
-.compass-rings::after { transform:translate(-50%,-50%) rotate(107deg); }
-.compass-language { position:absolute; z-index:3; border:0; padding:0; background:transparent; color:#f5ffff; font-family:Impact, 'Arial Black', sans-serif; font-size:.64rem; font-weight:900; letter-spacing:.04em; line-height:1; text-shadow:1px 1px 0 #052e43, -1px -1px 0 rgb(5 46 67 / .5); transition:transform .28s ease, color .2s ease, text-shadow .2s ease; }
-.compass-language:hover,.compass-language.active { color:#9efff7; text-shadow:0 0 8px #9efff7, 1px 1px 0 #052e43; transform:scale(1.16); }
-.compass-language-north { left:50%; top:.3rem; transform:translateX(-50%); }
-.compass-language-east { right:.3rem; top:50%; transform:translateY(-50%); }
-.compass-language-south { bottom:.3rem; left:50%; transform:translateX(-50%); }
-.compass-language-west { left:.3rem; top:50%; transform:translateY(-50%); }
-.compass-language-north:hover,.compass-language-north.active,.compass-language-south:hover,.compass-language-south.active { transform:translateX(-50%) scale(1.16); }
-.compass-language-east:hover,.compass-language-east.active,.compass-language-west:hover,.compass-language-west.active { transform:translateY(-50%) scale(1.16); }
-.compass-needle { position:absolute; z-index:2; left:50%; top:50%; width:.48rem; height:1.9rem; transform-origin:50% 100%; clip-path:polygon(50% 0,100% 100%,50% 84%,0 100%); background:linear-gradient(to top,#062d43 0 48%,#9efff7 49% 100%); filter:drop-shadow(0 0 4px rgb(220 255 252 / .75)); transition:transform .5s cubic-bezier(.16,1,.3,1); }
-.compass-needle-north { transform:translate(-50%,-100%) rotate(0); }
-.compass-needle-east { transform:translate(-50%,-100%) rotate(90deg); }
-.compass-needle-south { transform:translate(-50%,-100%) rotate(180deg); }
-.compass-needle-west { transform:translate(-50%,-100%) rotate(-90deg); }
-.compass-sound { position:absolute; z-index:4; display:grid; left:50%; top:50%; width:2.15rem; height:2.15rem; place-items:center; border:2px solid #052e43; border-radius:42% 58% 48% 52%; background:linear-gradient(135deg,#ecfffd,#9efff7); box-shadow:2px 2px 0 #052e43; transform:translate(-50%,-50%) rotate(6deg); }
-.compass-sound button { width:1.7rem !important; height:1.7rem !important; border:0 !important; background:transparent !important; box-shadow:none !important; }
 
-@media (prefers-reduced-motion: reduce) { .brand-name-crystal,.brand-logo,.brand-logo::before,.language-compass { animation: none; } .language-compass { transform: rotate(-4deg); }
-[class*='vine-tag-item-'] { animation: none; } }
+/* What is in the room: the icon, painted on the back wall. */
+.ventana-room {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-top: 0.6rem;
+  font-size: 1.65rem;
+  color: var(--ink);
+}
 
-@media (max-width: 1023px) { .desktop-brand-name { font-size: 2rem; } }
+.ventana-leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background:
+    repeating-linear-gradient(180deg, rgb(29 35 70 / 0.32) 0 2px, transparent 2px 7px),
+    var(--shutter, var(--sky));
+  border: 0 solid var(--ink);
+  transition: transform 0.55s var(--ease-spring);
+  backface-visibility: hidden;
+}
+
+.ventana-leaf-l {
+  left: 0;
+  border-right-width: 2px;
+  transform-origin: 0 50%;
+  border-top-left-radius: 2.2rem;
+}
+
+.ventana-leaf-r {
+  right: 0;
+  border-left-width: 2px;
+  transform-origin: 100% 50%;
+  border-top-right-radius: 2.2rem;
+}
+
+.ventana:hover .ventana-leaf-l,
+.ventana:focus-visible .ventana-leaf-l,
+.ventana[data-active='true'] .ventana-leaf-l {
+  transform: rotateY(-108deg);
+}
+
+.ventana:hover .ventana-leaf-r,
+.ventana:focus-visible .ventana-leaf-r,
+.ventana[data-active='true'] .ventana-leaf-r {
+  transform: rotateY(108deg);
+}
+
+/* The sill and the name painted under the window. */
+.ventana-sill {
+  width: 5.2rem;
+  height: 0.45rem;
+  margin-top: -2px;
+  border: 2.5px solid var(--ink);
+  border-radius: 3px;
+  background: var(--card);
+}
+
+.ventana-name {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.ventana-note {
+  margin-top: 0.15rem;
+  font-family: 'Caveat', cursive;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+
+.ventana[data-active='true'] .ventana-name {
+  color: var(--hibiscus-dark);
+}
+
+/* Flowers in the window box, for the page you are on. */
+.ventana[data-active='true'] .ventana-sill::after {
+  content: '✿ ✿ ✿';
+  position: relative;
+  top: -0.95rem;
+  display: block;
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: var(--hibiscus);
+}
+
+/* A hanging sign for the cart, between two windows. */
+.ventana-count {
+  position: absolute;
+  top: -0.35rem;
+  right: 0.2rem;
+  z-index: 3;
+}
+
+/* The street behind the windows: a run of painted housefronts. */
+.fachada {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg,
+      #f2c94c 0 12%, #e98aa8 12% 23%, #8fd3df 23% 35%, #f6a75a 35% 47%,
+      #b9d98f 47% 58%, #f2c94c 58% 69%, #c9a7e8 69% 80%, #8fd3df 80% 90%, #f6a75a 90% 100%);
+  opacity: 0.22;
+}
+
+.nav-link-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.95rem;
+  font-weight: 800;
+  color: var(--ink);
+  border: 2.5px solid transparent;
+  border-radius: 999px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-link-pill:hover {
+  border-color: var(--ink);
+  background: var(--mango-light);
+}
+
+.nav-link-pill-active {
+  border-color: var(--ink);
+  background: var(--mango);
+  box-shadow: var(--shade-sm);
+}
+
+/* ── Language: a painted sun with the four languages around it ──────────── */
+
+.language-compass {
+  position: relative;
+  width: 5.6rem;
+  height: 5.6rem;
+  flex: none;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+  box-shadow: var(--shade-sm);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* The flag colours stay as the wash; the sun sits over them. */
+.compass-rings {
+  position: absolute;
+  inset: 0.85rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--mango-light) 0 52%, var(--mango) 53% 100%);
+  border: 2.5px solid var(--ink);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.compass-rings::before {
+  content: '';
+  position: absolute;
+  inset: -0.75rem;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgb(29 35 70 / 0.5) 0 4deg, transparent 4deg 30deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 62%, black 63% 100%);
+  mask: radial-gradient(circle, transparent 0 62%, black 63% 100%);
+  animation: spin 60s linear infinite;
+}
+
+.compass-needle {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  width: 0.4rem;
+  height: 1.55rem;
+  transform-origin: 50% 100%;
+  clip-path: polygon(50% 0, 100% 100%, 50% 86%, 0 100%);
+  background: var(--hibiscus);
+  transition: transform 0.6s var(--ease-spring);
+}
+
+.compass-needle-north { transform: translate(-50%, -100%) rotate(0); }
+.compass-needle-east { transform: translate(-50%, -100%) rotate(90deg); }
+.compass-needle-south { transform: translate(-50%, -100%) rotate(180deg); }
+.compass-needle-west { transform: translate(-50%, -100%) rotate(-90deg); }
+
+.compass-language {
+  position: absolute;
+  z-index: 3;
+  padding: 0.05rem 0.2rem;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-shadow: 0 0 2px var(--ink), 1px 1px 0 var(--ink);
+  transition: transform 0.25s var(--ease-spring);
+}
+
+.compass-language.active {
+  background: var(--card);
+  color: var(--ink);
+  text-shadow: none;
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.compass-language-north { left: 50%; top: 0.18rem; transform: translateX(-50%); }
+.compass-language-east { right: 0.12rem; top: 50%; transform: translateY(-50%); }
+.compass-language-south { bottom: 0.18rem; left: 50%; transform: translateX(-50%); }
+.compass-language-west { left: 0.12rem; top: 50%; transform: translateY(-50%); }
+.compass-language-north:hover,
+.compass-language-south:hover { transform: translateX(-50%) scale(1.15); }
+.compass-language-east:hover,
+.compass-language-west:hover { transform: translateY(-50%) scale(1.15); }
+
+.compass-sound {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  width: 1.9rem;
+  height: 1.9rem;
+  place-items: center;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.compass-sound button {
+  width: 1.7rem !important;
+  height: 1.7rem !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+}
 
 .language-toggle {
   @apply inline-flex items-center rounded-full p-1;
   background: var(--card);
-  border: 1px solid var(--line);
+  border: 2.5px solid var(--ink);
   box-shadow: var(--shade-sm);
 }
 
 .language-toggle-button {
   @apply inline-flex h-9 min-w-[46px] items-center justify-center rounded-full px-3.5 text-sm font-extrabold;
   color: var(--ink);
-  transition: background 0.2s ease;
 }
 
 .language-toggle-button.active {
-  background: var(--lagoon);
-  color: #ffffff;
-}
-
-.language-toggle-button:not(.active):hover {
-  background: var(--lagoon-light);
+  background: var(--sky);
+  color: #fff;
 }
 
 /* ── Badges ─────────────────────────────────────────────────────────────── */
@@ -981,94 +839,114 @@ select:focus {
 .artsy-brick-badge-inverted {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.9rem;
-  border-radius: var(--leaf);
-  font-size: 0.72rem;
+  gap: 0.35rem;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  box-shadow: var(--shade-sm);
-  transition: transform 0.4s var(--ease-spring);
-}
-
-.artsy-brick-badge {
-  background: linear-gradient(135deg, var(--mango-light), var(--mango));
+  border: 2.5px solid var(--ink);
+  border-radius: 6px 12px 6px 12px;
+  box-shadow: 2px 2px 0 0 var(--ink);
+  background: var(--mango-light);
   color: var(--ink);
-}
-
-.artsy-brick-badge:hover {
-  transform: rotate(-4deg) scale(1.06);
 }
 
 .artsy-brick-badge-inverted {
-  background: linear-gradient(135deg, #d7f8f3, var(--lagoon-light));
-  color: var(--lagoon-dark);
-}
-
-.artsy-title-card,
-.artsy-title-card-light {
-  display: inline-block;
-  padding: 0.7rem 1.5rem;
-  border-radius: var(--pebble-a);
-  box-shadow: var(--shade);
-}
-
-.artsy-title-card {
-  background: linear-gradient(135deg, var(--lagoon), var(--lagoon-dark));
-  color: #ffffff;
-}
-
-.artsy-title-card-light {
-  background: var(--card);
-  color: var(--ink);
-}
-
-.stamp-edge {
-  --stamp-notch: 9px;
-  background: var(--card);
-  padding: 3px;
-  -webkit-mask-image: radial-gradient(circle at center, #000 68%, transparent 70%);
-  -webkit-mask-size: var(--stamp-notch) var(--stamp-notch);
-  -webkit-mask-repeat: repeat;
-  mask-image: radial-gradient(circle at center, #000 68%, transparent 70%);
-  mask-size: var(--stamp-notch) var(--stamp-notch);
-  mask-repeat: repeat;
+  background: var(--ink);
+  color: var(--mango-light);
 }
 
 /* ── Pathway cards ──────────────────────────────────────────────────────── */
 
-.pathway-card {
+.pathway-card,
+.pathway-card-dark {
   position: relative;
   overflow: hidden;
-  border-radius: var(--pebble-a);
-  border: 1px solid var(--line);
+  border: 3px solid var(--ink);
+  border-radius: var(--cut-a);
+  box-shadow: var(--shade);
   background: var(--card);
+  transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+}
+
+.pathway-card:hover,
+.pathway-card-dark:hover {
+  transform: translate(-2px, -4px);
   box-shadow: var(--shade-lg);
-  transition: transform 0.45s var(--ease-out);
-}
-
-.pathway-card:nth-child(2) {
-  border-radius: var(--pebble-b);
-}
-
-.pathway-card:hover {
-  transform: translateY(-8px);
 }
 
 .pathway-card-dark {
   background:
-    radial-gradient(circle at 85% 0%, rgb(147 236 225 / 0.25) 0%, transparent 45%),
-    linear-gradient(160deg, #0b4f5c 0%, var(--abyss) 100%);
-  color: #fbf5e8;
-  border-color: transparent;
+    radial-gradient(70% 60% at 85% 15%, rgb(255 221 110 / 0.5), transparent 60%),
+    linear-gradient(160deg, var(--sky-dark), var(--sky));
+  color: #fff;
 }
 
 .pathway-card-dark h3,
 .pathway-card-dark h2 {
-  color: #fbf5e8;
+  color: #fff;
 }
 
+/* ── Hero: the painting and its frame ───────────────────────────────────── */
+
+.hero-media-window {
+  position: relative;
+  overflow: hidden;
+  border: 4px solid var(--ink);
+  border-radius: 46% 46% 6px 6px / 30% 30% 6px 6px;
+  box-shadow: var(--shade-lg);
+  background: var(--sky);
+}
+
+.hero-polaroid,
+.hero-polaroid-main,
+.hero-polaroid-small {
+  position: relative;
+  background: var(--card);
+  border: 3px solid var(--ink);
+  padding: 8px 8px 30px;
+  box-shadow: var(--shade);
+}
+
+.hero-polaroid-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  text-align: center;
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+/* Bidó's sun: a disc and a ring of rays that turns very slowly. */
+.sol {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3b0 0 30%, var(--mango-light) 31% 62%, var(--mango) 63% 100%);
+  border: 4px solid var(--ink);
+}
+
+.sol-rays {
+  position: absolute;
+  inset: -34%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(var(--mango) 0 7deg, transparent 7deg 22deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 46%, black 47% 72%, transparent 73%);
+  mask: radial-gradient(circle, transparent 0 46%, black 47% 72%, transparent 73%);
+  animation: spin 90s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sol-rays,
+  .compass-rings::before {
+    animation: none;
+  }
+  .ventana-leaf {
+    transition: none;
+  }
+}
 /* ══════════════════════════════════════════════════════════════════════════
    Plan My Day — night lagoon
    ══════════════════════════════════════════════════════════════════════════ */
@@ -1091,15 +969,15 @@ select:focus {
 .planner-panel {
   border-radius: var(--pebble-a);
   background:
-    radial-gradient(circle at 90% 0%, rgb(147 236 225 / 0.18) 0%, transparent 40%),
-    linear-gradient(170deg, #0b4f5c 0%, var(--abyss) 100%);
-  color: #fbf5e8;
+    radial-gradient(circle at 90% 0%, rgb(169 228 238 / 0.18) 0%, transparent 40%),
+    linear-gradient(170deg, #263068 0%, var(--abyss) 100%);
+  color: #f7efe1;
   box-shadow: var(--shade-lg);
 }
 
 .planner-panel-soft {
   border-radius: 24px;
-  border: 1px solid rgb(251 245 232 / 0.18);
+  border: 1px solid rgb(247 239 225 / 0.18);
   background: rgb(255 255 255 / 0.06);
 }
 
@@ -1111,7 +989,7 @@ select:focus {
   gap: 1rem;
   border-radius: 22px 14px 22px 14px;
   border: 1px solid transparent;
-  background: #f4fbf9;
+  background: #f3f5fb;
   padding: 1.1rem 1.2rem;
   text-align: left;
   color: var(--ink);
@@ -1121,11 +999,11 @@ select:focus {
 
 .planner-option:hover {
   transform: translateY(-3px);
-  background: #e3faf6;
+  background: #e6ecfa;
 }
 
 .planner-option[data-selected='true'] {
-  background: linear-gradient(135deg, #fff3d4, var(--mango-light));
+  background: linear-gradient(135deg, #fff3c4, var(--mango-light));
   border-color: var(--mango);
 }
 
@@ -1164,7 +1042,7 @@ select:focus {
   width: 100%;
   overflow: hidden;
   border-radius: 9999px;
-  background: rgb(255 253 248 / 0.9);
+  background: rgb(255 251 243 / 0.9);
 }
 
 .planner-rail-fill {
@@ -1175,22 +1053,22 @@ select:focus {
 
 .planner-cta {
   @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-extrabold tracking-wide;
-  background: linear-gradient(135deg, #ffd47e 0%, #f7b23b 55%, #f29a3b 100%);
+  background: linear-gradient(135deg, #ffdd6e 0%, #f5b921 55%, #ee7a3c 100%);
   color: var(--ink);
-  box-shadow: 0 10px 24px -12px rgb(217 134 18 / 0.75);
+  box-shadow: 0 10px 24px -12px rgb(201 138 6 / 0.75);
   transition: transform 0.35s var(--ease-spring);
 }
 
 .planner-cta-ghost {
   @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold tracking-wide;
-  border: 1.5px solid rgb(251 245 232 / 0.6);
+  border: 1.5px solid rgb(247 239 225 / 0.6);
   background: transparent;
-  color: #fbf5e8;
+  color: #f7efe1;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .planner-cta-ghost:hover {
-  background: #fbf5e8;
+  background: #f7efe1;
   color: var(--ink);
 }
 
@@ -1257,7 +1135,7 @@ select:focus {
 }
 
 .animate-fab-glow-wave {
-  box-shadow: 0 12px 26px -12px rgb(30 106 59 / 0.8);
+  box-shadow: 0 12px 26px -12px rgb(47 97 30 / 0.8);
 }
 
 .animate-fab-glow-wave::after {
@@ -1265,7 +1143,7 @@ select:focus {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: 0 0 0 8px rgb(62 155 80 / 0.22);
+  box-shadow: 0 0 0 8px rgb(79 145 54 / 0.22);
   pointer-events: none;
   animation: fabRing 3.2s ease-in-out infinite;
   will-change: transform, opacity;
@@ -1468,7 +1346,7 @@ select:focus {
   position: relative;
   border-radius: var(--pebble-a);
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, #fffdf8 0%, #fdf8ec 100%);
+  background: linear-gradient(180deg, #fffbf3 0%, #fbf3e4 100%);
   padding: 1.25rem;
   box-shadow: var(--shade-sm), var(--shade);
 }
@@ -1511,7 +1389,7 @@ select:focus {
 .transfer-promise {
   border-radius: var(--pebble-b);
   border: 1px solid var(--line);
-  background: rgb(255 253 248 / 0.94);
+  background: rgb(255 251 243 / 0.94);
   padding: 1rem 1.1rem;
   box-shadow: var(--shade-sm);
 }
@@ -1527,7 +1405,7 @@ select:focus {
   left: 1.05rem;
   top: 2.6rem;
   bottom: 2.6rem;
-  border-left: 3px dotted rgb(23 181 172 / 0.55);
+  border-left: 3px dotted rgb(63 175 201 / 0.55);
 }
 
 .transfer-route-stop {
@@ -1550,12 +1428,12 @@ select:focus {
   background: var(--lagoon);
   color: #ffffff;
   font-size: 0.95rem;
-  box-shadow: 0 0 0 5px rgb(147 236 225 / 0.45);
+  box-shadow: 0 0 0 5px rgb(169 228 238 / 0.45);
 }
 
 .transfer-route-dot-end {
   background: var(--hibiscus);
-  box-shadow: 0 0 0 5px rgb(255 177 166 / 0.45);
+  box-shadow: 0 0 0 5px rgb(255 158 138 / 0.45);
 }
 
 .transfer-route-gap {
@@ -1602,13 +1480,13 @@ select:focus {
 
 .transfer-vehicle:hover {
   transform: translateY(-2px);
-  border-color: rgb(23 181 172 / 0.45);
+  border-color: rgb(63 175 201 / 0.45);
 }
 
 .transfer-vehicle-active {
   border-color: var(--lagoon);
-  background: linear-gradient(180deg, #f1fcfa 0%, #ffffff 100%);
-  box-shadow: 0 0 0 4px rgb(147 236 225 / 0.35);
+  background: linear-gradient(180deg, #eef3fb 0%, #ffffff 100%);
+  box-shadow: 0 0 0 4px rgb(169 228 238 / 0.35);
 }
 
 .transfer-vehicle-photo {
@@ -1654,7 +1532,7 @@ select:focus {
 
 .transfer-chip-on {
   border-color: var(--lagoon);
-  background: #f1fcfa;
+  background: #eef3fb;
 }
 
 /* The boarding pass. */
@@ -1662,7 +1540,7 @@ select:focus {
   position: relative;
   overflow: hidden;
   border-radius: 30px 22px 30px 22px;
-  background: #fffdf8;
+  background: #fffbf3;
   border: 1px solid var(--line);
   box-shadow: var(--shade-sm), var(--shade-lg);
 }
@@ -1675,7 +1553,7 @@ select:focus {
   padding: 0.9rem 1.25rem;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='40' viewBox='0 0 160 40'%3E%3Cpath d='M0 26 C20 18 40 34 60 26 C80 18 100 34 120 26 C140 18 150 24 160 22' stroke='%23ffffff' stroke-opacity='0.28' stroke-width='2' fill='none'/%3E%3C/svg%3E") 0 100% / 160px 40px repeat-x,
-    linear-gradient(110deg, var(--lagoon-dark) 0%, var(--lagoon) 60%, #3fc6bb 100%);
+    linear-gradient(110deg, var(--lagoon-dark) 0%, var(--lagoon) 60%, #4fbfd6 100%);
 }
 
 /* The tear line: a dashed rule with a half-moon bitten out of each side. */
@@ -1683,7 +1561,7 @@ select:focus {
   position: relative;
   height: 0;
   margin: 0 1.25rem;
-  border-top: 2px dashed rgb(14 59 54 / 0.18);
+  border-top: 2px dashed rgb(29 35 70 / 0.18);
 }
 
 .transfer-pass-tear::before,
@@ -1720,7 +1598,7 @@ select:focus {
   gap: 0.75rem;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: #fffdf8;
+  background: #fffbf3;
   padding: 0.55rem 0.6rem 0.55rem 1.25rem;
   box-shadow: var(--shade-lg);
   transition: transform 0.35s var(--ease-out), opacity 0.25s;
@@ -1765,7 +1643,7 @@ select:focus {
 }
 
 .planner-stones::before {
-  background: rgb(14 59 54 / 0.12);
+  background: rgb(29 35 70 / 0.12);
 }
 
 .planner-stones-fill {
@@ -1783,7 +1661,7 @@ select:focus {
   border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
   background: var(--paper);
   font-size: 1rem;
-  box-shadow: 0 0 0 2px rgb(14 59 54 / 0.12);
+  box-shadow: 0 0 0 2px rgb(29 35 70 / 0.12);
   transition: transform 0.35s var(--ease-spring), opacity 0.3s ease;
 }
 
@@ -1802,7 +1680,7 @@ select:focus {
 
 .planner-refine {
   border-radius: 20px 12px 20px 12px;
-  border: 1px dashed rgb(251 245 232 / 0.3);
+  border: 1px dashed rgb(247 239 225 / 0.3);
   background: rgb(255 255 255 / 0.05);
   padding: 0.85rem 0.9rem;
   transition: transform 0.3s var(--ease-spring);
@@ -1811,7 +1689,7 @@ select:focus {
 .planner-refine[data-set='true'] {
   border-style: solid;
   border-color: var(--mango);
-  background: rgb(247 178 59 / 0.12);
+  background: rgb(245 185 33 / 0.12);
 }
 
 .planner-refine:active {
@@ -1820,7 +1698,7 @@ select:focus {
 
 .voice-pill {
   border-radius: 22px 14px 22px 14px;
-  border: 1px solid rgb(251 245 232 / 0.22);
+  border: 1px solid rgb(247 239 225 / 0.22);
   background: rgb(255 255 255 / 0.07);
 }
 
@@ -1860,5 +1738,36 @@ select:focus {
   z-index: 1;
   box-shadow:
     0 0 0 3px var(--mango-light),
-    0 0 22px 6px rgb(247 178 59 / 0.65);
+    0 0 22px 6px rgb(245 185 33 / 0.65);
+}
+
+/* A title painted over a dark sky: white, with the contour as its shadow. */
+.page-title-dark {
+  color: #fff;
+  text-shadow: 3px 3px 0 var(--ink);
+}
+
+.page-title-dark::after {
+  background: var(--hibiscus);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Windows in the night street: now and then a lamp dims and comes back. */
+@keyframes lamp {
+  0%, 82%, 100% { opacity: 1; }
+  88% { opacity: 0.45; }
+}
+
+.night-window {
+  animation: lamp 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .night-window {
+    animation: none;
+  }
 }
