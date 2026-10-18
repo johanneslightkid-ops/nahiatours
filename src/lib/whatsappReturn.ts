@@ -21,8 +21,12 @@ export interface WhatsAppDeparture {
 
 const KEY = 'wa_departure_v1';
 const ANSWERED_KEY = 'wa_prompt_answered_v1';
-/** After an answer, the next trips to WhatsApp are the conversation it led to. */
-const QUIET_AFTER_ANSWER_MS = 20 * 60 * 1000;
+/**
+ * A failsafe only: a trip to WhatsApp that starts within a minute of an
+ * answer is the follow-up that answer led to. Anything started later — the
+ * guest booking one more tour — is a new trip and is asked about as usual.
+ */
+const FOLLOW_UP_MS = 60 * 1000;
 const WHATSAPP = /^(https?:\/\/(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com|chat\.whatsapp\.com)\/|whatsapp:\/\/)/i;
 
 export const isWhatsAppUrl = (url: string) => WHATSAPP.test(String(url ?? '').trim());
@@ -74,9 +78,11 @@ export const markPromptAnswered = () => {
   }
 };
 
-export const recentlyAnswered = () => {
+/** Whether this trip was started right after the guest answered the prompt. */
+export const followsAnswer = (departure: WhatsAppDeparture) => {
   try {
-    return Date.now() - Number(sessionStorage.getItem(ANSWERED_KEY) || 0) < QUIET_AFTER_ANSWER_MS;
+    const answeredAt = Number(sessionStorage.getItem(ANSWERED_KEY) || 0);
+    return answeredAt > 0 && departure.at >= answeredAt && departure.at - answeredAt < FOLLOW_UP_MS;
   } catch {
     return false;
   }
