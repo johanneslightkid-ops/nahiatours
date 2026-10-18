@@ -5,7 +5,8 @@
     "tours": "Ausflüge",
     "transport": "Transfers",
     "blog": "Blog",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "cart": "Warenkorb"
   },
   "hero": {
     "title": "Entdecke {brand}",
