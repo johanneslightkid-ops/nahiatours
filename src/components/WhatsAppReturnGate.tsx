@@ -5,7 +5,7 @@ import {
   installWhatsAppWatch,
   markPromptAnswered,
   readDeparture,
-  recentlyAnswered,
+  followsAnswer,
   WhatsAppDeparture,
 } from '../lib/whatsappReturn';
 import { readPendingAttempt } from '../lib/paymentAttempt';
@@ -34,8 +34,8 @@ const WhatsAppReturnGate: React.FC = () => {
       const trip = readDeparture();
       if (!trip) return;
       // Back from paying: the payment prompt asks the one question that matters.
-      // Just answered: this trip is the conversation the answer led to.
-      if (readPendingAttempt() || recentlyAnswered()) {
+      // Started right after an answer: the follow-up that answer led to.
+      if (readPendingAttempt() || followsAnswer(trip)) {
         clearDeparture();
         return;
       }
