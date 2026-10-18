@@ -282,7 +282,7 @@ const PaymentConfirmPrompt: React.FC<Props> = ({ attempt, onSnooze, onClose }) =
           <>
             <h2 id="pay-confirm-title" className="pr-8 font-display text-2xl font-extrabold">{t.laterTitle}</h2>
             <p className="mt-2 text-sm text-ink-soft">{t.laterText}</p>
-            <div className="mt-4 flex flex-col gap-2">
+            <div className="mt-4 flex flex-col gap-2" data-no-return-prompt>
               {attempt.source === 'cart' && (
                 <Link to="/cart" onClick={onClose} className="rounded-full bg-lagoon px-5 py-3 text-center font-extrabold text-paper">
                   🛒 {t.cart}
