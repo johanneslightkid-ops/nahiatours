@@ -40,6 +40,7 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
 
   return (
     <motion.article
+      id={`plan-${slug}`}
       initial={{ opacity: 0, y: 22 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
@@ -150,6 +151,7 @@ export const PlanTourCard: React.FC<PlanTourCardProps> = ({
           <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-paper/20 pt-4">
             <Link
               to={`/details/tours/${slug}#top`}
+              state={{ from: 'plan', planSlug: slug }}
               onClick={() => playClickFx()}
               className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lagoon-light transition hover:text-lagoon-light"
             >
