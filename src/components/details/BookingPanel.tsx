@@ -39,16 +39,30 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
   const { brandSettings } = useBrand();
   const say = (texts: { en: string; es: string; de: string; fr: string }) => localeText(locale, texts);
   const lang = (['es', 'de', 'fr'].includes(locale) ? locale : 'en') as 'en' | 'es' | 'de' | 'fr';
-  const rate: PricingOption = service.pricingOptions[0] ?? { tier: perPersonTier(lang), price: service.price, amount: null };
-  const [persons, setPersons] = useState(2);
+  // One rate on most sites (everyone pays the same); some sites sell at
+  // several (adults, children), and then each gets its own count.
+  const rates: PricingOption[] = service.pricingOptions.length
+    ? service.pricingOptions
+    : [{ tier: perPersonTier(lang), price: service.price, amount: null }];
+  const rate = rates[0];
+  const multi = rates.length > 1;
+  const [counts, setCounts] = useState<Record<string, number>>(() =>
+    Object.fromEntries(rates.map((option, index) => [option.tier, index === 0 ? 2 : 0]))
+  );
   const [date, setDate] = useState('');
 
-  const total = (rate.amount ?? 0) * persons;
+  const persons = Math.max(1, rates.reduce((sum, option) => sum + (counts[option.tier] ?? 0), 0));
+  const total = rates.reduce((sum, option) => sum + (option.amount ?? 0) * (counts[option.tier] ?? 0), 0);
+  const priced = rates.some((option) => option.amount);
   const money = (value: number) => `US$${Number.isInteger(value) ? value : value.toFixed(2)}`;
   const longDate = date
     ? new Intl.DateTimeFormat(localeTag(locale), { dateStyle: 'full' }).format(new Date(`${date}T00:00:00`))
     : '';
   const facts = useMemo(() => summariseDescription(service.description), [service.description]);
+  const breakdown = rates
+    .filter((option) => (counts[option.tier] ?? 0) > 0)
+    .map((option) => `${counts[option.tier]} × ${option.tier}${option.amount ? ` (${money(option.amount)})` : ''}`)
+    .join(', ');
 
   const cartItem = () => ({
     category: 'tours',
@@ -59,8 +73,9 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
     detailsPath,
     date: date || undefined,
     persons,
-    unitPrice: rate.amount ?? null,
-    tier: rate.tier,
+    ...(multi
+      ? { quantities: counts, fixedTotal: total > 0 ? total : null, tier: breakdown }
+      : { unitPrice: rate.amount ?? null, tier: rate.tier }),
     duration: facts.duration || undefined,
     included: facts.included,
     goodToKnow: facts.goodToKnow,
@@ -71,16 +86,16 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
     const name = brandSettings.brandName;
     const english = [
       `Hello ${name}! I would like to book: ${service.title}`,
-      `People: ${persons}`,
+      `People: ${multi ? breakdown : persons}`,
       `Date: ${longDate || 'flexible — please suggest one'}`,
-      rate.amount ? `Price: ${money(total)} (${persons} × ${money(rate.amount)})` : `Price: ${rate.price}`,
+      priced ? `Price: ${money(total)}${multi ? '' : ` (${persons} × ${money(rate.amount ?? 0)})`}` : `Price: ${rate.price}`,
       'Could you please confirm availability for that day? Thank you!',
     ].join('\n');
     const spanish = [
       `¡Hola ${name}! Quisiera reservar: ${service.title}`,
-      `Personas: ${persons}`,
+      `Personas: ${multi ? breakdown : persons}`,
       `Fecha: ${longDate || 'flexible — sugiéranme una'}`,
-      rate.amount ? `Precio: ${money(total)} (${persons} × ${money(rate.amount)})` : `Precio: ${rate.price}`,
+      priced ? `Precio: ${money(total)}${multi ? '' : ` (${persons} × ${money(rate.amount ?? 0)})`}` : `Precio: ${rate.price}`,
       '¿Me confirman la disponibilidad para ese día? ¡Gracias!',
     ].join('\n');
     const url = generateWhatsAppMessage(brandSettings.phoneNumber, lang === 'es' ? spanish : `${english}\n\n${spanish}`);
@@ -88,9 +103,34 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
     if (url) window.open(url, '_blank');
   };
 
-  const step = (delta: number) => {
+  const step = (tier: string, delta: number) => {
     playClickFx();
-    setPersons((current) => Math.min(MAX_PERSONS, Math.max(1, current + delta)));
+    setCounts((current) => {
+      const next = Math.min(MAX_PERSONS, Math.max(0, (current[tier] ?? 0) + delta));
+      const updated = { ...current, [tier]: next };
+      // Never nobody at all: the first rate keeps at least one person.
+      if (Object.values(updated).every((count) => count === 0)) updated[rates[0].tier] = 1;
+      return updated;
+    });
+  };
+
+  const stepper = (option: PricingOption, label: React.ReactNode) => {
+    const count = counts[option.tier] ?? 0;
+    const floor = !multi || rates.every((other) => other.tier === option.tier || (counts[other.tier] ?? 0) === 0) ? 1 : 0;
+    return (
+      <div key={option.tier}>
+        <span className="dv-book-label mb-1.5 flex items-center gap-1.5">{label}</span>
+        <div className="dv-book-stepper flex items-center justify-between">
+          <button type="button" onClick={() => step(option.tier, -1)} disabled={count <= floor} className="dv-book-step grid h-11 w-11 place-items-center" aria-label={`${option.tier} −1`}>
+            <HiMinus />
+          </button>
+          <output className="dv-book-count tabular-nums" aria-live="polite">{count}</output>
+          <button type="button" onClick={() => step(option.tier, 1)} disabled={count >= MAX_PERSONS} className="dv-book-step grid h-11 w-11 place-items-center" aria-label={`${option.tier} +1`}>
+            <HiPlus />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -98,28 +138,28 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
       <div className="dv-book-price flex items-end justify-between gap-3">
         <div>
           <p id="dv-book-title" className="dv-book-label">
-            {say({ en: 'Price per person', es: 'Precio por persona', de: 'Preis pro Person', fr: 'Prix par personne' })}
+            {multi
+              ? say({ en: 'Prices', es: 'Precios', de: 'Preise', fr: 'Prix' })
+              : say({ en: 'Price per person', es: 'Precio por persona', de: 'Preis pro Person', fr: 'Prix par personne' })}
           </p>
           <p className="dv-book-amount tabular-nums">{rate.amount ? money(rate.amount) : rate.price || '—'}</p>
         </div>
         <span className="dv-book-tag">{rate.tier}</span>
       </div>
+      {multi && (
+        <ul className="dv-book-rates mt-2 flex flex-wrap gap-2">
+          {rates.slice(1).map((option) => (
+            <li key={option.tier} className="dv-book-tag">
+              {option.tier}: {option.amount ? money(option.amount) : option.price}
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className="mt-5 grid gap-4">
-        <div>
-          <span className="dv-book-label mb-1.5 flex items-center gap-1.5">
-            <MdGroups aria-hidden="true" /> {say({ en: 'People', es: 'Personas', de: 'Personen', fr: 'Personnes' })}
-          </span>
-          <div className="dv-book-stepper flex items-center justify-between">
-            <button type="button" onClick={() => step(-1)} disabled={persons <= 1} className="dv-book-step grid h-11 w-11 place-items-center" aria-label={say({ en: 'One person less', es: 'Una persona menos', de: 'Eine Person weniger', fr: 'Une personne de moins' })}>
-              <HiMinus />
-            </button>
-            <output className="dv-book-count tabular-nums" aria-live="polite">{persons}</output>
-            <button type="button" onClick={() => step(1)} disabled={persons >= MAX_PERSONS} className="dv-book-step grid h-11 w-11 place-items-center" aria-label={say({ en: 'One person more', es: 'Una persona más', de: 'Eine Person mehr', fr: 'Une personne de plus' })}>
-              <HiPlus />
-            </button>
-          </div>
-        </div>
+        {multi
+          ? rates.map((option) => stepper(option, <><MdGroups aria-hidden="true" /> {option.tier}</>))
+          : stepper(rate, <><MdGroups aria-hidden="true" /> {say({ en: 'People', es: 'Personas', de: 'Personen', fr: 'Personnes' })}</>)}
 
         <label className="block">
           <span className="dv-book-label mb-1.5 flex items-center gap-1.5">
@@ -131,7 +171,7 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
 
       <div className="dv-book-total mt-5 flex items-center justify-between">
         <span>{say({ en: 'Total', es: 'Total', de: 'Gesamt', fr: 'Total' })}</span>
-        <strong className="tabular-nums">{rate.amount ? money(total) : rate.price}</strong>
+        <strong className="tabular-nums">{priced ? money(total) : rate.price}</strong>
       </div>
 
       <div className="mt-5 grid gap-3">
@@ -144,9 +184,10 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
         </button>
         <PaymentDropdown
           excursionTitle={service.title}
-          selectedPrice={rate.amount ? `${money(total)} USD` : rate.price}
-          amount={rate.amount ? total : undefined}
+          selectedPrice={priced ? `${money(total)} USD` : rate.price}
+          amount={priced ? total : undefined}
           persons={persons}
+          {...(multi ? { quantities: counts } : {})}
           bookingDate={longDate}
           category="tours"
           serviceId={service.id}
