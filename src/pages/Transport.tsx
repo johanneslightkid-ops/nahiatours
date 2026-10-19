@@ -17,6 +17,7 @@ import MobileNumberPicker from '../components/ui/MobileNumberPicker';
 import RouteMap from '../components/RouteMap';
 import PaymentDropdown from '../components/ui/PaymentDropdown';
 import AddToCartButton from '../components/cart/AddToCartButton';
+import { vehicleImage } from '../lib/vehicleImage';
 
 /**
  * Airport transfers — El Cortecito's own page.
@@ -520,9 +521,9 @@ const Transport: React.FC = () => {
                         className={`transfer-vehicle ${active ? 'transfer-vehicle-active' : ''}`}
                       >
                         <span className="transfer-vehicle-photo">
-                          {vt.image && !brokenImages[vt.key] ? (
+                          {vehicleImage(vt) && !brokenImages[vt.key] ? (
                             <img
-                              src={vt.image}
+                              src={vehicleImage(vt)}
                               alt=""
                               loading="lazy"
                               decoding="async"
