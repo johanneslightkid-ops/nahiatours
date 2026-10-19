@@ -19,6 +19,7 @@ import AddToCartButton from '../components/cart/AddToCartButton';
 import { startAttempt } from '../lib/paymentAttempt';
 import { getPaymentsReady, postToGateway, startCardCheckout } from '../services/paymentService';
 import { isPaymentMethodVisible } from '../utils/paymentMethods';
+import { vehicleImage } from '../lib/vehicleImage';
 
 type TripType = 'one-way' | 'round-trip';
 
@@ -582,9 +583,9 @@ const Transport: React.FC = () => {
                       />
                     </p>
                     <p className="text-xs text-ink-light">{vehicleText(selectedVehicle, locale).description}</p>
-                    {selectedVehicle.image && (
+                    {vehicleImage(selectedVehicle) && (
                       <div className="mt-2 h-28 w-full overflow-hidden rounded-xl bg-paper-warm md:h-36">
-                        <img src={selectedVehicle.image} alt={vehicleText(selectedVehicle, locale).label} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                        <img src={vehicleImage(selectedVehicle)} alt={vehicleText(selectedVehicle, locale).label} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                       </div>
                     )}
                     {needsTwoVehicles && (
