@@ -1,36 +1,88 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { localeText } from '../lib/localeText';
 import { FormattedMessage } from 'react-intl';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { getContentLocale, useI18n } from '../contexts/I18nContext';
-import { ServiceCategory, Tour, getServicesByCategory } from '../services/toursService';
+import { ServiceCategory, Tour, getServiceSlug, getServicesByCategory, perPersonTier } from '../services/toursService';
 import { useBrand } from '../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { getTransferConfig } from '../services/transferConfigService';
 import { calculateDistancePrice } from '../services/transferPricingEngine';
 import type { TransferConfig, TransferFormData, TransferPriceResult } from '../types/transport';
 import MarkdownRenderer from '../components/ui/MarkdownRenderer';
+import DetailCarousel from '../components/details/DetailCarousel';
+import DetailNav, { DetailOrigin, planReturnPath } from '../components/details/DetailNav';
+import BookingPanel from '../components/details/BookingPanel';
+import TourGuideSections, { GuideFacts } from '../components/details/TourGuideSections';
+import { TOUR_PROFILES, matchTourProfile } from '../planner/tourProfiles';
+import { TourGuide, langOf, loadTourGuide } from '../lib/tourGuide';
+import { playClickFx } from '../lib/soundEngine';
+
+/**
+ * One tour (or transfer), with everything needed to choose it and book it:
+ * its photographs in a carousel, the vendor's description, what there is to
+ * know about the place and the day (src/lib/tourGuide.ts), the booking panel
+ * beside it, and the ways back — to all tours, or to the plan when the guest
+ * came from the planner.
+ *
+ * The layout is shared by every site; the look of each part is the site's own
+ * `.dv-*` rules in globals.css.
+ */
+
+const money = (value: number) => `US$${Number.isInteger(value) ? value : value.toFixed(2)}`;
 
 const ServiceDetails: React.FC = () => {
   const { locale } = useI18n();
   const { category = 'tours', id = '' } = useParams();
-  const [service, setService] = useState<Tour | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const location = useLocation();
+  const origin: DetailOrigin = (location.state as DetailOrigin | null) ?? {};
+  const [services, setServices] = useState<Tour[]>([]);
+  const [englishTitles, setEnglishTitles] = useState<Map<number, string>>(new Map());
+  const [loaded, setLoaded] = useState(false);
+  const [guide, setGuide] = useState<TourGuide | null>(null);
   const [selectedOrigin, setSelectedOrigin] = useState('');
   const [selectedDestination, setSelectedDestination] = useState('');
   const { brandSettings } = useBrand();
+  const lang = langOf(locale);
+  const isTour = category !== 'transport';
 
   useEffect(() => {
-    const loadService = async () => {
-      const services = await getServicesByCategory(category as ServiceCategory, getContentLocale(locale));
-      const routeId = id.split('-')[0];
-      const match = services.find((item) => String(item.id) === routeId) ?? null;
-      setService(match);
-      setActiveIndex(0);
+    let current = true;
+    setLoaded(false);
+    (async () => {
+      const contentLocale = getContentLocale(locale);
+      const [list, english] = await Promise.all([
+        getServicesByCategory(category as ServiceCategory, contentLocale),
+        // The guide is matched on the English title, which every language shares an id with.
+        isTour && contentLocale !== 'en' ? getServicesByCategory('tours', 'en').catch(() => [] as Tour[]) : Promise.resolve([] as Tour[]),
+      ]);
+      if (!current) return;
+      setServices(list);
+      setEnglishTitles(new Map(english.map((item) => [item.id, item.title])));
+      setLoaded(true);
+    })();
+    return () => {
+      current = false;
     };
+  }, [category, locale, isTour]);
 
-    loadService();
-  }, [category, id, locale]);
+  const routeId = id.split('-')[0];
+  const index = services.findIndex((item) => String(item.id) === routeId);
+  const service = index >= 0 ? services[index] : null;
+
+  const profileOf = (tour: Tour) => matchTourProfile(englishTitles.get(tour.id) ?? tour.title);
+  const profile = service && isTour ? profileOf(service) : null;
+
+  useEffect(() => {
+    let current = true;
+    setGuide(null);
+    if (profile && profile.key !== 'unknown') {
+      loadTourGuide(profile.key).then((loadedGuide) => current && setGuide(loadedGuide));
+    }
+    return () => {
+      current = false;
+    };
+  }, [profile?.key]);
 
   const images = useMemo(() => {
     if (!service) {
@@ -39,6 +91,23 @@ const ServiceDetails: React.FC = () => {
 
     return service.details.images.length > 0 ? service.details.images : [service.image];
   }, [service]);
+
+  const pathOf = (item: Tour) => `/details/${isTour ? 'tours' : 'transport'}/${getServiceSlug(item)}`;
+  const neighbour = (offset: number) => {
+    if (index < 0 || services.length < 2) return undefined;
+    const item = services[(index + offset + services.length) % services.length];
+    return { title: item.title, path: pathOf(item) };
+  };
+
+  /** Three more of the same kind first, then whatever comes next. */
+  const related = useMemo(() => {
+    if (!service || !isTour) return [];
+    const group = TOUR_PROFILES.find((item) => item.key === profile?.key)?.categoryGroup;
+    const others = services.filter((item) => item.id !== service.id);
+    const sameKind = group ? others.filter((item) => profileOf(item).categoryGroup === group) : [];
+    const rest = others.filter((item) => !sameKind.includes(item));
+    return [...sameKind, ...rest].slice(0, 3);
+  }, [service, services, englishTitles, profile?.key]);
 
   useEffect(() => {
     if (!service?.transferRoutes?.length) {
@@ -146,15 +215,20 @@ const ServiceDetails: React.FC = () => {
 
   if (!service) {
     return (
-      <div className="section-shell py-20 text-center">
-        <p className="text-lg text-ink-soft">
-          <FormattedMessage id="details.notFound" defaultMessage="Service details could not be found." />
-        </p>
+      <div className="dv-page section-shell page-top pb-20 text-center">
+        {loaded && (
+          <>
+            <p className="text-lg text-ink-soft">
+              <FormattedMessage id="details.notFound" defaultMessage="Service details could not be found." />
+            </p>
+            <Link to={isTour ? '/tours' : '/transport'} className="dv-nav-back mt-6 inline-flex">
+              {localeText(locale, { en: 'See all tours', es: 'Ver todos los tours', de: 'Alle Touren ansehen', fr: 'Voir toutes les excursions' })}
+            </Link>
+          </>
+        )}
       </div>
     );
   }
-
-  const currentImage = images[activeIndex] ?? service.image;
 
   const handleContactWhatsApp = () => {
     const originZone = getRegionFromAddress(selectedOrigin);
@@ -182,40 +256,54 @@ const ServiceDetails: React.FC = () => {
     if (url) window.open(url, '_blank');
   };
 
+  const rate = service.pricingOptions[0] ?? { tier: perPersonTier(lang), price: service.price, amount: null };
+  const detailsPath = pathOf(service);
+  const scrollToBooking = () => {
+    playClickFx();
+    document.getElementById('dv-booking')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <div className="bg-paper py-16">
-      <div className="section-shell space-y-8">
-        <div className="flex items-center justify-between gap-4">
-          <Link to={category === 'transport' ? '/transport' : '/tours'} className="text-sm font-semibold text-lagoon-dark hover:text-lagoon-dark">
-            <FormattedMessage id="details.back" defaultMessage="← Back to listings" />
-          </Link>
-        </div>
+    <div className="dv-page page-top pb-28 lg:pb-16">
+      <div className="section-shell">
+        <DetailNav category={isTour ? 'tours' : 'transport'} origin={origin} previous={neighbour(-1)} next={neighbour(1)} locale={locale} />
 
-        <article className="glass-card overflow-hidden rounded-[2rem]">
-          <div className="relative bg-ink">
-            <img src={currentImage} alt={service.title} decoding="async" className="h-[420px] w-full object-cover" loading="lazy" decoding="async" />
-            <div className="absolute inset-x-0 bottom-0 bg-ink/75 p-8 text-white">
-              <h1 className="text-4xl font-bold md:text-5xl">{service.title}</h1>
-              <div className="mt-3 max-w-3xl text-paper/85">
-                <MarkdownRenderer content={service.description} />
+        <header className="dv-head mt-6">
+          <p className="dv-eyebrow">
+            {profile && profile.key !== 'unknown' ? `${profile.emoji} ` : ''}
+            {isTour
+              ? localeText(locale, { en: 'Excursion', es: 'Excursión', de: 'Ausflug', fr: 'Excursion' })
+              : localeText(locale, { en: 'Transfer', es: 'Traslado', de: 'Transfer', fr: 'Transfert' })}
+            {guide ? ` · ${guide.facts.duration[lang].split(/[,(]/)[0].trim()}` : ''}
+          </p>
+          <h1 className="dv-title">{service.title}</h1>
+          {isTour && rate.amount ? (
+            <p className="dv-head-price">
+              {localeText(locale, { en: 'from', es: 'desde', de: 'ab', fr: 'dès' })} <strong>{money(rate.amount)}</strong>{' '}
+              {localeText(locale, { en: 'per person', es: 'por persona', de: 'pro Person', fr: 'par personne' })}
+            </p>
+          ) : null}
+        </header>
+
+        <div className="dv-layout mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem]">
+          <div className="dv-main min-w-0 space-y-8">
+            <DetailCarousel images={images} title={service.title} locale={locale} />
+
+            {guide && <GuideFacts guide={guide} lang={lang} />}
+
+            <section className="dv-section" aria-labelledby="dv-description">
+              <h2 id="dv-description" className="dv-h2">
+                {isTour
+                  ? localeText(locale, { en: 'About this tour', es: 'Sobre este tour', de: 'Über diese Tour', fr: 'À propos de cette excursion' })
+                  : localeText(locale, { en: 'About this transfer', es: 'Sobre este traslado', de: 'Über diesen Transfer', fr: 'À propos de ce transfert' })}
+              </h2>
+              <div className="dv-prose">
+                <MarkdownRenderer content={service.details.description} />
               </div>
-            </div>
-          </div>
+            </section>
 
-          <div className="grid grid-cols-1 gap-4 border-b border-ink/20 bg-white px-6 py-6 md:grid-cols-4">
-            {images.map((image, index) => (
-              <button
-                key={`${image}-${index}`}
-                onClick={() => setActiveIndex(index)}
-                className={`overflow-hidden rounded-2xl border-2 transition ${index === activeIndex ? 'border-lagoon' : 'border-ink/15'}`}
-                aria-label={`Show image ${index + 1}`}
-              >
-                <img src={image} alt={`${service.title} ${index + 1}`} loading="lazy" decoding="async" className="h-24 w-full object-cover" />
-              </button>
-            ))}
-          </div>
-
-          <div className="space-y-8 p-8">
+            {!isTour && (
+              <div className="dv-section">
             <section>
               <h2 className="mb-4 text-2xl font-bold text-ink">
                 <FormattedMessage id="details.pricing" defaultMessage="Pricing" />
@@ -238,7 +326,7 @@ const ServiceDetails: React.FC = () => {
                       <select
                         value={selectedOrigin}
                         onChange={(event) => setSelectedOrigin(event.target.value)}
-                        className="w-full rounded-2xl ring-1 ring-ink/10 bg-white px-4 py-3 text-ink-soft outline-none"
+                        className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
                       >
                         {Array.from(new Set(availableOrigins)).map((origin) => (
                           <option key={origin} value={origin}>
@@ -255,7 +343,7 @@ const ServiceDetails: React.FC = () => {
                       <select
                         value={selectedDestination}
                         onChange={(event) => setSelectedDestination(event.target.value)}
-                        className="w-full rounded-2xl ring-1 ring-ink/10 bg-white px-4 py-3 text-ink-soft outline-none"
+                        className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
                       >
                         {availableDestinations.map((destination) => (
                           <option key={destination} value={destination}>
@@ -266,7 +354,7 @@ const ServiceDetails: React.FC = () => {
                     </label>
                   </div>
 
-                  <div className="rounded-3xl ring-1 ring-ink/10 bg-white p-5 shadow-md">
+                  <div className="rounded-3xl border-[2.5px] border-ink bg-white p-5 shadow-ink-sm">
                     <p className="text-sm font-semibold text-ink-soft">
                       <FormattedMessage id="transport.estimate" defaultMessage="Estimated transfer price" />
                     </p>
@@ -281,7 +369,7 @@ const ServiceDetails: React.FC = () => {
                           <select
                             value={selectedVehicleKey}
                             onChange={(event) => setSelectedVehicleKey(event.target.value)}
-                            className="w-full rounded-2xl ring-1 ring-ink/10 bg-white px-4 py-3 text-ink-soft outline-none"
+                            className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
                           >
                             {transferConfig.vehicleTypes.map((vehicle) => (
                               <option key={vehicle.key} value={vehicle.key}>
@@ -298,7 +386,7 @@ const ServiceDetails: React.FC = () => {
                             max={service.transferRoutes?.length ? 30 : 10}
                             value={passengers}
                             onChange={(event) => setPassengers(Number(event.target.value))}
-                            className="w-full rounded-2xl ring-1 ring-ink/10 bg-white px-4 py-3 text-ink-soft outline-none"
+                            className="w-full rounded-2xl border-2 border-ink bg-white px-4 py-3 text-ink-soft outline-none"
                           />
                         </label>
                       </div>
@@ -318,7 +406,7 @@ const ServiceDetails: React.FC = () => {
                           </div>
                         ) : null}
 
-                        <div className="mt-3 rounded-lg border border-ink/10 bg-paper-warm p-3">
+                        <div className="mt-3 rounded-lg border-2 border-ink/15 bg-paper-warm p-3">
                           <div className="flex justify-between">
                             <span>{localeText(locale, { en: 'Base distance price', es: 'Precio base', de: 'Grundpreis nach Entfernung', fr: 'Prix de base (distance)' })}</span>
                             <span>{priceResult ? `USD ${priceResult.breakdown.baseDistancePrice}` : basePrice != null ? `USD ${basePrice}` : 'N/A'}</span>
@@ -364,16 +452,64 @@ const ServiceDetails: React.FC = () => {
                 </div>
               )}
             </section>
+              </div>
+            )}
 
-            <section>
-              <h2 className="mb-4 text-2xl font-bold text-ink">
-                <FormattedMessage id="details.description" defaultMessage="Description" />
-              </h2>
-              <MarkdownRenderer content={service.details.description} />
-            </section>
+            {guide && <TourGuideSections guide={guide} lang={lang} />}
+
+            {related.length > 0 && (
+              <section className="dv-section dv-more" aria-labelledby="dv-more">
+                <h2 id="dv-more" className="dv-h2">
+                  {localeText(locale, { en: 'You might also like', es: 'También te puede gustar', de: 'Das könnte dir auch gefallen', fr: 'Vous aimerez aussi' })}
+                </h2>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {related.map((item) => (
+                    <Link key={item.id} to={pathOf(item)} state={origin} onClick={() => playClickFx()} className="dv-more-card group block overflow-hidden no-underline">
+                      <span className="block aspect-[4/3] overflow-hidden">
+                        <img src={item.image} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
+                      </span>
+                      <span className="dv-more-body block">
+                        <span className="dv-more-title block">{item.title}</span>
+                        {item.pricingOptions[0]?.amount ? (
+                          <span className="dv-more-price block">
+                            {localeText(locale, { en: 'from', es: 'desde', de: 'ab', fr: 'dès' })} {money(item.pricingOptions[0].amount)}
+                          </span>
+                        ) : null}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
-        </article>
+
+          {isTour && (
+            <aside id="dv-booking" className="dv-aside scroll-mt-28">
+              <div className="dv-aside-inner lg:sticky lg:top-24">
+                <BookingPanel service={service} detailsPath={detailsPath} locale={locale} />
+              </div>
+            </aside>
+          )}
+        </div>
       </div>
+
+      {isTour && (
+        /* Phones: the price and the way to book stay at hand while reading. */
+        <div className="dv-bar fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 px-4 py-3 lg:hidden">
+          {origin.from === 'plan' && (
+            <Link to={planReturnPath(origin)} onClick={() => playClickFx()} className="dv-bar-plan shrink-0">
+              {localeText(locale, { en: 'My plan', es: 'Mi plan', de: 'Mein Plan', fr: 'Mon plan' })}
+            </Link>
+          )}
+          <div className="min-w-0 flex-1 leading-tight">
+            <span className="dv-bar-label block">{localeText(locale, { en: 'per person', es: 'por persona', de: 'pro Person', fr: 'par personne' })}</span>
+            <span className="dv-bar-price block tabular-nums">{rate.amount ? money(rate.amount) : rate.price}</span>
+          </div>
+          <button type="button" onClick={scrollToBooking} className="dv-bar-book shrink-0">
+            {localeText(locale, { en: 'Book', es: 'Reservar', de: 'Buchen', fr: 'Réserver' })}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
