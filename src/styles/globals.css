@@ -1862,3 +1862,460 @@ select:focus {
     0 0 0 3px var(--mango-light),
     0 0 22px 6px rgb(247 178 59 / 0.65);
 }
+
+/* ── The tour page (src/pages/ServiceDetails.tsx, src/components/details) ─── */
+/*
+ * The layout is shared by every site; these rules are only how THIS site
+ * dresses it. Values first, then the rules that use them.
+ */
+:root {
+  --dv-display: Fraunces, Georgia, serif;
+  --dv-display-weight: 700;
+  --dv-ink: var(--ink);
+  --dv-soft: var(--ink-soft);
+  --dv-light: var(--ink-light);
+  --dv-card: var(--card);
+  --dv-field: #ffffff;
+  --dv-border: 1px solid var(--line);
+  --dv-btn-border: 1.5px solid rgb(14 59 54 / 0.18);
+  --dv-thumb-border: 2px solid transparent;
+  --dv-radius: var(--pebble-a);
+  --dv-radius-sm: var(--pebble-b);
+  --dv-shadow: var(--shade);
+  --dv-shadow-sm: var(--shade-sm);
+  --dv-shadow-xs: none;
+  --dv-book-shadow: var(--shade-lg);
+  --dv-frame-border: 0;
+  --dv-frame-radius: var(--leaf);
+  --dv-frame-shadow: var(--shade-lg);
+  --dv-accent: linear-gradient(135deg, #ffd47e 0%, #f7b23b 55%, #f29a3b 100%);
+  --dv-accent-ink: var(--ink);
+  --dv-accent-strong: var(--hibiscus);
+  --dv-arrow-bg: rgb(255 253 248 / 0.92);
+  --dv-arrow-ink: var(--ink);
+  --dv-arrow-border: 0;
+  --dv-price: var(--lagoon-dark);
+  --dv-chip: var(--lagoon-light);
+  --dv-chip-ink: var(--ink);
+  --dv-icon-bg: var(--lagoon-light);
+  --dv-icon-ink: var(--ink);
+  --dv-check: var(--jungle);
+  --dv-line: var(--line);
+  --dv-quote-bg: rgb(147 236 225 / 0.22);
+  --dv-wa: var(--jungle);
+  --dv-bullet: '🌴';
+  --dv-eyebrow-font: Caveat, cursive;
+  --dv-eyebrow-size: 1.45rem;
+  --dv-eyebrow-tracking: 0;
+  --dv-eyebrow-transform: none;
+  --dv-eyebrow-color: var(--hibiscus-dark);
+  --dv-book-band: linear-gradient(90deg, var(--lagoon), var(--mango), var(--hibiscus));
+  --dv-book-band-height: 0.4rem;
+}
+
+.dv-nav-plan,
+.dv-nav-back,
+.dv-nav-step {
+  border: var(--dv-btn-border);
+  border-radius: 999px;
+  color: var(--dv-ink);
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: var(--dv-shadow-sm);
+  transition: transform 0.25s ease;
+}
+.dv-nav-plan {
+  background: var(--dv-accent);
+  color: var(--dv-accent-ink);
+  padding: 0.6rem 1.2rem;
+}
+.dv-nav-back {
+  background: var(--dv-card);
+  padding: 0.55rem 1.05rem;
+}
+.dv-nav-step {
+  background: var(--dv-card);
+}
+.dv-nav-plan:hover,
+.dv-nav-back:hover,
+.dv-nav-step:hover {
+  transform: translateY(-2px);
+}
+
+.dv-eyebrow {
+  font-family: var(--dv-eyebrow-font);
+  font-size: var(--dv-eyebrow-size);
+  font-weight: 700;
+  letter-spacing: var(--dv-eyebrow-tracking);
+  text-transform: var(--dv-eyebrow-transform);
+  color: var(--dv-eyebrow-color);
+}
+.dv-title {
+  font-family: var(--dv-display);
+  font-size: clamp(2rem, 4.4vw, 3.4rem);
+  font-weight: var(--dv-display-weight);
+  line-height: 1.06;
+  color: var(--dv-ink);
+}
+.dv-head-price {
+  margin-top: 0.6rem;
+  font-weight: 600;
+  color: var(--dv-soft);
+}
+.dv-head-price strong {
+  font-family: var(--dv-display);
+  font-size: 1.55rem;
+  color: var(--dv-price);
+}
+
+.dv-carousel-frame {
+  border: var(--dv-frame-border);
+  border-radius: var(--dv-frame-radius);
+  background: var(--dv-ink);
+  box-shadow: var(--dv-frame-shadow);
+}
+.dv-carousel-arrow,
+.dv-carousel-zoom {
+  border: var(--dv-arrow-border);
+  border-radius: 999px;
+  background: var(--dv-arrow-bg);
+  color: var(--dv-arrow-ink);
+  box-shadow: var(--dv-shadow-sm);
+  transition: transform 0.2s ease;
+}
+.dv-carousel-arrow:hover {
+  transform: translateY(-50%) scale(1.08);
+}
+.dv-carousel-zoom:hover,
+.dv-lightbox-close:hover {
+  transform: scale(1.08);
+}
+.dv-carousel-count {
+  border-radius: 999px;
+  background: var(--dv-arrow-bg);
+  padding: 0.15rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--dv-arrow-ink);
+}
+.dv-carousel-dot {
+  background: rgb(255 255 255 / 0.65);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.18);
+  transition: transform 0.2s ease;
+}
+.dv-carousel-dot[data-active='true'] {
+  background: var(--dv-accent);
+  transform: scale(1.5);
+}
+.dv-carousel-thumb {
+  border: var(--dv-thumb-border);
+  border-radius: var(--dv-radius-sm);
+  opacity: 0.7;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.dv-carousel-thumb[data-active='true'] {
+  opacity: 1;
+  transform: translateY(-3px);
+  border-color: var(--dv-accent);
+}
+
+.dv-fact {
+  border: var(--dv-border);
+  border-radius: var(--dv-radius-sm);
+  background: var(--dv-card);
+  padding: 0.8rem 0.9rem;
+  box-shadow: var(--dv-shadow-xs);
+}
+.dv-fact-icon {
+  border-radius: 999px;
+  background: var(--dv-icon-bg);
+  color: var(--dv-icon-ink);
+}
+.dv-fact-label,
+.dv-book-label,
+.dv-bar-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--dv-light);
+}
+.dv-fact-value {
+  font-weight: 650;
+  line-height: 1.38;
+  color: var(--dv-ink);
+}
+
+.dv-section {
+  border: var(--dv-border);
+  border-radius: var(--dv-radius);
+  background: var(--dv-card);
+  padding: clamp(1.15rem, 2.4vw, 1.8rem);
+  box-shadow: var(--dv-shadow);
+}
+.dv-h2 {
+  margin-bottom: 0.9rem;
+  font-family: var(--dv-display);
+  font-size: 1.6rem;
+  font-weight: var(--dv-display-weight);
+  line-height: 1.12;
+  color: var(--dv-ink);
+}
+.dv-h2-icon {
+  color: var(--dv-accent-strong);
+}
+.dv-prose {
+  color: var(--dv-soft);
+  font-size: 1.02rem;
+  line-height: 1.72;
+}
+.dv-prose p + p {
+  margin-top: 0.8rem;
+}
+.dv-highlight {
+  font-weight: 600;
+  color: var(--dv-ink);
+}
+.dv-highlight-icon {
+  color: var(--dv-check);
+}
+.dv-timeline::before {
+  content: '';
+  position: absolute;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  left: 2.2rem;
+  border-left: 2px dashed var(--dv-line);
+}
+.dv-step-time {
+  position: relative;
+  z-index: 1;
+  align-self: start;
+  justify-self: start;
+  border-radius: 999px;
+  background: var(--dv-chip);
+  padding: 0.12rem 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--dv-chip-ink);
+}
+.dv-step-title {
+  font-weight: 800;
+  color: var(--dv-ink);
+}
+.dv-step-text {
+  color: var(--dv-soft);
+  line-height: 1.55;
+}
+.dv-small {
+  font-size: 0.85rem;
+  color: var(--dv-light);
+}
+.dv-list {
+  display: grid;
+  gap: 0.55rem;
+  color: var(--dv-soft);
+}
+.dv-list li {
+  position: relative;
+  padding-left: 1.35rem;
+}
+.dv-list li::before {
+  content: var(--dv-bullet);
+  position: absolute;
+  left: 0;
+  color: var(--dv-accent-strong);
+}
+.dv-quote {
+  border-left: 3px solid var(--dv-accent-strong);
+  border-radius: 0 var(--dv-radius-sm) var(--dv-radius-sm) 0;
+  background: var(--dv-quote-bg);
+  padding: 0.75rem 1rem;
+  font-family: var(--dv-display);
+  font-style: italic;
+  color: var(--dv-ink);
+}
+.dv-faq-item {
+  border-bottom: 1px solid var(--dv-line);
+  padding: 0.65rem 0;
+}
+.dv-faq-q {
+  font-weight: 800;
+  color: var(--dv-ink);
+}
+.dv-faq-mark {
+  display: inline-grid;
+  height: 1.7rem;
+  width: 1.7rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--dv-chip);
+  color: var(--dv-chip-ink);
+  font-weight: 900;
+}
+.dv-faq-a {
+  margin-top: 0.5rem;
+  color: var(--dv-soft);
+  line-height: 1.6;
+}
+
+.dv-book {
+  position: relative;
+  overflow: hidden;
+  border: var(--dv-border);
+  border-radius: var(--dv-radius);
+  background: var(--dv-card);
+  padding: 1.4rem;
+  box-shadow: var(--dv-book-shadow);
+}
+.dv-book::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--dv-book-band-height);
+  background: var(--dv-book-band);
+}
+.dv-book-amount {
+  font-family: var(--dv-display);
+  font-size: 2.4rem;
+  font-weight: var(--dv-display-weight);
+  line-height: 1;
+  color: var(--dv-price);
+}
+.dv-book-tag {
+  border-radius: 999px;
+  background: var(--dv-chip);
+  padding: 0.12rem 0.65rem;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--dv-chip-ink);
+}
+.dv-book-stepper {
+  border: var(--dv-border);
+  border-radius: 999px;
+  background: var(--dv-field);
+  padding: 0.25rem;
+}
+.dv-book-step {
+  border-radius: 999px;
+  background: var(--dv-chip);
+  color: var(--dv-chip-ink);
+}
+.dv-book-step:disabled {
+  opacity: 0.35;
+}
+.dv-book-count {
+  font-family: var(--dv-display);
+  font-size: 1.55rem;
+  color: var(--dv-ink);
+}
+.dv-book-date {
+  border: var(--dv-border);
+  border-radius: var(--dv-radius-sm);
+  background: var(--dv-field);
+  padding: 0.6rem 0.8rem;
+  font-weight: 700;
+  color: var(--dv-ink);
+}
+.dv-book-total {
+  border-top: 1.5px dashed var(--dv-line);
+  border-bottom: 1.5px dashed var(--dv-line);
+  padding: 0.7rem 0;
+  font-weight: 800;
+  color: var(--dv-ink);
+}
+.dv-book-total strong {
+  font-family: var(--dv-display);
+  font-size: 1.65rem;
+  color: var(--dv-price);
+}
+.dv-book-cart [data-add-to-cart] {
+  border: var(--dv-btn-border);
+  background: var(--dv-accent);
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--dv-accent-ink);
+  box-shadow: var(--dv-shadow-sm);
+}
+.dv-book-whatsapp {
+  border: var(--dv-btn-border);
+  border-radius: 999px;
+  background: var(--dv-wa);
+  padding: 0.75rem 1rem;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: var(--dv-shadow-sm);
+  transition: transform 0.2s ease;
+}
+.dv-book-whatsapp:hover {
+  transform: translateY(-2px);
+}
+.dv-book-note {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--dv-soft);
+}
+
+.dv-more-card {
+  border: var(--dv-border);
+  border-radius: var(--dv-radius-sm);
+  background: var(--dv-card);
+  box-shadow: var(--dv-shadow-sm);
+  transition: transform 0.25s ease;
+}
+.dv-more-card:hover {
+  transform: translateY(-3px);
+}
+.dv-more-body {
+  padding: 0.75rem 0.9rem;
+}
+.dv-more-title {
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--dv-ink);
+}
+.dv-more-price {
+  margin-top: 0.2rem;
+  font-weight: 700;
+  color: var(--dv-price);
+}
+
+.dv-bar {
+  border-top: var(--dv-border);
+  background: var(--dv-card);
+  box-shadow: 0 -8px 24px -16px rgb(0 0 0 / 0.35);
+}
+.dv-bar-price {
+  font-family: var(--dv-display);
+  font-size: 1.4rem;
+  font-weight: var(--dv-display-weight);
+  color: var(--dv-price);
+}
+.dv-bar-book,
+.dv-bar-plan {
+  border: var(--dv-btn-border);
+  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: var(--dv-shadow-sm);
+}
+.dv-bar-book {
+  background: var(--dv-accent);
+  color: var(--dv-accent-ink);
+}
+.dv-bar-plan {
+  background: var(--dv-card);
+  color: var(--dv-ink);
+}
+
+/* Coming back from a tour lands on it in the plan, clear of the header. */
+.planner-panel[id] {
+  scroll-margin-top: 7rem;
+}
+
+/* "Back to my plan" hangs like the menu's tags. */
+.dv-nav-plan { position: relative; border-radius: 14px; margin-top: 0.4rem; }
+.dv-nav-plan::before { content: ''; position: absolute; left: 50%; top: -0.55rem; width: 2px; height: 0.55rem; background: #8a5a2b; }
+.dv-list li::before { font-size: 0.8rem; }
