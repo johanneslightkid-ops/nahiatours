@@ -1902,3 +1902,440 @@ select:focus {
     animation: none !important;
   }
 }
+
+/* ── The tour page: a painting on the wall, and the ticket beside it ─────── */
+/*
+ * Layout lives in the shared components (src/components/details/*); this is
+ * only how this site dresses it. Frames, ink contour, hard offset shadow.
+ */
+
+.dv-nav-plan,
+.dv-nav-back,
+.dv-nav-step {
+  border: 3px solid var(--ink);
+  box-shadow: var(--shade-sm);
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+.dv-nav-plan {
+  border-radius: 999px;
+  background: var(--mango);
+  padding: 0.6rem 1.15rem;
+  transform: rotate(-1.5deg);
+}
+.dv-nav-back {
+  border-radius: 999px;
+  background: var(--card);
+  padding: 0.55rem 1.05rem;
+}
+.dv-nav-step {
+  border-radius: 999px;
+  background: var(--card);
+}
+.dv-nav-plan:hover,
+.dv-nav-back:hover,
+.dv-nav-step:hover {
+  transform: translate(-1px, -2px) rotate(-1deg);
+}
+
+.dv-eyebrow {
+  font-family: 'Caveat', cursive;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--hibiscus-dark);
+}
+.dv-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+  line-height: 1.04;
+  color: var(--ink);
+}
+.dv-head-price {
+  margin-top: 0.6rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.dv-head-price strong {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.6rem;
+  color: var(--sky-dark);
+  background: linear-gradient(transparent 62%, var(--mango-light) 62%);
+}
+
+/* The photographs hang in a frame. */
+.dv-carousel-frame {
+  border: 4px solid var(--ink);
+  border-radius: 1.6rem 0.7rem 1.6rem 0.7rem;
+  background: var(--ink);
+  box-shadow: 9px 9px 0 rgba(29, 35, 70, 0.9);
+}
+.dv-carousel-arrow,
+.dv-carousel-zoom {
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--mango);
+  color: var(--ink);
+  box-shadow: var(--shade-sm);
+  transition: transform 0.2s ease;
+}
+.dv-carousel-arrow:hover,
+.dv-carousel-zoom:hover {
+  transform: translateY(-50%) scale(1.08);
+}
+.dv-carousel-zoom:hover {
+  transform: scale(1.08);
+}
+.dv-carousel-count {
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--card);
+  padding: 0.1rem 0.7rem;
+  font-family: 'Caveat', cursive;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.dv-carousel-dot {
+  border: 2px solid var(--ink);
+  background: var(--card);
+  transition: transform 0.2s ease;
+}
+.dv-carousel-dot[data-active='true'] {
+  background: var(--mango);
+  transform: scale(1.5);
+}
+.dv-carousel-thumb {
+  border: 3px solid var(--ink);
+  border-radius: 0.9rem 0.4rem 0.9rem 0.4rem;
+  opacity: 0.72;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.dv-carousel-thumb[data-active='true'] {
+  opacity: 1;
+  transform: translateY(-3px) rotate(-1.5deg);
+  border-color: var(--hibiscus);
+}
+.dv-lightbox .dv-carousel-dot {
+  border-color: var(--paper);
+}
+
+/* Facts: little painted tiles. */
+.dv-fact {
+  border: 2.5px solid var(--ink);
+  border-radius: 1rem 0.5rem 1rem 0.5rem;
+  background: var(--card);
+  padding: 0.8rem 0.9rem;
+}
+.dv-fact-icon {
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+}
+.dv-fact:nth-child(7n + 1) .dv-fact-icon { background: var(--mango-light); }
+.dv-fact:nth-child(7n + 2) .dv-fact-icon { background: var(--lagoon-light); }
+.dv-fact:nth-child(7n + 3) .dv-fact-icon { background: var(--hibiscus-light); }
+.dv-fact:nth-child(7n + 4) .dv-fact-icon { background: var(--sky-light); }
+.dv-fact:nth-child(7n + 5) .dv-fact-icon { background: var(--jungle-light); }
+.dv-fact:nth-child(7n + 6) .dv-fact-icon { background: #FFC09A; }
+.dv-fact:nth-child(7n + 7) .dv-fact-icon { background: #F2AEDB; }
+.dv-fact-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.dv-fact-value {
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+/* Each part of the page is a card on the wall. */
+.dv-section {
+  border: 3px solid var(--ink);
+  border-radius: 1.5rem 0.8rem 1.5rem 0.8rem;
+  background: var(--card);
+  padding: clamp(1.15rem, 2.4vw, 1.75rem);
+  box-shadow: 5px 5px 0 rgba(29, 35, 70, 0.9);
+}
+.dv-h2 {
+  margin-bottom: 0.9rem;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.65rem;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.dv-h2-icon {
+  color: var(--hibiscus);
+}
+.dv-prose {
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+.dv-prose p + p {
+  margin-top: 0.8rem;
+}
+.dv-highlight {
+  font-weight: 600;
+  color: var(--ink);
+}
+.dv-highlight-icon {
+  color: var(--jungle);
+}
+.dv-timeline::before {
+  content: '';
+  position: absolute;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  left: 2.2rem;
+  border-left: 3px dashed var(--sky-light);
+}
+.dv-step-time {
+  position: relative;
+  z-index: 1;
+  align-self: start;
+  justify-self: start;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--mango-light);
+  padding: 0.1rem 0.55rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.dv-step-title {
+  font-weight: 800;
+  color: var(--ink);
+}
+.dv-step-text {
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.dv-small {
+  font-size: 0.85rem;
+  color: var(--ink-light);
+}
+.dv-list {
+  display: grid;
+  gap: 0.55rem;
+  color: var(--ink-soft);
+}
+.dv-list li {
+  position: relative;
+  padding-left: 1.4rem;
+}
+.dv-list li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: var(--sunset);
+}
+.dv-quote {
+  border-left: 4px solid var(--lagoon);
+  border-radius: 0 1rem 1rem 0;
+  background: color-mix(in srgb, var(--lagoon-light) 35%, white);
+  padding: 0.75rem 1rem;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-style: italic;
+  color: var(--ink);
+}
+.dv-faq-item {
+  border-bottom: 2px dashed rgb(29 35 70 / 0.25);
+  padding: 0.6rem 0;
+}
+.dv-faq-q {
+  font-weight: 800;
+  color: var(--ink);
+}
+.dv-faq-mark {
+  display: inline-grid;
+  height: 1.7rem;
+  width: 1.7rem;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--mango-light);
+  font-weight: 900;
+}
+.dv-faq-a {
+  margin-top: 0.5rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* The booking card: a ticket pinned beside the painting. */
+.dv-book {
+  position: relative;
+  border: 3px solid var(--ink);
+  border-radius: 1.6rem 0.8rem 1.6rem 0.8rem;
+  background: var(--card);
+  padding: 1.4rem;
+  box-shadow: 8px 8px 0 rgba(29, 35, 70, 0.9);
+  overflow: hidden;
+}
+.dv-book::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 0.6rem;
+  background: linear-gradient(90deg, var(--mango), var(--sunset), var(--hibiscus), var(--grape), var(--sky), var(--lagoon));
+}
+.dv-book-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.dv-book-amount {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--sky-dark);
+}
+.dv-book-tag {
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--lagoon-light);
+  padding: 0.1rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.dv-book-stepper {
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  padding: 0.25rem;
+}
+.dv-book-step {
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--mango-light);
+  color: var(--ink);
+}
+.dv-book-step:disabled {
+  opacity: 0.35;
+}
+.dv-book-count {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.6rem;
+  color: var(--ink);
+}
+.dv-book-date {
+  border: 2.5px solid var(--ink);
+  border-radius: 0.9rem;
+  background: white;
+  padding: 0.6rem 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.dv-book-total {
+  border-top: 2.5px dashed rgb(29 35 70 / 0.35);
+  border-bottom: 2.5px dashed rgb(29 35 70 / 0.35);
+  padding: 0.7rem 0;
+  font-weight: 800;
+  color: var(--ink);
+}
+.dv-book-total strong {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.7rem;
+  color: var(--hibiscus-dark);
+}
+.dv-book-whatsapp {
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--jungle);
+  padding: 0.75rem 1rem;
+  font-weight: 800;
+  color: var(--paper);
+  box-shadow: var(--shade-sm);
+}
+.dv-book-note {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+/* More tours: three small framed postcards. */
+.dv-more-card {
+  border: 3px solid var(--ink);
+  border-radius: 1rem 0.5rem 1rem 0.5rem;
+  background: var(--paper);
+  box-shadow: var(--shade-sm);
+  transition: transform 0.2s ease;
+}
+.dv-more-card:hover {
+  transform: translateY(-3px) rotate(-1deg);
+}
+.dv-more-body {
+  border-top: 3px solid var(--ink);
+  padding: 0.7rem 0.85rem;
+}
+.dv-more-title {
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.dv-more-price {
+  margin-top: 0.2rem;
+  font-family: 'Caveat', cursive;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--hibiscus-dark);
+}
+
+/* Phones: the bar at the foot of the page. */
+.dv-bar {
+  border-top: 3px solid var(--ink);
+  background: var(--card);
+}
+.dv-bar-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+.dv-bar-price {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.45rem;
+  color: var(--sky-dark);
+}
+.dv-bar-book,
+.dv-bar-plan {
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  font-weight: 800;
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: var(--shade-sm);
+}
+.dv-bar-book {
+  background: var(--mango);
+}
+.dv-bar-plan {
+  background: var(--paper);
+}
+
+/* Coming back from a tour lands on it in the plan, clear of the header. */
+.planner-panel[id] {
+  scroll-margin-top: 7rem;
+}
+.dv-lightbox-close:hover {
+  transform: scale(1.08);
+}
+/* "Add to cart" in the ticket: the site's own button, in this site's ink. */
+.dv-book-cart [data-add-to-cart] {
+  border: 3px solid var(--ink);
+  background: var(--mango-light);
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  color: var(--ink);
+  box-shadow: var(--shade-sm);
+}
