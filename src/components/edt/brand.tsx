@@ -118,5 +118,5 @@ export const CONTACT = {
 
 export const PARTNERS = {
   hotels: 'https://exclusivehotelpuntacana.com/',
-  flights: 'https://exclusivehotelpuntacana.com/flight-offers/',
+  flights: 'https://exclusivehotelpuntacana.com/flights/',
 };
