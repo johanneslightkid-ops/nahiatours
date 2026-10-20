@@ -1,609 +1,272 @@
 [
   {
-    "title": "Île Saona : le paradis retrouvé",
-    "description": "Vivez l’évasion caribéenne ultime avec une aventure en catamaran et en hors-bord vers l’île Saona. Sentez la brise marine en naviguant vers la célèbre piscine naturelle du parc national Cotubanamá — l’une des plus grandes au monde, où d’énormes étoiles de mer vivent dans une eau cristalline. \n\nCe qui distingue Saona VIP ? Nous faisons du trajet une fête, avec des animations à bord et une expérience haut de gamme à la plage d’Abanico.\n\n**Durée :** 10 heures\n\n**Inclus :**\n• Transport aller-retour depuis l’hôtel\n• Croisière en hors-bord et en catamaran avec open bar (rhum, softs et eau)\n• 3 heures sur l’île Saona, avec baignade dans la piscine naturelle et 2 heures de détente à la plage d’Abanico\n• Espace VIP réservé à la plage d’Abanico avec transats dédiés\n• Grand buffet de grillades, poisson frais et accompagnements locaux\n• Guide professionnel certifié",
+    "title": "Excursion à l’île Saona",
+    "description": "**Votre évasion caribéenne de rêve, à une simple traversée en bateau.** Mettez le cap sur l’**île Saona**, un joyau de la République dominicaine niché dans les eaux protégées du **parc national Cotubanamá**. Avec ses plages de sable blanc et fin, ses eaux turquoise et ses cocotiers majestueux, Saona offre l’expérience tropicale par excellence, tout droit sortie d’une carte postale.\n\n### Au programme\n\nAu départ de Bayahibe, cette aventure d’une journée vous emmène sur la **plus grande île** de la République dominicaine — un havre de paix de plus de 110 km². Que vous veniez pour vous détendre, explorer ou faire du snorkeling, chacun y trouve son bonheur.\n\n**Catamaran et vedette** — Profitez de deux traversées panoramiques — l’une relaxante, l’autre palpitante — à l’aller et au retour.\n\n**Halte à la piscine naturelle** — Avancez dans des eaux peu profondes et cristallines, célèbres pour leurs étoiles de mer géantes. Un moment de carte postale !\n\n**Temps libre à la plage** — Prélassez-vous sous les palmiers, nagez dans les eaux chaudes de la mer des Caraïbes ou flânez le long d’un littoral préservé.\n\n**Vie marine** — Faites du snorkeling dans des eaux calmes et découvrez des récifs coralliens colorés et des poissons tropicaux.\n\n**Déjeuner sur l’île** — Savourez un délicieux buffet dominicain servi directement sur la plage. Open bar inclus !\n\n**Durée :** 9 heures\n\n**Départ de :** Bayahíbe\n\n**Prix :** Adultes (11 ans et +) $65 · Enfants $40 · Bébés (0–2 ans) gratuit\n\n**Inclus :**\n• Transport aller-retour depuis l’hôtel\n• Traversées aller-retour en catamaran et en vedette\n• Halte à la piscine naturelle\n• Temps libre à la plage sur l’île Saona\n• Déjeuner buffet et open bar\n• Animation et musique à bord\n• Guides certifiés\n\n**À apporter :**\n• Tenue de plage\n• Serviettes\n• Lunettes de soleil\n• Protection solaire\n• Espèces pour les pourboires",
     "pricing": [
       {
-        "tier": "Personnes",
-        "price": "$60"
+        "tier": "Persons",
+        "price": "$65"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210651/tours/e0xfwsbpvqkwazqsfyxw.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210653/tours/qwgf9q8xec2qt8saq7sk.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210654/tours/xl9ckoxgzkgyhlpmr2yn.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210667/tours/lyqzwly5dynftyslzwfz.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/4.webp"
       },
       {
         "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210682/tours/jlifyu3ytncusfwx90je.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/5.webp"
       },
       {
         "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210699/tours/xriitjksxd1nbdtdxcgo.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/6.webp"
       },
       {
         "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210721/tours/zzmzbl2qtgexpkiqqcsf.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/7.webp"
       },
       {
         "role": "detail_8",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210733/tours/rnpsphrheac8wvmbrhs1.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/8.webp"
       },
       {
         "role": "detail_9",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210738/tours/ti6ev1udhkdakbljolbf.webp"
-      },
-      {
-        "role": "detail_10",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210748/tours/yvxdyng7ruy1ardelsxo.webp"
-      },
-      {
-        "role": "detail_11",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210766/tours/dw4x04f9ls2bcs3nk7hn.webp"
-      },
-      {
-        "role": "detail_12",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210773/tours/cqagwsw2bwrkuemqqjy2.webp"
-      }
-    ]
-  },
-  {
-    "title": "Île Saona exclusive : le festin de langouste",
-    "description": "Sublimez votre journée sur l’île avec notre formule Saona la plus luxueuse. Vous profitez de tout le circuit classique, avec en plus des extras haut de gamme pour les gourmets et les amateurs de confort.\n\n**Inclus :**\n• Transferts porte à porte depuis l’hôtel\n• Fête en catamaran avec animation live et open bar\n• 3 heures sur l’île avec visite de la piscine naturelle et de la plage d’Abanico\n• Espace plage VIP exclusif avec transats au premier rang\n• **Extras premium :** bière Presidente bien fraîche et une livre entière (0,45 kg) de langouste fraîchement grillée\n• Buffet gourmet avec viandes variées, poisson et boissons\n• Guide expérimenté et certifié",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$119"
+        "localPath": "imgs/edt/tours/saona-island-tour/9.webp"
       }
     ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210929/tours/wdbnry7sqerywcysm85x.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210948/tours/umadvucfetuxkdrvf0ni.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210961/tours/fybff3pkkijbjaibhzzn.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210991/tours/umtaxp9lowgndbxtu6ea.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211000/tours/n9joghxxbcqby55mj35d.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211037/tours/jj14ch303fsimmtzuljo.webp"
-      },
-      {
-        "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211037/tours/ijbpwqfopt6hsp2oudpr.webp"
-      },
-      {
-        "role": "detail_8",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211048/tours/bdzka8kplra7uuzvr6sg.webp"
-      },
-      {
-        "role": "detail_9",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211057/tours/i0esqaj7nrdrasl0pt2r.webp"
-      },
-      {
-        "role": "detail_10",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211069/tours/qn2mhz6lky8j8y5ztjdq.webp"
-      },
-      {
-        "role": "detail_11",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211075/tours/uaplnpbweafwmuy4kqtv.webp"
-      },
-      {
-        "role": "detail_12",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211086/tours/ezyn1zvzi1rmuv7fsudo.webp"
-      }
-    ]
-  },
-  {
-    "title": "Catalina exclusive : aventure snorkeling et récif",
-    "description": "Si vous rêvez d’explorer une vie sous-marine éclatante, l’île Catalina est votre destination. Contrairement aux autres circuits, nous mettons l’accent sur les spectaculaires récifs coralliens qui entourent ce joyau des Caraïbes. Plongez dans une eau turquoise pour admirer un kaléidoscope de poissons tropicaux, puis détendez-vous sur un sable blanc immaculé.\n\n**Durée :** 12 heures\n\n**Inclus :**\n• Prise en charge et retour à l’hôtel\n• Visite d’une boutique d’artisanat local\n• Traversée en bateau jusqu’à l’île (env. 25 min)\n• Rafraîchissements servis à bord\n• Déjeuner-buffet sur la plage avec boissons\n• Équipement de snorkeling professionnel (masque, tuba et aide à la flottaison)",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$70"
-      }
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
     ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213231/tours/awhlnbguojfhbh52aulz.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213274/tours/dkjcvpoeuswqx6stm0ed.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213293/tours/n1trnpgbtdpupnofjkme.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213333/tours/hmvocs7l5soiq4av6wde.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213346/tours/kadhsxch4imywscxcdr7.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213358/tours/bdiyg2pobccfl7ouvuqw.webp"
-      }
-    ]
+    "destination": "Bayahíbe",
+    "duration": "9 heures"
   },
   {
-    "title": "Party Boat Bávaro : danser sur les vagues",
-    "description": "Faites de l’océan votre piste de danse ! Rejoignez la fête la plus animée de Punta Cana en longeant la côte de Bávaro. Dansez sur les derniers tubes, faites du snorkeling parmi les poissons tropicaux et savourez un cocktail en pleine mer à la piscine naturelle.\n\n**Durée :** 4 heures\n\n**Inclus :**\n• Transfert aller-retour climatisé depuis l’hôtel\n• Catamaran moderne avec open bar premium\n• Musique entraînante et animations\n• Arrêt baignade à la piscine naturelle\n• Séance de snorkeling guidée, équipement inclus",
+    "title": "Dorado Park",
+    "description": "**Dorado Park Punta Cana – Du plaisir en famille pour tous**\nPréparez-vous à une journée pleine de rires, de jeux et de souvenirs inoubliables au Dorado Park Punta Cana, l’un des meilleurs lieux de divertissement familial, au cœur de Bávaro. Que vous veniez avec vos enfants, entre amis ou en amoureux, ce parc allie plaisir et détente dans un cadre sûr et coloré.\n\n**Ce que vous allez vivre**\nDorado Park regorge d’attractions passionnantes pour tous les âges — défiez vos amis en karting, sautez haut sur les trampolines à élastiques, retrouvez les grands classiques des autos tamponneuses, plongez dans les structures gonflables, essayez les jeux d’arcade ou rendez visite aux sympathiques animaux du mini-zoo. Il y en a pour tous les aventuriers.\n\n**Durée :** 8 heures\n\n**Départ de :** Punta Cana\n\n**Prix :** Adultes (11 ans et +) $129 · Enfants (3–11 ans) $65 · Bébés (0–2 ans) gratuit\n\n**Inclus :**\n• Prise en charge et retour à votre hôtel\n• Entrée au Dorado Park Punta Cana\n• Accès aux attractions selon la formule choisie\n• Activités ludiques pour petits et grands\n• Équipement de sécurité pour les attractions et les jeux\n• Personnel sur place pour vous accompagner\n• Repas et boissons disponibles à l’achat\n• Guides touristiques certifiés\n\n**À apporter :**\n• Vêtements confortables\n• Serviette\n• Lunettes de soleil\n• Crème solaire\n• Un peu d’espèces pour les pourboires ou les en-cas",
     "pricing": [
       {
-        "tier": "Personnes",
-        "price": "$50"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213524/tours/uiurdhaiowr8nxctaije.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213534/tours/dipmxffmk416f8fkljfp.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213566/tours/ikjoznzy67t5rftsv4eh.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213583/tours/uyvhipsaqgblsbrdaxhp.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213599/tours/w7unjwh9fl7dkzqwkyit.webp"
-      }
-    ]
-  },
-  {
-    "title": "Montaña Redonda : panoramas et saveurs",
-    "description": "Découvrez le sommet le plus photogénique de la République dominicaine. Perchée à 300 mètres au-dessus de la côte nord-est, la Montaña Redonda offre une vue panoramique à 360 degrés à couper le souffle. Balancez-vous au bord du monde et savourez un repas traditionnel au sommet.\n\n**Durée :** 4 à 5 heures\n\n**Inclus :**\n• Prise en charge et retour à l’hôtel\n• Montée palpitante au sommet en camion safari\n• Accès aux fameux balais « volants » et aux hamacs\n• Déjeuner dominicain traditionnel avec vue\n• Temps libre pour les photos\n• Visite d’une boutique à Macao et de la plage",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$90"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213741/tours/bdqqfq9bi6qml7zr5hsv.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213780/tours/jhavh718qvg9mxtsldmd.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213788/tours/nnqfnmtyzrsb0myaf0n0.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213794/tours/qigdcyuo5dfwvy6swdrk.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213803/tours/xzutnhvtfmhwxdjtbxzc.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213811/tours/vunz38axfhuas1zzmpkx.webp"
-      }
-    ]
-  },
-  {
-    "title": "Evolution Buggies : aventure tout-terrain",
-    "description": "Préparez-vous à vous salir ! Ce circuit tout-terrain vous emmène au cœur de la campagne dominicaine. Pilotez votre propre buggy sur des pistes accidentées, explorez le cénote caché de la grotte de Macao et terminez par une baignade rafraîchissante sur la célèbre plage de Macao.\n\n**Inclus :**\n• Prise en charge et retour à l’hôtel\n• Buggy tout-terrain et équipement de sécurité\n• Baignade dans une grotte souterraine naturelle\n• Visite d’une plantation traditionnelle (cacao, café, tabac)\n• Moment de détente à la plage de Macao",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$50"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213927/tours/uo9idcqzjhikdmxzhdpe.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213942/tours/uik0zhnwps9js4h0r8oh.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213946/tours/louqkw4hsnkpyrpya61s.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213951/tours/ww7dqyjxjlcqab0ionpr.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213969/tours/oucryu99vftmp9bt1hen.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213977/tours/agreqpiokb5quzjl8mbu.webp"
-      },
-      {
-        "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213995/tours/dqgpvgfyixrijhcn7gju.webp"
-      },
-      {
-        "role": "detail_8",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214000/tours/wq7tpdf4lvmuxyjoivhn.webp"
-      }
-    ]
-  },
-  {
-    "title": "Saint-Domingue : la première ville",
-    "description": "Remontez le temps dans la plus ancienne ville des Amériques. Flânez dans les rues pavées de la zone coloniale, visitez le palais du fils de Christophe Colomb et admirez la première cathédrale jamais construite dans le Nouveau Monde. Une immersion dans l’âme et l’histoire de la République dominicaine.\n\n**Durée :** 10 heures\n\n**Inclus :**\n• Transport privé climatisé\n• Entrées de tous les grands monuments et du parc des grottes « Los Tres Ojos »\n• Visites guidées de l’Alcázar de Colón et de la cathédrale\n• Visite du musée du chocolat et d’ateliers de bijoux (ambre et larimar)\n• Déjeuner dominicain traditionnel avec boissons\n• Assurance responsabilité civile complète",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$70"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214830/tours/saoqvsm2gzr6omj8tlcu.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214847/tours/idxr5lfjdhh0m7l438me.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214877/tours/znnjsc1gkesfgtosotev.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214884/tours/gu6inhhwlm2xd6uooqhz.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214896/tours/ox2sxy9ip5cvll9u1usa.webp"
-      }
-    ]
-  },
-  {
-    "title": "Safari culturel : la campagne en 4x4",
-    "description": "Sortez de l’hôtel et découvrez la vraie République dominicaine. À bord de nos camions 4x4 ouverts, vous visitez des écoles locales, des plantations de montagne et des ranchs familiaux. Un voyage de saveurs, de culture et de paysages superbes, idéal à tout âge.\n\n**Durée :** 8 heures\n\n**Inclus :**\n• Transport en camion safari\n• Visites pédagogiques de plantations de café, de cacao et de tabac avec dégustation\n• Visite de la basilique de Higüey et du marché local\n• Déjeuner traditionnel au ranch et baignade dans la rivière Maimón\n• Balade à cheval sur des sentiers tropicaux\n• Moment plage à la plage de Macao\n• Open bar et déjeuner-buffet",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$90"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214989/tours/ac8n9ohhayyjprq7szqn.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774215022/tours/awqrcxsirkvpdjhm3z2q.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774215029/tours/ardckymg8vqh6iewvq2v.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774215035/tours/am84esjc3cmr1ugajrpw.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774215043/tours/hlvzmyu9c3n83sbf3e5a.webp"
-      }
-    ]
-  },
-  {
-    "title": "Aventure hors-bord et snorkeling",
-    "description": "Soyez le capitaine de votre propre aventure ! Pilotez votre hors-bord sur les eaux turquoise de Bávaro. Ce frisson de vitesse s’accompagne d’une séance de snorkeling paisible sur un récif corallien protégé, peuplé de poissons tropicaux.\n\n**Inclus :**\n• Transferts depuis l’hôtel toutes les heures, pour plus de flexibilité\n• Hors-bord privé (un par couple)\n• Équipement de snorkeling professionnel\n• Arrêt à la piscine naturelle de Bávaro pour une baignade rafraîchissante\n• Guide expérimenté dans un bateau de tête",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$60"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216232/tours/fadp6ka0fejf3iqffy0k.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216241/tours/ceiossq7xq5drbjowqtl.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216270/tours/mmc2cytfyjqvuu23bwic.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216276/tours/btgcpdbvey49md0gyy2h.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216281/tours/snvnzd6xkalxy8fjaoxk.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216287/tours/sxngitob8ynfvmc5fuhi.webp"
-      },
-      {
-        "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216307/tours/d7c0zcj3m33uxnmngjdr.webp"
-      },
-      {
-        "role": "detail_8",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216315/tours/xclhakvixxfidjt87kj4.webp"
-      },
-      {
-        "role": "detail_9",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216329/tours/d8pxdck4ygu9s9hf3cl0.webp"
-      },
-      {
-        "role": "detail_10",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216339/tours/juulcgvabzn0bvw15ivy.webp"
-      },
-      {
-        "role": "detail_11",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216345/tours/xykte6udo1ujuzffdvbh.webp"
-      },
-      {
-        "role": "detail_12",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216351/tours/csf4fr4am8xfut5u1lgq.webp"
-      }
-    ]
-  },
-  {
-    "title": "Parachute ascensionnel : l’aventure dans le ciel",
-    "description": "Prêt pour la plus belle vue d’oiseau ? Envolez-vous au-dessus de la côte de Punta Cana et admirez le contraste saisissant entre la mer turquoise et le sable blanc. Sûr, grisant et absolument inoubliable : la meilleure façon de voir l’île.\n\n**Durée :** 25 minutes\n\n**Inclus :**\n• Transport aller-retour depuis l’hôtel\n• Trajet en hors-bord jusqu’à la zone de vol\n• Tout l’équipement de sécurité et instructions bilingues\n• Vol en parachute ascensionnel à haute altitude",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$60"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "imgs/tours/tour_parasail_detail_7.jpg"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "imgs/tours/tour_parasail_detail_8.jpg"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "imgs/tours/tour_parasail_detail_9.jpg"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "imgs/tours/tour_parasail_detail_10.jpg"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "imgs/tours/tour_parasail_detail_11.jpg"
-      }
-    ]
-  },
-  {
-    "title": "Coco Bongo : la meilleure fête du monde",
-    "description": "Ce n’est pas une simple boîte de nuit, c’est un spectacle de classe mondiale. Avec plus de 15 shows à grand spectacle chaque soir — acrobates, sosies d’artistes et effets dignes du cinéma — le Coco Bongo est une explosion pour les sens. Pour vivre la légendaire vie nocturne des Caraïbes, c’est ici.\n\n**Durée :** 5 heures\n\n**Inclus :**\n• Billet d’entrée et transfert aller-retour depuis l’hôtel\n• Accès à tous les shows et animations\n• Formules boissons selon la catégorie de billet choisie",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$90"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221689/tours/n8goxbgpt68izjvdiixh.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221695/tours/fvxqvo86awvwizb64aes.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221702/tours/yjldh8izclmarnvk5tvy.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221708/tours/sm02pdbkzkocf935vxmc.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221724/tours/opocyvlauzboqjcjqn9o.webp"
-      }
-    ]
-  },
-  {
-    "title": "Imagine : la fête dans une grotte",
-    "description": "Descendez sous terre pour une nuit inoubliable. L’Imagine est une immense grotte naturelle transformée en discothèque dernier cri. Avec plusieurs salles aux styles musicaux différents et une acoustique que seule une grotte peut offrir, c’est le lieu de fête le plus original de Punta Cana.\n\n**Durée :** 4 heures\n\n**Inclus :**\n• Entrée à la discothèque troglodyte\n• Navette aller-retour depuis l’hôtel\n• Open bar (toute la nuit) selon le type de billet\n• DJ sets en live et animations",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$85"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221853/tours/phgqpjshey4mwxoevbtg.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221859/tours/lrtpfoqmceicbmfg29qx.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221948/tours/s6ofe4auifoyrugp2err.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221958/tours/s91ardtvvuprwmd6pyjk.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221971/tours/utmudtdmawweevuov9qy.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221998/tours/ep57r3lvanurnt7f0nqx.webp"
-      }
-    ]
-  },
-  {
-    "title": "Monkeyland : à la rencontre des singes-écureuils",
-    "description": "Approchez de tout près les habitants les plus charmants de la jungle dominicaine. À Monkeyland, des singes-écureuils très sociables vous sautent sur les épaules et mangent dans votre main. Une expérience attendrissante, parfaite pour les amoureux de la nature et les familles.\n\n**Durée :** 4 heures\n\n**Inclus :**\n• Prise en charge et retour à l’hôtel\n• Visite guidée du sanctuaire des singes\n• Présentation pédagogique sur les habitudes et l’habitat des singes\n• Dégustation de café bio local, de chocolat et de fruits",
-    "pricing": [
-      {
-        "tier": "Personnes",
-        "price": "$110"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222121/tours/gojo9pqg3l0kftfafvx4.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222128/tours/ri5arfiwivvdrfxezjq9.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222145/tours/isifdkfclpkpzuewcl1j.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222219/tours/ahsy4rbptrs9oo4yc095.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222228/tours/lfdgfqbrnardl4ofied5.webp"
-      }
-    ]
-  },
-  {
-    "title": "Scape Park : parc d’aventure en pleine nature",
-    "description": "Libérez l’explorateur qui sommeille en vous au Scape Park. Du survol des arbres en tyrolienne à la baignade dans l’eau turquoise cachée du cénote « Hoyo Azul », ce parc offre un mélange parfait d’adrénaline et de beauté naturelle.\n\n**Durée :** 4 à 5 heures\n\n**Inclus :**\n• Transport aller-retour depuis l’hôtel\n• Accès toute la journée aux attractions du parc\n• Guides bilingues pour vous accompagner dans le parc",
-    "pricing": [
-      {
-        "tier": "Personnes",
+        "tier": "Persons",
         "price": "$129"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279279/tours/yobk3cxbzzim4k7rna52.webp"
+        "localPath": "imgs/edt/tours/dorado-park/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279327/tours/svelzgcoqb7ib3rb7sj0.webp"
+        "localPath": "imgs/edt/tours/dorado-park/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279334/tours/s3ygfpluwqi6k2rgqimz.webp"
+        "localPath": "imgs/edt/tours/dorado-park/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279343/tours/vjdhftpkulaehfbzhplt.webp"
+        "localPath": "imgs/edt/tours/dorado-park/4.webp"
       },
       {
         "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279392/tours/vi3ustwm9nfhlaanru8x.webp"
+        "localPath": "imgs/edt/tours/dorado-park/5.webp"
       },
       {
         "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279401/tours/h0i9rnwxxrpc3lbc32xj.webp"
+        "localPath": "imgs/edt/tours/dorado-park/6.webp"
       },
       {
         "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279428/tours/fuzbcwaslksvrkixhwtz.webp"
+        "localPath": "imgs/edt/tours/dorado-park/7.webp"
+      },
+      {
+        "role": "detail_8",
+        "localPath": "imgs/edt/tours/dorado-park/8.webp"
       }
-    ]
+    ],
+    "tags": [
+      "adventure",
+      "water",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "8 heures"
   },
   {
-    "title": "Tyrolienne : frissons au-dessus de la canopée",
-    "description": "Glissez au-dessus de la canopée luxuriante du mont Anamuya sur l’un des plus longs parcours de tyrolienne des Caraïbes. Avec 12 lignes reliant 18 plateformes, vous vivez une pure montée d’adrénaline au milieu d’une nature tropicale à couper le souffle.\n\n**Durée :** 5 heures\n\n**Inclus :**\n• Transferts en camion safari depuis l’hôtel\n• Équipement de sécurité et moniteurs certifiés ACCT\n• Parcours complet de 12 tyroliennes\n• Fruits rafraîchissants et boissons",
+    "title": "Excursion à Saint-Domingue",
+    "description": "**Plongez dans l’histoire et la culture au cœur des Caraïbes**\n\nSanto Domingo de Guzmán — Saint-Domingue —, la capitale animée de la République dominicaine, est la plus ancienne ville habitée sans interruption des Amériques. Berceau du Nouveau Monde, elle regorge de trésors d’histoire et de culture et d’une superbe architecture coloniale. Son centre historique, la Zone coloniale, est inscrit au patrimoine mondial de l’UNESCO et abonde en vestiges de son passé du XVIe siècle. Parmi ses monuments les plus célèbres figure la **Catedral Primada de América**, la toute première cathédrale construite dans les Amériques.\n\nLa ville est une métropole trépidante d’environ 3 millions d’habitants, divisée en plusieurs municipalités, dont Santo Domingo Este, le District national, Santo Domingo Oeste et Santo Domingo Norte. Si la ville vit au rythme de la modernité, son passé n’est jamais bien loin.\n\n**Durée :** 10 heures\n\n**Départ de :** Santo Domingo\n\n**Prix :** Adultes (11 ans et +) $90 · Enfants (3–11 ans) $45 · Bébés (0–2 ans) gratuit\n\n**Inclus :**\n• Prise en charge et retour à l’hôtel\n• Transport climatisé\n• Guide certifié\n• Visite des monuments de la Zone coloniale, notamment :\n• Catedral Primada de América\n• Alcázar de Colón\n• Forteresse Ozama\n• Parque Colón et Plaza de España\n• Une promenade à pied dans les rues pavées de la Zone coloniale\n• Du temps libre pour découvrir les marchés, les places et les cafés\n• Prise en charge et retour à l’hôtel\n• Boissons non alcoolisées\n• Déjeuner dominicain typique\n\n**À apporter :**\n• Tenue de plage\n• Serviettes\n• Lunettes de soleil\n• Protection solaire\n• Espèces pour les pourboires",
     "pricing": [
       {
-        "tier": "Personnes",
-        "price": "$70"
+        "tier": "Persons",
+        "price": "$90"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774280946/tours/vkuwif21csjdtyfjuata.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774280976/tours/pkf4tyos3u5ymaunx1s7.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774280993/tours/ntdedp08pslcovrm2wbk.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774281010/tours/qewzvxzfpmjarma2zqmr.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/4.webp"
       },
       {
         "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774281018/tours/zu6z15srjdddd6ceiuig.webp"
-      }
-    ]
-  },
-  {
-    "title": "Rencontre avec les dauphins : nager avec les stars",
-    "description": "Réalisez un rêve en rencontrant les créatures les plus intelligentes de l’océan. Profitez d’une baignade interactive pour vivre la joie d’un câlin, d’un bisou et d’une poignée de main de dauphin. Une rencontre éducative et émouvante, temps fort de tout séjour à Punta Cana.\n\n**Durée :** 1 heure\n\n**Inclus :**\n• Transfert de votre resort au centre aquatique\n• Séance interactive guidée avec les dauphins\n• Consignes de sécurité et présentation pédagogique",
-    "pricing": [
+        "localPath": "imgs/edt/tours/santo-domingo-tour/5.webp"
+      },
       {
-        "tier": "Personnes",
-        "price": "$110"
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/santo-domingo-tour/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/santo-domingo-tour/7.webp"
       }
     ],
-    "images": []
+    "tags": [
+      "cultural",
+      "full-day",
+      "water"
+    ],
+    "destination": "Santo Domingo",
+    "duration": "10 heures"
+  },
+  {
+    "title": "Bateau-fête à Punta Cana",
+    "description": "Préparez-vous à danser, à faire du snorkeling et à faire la fête à bord du **bateau-fête le plus animé de Punta Cana** — une aventure tropicale inoubliable sur les eaux cristallines des Caraïbes.\n\nNous longerons un littoral à couper le souffle, entre palmiers ondulant au vent et paysages éclatants. Notre équipe d’animateurs pleine d’énergie fera monter l’ambiance avec un mélange de bachata, de merengue, de reggaeton, de salsa et de tubes internationaux. La musique, les paysages et l’ambiance sont incomparables !\n\n**Durée :** 9 heures\n\n**Départ de :** Punta Cana\n\n**Prix :** Adultes (11 ans et +) $95\n\n**Inclus :**\n• Prise en charge et retour à l’hôtel\n• Balade en catamaran le long de la côte de Punta Cana\n• Snorkeling, équipement inclus\n• Halte à la piscine naturelle\n• Open bar (boissons locales)\n• En-cas à bord\n• Guides certifiés et équipe d’animation\n\n**À apporter :**\n• Serviette\n• Lunettes de soleil\n• Crème solaire\n• Espèces pour les pourboires ou les extras",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$95"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/5.webp"
+      }
+    ],
+    "tags": [
+      "water",
+      "adventure",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "9 heures"
+  },
+  {
+    "title": "Adventure Boogies",
+    "description": "Choisissez votre style d’aventure — une expérience tout-terrain inoubliable ! Préparez-vous à une journée riche en adrénaline sur les pistes accidentées de Punta Cana ! Avec **Adventure Boogies**, vous aurez l’occasion d’explorer des paysages magnifiques, de vous imprégner de la culture dominicaine et de libérer votre esprit d’aventure lors d’une excursion tout-terrain sans pareille.\n\nVous roulerez sur des sentiers boueux, à travers des villages animés et des chemins tropicaux luxuriants, et visiterez des lieux fascinants comme une **grotte naturelle** aux eaux cristallines. Pour couronner le tout, vous profiterez d’un moment de détente à la **plage de Macao**, l’une des plus belles plages de la République dominicaine.\n\nCette excursion s’adresse à tous les aventuriers, que vous partiez seul, en couple, en famille ou entre amis. Choisissez parmi quatre formules, chacune pensée pour répondre à vos envies et rendre votre expérience mémorable :\n\n### Choisissez votre véhicule\n\n### 🚙 Buggy individuel – $85 par personne\n\nParfait pour ceux qui aiment le frisson d’avoir le contrôle total. Pilotez en solo et parcourez les pistes en toute autonomie !\n\n### 🚙 Buggy double – $60 par personne\n\nIdéal pour les couples ou les amis qui veulent partager la route et l’aventure.\n\n### 🚙 Buggy familial – $45 par personne (jusqu’à 4 personnes)\n\nLa meilleure option pour les familles ou les petits groupes qui recherchent plus d’espace et de sécurité pour explorer la campagne.\n\n### 🚜 Buggy safari – $89 par personne\n\nPour ceux qui souhaitent une excursion plus longue et plus immersive, avec des haltes culturelles supplémentaires, des dégustations de produits locaux et des échanges plus approfondis avec les communautés rurales. Cette version comprend également une **balade à cheval**, une **descente en tyrolienne** et des **rafraîchissements** en cours de route.\n\n**Durée :** 4 heures\n\n**Départ de :** Punta Cana\n\n**Prix :** Buggy individuel $85 · Buggy double (60 x pax) $60 · Buggy familial $45 · Buggy + safari $89\n\n**Inclus :**\n• Prise en charge et retour à l’hôtel\n• Balade palpitante en buggy\n• Baignade dans un cénote\n• Visite d’une boutique typique\n• Équipement spécialisé inclus\n• Entrée à Domitai\n• Guides certifiés\n\n**À apporter :**\n• Tenue de plage\n• Serviettes\n• Lunettes de soleil\n• Protection solaire\n• Espèces pour les pourboires\n• Équipement de sécurité\n• Des vêtements que vous n’avez pas peur de salir (la boue fait partie du plaisir !)",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$85"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/adventure-boogies/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/adventure-boogies/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/adventure-boogies/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/adventure-boogies/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/adventure-boogies/5.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "half-day",
+      "water"
+    ],
+    "destination": "Punta Cana",
+    "duration": "4 heures"
+  },
+  {
+    "title": "Excursion à l’île Catalina",
+    "description": "**Un joyau caché des Caraïbes.** Découvrez la magie de l’île Catalina — une superbe escapade tropicale située au large de la côte sud-est de la République dominicaine, près de La Romana. Célèbre pour ses eaux turquoise cristallines, son sable blanc et fin et ses récifs coralliens éclatants, l’île Catalina est une destination de rêve pour les amoureux de la plage, les passionnés de snorkeling et tous ceux qui recherchent tout simplement le calme et la beauté de la nature.\n\nVotre voyage commence par une traversée panoramique en vedette sur la mer des Caraïbes. En chemin, nous ferons halte à la magnifique **Piscine naturelle**, un banc de sable peu profond où vous pourrez marcher dans l’eau, siroter un verre et profiter du soleil — un véritable coin de paradis !\n\nUne fois sur l’île Catalina, vous profiterez d’une **journée de plage décontractée**, avec tout le temps de vous détendre, de nager, d’explorer l’île ou de faire du snorkeling sur des récifs foisonnants de vie marine. Ouvrez l’œil : vous apercevrez des poissons tropicaux colorés, et peut-être même les vestiges de l’épave légendaire du « Capitaine Kidd » !\n\n**Durée :** 9 heures\n\n**Départ de :** Bayahíbe\n\n**Prix :** Adultes (11 ans et +) $115 · Enfants (3–11 ans) $60 · Bébés (0–2 ans) gratuit\n\n**Inclus :**\n• Prise en charge et retour à l’hôtel\n• Traversée aller-retour en vedette\n• Halte à la Piscine naturelle\n• Délicieux déjeuner buffet sur l’île\n• Open bar (bière, rhum, eau, boissons non alcoolisées)\n• Temps libre pour profiter de la plage et du récif de l’île Catalina\n• Animateurs et guides certifiés\n• Équipe d’animation et de divertissement\n\n**À apporter :**\n• Tenue de plage\n• Serviettes\n• Lunettes de soleil\n• Protection solaire\n• Espèces pour les pourboires",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$115"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/catalina-island-tour/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/catalina-island-tour/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/catalina-island-tour/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/catalina-island-tour/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/catalina-island-tour/5.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Bayahíbe",
+    "duration": "9 heures"
   }
 ]

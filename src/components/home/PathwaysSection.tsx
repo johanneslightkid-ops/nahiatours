@@ -33,7 +33,7 @@ const PathwaysSection: React.FC = () => {
         catalogueCta: 'View excursions',
         plannerTitle: 'Plan My Day',
         plannerText:
-          'Twelve questions about your crew, your energy and your budget. You get a day-by-day itinerary with real prices and no impossible timings.',
+          'Seven questions about your crew, your energy and your budget. You get a day-by-day itinerary with real prices and no impossible timings.',
         plannerCta: hasProgress ? 'Resume my plan' : 'Start the planner',
         plannerBadge: 'Intelligent',
         or: 'or just ask us',
@@ -53,7 +53,7 @@ const PathwaysSection: React.FC = () => {
         catalogueCta: 'Ver excursiones',
         plannerTitle: 'Planea mi Día',
         plannerText:
-          'Doce preguntas sobre tu grupo, tu energía y tu presupuesto. Recibes un itinerario día por día, con precios reales y sin horarios imposibles.',
+          'Siete preguntas sobre tu grupo, tu energía y tu presupuesto. Recibes un itinerario día por día, con precios reales y sin horarios imposibles.',
         plannerCta: hasProgress ? 'Retomar mi plan' : 'Empezar el planificador',
         plannerBadge: 'Inteligente',
         or: 'o pregunta directamente',
@@ -73,7 +73,7 @@ const PathwaysSection: React.FC = () => {
       catalogueCta: 'Ausflüge ansehen',
       plannerTitle: 'Meinen Tag planen',
       plannerText:
-        'Zwölf Fragen zu deiner Gruppe, deiner Energie und deinem Budget. Du bekommst einen Plan für jeden Tag, mit echten Preisen und ohne unmögliche Zeiten.',
+        'Sieben Fragen zu deiner Gruppe, deiner Energie und deinem Budget. Du bekommst einen Plan für jeden Tag, mit echten Preisen und ohne unmögliche Zeiten.',
       plannerCta: hasProgress ? 'Meinen Plan fortsetzen' : 'Planer starten',
       plannerBadge: 'Intelligent',
       or: 'oder frag uns einfach',
@@ -93,7 +93,7 @@ const PathwaysSection: React.FC = () => {
       catalogueCta: 'Voir les excursions',
       plannerTitle: 'Planifier ma journée',
       plannerText:
-        'Douze questions sur votre groupe, votre énergie et votre budget. Vous recevez un programme jour par jour, avec de vrais prix et sans horaires impossibles.',
+        'Sept questions sur votre groupe, votre énergie et votre budget. Vous recevez un programme jour par jour, avec de vrais prix et sans horaires impossibles.',
       plannerCta: hasProgress ? 'Reprendre mon plan' : 'Lancer le planificateur',
       plannerBadge: 'Intelligent',
       or: 'ou demandez-nous directement',
@@ -103,85 +103,70 @@ const PathwaysSection: React.FC = () => {
   });
 
   return (
-    <section
-      id="plan-my-day"
-      className="home-section dawn-section wavy-band relative overflow-hidden px-4 py-24 sm:py-32 md:px-8"
-    >
-      <div className="parallax-wash parallax-wash-left" />
-      <div className="parallax-wash parallax-wash-right" />
-
-      <div className="relative z-10 mx-auto max-w-6xl">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="artsy-brick-badge-inverted mb-5 inline-flex">{copy.eyebrow}</span>
-          <h2 className="mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
-            {copy.title}
-          </h2>
-          <p className="text-lg font-semibold leading-8 text-ink-soft">{copy.subtitle}</p>
+    <section id="plan-my-day" className="home-section relative overflow-hidden bg-paper-warm py-20 sm:py-28">
+      <div className="section-shell relative">
+        <div className="mb-12 grid gap-6 lg:grid-cols-[1.2fr,1fr] lg:items-end">
+          <div>
+            <span className="kicker">{copy.eyebrow}</span>
+            <h2 className="display-lg mt-4">{copy.title}</h2>
+          </div>
+          <p className="lede">{copy.subtitle}</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Manual mode */}
+        <div className="grid gap-5 md:grid-cols-2">
+          {/* Manual mode: the catalogue, over its own photograph. */}
           <motion.div
             initial={{ opacity: 0, y: 26 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="pathway-card flex flex-col p-8 sm:p-10"
+            className="pathway-card group flex min-h-[26rem] flex-col justify-end overflow-hidden"
           >
-            <span className="text-4xl">🗂️</span>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-ink">{copy.catalogueTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-ink-soft">{copy.catalogueText}</p>
-            <Link
-              to="/tours#top"
-              onClick={() => playClickFx()}
-              onMouseEnter={() => playHoverFx()}
-              className="tropical-button-outline mt-7 self-start"
-            >
-              {copy.catalogueCta} <HiArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+            <img src="/imgs/edt/tours/catalina-island-tour/1-sm.webp" alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/5" />
+            <div className="relative p-8 sm:p-10">
+              <span className="badge badge-light">01 · {copy.catalogueTitle}</span>
+              <h3 className="mt-4 font-display text-4xl uppercase text-white">{copy.catalogueTitle}</h3>
+              <p className="mt-3 max-w-md text-base leading-relaxed text-white/85">{copy.catalogueText}</p>
+              <Link to="/tours#top" onClick={() => playClickFx()} onMouseEnter={() => playHoverFx()} className="btn-amber mt-7">
+                {copy.catalogueCta} <HiArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </motion.div>
 
-          {/* Guided mode */}
+          {/* Guided mode. */}
           <motion.div
             initial={{ opacity: 0, y: 26 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="pathway-card pathway-card-dark flex flex-col p-8 sm:p-10"
+            className="pathway-card pathway-card-dark flex min-h-[26rem] flex-col justify-between p-8 sm:p-10"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="text-4xl">🧭</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-mango-light px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-ink">
-                <HiSparkles className="h-3 w-3" /> {copy.plannerBadge}
-              </span>
+              <span className="badge badge-gold">02 · {copy.plannerTitle}</span>
+              <span className="badge badge-amber"><HiSparkles className="h-3 w-3" /> {copy.plannerBadge}</span>
             </div>
-            <h3 className="mt-4 font-display text-2xl font-extrabold text-paper">{copy.plannerTitle}</h3>
-            <p className="mt-3 flex-1 text-base font-semibold leading-relaxed text-paper/85">{copy.plannerText}</p>
-            <Link
-              to="/plan#top"
-              onClick={() => playClickFx()}
-              onMouseEnter={() => playHoverFx()}
-              className="planner-cta mt-7 self-start"
-            >
-              {copy.plannerCta} <HiArrowRight className="h-4 w-4" />
-            </Link>
+            <div>
+              <h3 className="font-display text-4xl uppercase text-white">{copy.plannerTitle}</h3>
+              <p className="mt-3 max-w-md text-base leading-relaxed text-paper/80">{copy.plannerText}</p>
+              <Link to="/plan#top" onClick={() => playClickFx()} onMouseEnter={() => playHoverFx()} className="planner-cta mt-7">
+                {copy.plannerCta} <HiArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </motion.div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-3">
-          <span className="hand-note">{copy.or}</span>
+        <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <span className="font-accent text-2xl text-ink-soft">{copy.or}</span>
           <button
             onMouseEnter={() => playHoverFx()}
             onClick={() => {
               playClickFx();
-              window.open(
-                generateWhatsAppMessage(brandSettings.phoneNumber, copy.whatsappMessage),
-                '_blank'
-              );
+              window.open(generateWhatsAppMessage(brandSettings.phoneNumber, copy.whatsappMessage), '_blank');
             }}
-            className="tropical-button"
+            className="btn-wa"
           >
-            <FaWhatsapp className="mr-2 h-4 w-4" /> {copy.whatsapp}
+            <FaWhatsapp className="h-5 w-5" /> {copy.whatsapp}
           </button>
         </div>
       </div>

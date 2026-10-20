@@ -1,36 +1,64 @@
 [
   {
     "id": 1,
-    "image": "https://cdn.pixabay.com/photo/2016/11/18/17/20/airport-1834685_1280.jpg",
-    "title": "Private Transfer (Punta Cana Zone)",
-    "description": "Private airport shuttle with meet-and-greet service and luggage assistance.",
-    "price": "From USD 15",
-    "pricingOptions": [
-      { "tier": "People", "price": "From USD 15", "amount": 15 }
-    ],
+    "title": "Traslados privados",
+    "image": "/imgs/edt/vehicles/minivan.webp",
+    "description": "Minivan privada con aire acondicionado para 1 a 8 pasajeros: aeropuerto, hotel, villa o cualquier punto de la isla. Un servicio seguro y confiable las 24 horas del día.",
+    "price": "Desde USD 38",
     "details": {
-      "description": "Fast and comfortable transfer from the airport or hotel with a dedicated driver and air-conditioned vehicle.",
+      "description": "Te recibimos en el Aeropuerto Internacional de Punta Cana (PUJ), te ayudamos con el equipaje y te llevamos directo a tu hotel. Opciones para 1 a 8 pasajeros, solo ida o ida y vuelta, a cualquier hora del día o de la noche.",
       "images": [
-        "https://cdn.pixabay.com/photo/2016/11/18/17/20/airport-1834685_1280.jpg",
-        "https://cdn.pixabay.com/photo/2016/11/29/09/16/airport-1867307_1280.jpg"
+        "/imgs/edt/vehicles/minivan.webp",
+        "/imgs/edt/banners/transfers.webp"
       ]
-    }
+    },
+    "pricingOptions": [
+      {
+        "tier": "Personas",
+        "price": "Desde USD 38",
+        "amount": 38
+      }
+    ]
   },
   {
     "id": 2,
-    "image": "https://cdn.pixabay.com/photo/2016/11/29/09/32/car-1868725_1280.jpg",
-    "title": "Luxury Transfer",
-    "description": "Premium SUV or van service for executive arrivals and special occasions.",
-    "price": "From USD 35",
-    "pricingOptions": [
-      { "tier": "People", "price": "From USD 35", "amount": 35 }
-    ],
+    "title": "Traslados de lujo",
+    "image": "/imgs/edt/vehicles/suburban.webp",
+    "description": "Chevrolet Suburban con chofer profesional para 1 a 5 pasajeros. No te conformes con llegar: llega con estilo.",
+    "price": "Desde USD 80",
     "details": {
-      "description": "Upgrade your arrival with a polished VIP transfer experience and premium comfort.",
+      "description": "Una Suburban negra, un chofer bilingüe y agua fría esperándote a bordo. Para llegadas, bodas, días de golf y cada trayecto que deba sentirse tan bien como el destino.",
       "images": [
-        "https://cdn.pixabay.com/photo/2016/11/29/09/32/car-1868725_1280.jpg",
-        "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"
+        "/imgs/edt/vehicles/suburban.webp",
+        "/imgs/edt/banners/transfers.webp"
       ]
-    }
+    },
+    "pricingOptions": [
+      {
+        "tier": "Personas",
+        "price": "Desde USD 80",
+        "amount": 80
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Autobús para traslados",
+    "image": "/imgs/edt/vehicles/bus.webp",
+    "description": "Un autobús de gran capacidad para grupos de 30 a 45 pasajeros: bodas, viajes de incentivo y familias que viajan juntas.",
+    "price": "Desde USD 159",
+    "details": {
+      "description": "Un autobús, un horario y todos juntos: para grupos de 30 a 45 invitados entre el aeropuerto, los hoteles y cada punto de salida de las excursiones.",
+      "images": [
+        "/imgs/edt/vehicles/bus.webp"
+      ]
+    },
+    "pricingOptions": [
+      {
+        "tier": "Personas",
+        "price": "Desde USD 159",
+        "amount": 159
+      }
+    ]
   }
 ]

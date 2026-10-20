@@ -47,6 +47,8 @@ export const PROTECTED_RESOURCES = new Set([
   'contact-requests',
   'notify-config',
   'pay-attempts',
+  // A site's YouTube Data API key (functions/api/youtube.ts).
+  'youtube-secret',
 ]);
 
 /**

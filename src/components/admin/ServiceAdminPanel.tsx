@@ -307,6 +307,41 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
           />
         </div>
 
+        {category === 'tours' && (
+          <div className="mt-6 rounded-3xl border border-ink/15 p-5">
+            <h3 className="mb-1 text-lg font-semibold text-ink">Filtros del catálogo</h3>
+            <p className="mb-4 text-sm text-ink-soft">
+              Opcional. Categorías separadas por comas (water, adventure, cultural, full-day, half-day), lugar de salida y duración.
+            </p>
+            <div className="grid gap-3 md:grid-cols-3">
+              <input
+                type="text"
+                value={(draft.tags ?? []).join(', ')}
+                onChange={(event) => {
+                  const tags = event.target.value.split(',').map((tag) => tag.trim()).filter(Boolean);
+                  setDraft((current) => ({ ...current, tags }));
+                }}
+                placeholder="water, adventure, full-day"
+                className="w-full rounded-2xl border border-ink/15 px-4 py-3"
+              />
+              <input
+                type="text"
+                value={draft.destination ?? ''}
+                onChange={(event) => setDraft((current) => ({ ...current, destination: event.target.value }))}
+                placeholder="Punta Cana"
+                className="w-full rounded-2xl border border-ink/15 px-4 py-3"
+              />
+              <input
+                type="text"
+                value={draft.duration ?? ''}
+                onChange={(event) => setDraft((current) => ({ ...current, duration: event.target.value }))}
+                placeholder="9 hours"
+                className="w-full rounded-2xl border border-ink/15 px-4 py-3"
+              />
+            </div>
+          </div>
+        )}
+
         {category === 'transport' && (
           <div className="mt-6 rounded-3xl border border-ink/15 p-5">
             <div className="mb-4 flex items-center justify-between">

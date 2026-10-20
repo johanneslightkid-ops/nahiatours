@@ -86,8 +86,9 @@ export async function onRequest(context: { request: Request; env: Record<string,
     // Upload to Cloudinary
     // Cloudinary uses a distinct endpoint for videos. Keeping the resource
     // type derived on the server means the home collage accepts either format
-    // from the same, authenticated admin control.
-    const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
+    // from the same, authenticated admin control. Cloudinary files audio under
+    // "video" too, so songs for a site's music player go the same way.
+    const resourceType = file.type.startsWith('video/') || file.type.startsWith('audio/') ? 'video' : 'image';
     const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
     const uploadResponse = await fetch(uploadUrl, {
       method: 'POST',

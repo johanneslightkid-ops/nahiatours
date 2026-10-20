@@ -1,11 +1,10 @@
 /**
- * El Cortecito — the living-water design system.
+ * Exclusive Dominican Tours — Full Throttle, in daylight.
  *
- * Where the other sites are posters or paintings, this one is a naturalist's
- * field book laid open on the sand at El Cortecito: botanical leaves, reef
- * fish, birds of the Hispaniolan coast, and real moving water underneath it
- * all (src/components/water/*, WebGL). Shapes are organic — leaves, pebbles,
- * currents — never boxes with hard offset shadows.
+ * Action-documentary photography graded like a jet-set film: ivory and sand
+ * where the other cut was black, charcoal ink, amber for energy, a thin line
+ * of champagne gold for the luxury, and WhatsApp green for the one thing every
+ * page wants you to press. Anton for the shouting, Barlow for the reading.
  *
  * The nine colour families every branch defines are all here, under the same
  * names, so the shared admin and planner code keeps resolving. Only their
@@ -18,131 +17,134 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Mangrove ink: a deep green-teal that reads as near-black on sand.
+        // Charcoal, not pure black: it reads as black on ivory without the glare.
         ink: {
-          DEFAULT: '#0E3B36',
-          soft: '#3E615B',
-          light: '#7D9A94',
+          DEFAULT: '#14161A',
+          soft: '#454B54',
+          light: '#8A9099',
         },
-        // Sand, from dry dune to wet shoreline.
+        // Ivory, sand and the white of a card.
         paper: {
-          DEFAULT: '#FBF5E8',
-          warm: '#F5EAD3',
-          deep: '#E9D8B6',
-          card: '#FFFDF8',
+          DEFAULT: '#F7F4EE',
+          warm: '#EFE9DF',
+          deep: '#E2D9C9',
+          card: '#FFFFFF',
         },
-        // Papaya and morning sun.
+        // Amber: the energy colour. Buttons, ranks, the price.
         mango: {
-          light: '#FFD47E',
-          DEFAULT: '#F7B23B',
-          dark: '#D98612',
+          light: '#FFD08A',
+          DEFAULT: '#F2A33A',
+          dark: '#C27812',
         },
-        // Hibiscus and coral reef.
         hibiscus: {
-          light: '#FFB1A6',
-          DEFAULT: '#F2675C',
-          dark: '#CF453E',
+          light: '#FFB8AC',
+          DEFAULT: '#E4553F',
+          dark: '#B63B28',
         },
-        // Caribbean turquoise.
+        // The logo's Caribbean blue.
         lagoon: {
-          light: '#93ECE1',
-          DEFAULT: '#17B5AC',
-          dark: '#0A7C76',
+          light: '#B5DDF2',
+          DEFAULT: '#1F7DC1',
+          dark: '#155B8F',
         },
         sky: {
-          light: '#BDE9FA',
-          DEFAULT: '#4DB6E5',
-          dark: '#197DB1',
+          light: '#D3EBF8',
+          DEFAULT: '#4BA7DD',
+          dark: '#1F6EA2',
         },
-        // Leaf greens, from new fern to old palm.
+        // The logo's palm green; WhatsApp gets its own brighter one below.
         jungle: {
-          light: '#A3DB93',
-          DEFAULT: '#3E9B50',
-          dark: '#1E6A3B',
+          light: '#ABE2B9',
+          DEFAULT: '#1E9E57',
+          dark: '#11733D',
         },
-        // Flamboyán blossom.
         sunset: {
-          light: '#FFB592',
-          DEFAULT: '#F2723C',
-          dark: '#C7491C',
+          light: '#FFC79E',
+          DEFAULT: '#EE7D30',
+          dark: '#BF561A',
         },
-        // Wild orchid.
         grape: {
-          light: '#D9BAF2',
-          DEFAULT: '#9C6CD0',
-          dark: '#6E45A3',
+          light: '#D8CCF0',
+          DEFAULT: '#7A5DC3',
+          dark: '#56409A',
+        },
+        // Champagne gold: hairlines, small caps, the luxury.
+        gold: {
+          light: '#EADCB7',
+          DEFAULT: '#C6A15B',
+          dark: '#9A7A3B',
+        },
+        whatsapp: {
+          DEFAULT: '#25D366',
+          dark: '#128C4B',
         },
         // Roles the admin panel is written against.
         coral: {
-          deep: '#CF453E',
+          deep: '#B63B28',
         },
         sea: {
-          deep: '#0A7C76',
+          deep: '#155B8F',
         },
-        // Deep water, for the footer and the reef.
         abyss: {
-          DEFAULT: '#06323D',
-          light: '#0B4F5C',
+          DEFAULT: '#14161A',
+          light: '#23272E',
         },
 
-        tropicalGreen: '#3E9B50',
-        tropicalBlue: '#4DB6E5',
-        sandyBeige: '#F5EAD3',
-        sunsetOrange: '#F2723C',
-        oceanWave: '#17B5AC',
+        tropicalGreen: '#1E9E57',
+        tropicalBlue: '#4BA7DD',
+        sandyBeige: '#EFE9DF',
+        sunsetOrange: '#EE7D30',
+        oceanWave: '#1F7DC1',
       },
-      // `border-ink` is everywhere in the shared markup. Here it is a soft
-      // hairline the colour of wet leaves rather than a black pen outline —
-      // the field-book page has pencil edges, not sticker outlines.
+      // `border-ink` is everywhere in the shared markup: here a fine hairline.
       borderColor: {
         ink: {
-          DEFAULT: 'rgb(14 59 54 / 0.16)',
-          soft: 'rgb(14 59 54 / 0.24)',
-          light: 'rgb(14 59 54 / 0.1)',
+          DEFAULT: 'rgb(20 22 26 / 0.14)',
+          soft: 'rgb(20 22 26 / 0.22)',
+          light: 'rgb(20 22 26 / 0.08)',
         },
       },
       fontFamily: {
-        heading: ['Fraunces', 'Georgia', 'serif'],
-        display: ['Fraunces', 'Georgia', 'serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        body: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        accent: ['Caveat', 'cursive'],
-        script: ['Caveat', 'cursive'],
+        heading: ['Anton', 'Impact', 'sans-serif'],
+        display: ['Anton', 'Impact', 'sans-serif'],
+        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        sans: ['Barlow', 'system-ui', 'sans-serif'],
+        body: ['Barlow', 'system-ui', 'sans-serif'],
+        condensed: ['"Barlow Condensed"', 'Barlow', 'sans-serif'],
+        accent: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        script: ['"Cormorant Garamond"', 'Georgia', 'serif'],
       },
       backgroundImage: {
-        'sun-rays': 'radial-gradient(circle at 50% 50%, rgba(255,212,126,0.55) 0%, transparent 60%)',
-        'sky-wash': 'linear-gradient(180deg, #BDE9FA 0%, #E3F6FB 50%, #FBF5E8 100%)',
-        'sunset-wash': 'linear-gradient(180deg, #FFD47E 0%, #F7965C 55%, #F2675C 100%)',
-        'lagoon-wash': 'linear-gradient(180deg, #93ECE1 0%, #17B5AC 60%, #0A7C76 100%)',
-        'jungle-wash': 'linear-gradient(180deg, #A3DB93 0%, #3E9B50 60%, #1E6A3B 100%)',
-        'paper-wash': 'linear-gradient(180deg, #FBF5E8 0%, #F5EAD3 100%)',
-        'abyss-wash': 'linear-gradient(180deg, #0B4F5C 0%, #06323D 100%)',
+        'sun-rays': 'radial-gradient(circle at 70% 20%, rgba(242,163,58,0.35) 0%, transparent 60%)',
+        'sky-wash': 'linear-gradient(180deg, #FFFFFF 0%, #F7F4EE 100%)',
+        'sunset-wash': 'linear-gradient(135deg, #FFD08A 0%, #F2A33A 55%, #EE7D30 100%)',
+        'lagoon-wash': 'linear-gradient(135deg, #B5DDF2 0%, #1F7DC1 100%)',
+        'jungle-wash': 'linear-gradient(135deg, #ABE2B9 0%, #1E9E57 100%)',
+        'paper-wash': 'linear-gradient(180deg, #F7F4EE 0%, #EFE9DF 100%)',
+        'abyss-wash': 'linear-gradient(180deg, #23272E 0%, #14161A 100%)',
       },
       boxShadow: {
-        // Soft, green-tinted daylight shadows. The names are kept because the
-        // shared markup asks for them; the look is leaf-shade, not ink.
-        'ink-sm': '0 3px 10px -4px rgba(14, 59, 54, 0.22)',
-        'ink': '0 10px 26px -12px rgba(14, 59, 54, 0.32)',
-        'ink-lg': '0 18px 42px -16px rgba(14, 59, 54, 0.36)',
-        'ink-xl': '0 30px 60px -22px rgba(14, 59, 54, 0.42)',
-        'mango': '0 12px 28px -12px rgba(217, 134, 18, 0.55)',
-        'lagoon': '0 12px 28px -12px rgba(10, 124, 118, 0.55)',
-        'hibiscus': '0 12px 28px -12px rgba(207, 69, 62, 0.5)',
-        'lift': '0 14px 30px -14px rgba(14, 59, 54, 0.45)',
-        'glow': '0 0 0 6px rgba(147, 236, 225, 0.35)',
+        'ink-sm': '0 2px 8px -3px rgba(20, 22, 26, 0.18)',
+        'ink': '0 12px 30px -14px rgba(20, 22, 26, 0.28)',
+        'ink-lg': '0 24px 50px -22px rgba(20, 22, 26, 0.34)',
+        'ink-xl': '0 36px 70px -28px rgba(20, 22, 26, 0.4)',
+        'mango': '0 14px 30px -14px rgba(194, 120, 18, 0.55)',
+        'lagoon': '0 14px 30px -14px rgba(21, 91, 143, 0.5)',
+        'hibiscus': '0 14px 30px -14px rgba(182, 59, 40, 0.5)',
+        'lift': '0 16px 34px -16px rgba(20, 22, 26, 0.4)',
+        'glow': '0 0 0 4px rgba(242, 163, 58, 0.3)',
+        'gold': '0 0 0 1px rgba(198, 161, 91, 0.45)',
       },
       borderRadius: {
-        'sm': '10px',
-        'md': '14px',
-        'lg': '20px',
-        'xl': '26px',
-        '2xl': '32px',
-        '3xl': '40px',
-        'blob': '46% 54% 52% 48% / 52% 46% 54% 48%',
-        // A leaf lying on its side, and a pebble.
-        'leaf': '72% 12% 72% 12% / 72% 12% 72% 12%',
-        'pebble': '58% 42% 55% 45% / 48% 56% 44% 52%',
+        'sm': '4px',
+        'md': '6px',
+        'lg': '10px',
+        'xl': '14px',
+        '2xl': '18px',
+        '3xl': '24px',
+        'blob': '18px',
+        'leaf': '999px',
+        'pebble': '14px',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -160,12 +162,12 @@ module.exports = {
           '50%': { transform: 'translateY(-10px)' },
         },
         sway: {
-          '0%, 100%': { transform: 'rotate(-3deg)' },
-          '50%': { transform: 'rotate(3deg)' },
+          '0%, 100%': { transform: 'rotate(-2deg)' },
+          '50%': { transform: 'rotate(2deg)' },
         },
         bob: {
-          '0%, 100%': { transform: 'translateY(0) rotate(-1.5deg)' },
-          '50%': { transform: 'translateY(-9px) rotate(1.5deg)' },
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-8px)' },
         },
         fadeIn: {
           '0%': { opacity: '0' },

@@ -1,14 +1,15 @@
 # ==============================================================================
-# El Cortecito — Cloudflare Worker (static assets + API routes)
+# Exclusive Dominican Tours — Cloudflare Worker (static assets + API routes)
 # ==============================================================================
 #
 # A SEPARATE SITE out of the same repository, not a change to any existing one.
-# `nahiatours` is production; this is the living-water design (WebGL water,
-# botanical illustration). `wrangler deploy` addresses a Worker by name, so the
-# name below is the only thing that decides where this lands, and the deploy
-# workflow asserts it before it uploads anything.
+# `nahiatours` is production; this is Exclusive Dominican Tours, forked from El
+# Cortecito's functionality in its own design (action photography, Anton and
+# Barlow, ivory, gold and green). `wrangler deploy` addresses a Worker by
+# name, so the name below is the only thing that decides where this lands, and
+# the deploy workflow asserts it before it uploads anything.
 #
-# Served at https://elcortecito.johannes-neugschwentner.workers.dev
+# Served at https://exclusive-tours.johannes-neugschwentner.workers.dev
 #
 # The Cloudflare project deploys with `npx wrangler deploy`, the Workers
 # command. It needs `main` (a script entry point) and `[assets]` (a directory to
@@ -21,7 +22,7 @@
 # now Workers-shaped. worker/index.ts dispatches to the same functions/*
 # handlers the Pages deployment used, so no endpoint logic is duplicated.
 
-name = "elcortecito"
+name = "exclusive-tours"
 main = "worker/index.ts"
 compatibility_date = "2024-05-01"
 
@@ -82,13 +83,13 @@ binding = "AI"
 # Note this is a Worker, so wrangler.toml is the source of truth for bindings —
 # a binding added in the dashboard is overwritten by the next deploy.
 #
-# Pinned to elcortecito-data. Not resolved by title: the Worker's Cloudflare
-# git build has no KV_NAMESPACE_TITLE, and the script's default title is
-# nahiatours-data, so every such build bound El Cortecito to nahia.tours's
-# data and its admin wrote there. A literal id cannot resolve wrongly.
+# Pinned to exclusive-tours-data. Not resolved by title: a Cloudflare git
+# build has no KV_NAMESPACE_TITLE, and the script's default title is
+# nahiatours-data, so a title lookup could bind this site to nahia.tours's
+# data. A literal id cannot resolve wrongly.
 [[kv_namespaces]]
 binding = "DATA_KV_F"
-id = "5026f24391e24f13b76f5e4918d6d72d"
+id = "5c534450c0cf47fa9d50560f235c4630"
 
 # ==============================================================================
 # Environment variables
@@ -114,12 +115,12 @@ id = "5026f24391e24f13b76f5e4918d6d72d"
 # serving another's pages there is otherwise nothing to read: these two lines
 # make a wrongly-routed domain say so in one request. They are labels, not
 # settings — nothing reads them but the health endpoint.
-SITE = "elcortecito"
-SITE_BRANCH = "elcortecito"
+SITE = "exclusive-tours"
+SITE_BRANCH = "exclusive-dominican-tours"
 # The address search engines should find this site under: every canonical
 # link, sitemap entry and social card points here (shared/seo.ts), and a
 # workers.dev host that is not this address is kept out of the index.
-SITE_URL = "https://elcortecito.johannes-neugschwentner.workers.dev"
+SITE_URL = "https://exclusive-tours.johannes-neugschwentner.workers.dev"
 # The language the site opens in, and so the language of its page titles.
 SITE_LOCALE = "en"
 

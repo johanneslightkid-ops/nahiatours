@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { localeText } from '../lib/localeText';
-import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
+import { FaWhatsapp } from 'react-icons/fa';
+import { HiArrowRight } from 'react-icons/hi';
 import Hero from '../components/Hero';
-import StorySection from '../components/StorySection';
-import AdventureCard from '../components/AdventureCard';
 import TestimonialDisplay from '../components/TestimonialDisplay';
 import SocialMediaVideos from '../components/SocialMediaVideos';
 import FABWhatsApp from '../components/FABWhatsApp';
@@ -14,17 +13,23 @@ import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { generateBlogListStructuredData } from '../utils/seoHelpers';
 import { getIntroStoryPreferred, StoryData } from '../services/introStoryService';
 import { useBlog } from '../contexts/BlogContext';
-import QuickFacts from '../components/home/QuickFacts';
 import PathwaysSection from '../components/home/PathwaysSection';
-import { playClickFx, playHoverFx } from '../lib/soundEngine';
-import CaribbeanSea from '../components/water/CaribbeanSea';
-import ReefLight from '../components/water/ReefLight';
-import { GlidingBirds, LeafCanopy, Reveal, RisingBubbles, SwimmingSchool } from '../components/nature/Nature';
-import { Coral, EagleRay, Hibiscus, PalmTree, Sailboat, SeaFan, SeaTurtle, Seaweed } from '../components/ui/Illustrations';
+import { playClickFx } from '../lib/soundEngine';
+import MomentsGallery from '../components/edt/home/MomentsGallery';
+import TopToursGallery from '../components/edt/home/TopToursGallery';
+import WelcomeSection from '../components/edt/home/WelcomeSection';
+import PromisesSection from '../components/edt/home/PromisesSection';
+import TopTransfersGallery from '../components/edt/home/TopTransfersGallery';
+import RecognitionSection from '../components/edt/home/RecognitionSection';
 
-const HERO_BACKGROUND_IMAGE = '/imgs/tours/tour_saona_island_detail_12.jpg';
-const HERO_BACKGROUND_VIDEO = '/buggy.mp4';
+const HERO_BACKGROUND_IMAGE = '/imgs/edt/banners/excursions.webp';
 
+/**
+ * The landing page, top to bottom: the hero (with the "Inspire me" switch),
+ * the gallery of real moments, the ranked best sellers, the welcome and its
+ * story, why us, the transfers, certifications, guest reviews, the call to
+ * action and the two ways to build a day.
+ */
 const Home: React.FC = () => {
   const { brandSettings } = useBrand();
   const { locale } = useI18n();
@@ -32,325 +37,114 @@ const Home: React.FC = () => {
   const contentLocale = getContentLocale(locale);
   const navigate = useNavigate();
   const [storyData, setStoryData] = useState<StoryData | null>(null);
-  // The two water bands listen to the pointer across their whole section.
-  const sunsetRef = useRef<HTMLElement>(null);
-  const reefRef = useRef<HTMLElement>(null);
   const seoArticles = blogArticles[contentLocale] ?? [];
-  const hiddenBlogStyle = {
-    position: 'absolute' as const,
-    left: '-9999px',
-    top: 'auto',
-    width: '1px',
-    height: '1px',
-    overflow: 'hidden',
-  };
 
   useEffect(() => {
     let isCurrent = true;
-
     getIntroStoryPreferred(contentLocale).then((data) => {
-      if (isCurrent) {
-        setStoryData(data);
-      }
+      if (isCurrent) setStoryData(data);
     });
-
     return () => {
       isCurrent = false;
     };
   }, [contentLocale]);
 
   useEffect(() => {
-    if (seoArticles.length === 0) {
-      return;
-    }
-
+    if (seoArticles.length === 0) return undefined;
     generateBlogListStructuredData(
-      localeText(locale, { en: 'Blog', es: 'Blog de Tours', de: 'Reiseblog', fr: 'Blog voyage' }),
+      localeText(locale, { en: 'Blog', es: 'Blog', de: 'Reiseblog', fr: 'Blog voyage' }),
       localeText(locale, {
-        en: 'Punta Cana travel blog entries for SEO and search engines.',
-        es: 'Entradas del blog de viajes en Punta Cana para SEO y motores de búsqueda.',
-        de: 'Beiträge aus dem Reiseblog über Punta Cana.',
-        fr: 'Articles du blog voyage sur Punta Cana.',
+        en: 'Punta Cana travel guides and trip ideas.',
+        es: 'Guías de viaje e ideas para Punta Cana.',
+        de: 'Reiseführer und Ideen für Punta Cana.',
+        fr: 'Guides et idées de voyage à Punta Cana.',
       }),
       seoArticles
     );
-
     return () => {
       document.querySelectorAll('script[type="application/ld+json"]').forEach((script) => {
-        if (script.textContent?.includes('Blog')) {
-          script.remove();
-        }
+        if (script.textContent?.includes('Blog')) script.remove();
       });
     };
   }, [locale, seoArticles]);
 
+  const say = (texts: { en: string; es: string; de: string; fr: string }) => localeText(locale, texts);
+
+  const runCta = (target: string | undefined, action: string | undefined) => {
+    playClickFx();
+    if (target?.startsWith('http')) window.open(target, '_blank');
+    else if (action === 'plan') navigate('/plan');
+    else if (action === 'contact') navigate('/contact');
+    else navigate(target || '/tours');
+  };
+
   return (
     <div id="top" className="relative">
-      {/* FAB WhatsApp Button */}
       <FABWhatsApp phoneNumber={brandSettings.phoneNumber} />
 
-      {/* Hero Section */}
-      <Hero backgroundImage={HERO_BACKGROUND_IMAGE} backgroundVideo={HERO_BACKGROUND_VIDEO} />
+      <Hero backgroundImage={HERO_BACKGROUND_IMAGE} />
 
-      {/* Hard facts, straight from the live catalogue */}
-      <QuickFacts />
+      {/* Between the hero and the welcome: the gallery, then the best sellers. */}
+      <MomentsGallery />
+      <TopToursGallery />
 
-      {seoArticles.length > 0 && (
-        <section aria-hidden="true" style={hiddenBlogStyle}>
-          <h2>{locale === 'es' ? 'Blog' : 'Blog'}</h2>
-          {seoArticles.map((article) => (
-            <article key={article.id}>
-              <h3>{article.title}</h3>
-              <p>{article.post.slice(0, 180)}</p>
-            </article>
-          ))}
-        </section>
-      )}
+      <WelcomeSection />
+      <PromisesSection />
 
-      {/* Story Narrative Sections */}
-      <div className="space-y-0 min-h-[50vh]">
-        {!storyData ? (
-          <section className="home-section shore-section py-24">
-            <div className="section-shell grid gap-10 md:grid-cols-2 md:items-center">
-              <div className="animate-pulse space-y-4">
-                <div className="h-4 w-32 rounded-full bg-ink/10" />
-                <div className="h-10 w-3/4 rounded-2xl bg-ink/10" />
-                <div className="h-24 w-full rounded-3xl border-2 border-ink/15 bg-paper-warm" />
-                <div className="h-4 w-2/3 rounded-full bg-ink/10" />
-              </div>
-              <div className="h-64 w-full animate-pulse rounded-[28px_16px_30px_18px] border-2 border-ink/15 bg-paper-warm md:h-80" />
-            </div>
-          </section>
-        ) : (
-          storyData.sections.map((section, index) => {
-            if (section.id === 'adventure_preview') {
-              // Adventure preview section with cards
-              return (
-                <section
-                  key={section.id}
-                  id={section.id}
-                  className="home-section lagoon-section wavy-band relative overflow-hidden px-4 py-28 sm:py-32 md:px-8 lg:py-36"
-                >
-                  <div className="parallax-wash parallax-wash-left" />
-                  <div className="parallax-wash parallax-wash-right" />
-                  <SwimmingSchool className="z-0" opacity={0.75} />
-                  <LeafCanopy variant="jungle" />
-
-                  <div className="relative z-10 max-w-6xl mx-auto">
-                    {/* Header */}
-                    <Reveal className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
-                      <div className="section-icon mx-auto mb-5">
-                        {section.emoji}
-                      </div>
-                      <h2 className="scribble-title-bg mb-4 font-display text-3xl font-extrabold leading-tight text-ink sm:text-4xl md:text-5xl">
-                        {section.title}
-                      </h2>
-                      <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold leading-8 text-ink-soft sm:text-xl">
-                        {section.description}
-                      </p>
-                    </Reveal>
-
-                    {/* Adventure cards grid */}
-                    {section.adventures && (
-                      <div className="grid gap-7 md:grid-cols-3 lg:gap-8">
-                        {section.adventures.map((adventure, i) => (
-                          <Reveal key={adventure.id} delay={i * 0.12} className="h-full">
-                            <AdventureCard adventure={adventure} index={i} />
-                          </Reveal>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </section>
-              );
-            }
-
-            // Regular story sections
-            return (
-              <StorySection
-                key={section.id}
-                id={section.id}
-                title={section.title}
-                emoji={section.emoji}
-                timeframe={section.timeframe}
-                description={section.description}
-                narrative={section.narrative || ''}
-                imageUrl={section.imageUrl}
-                vimeoUrl={section.vimeoUrl}
-                mood={section.mood || ''}
-                isAlternate={index % 2 === 1}
-                themeName={['shore-section', 'lagoon-section', 'cove-section', 'bay-section'][index % 4]}
-              />
-            );
-          })
-        )}
-      </div>
-
-      {/* Call-to-Action Banner: prefer dynamic CTAs from storyData.callToActions */}
-      {!storyData ? null : storyData.callToActions && storyData.callToActions.length > 0 ? (
-        <section id="perfect-day" ref={sunsetRef} className="home-section sunset-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
-          <CaribbeanSea className="z-0" pointerTarget={sunsetRef} />
-          <GlidingBirds className="z-[1]" tone="text-[#2a1d3a]/70" count={4} />
-          <div className="pointer-events-none absolute -bottom-6 -left-16 z-[1] h-80 w-56 opacity-90 sm:h-[28rem] sm:w-80" aria-hidden="true">
-            <PalmTree className="h-full w-full brightness-[0.25] saturate-50" />
-          </div>
-          <div className="pointer-events-none absolute -bottom-10 -right-20 z-[1] hidden h-[30rem] w-80 -scale-x-100 md:block" aria-hidden="true">
-            <PalmTree className="h-full w-full brightness-[0.22] saturate-50" />
-          </div>
-          <div className="relative z-10 max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
-              {storyData.storyTitle || 'Ready for Your Perfect Day in Paradise?'}
-            </h2>
-            {storyData.storyTagline && (
-              <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
-                {storyData.storyTagline}
-              </p>
-            )}
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              {storyData.callToActions.map((cta, i) => (
-                <button
-                  key={`${cta.text}-${i}`}
-                  onMouseEnter={() => playHoverFx()}
-                  onClick={() => {
-                    playClickFx();
-                    if (cta.target?.startsWith('http')) {
-                      window.open(cta.target, '_blank');
-                    } else {
-                      navigate(cta.target || '/');
-                    }
-                  }}
-                  className="tropical-button"
-                >
-                  {cta.text}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : (
-        <section id="perfect-day" ref={sunsetRef} className="home-section sunset-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
-          <CaribbeanSea className="z-0" pointerTarget={sunsetRef} />
-          <GlidingBirds className="z-[1]" tone="text-[#2a1d3a]/70" count={4} />
-          <div className="pointer-events-none absolute -bottom-6 -left-16 z-[1] h-80 w-56 opacity-90 sm:h-[28rem] sm:w-80" aria-hidden="true">
-            <PalmTree className="h-full w-full brightness-[0.25] saturate-50" />
-          </div>
-          <div className="pointer-events-none absolute -bottom-10 -right-20 z-[1] hidden h-[30rem] w-80 -scale-x-100 md:block" aria-hidden="true">
-            <PalmTree className="h-full w-full brightness-[0.22] saturate-50" />
-          </div>
-          <div className="relative z-10 max-w-4xl mx-auto text-center">
-            <h2 className="mb-6 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
-              Ready for Your Perfect Day in Paradise?
-            </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-lg font-bold leading-8 text-white sm:text-xl">
-              Your adventure is just one click away. Contact us on WhatsApp or choose your adventure below.
-            </p>
-            <p className="mb-6 font-accent text-xl text-white/80">{localeText(locale, { en: 'move the sun with your pointer', es: 'mueve el sol con el cursor', de: 'bewege die Sonne mit dem Zeiger', fr: 'déplacez le soleil avec le curseur' })}</p>
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <button
-                onMouseEnter={() => playHoverFx()}
-                onClick={() => {
-                  playClickFx();
-                  window.open(
-                    generateWhatsAppMessage(
-                      brandSettings.phoneNumber,
-                      'Hola! Me gustaría información sobre sus tours.'
-                    ),
-                    '_blank'
-                  );
-                }}
-                className="tropical-button"
-              >
-                Chat on WhatsApp
-              </button>
-              <button
-                onMouseEnter={() => playHoverFx()}
-                onClick={() => {
-                  playClickFx();
-                  navigate('/tours');
-                }}
-                className="tropical-button-outline"
-              >
-                View Adventures
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Testimonials Section */}
+      {/* Transfers, then who stands behind us, then what guests say. */}
+      <TopTransfersGallery />
+      <RecognitionSection />
       <TestimonialDisplay locale={locale} />
 
-      {/* Why Choose Us Section - Enhanced */}
-      <section ref={reefRef} className="home-section reef-section wavy-band relative overflow-hidden px-4 py-28 text-white sm:py-36 md:px-8">
-        <ReefLight className="z-0" pointerTarget={reefRef} />
-        <RisingBubbles className="z-[1]" />
-        <div className="pointer-events-none absolute left-0 top-[14%] z-[1] opacity-80" style={{ animation: 'swimRight 60s linear infinite', animationDelay: '-12s' }} aria-hidden="true">
-          <EagleRay className="h-20 w-28 rotate-90 sm:h-28 sm:w-40" />
+      {/* The call to action. */}
+      <section id="perfect-day" className="home-section relative overflow-hidden bg-ink text-white">
+        <div className="absolute inset-0" aria-hidden="true">
+          <img src="/imgs/edt/tours/saona-island-tour-palmilla-beach/1.webp" alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(20_22_26/0.35)_0%,rgb(20_22_26/0.75)_100%)]" />
+          <div className="absolute inset-0" style={{ background: 'var(--grade)' }} />
+          <div className="hero-grain absolute inset-0" />
         </div>
-        <div className="pointer-events-none absolute left-0 top-[60%] z-[1] hidden opacity-80 md:block" style={{ animation: 'swimLeft 75s linear infinite', animationDelay: '-30s' }} aria-hidden="true">
-          <SeaTurtle className="h-24 w-20 rotate-90" />
-        </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-36" aria-hidden="true">
-          <Seaweed className="absolute bottom-0 left-[3%] h-36 w-16" />
-          <Coral className="absolute -bottom-3 left-[12%] h-28 w-28" />
-          <SeaFan className="absolute bottom-0 right-[22%] hidden h-32 w-32 md:block" />
-          <Coral tone="orchid" className="absolute -bottom-3 right-[4%] h-32 w-32" />
-          <Seaweed tone="gold" className="absolute bottom-0 right-[14%] hidden h-28 w-14 sm:block" />
-        </div>
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16">
-            <h2 className="mb-4 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl">
-              <FormattedMessage id="features.title" />
-            </h2>
-            <p className="text-lg font-bold leading-8 text-white sm:text-xl">
-              Thoughtful service from arrival to return with {brandSettings.brandName}
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
-            {/* Safety First */}
-            <div className="home-feature-card group p-8 animate-wave-sway-1">
-              <div className="mb-4"><SeaTurtle className="h-14 w-12" /></div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
-                <FormattedMessage id="features.safety.title" />
-              </h3>
-              <p className="font-semibold text-ink-soft">
-                <FormattedMessage id="features.safety.description" />
-              </p>
-            </div>
-
-            {/* Curated Experiences */}
-            <div className="home-feature-card group p-8 animate-wave-sway-2">
-              <div className="mb-4"><Hibiscus className="h-14 w-14" /></div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
-                <FormattedMessage id="features.experiences.title" />
-              </h3>
-              <p className="font-semibold text-ink-soft">
-                <FormattedMessage id="features.experiences.description" />
-              </p>
-            </div>
-
-            {/* Transportation */}
-            <div className="home-feature-card group p-8 animate-wave-sway-3">
-              <div className="mb-4"><Sailboat className="h-14 w-14" /></div>
-              <h3 className="mb-3 font-display text-2xl font-extrabold text-ink">
-                <FormattedMessage id="features.transportation.title" />
-              </h3>
-              <p className="font-semibold text-ink-soft">
-                <FormattedMessage id="features.transportation.description" />
-              </p>
-            </div>
+        <div className="section-shell relative py-28 text-center sm:py-36">
+          <span className="kicker kicker-light justify-center">{say({ en: 'Your move', es: 'Tu turno', fr: 'À vous de jouer', de: 'Dein Zug' })}</span>
+          <h2 className="display-lg mx-auto mt-5 max-w-4xl text-white">
+            {storyData?.storyTitle || say({ en: 'Ready for your perfect day in paradise?', es: '¿Listo para tu día perfecto en el paraíso?', fr: 'Prêt pour votre journée parfaite au paradis ?', de: 'Bereit für deinen perfekten Tag im Paradies?' })}
+          </h2>
+          {storyData?.storyTagline && <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/85 sm:text-xl">{storyData.storyTagline}</p>}
+          <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+            {(storyData?.callToActions?.length ? storyData.callToActions : []).map((cta, i) => (
+              <button key={`${cta.text}-${i}`} onClick={() => runCta(cta.target, cta.action)} className="btn-amber">
+                {cta.text} <HiArrowRight className="h-4 w-4" />
+              </button>
+            ))}
+            <button
+              onClick={() => {
+                playClickFx();
+                window.open(
+                  generateWhatsAppMessage(
+                    brandSettings.phoneNumber,
+                    say({ en: 'Hi! I would like information about your tours.', es: '¡Hola! Me gustaría información sobre sus tours.', fr: 'Bonjour ! J’aimerais des informations sur vos excursions.', de: 'Hallo! Ich hätte gern Infos zu euren Touren.' })
+                  ),
+                  '_blank'
+                );
+              }}
+              className="btn-wa"
+            >
+              <FaWhatsapp className="h-5 w-5" /> {say({ en: 'Chat on WhatsApp', es: 'Escribir por WhatsApp', fr: 'Écrire sur WhatsApp', de: 'Per WhatsApp schreiben' })}
+            </button>
+            <button onClick={() => { playClickFx(); navigate('/tours'); }} className="btn-outline-light">
+              {say({ en: 'View all tours', es: 'Ver todos los tours', fr: 'Voir les excursions', de: 'Alle Touren' })}
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Closing: catalogue mode vs. the guided planner */}
+      {/* Closing: catalogue mode vs. the guided planner. */}
       <PathwaysSection />
 
-      {/* Social Media Videos Section - Only shows if videos exist */}
+      {/* Social videos — only when there are any. */}
       <SocialMediaVideos />
 
-      {/* SEO: Hidden blog articles for search engine indexing */}
+      {/* SEO: the blog's articles, for search engines. */}
       <div className="hidden h-0 w-0 overflow-hidden">
         {blogArticles[contentLocale]?.map((article) => (
           <article key={article.id} data-article-id={article.slug}>

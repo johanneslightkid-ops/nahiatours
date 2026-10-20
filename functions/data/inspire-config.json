@@ -1,0 +1,24 @@
+{
+  "enabled": true,
+  "background": "/imgs/edt/inspire/paradise.webp",
+  "backgroundPoster": "/imgs/edt/gallery/aerial-beach.webp",
+  "effect": "caustics",
+  "effectIntensity": 0.7,
+  "slideSeconds": 7,
+  "tourIds": [],
+  "tracks": [],
+  "volume": 0.6,
+  "duckLevel": 0.2,
+  "youtube": {
+    "channel": "",
+    "searchSuffix": "Punta Cana Bávaro tour",
+    "preferShorts": true,
+    "maxResults": 12
+  },
+  "headline": {
+    "en": "Your Caribbean, your way",
+    "es": "Tu Caribe, a tu manera",
+    "fr": "Vos Caraïbes, à votre façon",
+    "de": "Deine Karibik, dein Weg"
+  }
+}

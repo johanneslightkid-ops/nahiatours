@@ -1,19 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { localeText } from '../lib/localeText';
-import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
-import { FaStar } from 'react-icons/fa';
-import { HiArrowDown, HiCheck, HiShieldCheck } from 'react-icons/hi';
+import { FaStar, FaWhatsapp } from 'react-icons/fa';
+import { HiArrowDown, HiArrowRight } from 'react-icons/hi';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { useBrand } from '../contexts/BrandContext';
 import { HeroMediaItem } from '../services/brandService';
-import { useI18n } from '../contexts/I18nContext';
-import { playClickFx, playHoverFx } from '../lib/soundEngine';
+import { useI18n, type Locale } from '../contexts/I18nContext';
+import { playClickFx } from '../lib/soundEngine';
 import { getPublishedTestimonials, getRatingVisibility } from '../services/testimonialService';
-import LagoonWater from './water/LagoonWater';
-import { GlidingBirds, LeafCanopy, PointerHummingbird } from './nature/Nature';
-import { Hibiscus, MonsteraLeaf, Fern } from './ui/Illustrations';
+import { getServiceSlug } from '../services/toursService';
+import { generateWhatsAppMessage } from '../utils/whatsapp';
+import { descriptionField, smallImage, useTours } from '../edt/useTours';
+import { InspireToggle } from './edt/inspire/InspireContext';
 
 interface HeroProps {
   backgroundImage: string;
@@ -21,314 +20,270 @@ interface HeroProps {
   backgroundVideo?: string;
 }
 
+type L = Record<Locale, string>;
+const t = (locale: Locale, text: L) => text[locale] ?? text.en;
+
+const COPY = {
+  kicker: { en: 'Punta Cana · Bayahíbe · Samaná · Santo Domingo', es: 'Punta Cana · Bayahíbe · Samaná · Santo Domingo', fr: 'Punta Cana · Bayahíbe · Samaná · Saint-Domingue', de: 'Punta Cana · Bayahíbe · Samaná · Santo Domingo' },
+  line1: { en: 'Begin your', es: 'Empieza tu', fr: 'Commencez votre', de: 'Starte dein' },
+  line2: { en: 'adventure', es: 'aventura', fr: 'aventure', de: 'Abenteuer' },
+  line3: { en: 'in style.', es: 'con estilo.', fr: 'avec style.', de: 'mit Stil.' },
+  subtitle: {
+    en: 'Enjoy your vacation to the fullest with our selection of excursions and transfers. Book easily, travel worry-free and live every moment.',
+    es: 'Disfruta tus vacaciones al máximo con nuestra selección de excursiones y traslados. Reserva fácil, viaja sin preocupaciones y vive cada momento.',
+    fr: 'Profitez pleinement de vos vacances avec notre sélection d’excursions et de transferts. Réservez facilement, voyagez l’esprit léger et vivez chaque instant.',
+    de: 'Genieße deinen Urlaub in vollen Zügen mit unseren Ausflügen und Transfers. Einfach buchen, sorglos reisen und jeden Moment erleben.',
+  },
+  tours: { en: 'See all tours', es: 'Ver todos los tours', fr: 'Voir toutes les excursions', de: 'Alle Touren ansehen' },
+  plan: { en: 'Plan my day', es: 'Planea mi día', fr: 'Planifier ma journée', de: 'Meinen Tag planen' },
+  wa: { en: 'Hi! I would like to book an excursion.', es: '¡Hola! Me gustaría reservar una excursión.', fr: 'Bonjour ! Je voudrais réserver une excursion.', de: 'Hallo! Ich möchte einen Ausflug buchen.' },
+  bestSeller: { en: 'Best seller', es: 'Más vendido', fr: 'Meilleure vente', de: 'Bestseller' },
+  from: { en: 'from', es: 'desde', fr: 'dès', de: 'ab' },
+  book: { en: 'Book it', es: 'Reservar', fr: 'Réserver', de: 'Buchen' },
+  scroll: { en: 'Explore the excursions', es: 'Explora las excursiones', fr: 'Découvrir les excursions', de: 'Ausflüge entdecken' },
+  excursions: { en: 'excursions', es: 'excursiones', fr: 'excursions', de: 'Ausflüge' },
+  since: { en: 'on the island since', es: 'en la isla desde', fr: 'sur l’île depuis', de: 'auf der Insel seit' },
+  rating: { en: 'average guest rating', es: 'valoración media', fr: 'note moyenne', de: 'Gästebewertung' },
+  transfers: { en: 'private transfers, every day', es: 'traslados privados, cada día', fr: 'transferts privés, tous les jours', de: 'private Transfers, jeden Tag' },
+};
+
+const SLIDE_MS = 7000;
+
 /**
- * The beach at El Cortecito, from above.
+ * Full throttle, in daylight.
  *
- * The whole hero is the shoreline: dry sand under the copy, the swash running
- * up and back, and the lagoon opening out beyond it — live WebGL water that
- * rings where you touch it and whose fish scatter when you reach in. The
- * vine of the navigation hangs over the top of it.
+ * The company's own action photographs, one after another, each drifting in
+ * slowly (scale and opacity — nothing else moves), under a warm film grade
+ * and a charcoal wash on the side the words are on. Anton, very big; the
+ * second line in amber. The best seller sits on the right with its price
+ * upfront. Below, on a white strip, the four numbers that matter.
  *
- * On a wide screen the sand is on the left and the water on the right; on a
- * phone the beach is at the top and the lagoon below. Three hand-cut media
- * cards float on the water. They are deliberately present on phones too: the
- * collage is part of the welcome, not desktop-only decoration.
+ * The "Inspire me" switch turns the whole site into the in-store TV show.
  */
 const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const { brandSettings } = useBrand();
   const { locale } = useI18n();
-  const isEs = locale === 'es';
-  const say = (texts: { en: string; es: string; de: string; fr: string }) => localeText(locale, texts);
   const reduced = useReducedMotion();
-  const heroMedia = brandSettings.heroMedia?.length === 3
+  const tours = useTours(locale);
+  const [slide, setSlide] = useState(0);
+  const [ratingBadge, setRatingBadge] = useState<{ average: number; count: number } | null>(null);
+
+  const configured: HeroMediaItem[] = brandSettings.heroMedia?.length
     ? brandSettings.heroMedia
-    : [
-        { url: backgroundVideo || '', type: 'video' as const, alt: 'Buggy adventure in Punta Cana' },
-        { url: backgroundImage, type: 'image' as const, alt: 'Saona Island shore' },
-        { url: backgroundImage, type: 'image' as const, alt: 'Caribbean moments' },
-      ];
-  const showVideo = useDeferredVideo(heroMedia.some((item) => item.type === 'video'));
-  const [touched, setTouched] = useState(false);
-  const [ratingBadge, setRatingBadge] = useState<{ average: number; visible: boolean } | null>(null);
+    : [{ url: backgroundImage, type: 'image', alt: '' }];
+  const media = configured.filter((item) => item.url);
+  if (backgroundVideo && !media.some((item) => item.type === 'video') && media.length === 0) {
+    media.push({ url: backgroundVideo, type: 'video' });
+  }
+  const showVideo = useDeferredVideo(media.some((item) => item.type === 'video'));
+
+  useEffect(() => {
+    if (reduced || media.length < 2) return undefined;
+    const timer = window.setInterval(() => setSlide((value) => (value + 1) % media.length), SLIDE_MS);
+    return () => window.clearInterval(timer);
+  }, [media.length, reduced]);
 
   useEffect(() => {
     let active = true;
-
-    const loadRating = async () => {
-      const testimonials = await getPublishedTestimonials();
+    getPublishedTestimonials().then((testimonials) => {
       if (!active) return;
-
       const range = brandSettings.heroRatingRange ?? { min: 3, max: 5 };
-      const result = getRatingVisibility(testimonials, {
-        enabled: brandSettings.heroRatingEnabled,
-        min: range.min,
-        max: range.max,
-      });
-      setRatingBadge(result.visible ? { average: result.average ?? 0, visible: true } : null);
+      const result = getRatingVisibility(testimonials, { enabled: brandSettings.heroRatingEnabled, min: range.min, max: range.max });
+      setRatingBadge(result.visible && result.average !== null ? { average: result.average, count: result.count } : null);
+    });
+    return () => {
+      active = false;
     };
-
-    void loadRating();
-    return () => { active = false; };
   }, [brandSettings.heroRatingEnabled, brandSettings.heroRatingRange]);
 
-  // The copy drifts up a little slower than the page, the sand stays put.
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
-  const copyY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : 120]);
-  const copyOpacity = useTransform(scrollYProgress, [0, 0.8], [1, reduced ? 1 : 0.2]);
-  const floatY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : -160]);
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : 90]);
+  const mediaScale = useTransform(scrollYProgress, [0, 1], [1, reduced ? 1 : 1.08]);
 
-  const image = backgroundImage || '/imgs/tours/tour_saona_island_detail_12.jpg';
+  const best = tours?.[0];
+  const bestPath = best ? `/details/tours/${getServiceSlug(best)}` : '/tours';
+  const bestDuration = best ? best.duration || descriptionField(best.description, 'duration') : '';
 
-  const renderMedia = (item: HeroMediaItem, className: string) =>
-    item.type === 'video' && showVideo ? (
-      <video
-        className={className}
-        src={item.url}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        poster={image}
-        aria-label={item.alt || undefined}
-      />
-    ) : (
-      <img
-        src={item.type === 'video' ? image : item.url}
-        alt={item.alt || ''}
-        className={className}
-      />
-    );
-
-  const trustSignals = [
-    { icon: <HiShieldCheck className="h-4 w-4 text-jungle" />, label: say({ en: 'Licensed local crew', es: 'Equipo local con licencia', de: 'Lizenziertes lokales Team', fr: 'Équipe locale agréée' }) },
-    { icon: <HiCheck className="h-4 w-4 text-lagoon-dark" />, label: say({ en: 'Instant WhatsApp booking', es: 'Reserva al instante por WhatsApp', de: 'Sofort per WhatsApp buchen', fr: 'Réservation instantanée par WhatsApp' }) },
-    { icon: <HiCheck className="h-4 w-4 text-mango-dark" />, label: say({ en: 'Hotel pick-up included', es: 'Recogida en el hotel', de: 'Abholung am Hotel inklusive', fr: 'Prise en charge à l’hôtel incluse' }) },
+  const stats = [
+    { value: tours?.length ? String(tours.length) : '30+', label: t(locale, COPY.excursions) },
+    { value: '2015', label: t(locale, COPY.since) },
+    ...(ratingBadge ? [{ value: ratingBadge.average.toFixed(2), label: t(locale, COPY.rating), star: true }] : []),
+    { value: '24/7', label: t(locale, COPY.transfers) },
   ];
 
+  const scrollOn = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    playClickFx();
+    const target = document.getElementById('top-tours');
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  };
+
   return (
-    <section
-      ref={sectionRef}
-      onPointerDown={() => setTouched(true)}
-      className="relative isolate z-0 -mt-[5rem] w-full touch-pan-y overflow-hidden lg:-mt-[9rem]"
-    >
-      {/* What shows before the first frame of water, or if WebGL is missing. */}
-      <div
-        className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#F4E5C4_0%,#F4E5C4_55%,#93ECE1_60%,#17B5AC_85%,#0A7C76_100%)] lg:bg-[linear-gradient(105deg,#F4E5C4_0%,#F4E5C4_50%,#93ECE1_56%,#17B5AC_78%,#0A7C76_100%)]"
-        aria-hidden="true"
-      />
-      <LagoonWater className="-z-10" pointerTarget={sectionRef} />
-
-      <LeafCanopy variant="shore" className="z-10" />
-      <GlidingBirds className="z-10" tone="text-ink/60" />
-      <PointerHummingbird boundsRef={sectionRef} />
-
-      <div className="section-shell relative z-20 flex min-h-[100svh] flex-col justify-center pb-24 pt-28 lg:pb-28 lg:pt-44">
-        <div className="grid w-full gap-10 lg:grid-cols-12 lg:items-center">
-          <motion.div style={{ y: copyY, opacity: copyOpacity }} className="lg:col-span-6 xl:col-span-6">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="mb-5 inline-flex items-center gap-2 rounded-leaf bg-paper-card/85 px-4 py-1.5 shadow-ink-sm">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lagoon opacity-60" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-lagoon" />
-                </span>
-                <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-ink">
-                  El Cortecito · Bávaro · Saona
-                </span>
-              </div>
-
-              <div className="mb-2">
-                <span className="hand-note">{say({ en: '¡Hola, traveller!', es: '¡Hola, viajero!', de: '¡Hola, Reisende!', fr: '¡Hola, voyageur !' })}</span>
-              </div>
-
-              <h1 className="mb-6 font-display text-[2.6rem] font-bold leading-[1.02] text-ink sm:text-6xl lg:text-[4.4rem]">
-                <span className="marker-highlight">
-                  <FormattedMessage id="hero.title" values={{ brand: brandSettings.brandName }} />
-                </span>
-              </h1>
-
-              <p className="mb-9 max-w-xl text-lg font-medium leading-relaxed text-ink-soft sm:text-xl">
-                <FormattedMessage id="hero.subtitle" />
-              </p>
-
-              <div className="mb-9 flex flex-col flex-wrap gap-3 sm:flex-row">
-                <Link
-                  to="/tours#top"
-                  onClick={() => playClickFx()}
-                  onMouseEnter={() => playHoverFx()}
-                  className="tropical-button"
-                >
-                  <FormattedMessage id="hero.cta" />
-                </Link>
-                <Link
-                  to="/plan#top"
-                  onClick={() => playClickFx()}
-                  onMouseEnter={() => playHoverFx()}
-                  className="tropical-button-outline btn-lagoon"
-                >
-                  <FormattedMessage id="nav.plan" defaultMessage="Plan my day" />
-                </Link>
-                <Link
-                  to="/transport#top"
-                  onClick={() => playClickFx()}
-                  onMouseEnter={() => playHoverFx()}
-                  className="tropical-button-outline"
-                >
-                  <FormattedMessage id="nav.transport" defaultMessage="Private Transport" />
-                </Link>
-              </div>
-
-              <ul className="flex flex-wrap items-center gap-2.5">
-                {trustSignals.map((signal, i) => (
-                  <li
-                    key={signal.label}
-                    className={`inline-flex items-center gap-2 bg-paper-card/90 px-3.5 py-1.5 text-xs font-bold text-ink shadow-ink-sm ${
-                      i % 2 ? 'rounded-[18px_10px_18px_10px]' : 'rounded-[10px_18px_10px_18px]'
-                    }`}
-                  >
-                    {signal.icon}
-                    <span>{signal.label}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          </motion.div>
-
-          {/* Out on the water: three imperfect little holiday keepsakes. */}
-          <motion.div style={{ y: floatY }} className="hero-media-collage relative h-[22rem] sm:h-[27rem] lg:col-span-6 lg:h-[32rem] xl:col-span-6">
-            <motion.div
-              className="absolute right-4 top-2 z-30 hidden items-center gap-2 font-accent text-2xl text-white lg:flex"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: touched ? 0 : 1 }}
-              transition={{ delay: touched ? 0 : 1.6, duration: 0.8 }}
-              style={{ textShadow: '0 2px 12px rgba(6,50,61,0.5)' }}
-            >
-              <svg viewBox="0 0 60 40" className="h-8 w-12 -scale-x-100" aria-hidden="true">
-                <path d="M4 30 C20 34 40 26 52 8 M52 8 L44 10 M52 8 L52 17" stroke="white" strokeWidth={2.4} fill="none" strokeLinecap="round" />
-              </svg>
-              {say({ en: 'touch the water', es: 'toca el agua', de: 'berühr das Wasser', fr: 'touchez l’eau' })}
-            </motion.div>
-
-            <motion.div
-              className="absolute bottom-1 right-[3%] z-20 w-[70%] max-w-[22rem] sm:bottom-4 sm:right-[10%] lg:bottom-5 lg:right-8 lg:w-72 xl:w-80"
-              initial={{ opacity: 0, y: 40, rotate: 6 }}
-              animate={{ opacity: 1, y: 0, rotate: 3 }}
-              transition={{ duration: 1.1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="hero-polaroid animate-wave-sway-2 hero-polaroid-main">
-                <div className="hero-media-window h-44 sm:h-52">
-                  {renderMedia(heroMedia[0], 'h-full w-full object-cover photo-pop')}
-                </div>
-                <div className="flex items-center justify-between gap-3 px-2 pb-1 pt-3">
-                  <p className="font-accent text-xl leading-none text-lagoon-dark sm:text-2xl">
-                    {say({ en: 'Greetings from Bávaro', es: 'Saludos desde Bávaro', de: 'Grüße aus Bávaro', fr: 'Bons baisers de Bávaro' })}
-                  </p>
-                  {ratingBadge && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-mango-light px-2.5 py-1.5 font-display text-[0.72rem] font-bold text-ink shadow-sm sm:text-sm">
-                      <FaStar className="text-mango-dark" aria-hidden="true" />
-                      {ratingBadge.average.toFixed(2)}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              className="absolute left-[1%] top-4 z-10 w-[42%] max-w-[11rem] sm:left-[7%] sm:top-8 sm:max-w-[13rem] lg:left-5 lg:top-16 xl:left-10"
-              initial={{ opacity: 0, y: 28, rotate: -14 }}
-              animate={{ opacity: 1, y: 0, rotate: -8 }}
-              transition={{ duration: 0.9, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="hero-polaroid hero-polaroid-small animate-wave-sway-4">
-                <div className="hero-media-window h-28 sm:h-36 lg:h-40">
-                  {renderMedia(heroMedia[1], 'h-full w-full object-cover photo-pop')}
-                </div>
-                <p className="hero-polaroid-caption">{say({ en: 'sun + salt', es: 'sol + sal', de: 'Sonne + Salz', fr: 'soleil + sel' })}</p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              className="absolute right-[1%] top-12 z-10 w-[39%] max-w-[10.5rem] sm:right-[4%] sm:top-16 sm:max-w-[12.5rem] lg:right-0 lg:top-20"
-              initial={{ opacity: 0, y: 28, rotate: 15 }}
-              animate={{ opacity: 1, y: 0, rotate: 9 }}
-              transition={{ duration: 0.9, delay: 0.72, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="hero-polaroid hero-polaroid-small animate-wave-sway-6">
-                <div className="hero-media-window h-24 sm:h-32 lg:h-36">
-                  {renderMedia(heroMedia[2], 'h-full w-full object-cover photo-pop')}
-                </div>
-                <p className="hero-polaroid-caption">{say({ en: 'a keepsake', es: 'un recuerdo', de: 'ein Andenken', fr: 'un souvenir' })}</p>
-              </div>
-            </motion.div>
-
-            <div className="absolute left-[37%] top-[42%] z-30 sm:left-[42%] lg:left-16 lg:top-28" style={{ animation: 'swimBob 6s ease-in-out infinite' }}>
-              <Hibiscus className="h-16 w-16 animate-spin-slow drop-shadow-[0_10px_8px_rgba(6,50,61,0.3)]" />
+    <section ref={sectionRef} className="relative isolate overflow-hidden bg-ink text-white">
+      {/* The photographs. */}
+      <motion.div className="absolute inset-0 -z-10" style={{ scale: mediaScale }} aria-hidden="true">
+        {media.map((item, index) => {
+          const on = index === slide;
+          return (
+            <div key={`${item.url}-${index}`} className={`hero-slide ${on ? 'is-on' : ''}`}>
+              {item.type === 'video' && showVideo ? (
+                <video className="h-full w-full object-cover" src={item.url} autoPlay muted loop playsInline preload="metadata" />
+              ) : item.type === 'video' ? null : (
+                <img
+                  src={item.url}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  fetchPriority={index === 0 ? 'high' : 'low'}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+              )}
             </div>
+          );
+        })}
+        <div className="absolute inset-0 bg-[linear-gradient(95deg,rgb(20_22_26/0.82)_0%,rgb(20_22_26/0.55)_38%,rgb(20_22_26/0.12)_68%,rgb(20_22_26/0)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(20_22_26/0.55)_0%,rgb(20_22_26/0)_26%,rgb(20_22_26/0)_70%,rgb(20_22_26/0.55)_100%)]" />
+        <div className="absolute inset-0" style={{ background: 'var(--grade)' }} />
+        <div className="hero-grain absolute inset-0" />
+      </motion.div>
+
+      <div className="section-shell relative flex min-h-[88svh] flex-col justify-end pb-10 pt-28 sm:pb-12 lg:min-h-[94vh] lg:justify-center lg:pb-44 lg:pt-40">
+        <div className="grid items-end gap-10 lg:grid-cols-12">
+          <motion.div style={{ y: copyY }} className="lg:col-span-8">
+            <motion.span
+              className="kicker kicker-light"
+              initial={reduced ? false : { opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {t(locale, COPY.kicker)}
+            </motion.span>
+
+            <h1 className="mt-5 font-display uppercase text-white">
+              {[t(locale, COPY.line1), t(locale, COPY.line2), t(locale, COPY.line3)].map((line, index) => (
+                <motion.span
+                  key={line}
+                  className={`hero-line block ${index === 2 ? 'text-mango' : ''}`}
+                  initial={reduced ? false : { opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.1 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {line}
+                </motion.span>
+              ))}
+            </h1>
+
+            <motion.p
+              className="mt-6 max-w-xl text-lg font-medium leading-relaxed text-white/85 sm:text-xl"
+              initial={reduced ? false : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.45 }}
+            >
+              {t(locale, COPY.subtitle)}
+            </motion.p>
+
+            <motion.div
+              className="mt-9 flex flex-wrap items-center gap-3"
+              initial={reduced ? false : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.55 }}
+            >
+              <Link to="/tours" onClick={() => playClickFx()} className="btn-amber">
+                {t(locale, COPY.tours)} <HiArrowRight className="h-4 w-4" />
+              </Link>
+              <Link to="/plan" onClick={() => playClickFx()} className="btn-outline-light">
+                {t(locale, COPY.plan)}
+              </Link>
+              <a
+                href={generateWhatsAppMessage(brandSettings.phoneNumber, t(locale, COPY.wa))}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => playClickFx()}
+                className="btn-wa"
+                aria-label="WhatsApp"
+              >
+                <FaWhatsapp className="h-5 w-5" />
+                <span className="hidden sm:inline">WhatsApp</span>
+              </a>
+              <InspireToggle className="sm:ml-3" />
+            </motion.div>
           </motion.div>
+
+          {/* The #1, price upfront. */}
+          {best && (
+            <motion.div
+              className="hidden lg:col-span-4 lg:block"
+              initial={reduced ? false : { opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Link to={bestPath} onClick={() => playClickFx()} className="hero-best group block no-underline">
+                <div className="relative h-44 overflow-hidden">
+                  <img src={smallImage(best.image)} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="eager" />
+                  <span className="absolute left-3 top-3 badge badge-amber">#1 · {t(locale, COPY.bestSeller)}</span>
+                </div>
+                <div className="flex items-end justify-between gap-4 p-5">
+                  <div>
+                    <p className="font-display text-2xl uppercase leading-none text-ink">{best.title}</p>
+                    <p className="mt-2 text-sm font-medium text-ink-soft">
+                      {bestDuration}
+                      {ratingBadge && (
+                        <span className="ml-2 inline-flex items-center gap-1 text-ink">
+                          <FaStar className="h-3.5 w-3.5 text-mango" /> {ratingBadge.average.toFixed(2)}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="block font-condensed text-xs font-bold uppercase tracking-[0.18em] text-gold-dark">{t(locale, COPY.from)}</span>
+                    <span className="font-display text-4xl leading-none text-ink">{best.price}</span>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          )}
         </div>
+
+        {/* Which photograph. */}
+        {media.length > 1 && (
+          <div className="mt-10 flex gap-2" aria-hidden="true">
+            {media.map((item, index) => (
+              <button
+                key={`dot-${index}`}
+                type="button"
+                tabIndex={-1}
+                onClick={() => setSlide(index)}
+                className="h-1 w-10 overflow-hidden rounded-full bg-white/25"
+              >
+                <span className={`hero-progress block h-full origin-left bg-mango ${index === slide ? 'is-on' : ''}`} style={{ animationDuration: `${SLIDE_MS}ms` }} />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Leaves at the foot of the beach, in front of everything. */}
-      <div className="pointer-events-none absolute -bottom-10 -left-10 z-10 h-44 w-36 sm:h-72 sm:w-60" aria-hidden="true">
-        <div className="h-full w-full rotate-[28deg]">
-          <MonsteraLeaf className="leaf-sway-slow h-full w-full" />
+      {/* The numbers, on a white strip across the foot of the photograph. */}
+      <div className="relative z-10 pb-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:pb-0">
+        <div className="section-shell">
+          <div className="hero-stats">
+            {stats.map((stat) => (
+              <div key={stat.label} className="hero-stat">
+                <span className="font-display text-3xl leading-none text-ink sm:text-4xl">
+                  {stat.value}
+                  {'star' in stat && stat.star && <FaStar className="ml-1 inline h-5 w-5 -translate-y-1 text-mango" />}
+                </span>
+                <span className="mt-1.5 block font-condensed text-[0.72rem] font-bold uppercase tracking-[0.18em] text-ink-soft">{stat.label}</span>
+              </div>
+            ))}
+            <a href="#top-tours" onClick={scrollOn} className="hero-stat hero-stat-cta no-underline">
+              <span className="font-condensed text-sm font-bold uppercase tracking-[0.16em] text-ink">{t(locale, COPY.scroll)}</span>
+              <HiArrowDown className="mt-1 h-5 w-5 animate-bounce text-mango-dark" />
+            </a>
+          </div>
         </div>
       </div>
-      <div className="pointer-events-none absolute -bottom-6 left-28 z-20 hidden h-48 w-40 md:block" aria-hidden="true">
-        <div className="h-full w-full -rotate-[12deg]">
-          <Fern className="leaf-sway h-full w-full" />
-        </div>
-      </div>
-
-      <div className="absolute inset-x-0 bottom-14 z-30 flex justify-center">
-        <a
-          href="#perfect-day"
-          onClick={(event) => {
-            playClickFx();
-            // "Ready for your perfect day in paradise?" — a smooth glide down,
-            // or a jump for anyone who has asked for less motion.
-            const target = document.getElementById('perfect-day');
-            if (!target) return;
-            event.preventDefault();
-            const behavior: ScrollBehavior = reduced ? 'auto' : 'smooth';
-            target.scrollIntoView({ behavior, block: 'start' });
-            // Sections above can still change height while the page glides
-            // (late images, reveal animations), which leaves it short or past
-            // the mark on a phone. Once it settles, close the gap.
-            let settle = 0;
-            const correct = () => {
-              window.clearTimeout(settle);
-              settle = window.setTimeout(() => {
-                const offset = target.getBoundingClientRect().top;
-                if (Math.abs(offset) > 4) window.scrollBy({ top: offset, behavior });
-              }, 160);
-            };
-            window.addEventListener('scroll', correct, { passive: true });
-            window.setTimeout(() => window.removeEventListener('scroll', correct), 2500);
-          }}
-          onMouseEnter={() => playHoverFx()}
-          className="inline-flex items-center gap-2 rounded-leaf bg-paper-card/90 px-5 py-2 text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-ink no-underline shadow-ink"
-        >
-          <span>{say({ en: 'Explore the excursions', es: 'Explora las excursiones', de: 'Ausflüge entdecken', fr: 'Découvrir les excursions' })}</span>
-          <HiArrowDown className="h-4 w-4 animate-bounce" />
-        </a>
-      </div>
-
-      {/* The sand of the next band, rolling in over the water. */}
-      <svg
-        className="absolute inset-x-0 bottom-0 z-20 block h-12 w-full sm:h-16"
-        viewBox="0 0 1200 80"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path d="M0 40 C150 10 300 70 480 44 C660 18 780 64 960 46 C1080 34 1140 40 1200 30 L1200 80 L0 80 Z" fill="#FBF5E8" />
-        <path d="M0 40 C150 10 300 70 480 44 C660 18 780 64 960 46 C1080 34 1140 40 1200 30" stroke="#FFFFFF" strokeOpacity={0.8} strokeWidth={3} fill="none" strokeDasharray="3 10" />
-      </svg>
     </section>
   );
 };

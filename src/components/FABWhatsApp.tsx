@@ -29,13 +29,13 @@ const FABWhatsApp: React.FC<FABWhatsAppProps> = ({ phoneNumber, message }) => {
     <button
       onClick={handleClick}
       onMouseEnter={() => playHoverFx()}
-      className="whatsapp-fab animate-fab-glow-wave fixed bottom-6 right-6 z-50 flex h-14 items-center justify-center gap-2.5 rounded-full border-[2.5px] border-ink bg-jungle px-5 text-white transition-transform duration-200 hover:-translate-y-1 hover:bg-jungle-light hover:text-ink"
+      className="whatsapp-fab animate-fab-glow-wave fixed bottom-5 right-5 z-50 flex h-14 items-center justify-center gap-2.5 rounded-full bg-whatsapp px-4 text-[#06301a] shadow-ink-lg transition-transform duration-200 hover:-translate-y-1 sm:px-5"
       aria-label="Contact via WhatsApp"
       title={`Chat with ${brandName} on WhatsApp`}
     >
       <FaWhatsapp className="h-7 w-7" />
-      <span className="hidden text-xs font-extrabold uppercase tracking-wider sm:inline">
-        WhatsApp Concierge
+      <span className="hidden font-condensed text-sm font-bold uppercase tracking-[0.14em] sm:inline">
+        WhatsApp
       </span>
     </button>
   );

@@ -1,0 +1,71 @@
+{
+  "enabled": true,
+  "speed": 32,
+  "items": [
+    {
+      "id": "punta-cana",
+      "name": "Punta Cana",
+      "image": "/imgs/edt/dest/punta-cana.webp",
+      "tag": "Punta Cana",
+      "enabled": true,
+      "caption": {
+        "en": "Beaches, buggies and the open sea",
+        "es": "Playas, buggies y mar abierto",
+        "fr": "Plages, buggies et grand large",
+        "de": "Strände, Buggys und offenes Meer"
+      }
+    },
+    {
+      "id": "bayahibe",
+      "name": "Bayahíbe",
+      "image": "/imgs/edt/dest/bayahibe.webp",
+      "tag": "Bayahíbe",
+      "enabled": true,
+      "caption": {
+        "en": "Gateway to Saona and Catalina",
+        "es": "La puerta a Saona y Catalina",
+        "fr": "La porte de Saona et Catalina",
+        "de": "Das Tor nach Saona und Catalina"
+      }
+    },
+    {
+      "id": "samana",
+      "name": "Samaná",
+      "image": "/imgs/edt/dest/samana.webp",
+      "tag": "Samaná",
+      "enabled": true,
+      "caption": {
+        "en": "Whales, waterfalls and Cayo Levantado",
+        "es": "Ballenas, cascadas y Cayo Levantado",
+        "fr": "Baleines, cascades et Cayo Levantado",
+        "de": "Wale, Wasserfälle und Cayo Levantado"
+      }
+    },
+    {
+      "id": "santo-domingo",
+      "name": "Santo Domingo",
+      "image": "/imgs/edt/dest/santo-domingo.webp",
+      "tag": "Santo Domingo",
+      "enabled": true,
+      "caption": {
+        "en": "The first city of the Americas",
+        "es": "La primera ciudad de América",
+        "fr": "La première ville des Amériques",
+        "de": "Die erste Stadt Amerikas"
+      }
+    },
+    {
+      "id": "puerto-plata",
+      "name": "Puerto Plata",
+      "image": "/imgs/edt/dest/puerto-plata.webp",
+      "tag": "Puerto Plata",
+      "enabled": true,
+      "caption": {
+        "en": "The Amber Coast of the north",
+        "es": "La Costa de Ámbar del norte",
+        "fr": "La Côte d’Ambre du nord",
+        "de": "Die Bernsteinküste im Norden"
+      }
+    }
+  ]
+}

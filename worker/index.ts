@@ -45,6 +45,7 @@ import { onRequest as handleNotifyConfig } from '../functions/api/notify-config'
 import { onRequest as handlePayAttempt, sweepOverdue } from '../functions/api/pay-attempt';
 import { onRequest as handleActivity } from '../functions/api/activity';
 import { onRequest as handleSendSummary } from '../functions/api/send-summary';
+import { onRequest as handleYoutube } from '../functions/api/youtube';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
 import { robotsResponse, sitemapResponse, withPageSeo } from '../shared/seo';
 
@@ -68,6 +69,7 @@ type RouteHandler = (context: {
 
 const ROUTES: Record<string, RouteHandler> = {
   '/api/data': handleData,
+  '/api/youtube': handleYoutube,
   // Which branch built what is being served, and which bindings arrived with
   // it. Public, and carries no value that is worth keeping.
   '/api/health': handleHealth,

@@ -1,49 +1,108 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { HiChevronDown } from 'react-icons/hi';
 import { useI18n, type Locale } from '../contexts/I18nContext';
 import SoundToggle from './SoundToggle';
 
-const DIRECTIONS: Array<{ code: Locale; short: string; name: string; direction: 'north' | 'east' | 'south' | 'west' }> = [
-  { code: 'en', short: 'EN', name: 'English', direction: 'north' },
-  { code: 'de', short: 'DE', name: 'Deutsch', direction: 'east' },
-  { code: 'es', short: 'ES', name: 'Español', direction: 'south' },
-  { code: 'fr', short: 'FR', name: 'Français', direction: 'west' },
+const LANGUAGES: Array<{ code: Locale; short: string; name: string }> = [
+  { code: 'en', short: 'EN', name: 'English' },
+  { code: 'es', short: 'ES', name: 'Español' },
+  { code: 'fr', short: 'FR', name: 'Français' },
+  { code: 'de', short: 'DE', name: 'Deutsch' },
 ];
 
-const FLAG_BACKGROUNDS: Record<Locale, string> = {
-  en: 'linear-gradient(90deg, rgba(11,36,105,0.9) 0 38%, rgba(255,255,255,0.95) 38% 46%, rgba(179,20,42,0.9) 46% 54%, rgba(255,255,255,0.95) 54% 62%, rgba(11,36,105,0.9) 62% 100%), linear-gradient(180deg, rgba(11,36,105,0.9) 0 38%, rgba(255,255,255,0.95) 38% 46%, rgba(179,20,42,0.9) 46% 54%, rgba(255,255,255,0.95) 54% 62%, rgba(11,36,105,0.9) 62% 100%)',
-  de: 'linear-gradient(180deg, rgba(0,0,0,0.95) 0 33%, rgba(221,0,0,0.82) 33% 66%, rgba(255,206,0,0.86) 66% 100%)',
-  es: 'linear-gradient(180deg, rgba(198,11,30,0.82) 0 20%, rgba(255,196,0,0.9) 20% 80%, rgba(198,11,30,0.82) 80% 100%)',
-  fr: 'linear-gradient(135deg, rgba(0,85,164,0.88) 0 33%, rgba(255,255,255,0.92) 33% 66%, rgba(239,65,53,0.82) 66% 100%)',
-};
+interface LanguageSwitcherProps {
+  /** On a photograph: white type. */
+  tone?: 'light' | 'dark';
+  /** Show all four as a row of buttons instead of a menu (the phone menu). */
+  inline?: boolean;
+}
 
-const LanguageSwitcher: React.FC = () => {
+/** Four languages in the space of one: a small menu, or a row in the phone menu. */
+const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ tone = 'dark', inline = false }) => {
   const { locale, setLocale } = useI18n();
-  const [selectedCode, setSelectedCode] = useState<Locale>(locale);
-  useEffect(() => setSelectedCode(locale), [locale]);
-  const selected = DIRECTIONS.find((item) => item.code === selectedCode) ?? DIRECTIONS[0];
-  const compassBackground = FLAG_BACKGROUNDS[selectedCode] ?? FLAG_BACKGROUNDS.en;
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  const current = LANGUAGES.find((item) => item.code === locale) ?? LANGUAGES[0];
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = (event: MouseEvent) => {
+      if (!box.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false);
+    window.addEventListener('mousedown', close);
+    window.addEventListener('keydown', escape);
+    return () => {
+      window.removeEventListener('mousedown', close);
+      window.removeEventListener('keydown', escape);
+    };
+  }, [open]);
+
+  if (inline) {
+    return (
+      <div className="flex items-center gap-1.5" role="group" aria-label="Language">
+        {LANGUAGES.map((language) => (
+          <button
+            key={language.code}
+            type="button"
+            onClick={() => setLocale(language.code)}
+            aria-pressed={language.code === locale}
+            className={`rounded-[3px] px-3 py-2 font-condensed text-sm font-bold tracking-[0.14em] transition ${
+              language.code === locale ? 'bg-ink text-paper' : 'bg-white text-ink ring-1 ring-ink/10 hover:bg-paper-warm'
+            }`}
+          >
+            {language.short}
+          </button>
+        ))}
+        <SoundToggle />
+      </div>
+    );
+  }
 
   return (
-    <div className="language-compass" aria-label="Language and sound controls" style={{ background: compassBackground }}>
-      <span className="compass-rings" aria-hidden="true" />
-      <span className={`compass-needle compass-needle-${selected.direction}`} aria-hidden="true" />
-      {DIRECTIONS.map((language) => (
-        <button
-          key={language.code}
-          type="button"
-          title={language.name}
-          aria-label={`Switch language to ${language.name}`}
-          aria-pressed={selectedCode === language.code}
-          onClick={() => {
-            setSelectedCode(language.code);
-            setLocale(language.code);
-          }}
-          className={`compass-language compass-language-${language.direction} ${selectedCode === language.code ? 'active' : ''}`}
-        >
-          {language.short}
-        </button>
-      ))}
-      <div className="compass-sound" title="Sound effects"><SoundToggle /></div>
+    <div ref={box} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`Language: ${current.name}`}
+        className={`inline-flex h-9 items-center gap-1 rounded-[3px] px-2.5 font-condensed text-[0.85rem] font-bold tracking-[0.14em] transition ${
+          tone === 'light' ? 'text-white ring-1 ring-white/40 hover:bg-white/10' : 'text-ink ring-1 ring-ink/15 hover:bg-paper-warm'
+        }`}
+      >
+        {current.short}
+        <HiChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-11 z-50 w-44 overflow-hidden rounded-md bg-white py-1 shadow-ink-lg ring-1 ring-ink/10">
+          <ul role="listbox" aria-label="Language">
+            {LANGUAGES.map((language) => (
+              <li key={language.code}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={language.code === locale}
+                  onClick={() => {
+                    setLocale(language.code);
+                    setOpen(false);
+                  }}
+                  className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-sm font-semibold transition hover:bg-paper ${
+                    language.code === locale ? 'text-ink' : 'text-ink-soft'
+                  }`}
+                >
+                  <span>{language.name}</span>
+                  <span className="font-condensed text-xs font-bold tracking-[0.16em] text-gold-dark">{language.short}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center justify-between border-t border-ink/10 px-4 py-2 text-xs font-semibold text-ink-soft">
+            <span>FX</span>
+            <SoundToggle />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

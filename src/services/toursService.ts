@@ -36,6 +36,10 @@ interface RawService {
   images?: RawImage[];
   image?: string;
   transferRoutes?: RawTransferRoute[];
+  /** Optional catalogue facets: categories, departure point, length. */
+  tags?: string[];
+  destination?: string;
+  duration?: string;
 }
 
 export interface PricingOption {
@@ -58,6 +62,14 @@ export interface Tour {
   pricingOptions: PricingOption[];
   details: ServiceDetails;
   transferRoutes?: TransferRoute[];
+  /**
+   * Facets a site may keep with a tour — its categories ("water",
+   * "adventure"…), where it departs from and how long it lasts. Optional, and
+   * written back untouched, so a site that never sets them loses nothing.
+   */
+  tags?: string[];
+  destination?: string;
+  duration?: string;
 }
 
 const extractAmountFromPrice = (price: string): number | null => {
@@ -161,6 +173,9 @@ const normalizeService = (
       images: detailImages.length > 0 ? detailImages : [image],
     },
     transferRoutes,
+    ...(Array.isArray(rawService.tags) ? { tags: rawService.tags.map((tag) => String(tag).trim()).filter(Boolean) } : {}),
+    ...(rawService.destination ? { destination: String(rawService.destination).trim() } : {}),
+    ...(rawService.duration ? { duration: String(rawService.duration).trim() } : {}),
   };
 };
 
@@ -226,6 +241,9 @@ const serializeToursForSave = (services: Tour[]): RawService[] =>
       role: `detail_${index + 1}`,
       localPath: toLocalPath(image),
     })),
+    ...(service.tags?.length ? { tags: service.tags } : {}),
+    ...(service.destination ? { destination: service.destination } : {}),
+    ...(service.duration ? { duration: service.duration } : {}),
   }));
 
 const serializeTransportForSave = (services: Tour[]): RawService[] =>

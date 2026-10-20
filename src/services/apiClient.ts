@@ -106,6 +106,7 @@ const LOCALIZED_RESOURCES = new Set([
   'intro-story',
   'story-nodes',
   'translations',
+  'site-pages',
 ]);
 
 const bundledPath = (resource: string, locale?: string | number | boolean) => {

@@ -1,734 +1,1397 @@
 [
   {
-    "title": "Isla Saona: Das gefundene Paradies",
-    "description": "Erlebe die ultimative Karibik-Auszeit mit einem abwechslungsreichen Katamaran- und Speedboot-Abenteuer zur Isla Saona. Spür die Meeresbrise, während du zum berühmten Naturpool im Nationalpark Cotubanamá segelst — einem der größten der Welt, in dessen kristallklarem Wasser riesige Seesterne leben. \n\nWas macht Saona VIP besonders? Wir machen die Fahrt zum Fest, mit Unterhaltung an Bord und einem Premium-Erlebnis am Strand Abanico.\n\n**Dauer:** 10 Stunden\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Speedboot- und Katamaranfahrt mit Open Bar (Rum, Softdrinks und Wasser)\n• 3 Stunden auf der Isla Saona, mit Baden im Naturpool und 2 Stunden Entspannung am Strand Abanico\n• Reservierter VIP-Bereich am Strand Abanico mit eigenen Sonnenliegen\n• Großes Buffet mit Gegrilltem, frischem Fisch und einheimischen Beilagen\n• Zertifizierter, professioneller Reiseleiter",
+    "title": "Ausflug zur Insel Saona",
+    "description": "**Dein karibischer Traumurlaub – nur eine Bootsfahrt entfernt.** Segle zur **Insel Saona**, einem Juwel der Dominikanischen Republik inmitten der geschützten Gewässer des **Nationalparks Cotubanamá**. Mit puderweißen Sandstränden, türkisfarbenem Wasser und hoch aufragenden Kokospalmen bietet Saona das ultimative Tropenerlebnis – wie direkt aus einer Postkarte.\n\n### Was dich erwartet\n\nAb Bayahibe bringt dich dieses Ganztagesabenteuer zur **größten Insel** der Dominikanischen Republik – einem ruhigen Paradies von über 110 km². Ob du entspannen, entdecken oder schnorcheln möchtest: Hier kommt jeder Reisetyp auf seine Kosten.\n\n**Katamaran- & Speedbootfahrt** — Genieße zwei traumhafte Überfahrten – eine gemütlich, eine rasant – zur Insel und zurück.\n\n**Stopp am Naturpool** — Wate durch seichtes, kristallklares Wasser, das für seine riesigen Seesterne bekannt ist. Ein Moment wie gemalt!\n\n**Strandzeit** — Relaxe unter Palmen, schwimm im warmen Karibischen Meer oder schlendere an der unberührten Küste entlang.\n\n**Unterwasserwelt** — Schnorchle in ruhigem Wasser und entdecke farbenprächtige Korallenriffe und tropische Fische.\n\n**Mittagessen auf der Insel** — Lass dir ein köstliches dominikanisches Buffet direkt am Strand schmecken. Eine Open Bar ist inklusive!\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Bayahíbe\n\n**Preise:** Erwachsene (ab 11 Jahren) $65 · Kinder $40 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Hin- und Rücktransfer ab Hotel\n• Katamaran- und Speedbootfahrt hin und zurück\n• Stopp am Naturpool\n• Strandzeit auf der Insel Saona\n• Mittagsbuffet und Open Bar\n• Unterhaltung und Musik an Bord\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
     "pricing": [
       {
-        "tier": "Personen",
-        "price": "$60"
+        "tier": "Persons",
+        "price": "$65"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210651/tours/e0xfwsbpvqkwazqsfyxw.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210653/tours/qwgf9q8xec2qt8saq7sk.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210654/tours/xl9ckoxgzkgyhlpmr2yn.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210667/tours/lyqzwly5dynftyslzwfz.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/4.webp"
       },
       {
         "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210682/tours/jlifyu3ytncusfwx90je.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/5.webp"
       },
       {
         "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210699/tours/xriitjksxd1nbdtdxcgo.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/6.webp"
       },
       {
         "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210721/tours/zzmzbl2qtgexpkiqqcsf.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/7.webp"
       },
       {
         "role": "detail_8",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210733/tours/rnpsphrheac8wvmbrhs1.webp"
+        "localPath": "imgs/edt/tours/saona-island-tour/8.webp"
       },
       {
         "role": "detail_9",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210738/tours/ti6ev1udhkdakbljolbf.webp"
-      },
-      {
-        "role": "detail_10",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210748/tours/yvxdyng7ruy1ardelsxo.webp"
-      },
-      {
-        "role": "detail_11",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210766/tours/dw4x04f9ls2bcs3nk7hn.webp"
-      },
-      {
-        "role": "detail_12",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210773/tours/cqagwsw2bwrkuemqqjy2.webp"
-      }
-    ]
-  },
-  {
-    "title": "Isla Saona Exklusiv: Das Hummer-Festmahl",
-    "description": "Mach dein Inselerlebnis noch besonderer mit unserem luxuriösesten Saona-Paket. Du bekommst alles aus unserer klassischen Tour plus hochwertige Extras für Genießer und alle, die es bequem mögen.\n\n**Inklusive:**\n• Transfer von Tür zu Tür ab dem Hotel\n• Katamaran-Party mit Live-Unterhaltung und Open Bar\n• 3 Stunden auf der Insel mit Besuch des Naturpools und des Strandes Abanico\n• Exklusiver VIP-Strandbereich mit Sonnenliegen in der ersten Reihe\n• **Premium-Extras:** Eiskaltes Presidente-Bier und ein ganzes Pfund (0,45 kg) frisch gegrillter Hummer\n• Gourmet-Buffet mit verschiedenen Fleischsorten, Fisch und Getränken\n• Erfahrener, zertifizierter Guide",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$119"
+        "localPath": "imgs/edt/tours/saona-island-tour/9.webp"
       }
     ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210929/tours/wdbnry7sqerywcysm85x.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210948/tours/umadvucfetuxkdrvf0ni.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210961/tours/fybff3pkkijbjaibhzzn.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774210991/tours/umtaxp9lowgndbxtu6ea.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211000/tours/n9joghxxbcqby55mj35d.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211037/tours/jj14ch303fsimmtzuljo.webp"
-      },
-      {
-        "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211037/tours/ijbpwqfopt6hsp2oudpr.webp"
-      },
-      {
-        "role": "detail_8",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211048/tours/bdzka8kplra7uuzvr6sg.webp"
-      },
-      {
-        "role": "detail_9",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211057/tours/i0esqaj7nrdrasl0pt2r.webp"
-      },
-      {
-        "role": "detail_10",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211069/tours/qn2mhz6lky8j8y5ztjdq.webp"
-      },
-      {
-        "role": "detail_11",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211075/tours/uaplnpbweafwmuy4kqtv.webp"
-      },
-      {
-        "role": "detail_12",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774211086/tours/ezyn1zvzi1rmuv7fsudo.webp"
-      }
-    ]
-  },
-  {
-    "title": "Catalina Exklusiv: Schnorchel- und Riff-Abenteuer",
-    "description": "Wenn du davon träumst, die bunte Unterwasserwelt zu erkunden, ist die Isla Catalina dein Ziel. Anders als bei anderen Touren stehen hier die spektakulären Korallenriffe rund um dieses Juwel der Karibik im Mittelpunkt. Tauch ins türkisfarbene Wasser, bestaune ein Kaleidoskop tropischer Fische und entspann dich danach am unberührten weißen Sandstrand.\n\n**Dauer:** 12 Stunden\n\n**Inklusive:**\n• Bequeme Abholung und Rückfahrt zum Hotel\n• Besuch eines Ladens mit einheimischem Kunsthandwerk\n• Malerische Bootsfahrt zur Insel (ca. 25 Min.)\n• Erfrischungen an Bord\n• Mittagsbuffet am Strand mit Getränken\n• Professionelle Schnorchelausrüstung (Maske, Schnorchel und Schwimmhilfe)",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$70"
-      }
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
     ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213231/tours/awhlnbguojfhbh52aulz.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213274/tours/dkjcvpoeuswqx6stm0ed.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213293/tours/n1trnpgbtdpupnofjkme.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213333/tours/hmvocs7l5soiq4av6wde.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213346/tours/kadhsxch4imywscxcdr7.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213358/tours/bdiyg2pobccfl7ouvuqw.webp"
-      }
-    ]
+    "destination": "Bayahíbe",
+    "duration": "9 Stunden"
   },
   {
-    "title": "Partyboot Bávaro: Tanzen auf den Wellen",
-    "description": "Mach das Meer zu deiner Tanzfläche! Feier die lebendigste Party in Punta Cana, während wir an der Küste von Bávaro entlangfahren. Tanz zu den neuesten Hits, schnorchle zwischen tropischen Fischen und genieß mitten im Meer am Naturpool einen Cocktail.\n\n**Dauer:** 4 Stunden\n\n**Inklusive:**\n• Klimatisierter Hin- und Rücktransfer zum Hotel\n• Moderner Katamaran mit Premium-Open-Bar\n• Mitreißende Musik und Unterhaltung\n• Badestopp am Naturpool\n• Geführtes Schnorcheln, Ausrüstung inklusive",
+    "title": "Dorado Park",
+    "description": "**Dorado Park Punta Cana – Familienspaß für alle**\nFreu dich auf einen Tag voller Lachen, Spiele und unvergesslicher Erinnerungen im Dorado Park Punta Cana, einem der beliebtesten Freizeitziele für Familien mitten in Bávaro. Ob mit Kindern, Freunden oder einem ganz besonderen Menschen – dieser Park verbindet Spaß und Entspannung in einer sicheren, farbenfrohen Umgebung.\n\n**Was dich erwartet**\nDer Dorado Park steckt voller aufregender Attraktionen für jedes Alter: Liefere dir Go-Kart-Rennen mit deinen Freunden, spring auf Bungee-Trampolinen hoch hinaus, dreh ein paar Runden im klassischen Autoscooter, tob dich in aufblasbaren Spielwelten aus, probier die Arcade-Spiele oder besuche die zutraulichen Tiere im Mini-Zoo. Hier findet jeder Abenteurer etwas.\n\n**Dauer:** 8 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $129 · Kinder (3–11 Jahre) $65 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Eintritt in den Dorado Park Punta Cana\n• Zugang zu den Attraktionen je nach gewähltem Paket\n• Spaßige Aktivitäten für Kinder und Erwachsene\n• Sicherheitsausrüstung für Fahrgeschäfte und Spiele\n• Betreuung durch Personal vor Ort\n• Speisen und Getränke vor Ort käuflich erhältlich\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Bequeme Kleidung\n• Handtuch\n• Sonnenbrille\n• Sonnencreme\n• Etwas Bargeld für Trinkgeld oder Snacks",
     "pricing": [
       {
-        "tier": "Personen",
-        "price": "$50"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213524/tours/uiurdhaiowr8nxctaije.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213534/tours/dipmxffmk416f8fkljfp.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213566/tours/ikjoznzy67t5rftsv4eh.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213583/tours/uyvhipsaqgblsbrdaxhp.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213599/tours/w7unjwh9fl7dkzqwkyit.webp"
-      }
-    ]
-  },
-  {
-    "title": "Montaña Redonda: Aussicht und Genuss",
-    "description": "Entdecke den fotogensten Gipfel der Dominikanischen Republik. 300 Meter über der Nordostküste bietet die Montaña Redonda einen atemberaubenden 360-Grad-Panoramablick. Schaukle über den Rand der Welt und genieß auf dem Gipfel ein traditionelles Essen.\n\n**Dauer:** 4–5 Stunden\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Aufregende Auffahrt zum Gipfel im Safari-Truck\n• Zugang zu den berühmten „fliegenden“ Besen und Hängematten\n• Traditionelles dominikanisches Mittagessen mit Aussicht\n• Freie Zeit zum Fotografieren\n• Besuch eines Ladens in Macao und des Strandes",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$90"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213741/tours/bdqqfq9bi6qml7zr5hsv.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213780/tours/jhavh718qvg9mxtsldmd.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213788/tours/nnqfnmtyzrsb0myaf0n0.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213794/tours/qigdcyuo5dfwvy6swdrk.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213803/tours/xzutnhvtfmhwxdjtbxzc.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213811/tours/vunz38axfhuas1zzmpkx.webp"
-      }
-    ]
-  },
-  {
-    "title": "Evolution Buggies: Offroad-Abenteuer",
-    "description": "Mach dich auf Schlamm gefasst! Diese Offroad-Tour führt dich mitten durch das dominikanische Hinterland. Steuere deinen eigenen Buggy über holprige Pisten, erkunde die versteckte Cenote der Höhle von Macao und erfrisch dich zum Schluss am weltberühmten Strand von Macao.\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Geländebuggy und Sicherheitsausrüstung\n• Baden in einer natürlichen unterirdischen Höhle\n• Besuch einer traditionellen Plantage (Kakao, Kaffee, Tabak)\n• Zeit zum Entspannen am Strand von Macao",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$50"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213927/tours/uo9idcqzjhikdmxzhdpe.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213942/tours/uik0zhnwps9js4h0r8oh.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213946/tours/louqkw4hsnkpyrpya61s.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213951/tours/ww7dqyjxjlcqab0ionpr.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213969/tours/oucryu99vftmp9bt1hen.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213977/tours/agreqpiokb5quzjl8mbu.webp"
-      },
-      {
-        "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774213995/tours/dqgpvgfyixrijhcn7gju.webp"
-      },
-      {
-        "role": "detail_8",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214000/tours/wq7tpdf4lvmuxyjoivhn.webp"
-      }
-    ]
-  },
-  {
-    "title": "Santo Domingo: Die erste Stadt",
-    "description": "Reise zurück in der Zeit in die älteste Stadt Amerikas. Spaziere über das Kopfsteinpflaster der Kolonialzone, besuche den Palast des Sohnes von Christoph Kolumbus und bestaune die erste Kathedrale, die je in der Neuen Welt gebaut wurde. Ein tiefer Einblick in Seele und Geschichte der Dominikanischen Republik.\n\n**Dauer:** 10 Stunden\n\n**Inklusive:**\n• Privater, klimatisierter Transport\n• Eintritt zu allen wichtigen Denkmälern und zum Höhlenpark „Los Tres Ojos“\n• Führungen durch den Alcázar de Colón und die Kathedrale\n• Besuch des Schokoladenmuseums und von Schmuckwerkstätten (Bernstein & Larimar)\n• Traditionelles dominikanisches Mittagessen mit Getränken\n• Vollständige Haftpflichtversicherung",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$70"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214830/tours/saoqvsm2gzr6omj8tlcu.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214847/tours/idxr5lfjdhh0m7l438me.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214877/tours/znnjsc1gkesfgtosotev.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214884/tours/gu6inhhwlm2xd6uooqhz.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214896/tours/ox2sxy9ip5cvll9u1usa.webp"
-      }
-    ]
-  },
-  {
-    "title": "Kultur-Safari: 4x4-Tour durchs Hinterland",
-    "description": "Verlass das Resort und erlebe die echte Dominikanische Republik. In unseren offenen 4x4-Trucks besuchst du einheimische Schulen, Bergplantagen und Familien-Ranches. Eine Reise voller Geschmack, Kultur und atemberaubender Landschaften — ideal für jedes Alter.\n\n**Dauer:** 8 Stunden\n\n**Inklusive:**\n• Transport im Safari-Truck\n• Lehrreiche Führungen über Kaffee-, Kakao- und Tabakfarmen mit Verkostung\n• Besuch der Basilika von Higüey und des örtlichen Marktes\n• Traditionelles Mittagessen auf der Ranch und Baden im Fluss Maimón\n• Malerischer Ausritt auf tropischen Pfaden\n• Strandzeit am Strand von Macao\n• Open Bar und Mittagsbuffet",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$90"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774214989/tours/ac8n9ohhayyjprq7szqn.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774215022/tours/awqrcxsirkvpdjhm3z2q.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774215029/tours/ardckymg8vqh6iewvq2v.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774215035/tours/am84esjc3cmr1ugajrpw.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774215043/tours/hlvzmyu9c3n83sbf3e5a.webp"
-      }
-    ]
-  },
-  {
-    "title": "Speedboot- und Schnorchel-Abenteuer",
-    "description": "Sei Kapitän deines eigenen Abenteuers! Steuere dein eigenes Speedboot über das türkisfarbene Wasser von Bávaro. Auf den rasanten Nervenkitzel folgt entspanntes Schnorcheln an einem geschützten Korallenriff voller tropischer Fische.\n\n**Inklusive:**\n• Stündliche Hoteltransfers für maximale Flexibilität\n• Eigenes Speedboot (eins pro Paar)\n• Professionelle Schnorchelausrüstung\n• Stopp am Naturpool von Bávaro für ein erfrischendes Bad im Meer\n• Erfahrener Guide im Führungsboot",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$80"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216232/tours/fadp6ka0fejf3iqffy0k.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216241/tours/ceiossq7xq5drbjowqtl.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216270/tours/mmc2cytfyjqvuu23bwic.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216276/tours/btgcpdbvey49md0gyy2h.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216281/tours/snvnzd6xkalxy8fjaoxk.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216287/tours/sxngitob8ynfvmc5fuhi.webp"
-      },
-      {
-        "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216307/tours/d7c0zcj3m33uxnmngjdr.webp"
-      },
-      {
-        "role": "detail_8",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216315/tours/xclhakvixxfidjt87kj4.webp"
-      },
-      {
-        "role": "detail_9",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216329/tours/d8pxdck4ygu9s9hf3cl0.webp"
-      },
-      {
-        "role": "detail_10",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216339/tours/juulcgvabzn0bvw15ivy.webp"
-      },
-      {
-        "role": "detail_11",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216345/tours/xykte6udo1ujuzffdvbh.webp"
-      },
-      {
-        "role": "detail_12",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774216351/tours/csf4fr4am8xfut5u1lgq.webp"
-      }
-    ]
-  },
-  {
-    "title": "Parasailing: Abenteuer hoch am Himmel",
-    "description": "Bereit für die ultimative Vogelperspektive? Schwebe hoch über der Küste von Punta Cana und erlebe den herrlichen Kontrast zwischen türkisfarbenem Meer und weißem Sand. Sicher, aufregend und absolut unvergesslich — so siehst du die Insel am schönsten.\n\n**Dauer:** 25 Minuten\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Speedbootfahrt zur Flugzone\n• Komplette Sicherheitsausrüstung und zweisprachige Einweisung\n• Parasailing-Flug in großer Höhe",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$80"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "imgs/tours/tour_parasail_detail_7.jpg"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "imgs/tours/tour_parasail_detail_8.jpg"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "imgs/tours/tour_parasail_detail_9.jpg"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "imgs/tours/tour_parasail_detail_10.jpg"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "imgs/tours/tour_parasail_detail_11.jpg"
-      }
-    ]
-  },
-  {
-    "title": "Coco Bongo: Die beste Party der Welt",
-    "description": "Das ist nicht einfach ein Club — es ist ein Spektakel der Weltklasse. Mit über 15 aufwendig produzierten Shows pro Nacht, mit Akrobaten, Tribute-Künstlern und Effekten wie im Kino, ist das Coco Bongo ein Feuerwerk für alle Sinne. Wer das legendäre Nachtleben der Karibik erleben will, ist hier richtig.\n\n**Dauer:** 5 Stunden\n\n**Inklusive:**\n• Eintrittskarte und Hin- und Rücktransfer zum Hotel\n• Zugang zu allen Shows und zur Unterhaltung\n• Getränkepakete je nach gewählter Ticketkategorie",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$90"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221689/tours/n8goxbgpt68izjvdiixh.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221695/tours/fvxqvo86awvwizb64aes.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221702/tours/yjldh8izclmarnvk5tvy.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221708/tours/sm02pdbkzkocf935vxmc.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221724/tours/opocyvlauzboqjcjqn9o.webp"
-      }
-    ]
-  },
-  {
-    "title": "Imagine: Party in einer Höhle",
-    "description": "Steig hinab in die Erde für eine Nacht, die du nie vergisst. Das Imagine ist eine riesige natürliche Höhle, verwandelt in einen hochmodernen Nachtclub. Mit verschiedenen Räumen für unterschiedliche Musikrichtungen und einer Akustik, wie sie nur eine Höhle bietet, ist es der außergewöhnlichste Partyort in Punta Cana.\n\n**Dauer:** 4 Stunden\n\n**Inklusive:**\n• Eintritt in den Höhlen-Nachtclub\n• Hin- und Rücktransfer zum Hotel\n• Open Bar (die ganze Nacht), je nach Ticketart\n• Live-DJ-Sets und Unterhaltung",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$85"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221853/tours/phgqpjshey4mwxoevbtg.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221859/tours/lrtpfoqmceicbmfg29qx.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221948/tours/s6ofe4auifoyrugp2err.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221958/tours/s91ardtvvuprwmd6pyjk.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221971/tours/utmudtdmawweevuov9qy.webp"
-      },
-      {
-        "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774221998/tours/ep57r3lvanurnt7f0nqx.webp"
-      }
-    ]
-  },
-  {
-    "title": "Monkeyland: Begegnung mit Totenkopfäffchen",
-    "description": "Komm den charmantesten Bewohnern des dominikanischen Dschungels ganz nah. Im Monkeyland springen dir zutrauliche Totenkopfäffchen auf die Schultern und fressen dir aus der Hand. Ein herzerwärmendes Erlebnis für Naturfreunde und Familien.\n\n**Dauer:** 4 Stunden\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Führung durch das Affenschutzgebiet\n• Lehrreicher Vortrag über Gewohnheiten und Lebensraum der Affen\n• Verkostung von einheimischem Bio-Kaffee, Schokolade und Obst",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$110"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222121/tours/gojo9pqg3l0kftfafvx4.webp"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222128/tours/ri5arfiwivvdrfxezjq9.webp"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222145/tours/isifdkfclpkpzuewcl1j.webp"
-      },
-      {
-        "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222219/tours/ahsy4rbptrs9oo4yc095.webp"
-      },
-      {
-        "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774222228/tours/lfdgfqbrnardl4ofied5.webp"
-      }
-    ]
-  },
-  {
-    "title": "Scape Park: Naturabenteuerpark",
-    "description": "Weck den Entdecker in dir im Scape Park. Vom Flug über die Baumwipfel an der Seilrutsche bis zum Bad im versteckten türkisblauen Wasser der Cenote „Hoyo Azul“ bietet dieser Park die perfekte Mischung aus Adrenalin und Naturschönheit.\n\n**Dauer:** 4–5 Stunden\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Tagesticket für die Attraktionen des Parks\n• Zweisprachige Guides, die dich durch den Park begleiten",
-    "pricing": [
-      {
-        "tier": "Personen",
+        "tier": "Persons",
         "price": "$129"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279279/tours/yobk3cxbzzim4k7rna52.webp"
+        "localPath": "imgs/edt/tours/dorado-park/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279327/tours/svelzgcoqb7ib3rb7sj0.webp"
+        "localPath": "imgs/edt/tours/dorado-park/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279334/tours/s3ygfpluwqi6k2rgqimz.webp"
+        "localPath": "imgs/edt/tours/dorado-park/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279343/tours/vjdhftpkulaehfbzhplt.webp"
+        "localPath": "imgs/edt/tours/dorado-park/4.webp"
       },
       {
         "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279392/tours/vi3ustwm9nfhlaanru8x.webp"
+        "localPath": "imgs/edt/tours/dorado-park/5.webp"
       },
       {
         "role": "detail_6",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279401/tours/h0i9rnwxxrpc3lbc32xj.webp"
+        "localPath": "imgs/edt/tours/dorado-park/6.webp"
       },
       {
         "role": "detail_7",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774279428/tours/fuzbcwaslksvrkixhwtz.webp"
+        "localPath": "imgs/edt/tours/dorado-park/7.webp"
+      },
+      {
+        "role": "detail_8",
+        "localPath": "imgs/edt/tours/dorado-park/8.webp"
       }
-    ]
+    ],
+    "tags": [
+      "adventure",
+      "water",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "8 Stunden"
   },
   {
-    "title": "Zipline: Nervenkitzel über den Baumkronen",
-    "description": "Schwebe durch das üppige Blätterdach des Berges Anamuya auf einem der längsten Zipline-Parcours der Karibik. Mit 12 Seilbahnen zwischen 18 Plattformen erlebst du pures Adrenalin, umgeben von atemberaubender tropischer Natur.\n\n**Dauer:** 5 Stunden\n\n**Inklusive:**\n• Hoteltransfer im Safari-Truck\n• ACCT-zertifizierte Sicherheitsausrüstung und Instruktoren\n• Kompletter Parcours mit 12 Ziplines\n• Erfrischendes Obst und Getränke",
+    "title": "Santo-Domingo-Tour",
+    "description": "**Tauch ein in Geschichte und Kultur im Herzen der Karibik**\n\nSanto Domingo de Guzmán, die lebendige Hauptstadt der Dominikanischen Republik, ist die älteste durchgehend bewohnte Stadt Amerikas. Als Wiege der Neuen Welt ist sie eine wahre Schatzkammer voller Geschichte, Kultur und prachtvoller Kolonialarchitektur. Das historische Zentrum, die Zona Colonial, gehört zum UNESCO-Weltkulturerbe und steckt voller Zeugnisse aus dem 16. Jahrhundert. Zu den berühmtesten Sehenswürdigkeiten zählt die **Catedral Primada de América**, die erste Kathedrale, die je auf dem amerikanischen Kontinent erbaut wurde.\n\nDie Stadt ist eine pulsierende Metropole mit rund 3 Millionen Einwohnern und gliedert sich in mehrere Gemeinden, darunter Santo Domingo Este, der Distrito Nacional, Santo Domingo Oeste und Santo Domingo Norte. So modern sie sich auch entwickelt – ihre Vergangenheit ist immer zum Greifen nah.\n\n**Dauer:** 10 Stunden\n\n**Abfahrt ab:** Santo Domingo\n\n**Preise:** Erwachsene (ab 11 Jahren) $90 · Kinder (3–11 Jahre) $45 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Klimatisierter Transport\n• Zertifizierter Guide\n• Besuch der Sehenswürdigkeiten der Zona Colonial, darunter:\n• Catedral Primada de América\n• Alcázar de Colón\n• Fortaleza Ozama\n• Parque Colón und Plaza de España\n• Rundgang durch die Kopfsteinpflastergassen der Zona Colonial\n• Zeit, um lokale Märkte, Plätze und Cafés zu erkunden\n• Abholung und Rückfahrt zum Hotel\n• Softdrinks\n• Typisch dominikanisches Mittagessen\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
     "pricing": [
       {
-        "tier": "Personen",
-        "price": "$70"
+        "tier": "Persons",
+        "price": "$90"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774280946/tours/vkuwif21csjdtyfjuata.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774280976/tours/pkf4tyos3u5ymaunx1s7.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774280993/tours/ntdedp08pslcovrm2wbk.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774281010/tours/qewzvxzfpmjarma2zqmr.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/4.webp"
       },
       {
         "role": "detail_5",
-        "localPath": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1774281018/tours/zu6z15srjdddd6ceiuig.webp"
+        "localPath": "imgs/edt/tours/santo-domingo-tour/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/santo-domingo-tour/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/santo-domingo-tour/7.webp"
       }
-    ]
+    ],
+    "tags": [
+      "cultural",
+      "full-day",
+      "water"
+    ],
+    "destination": "Santo Domingo",
+    "duration": "10 Stunden"
   },
   {
-    "title": "Delfin-Begegnung: Schwimmen mit den Stars",
-    "description": "Erfüll dir einen Traum und triff die intelligentesten Bewohner des Ozeans. Genieß ein interaktives Schwimmen, bei dem du die Umarmung, den Kuss und den Händedruck eines Delfins erleben kannst. Diese lehrreiche und bewegende Begegnung ist ein Höhepunkt für jeden Gast in Punta Cana.\n\n**Dauer:** 1 Stunde\n\n**Inklusive:**\n• Transfer von deinem Resort zum Wasserzentrum\n• Geführte interaktive Begegnung mit Delfinen\n• Sicherheitseinweisung und lehrreicher Vortrag",
+    "title": "Partyboot Punta Cana",
+    "description": "Mach dich bereit zum Tanzen, Schnorcheln und Feiern an Bord des aufregendsten **Partyboots in Punta Cana** – ein unvergessliches Tropenabenteuer auf dem kristallklaren Wasser der Karibik.\n\nWir schippern an der atemberaubenden Küste entlang, umgeben von wiegenden Palmen und leuchtenden Farben. Unser energiegeladenes Animationsteam sorgt mit einem Mix aus Bachata, Merengue, Reggaeton, Salsa und internationalen Hits für beste Stimmung. Musik, Ausblicke und Energie – einfach unschlagbar!\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $95\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Katamaranfahrt entlang der Küste von Punta Cana\n• Schnorcheln inklusive Ausrüstung\n• Stopp am Naturpool\n• Open Bar (lokale Getränke)\n• Snack an Bord\n• Zertifizierte Guides und Animationsteam\n\n**Mitbringen:**\n• Handtuch\n• Sonnenbrille\n• Sonnencreme\n• Bargeld für Trinkgeld oder Extras",
     "pricing": [
       {
-        "tier": "Personen",
+        "tier": "Persons",
+        "price": "$95"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/punta-cana-party-boat/5.webp"
+      }
+    ],
+    "tags": [
+      "water",
+      "adventure",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Buggy-Abenteuer",
+    "description": "Wähle deinen Abenteuerstil – ein unvergessliches Offroad-Erlebnis! Mach dich bereit für einen Tag voller Adrenalin auf den holprigen Pisten von Punta Cana! Mit unserem **Buggy-Abenteuer** erkundest du atemberaubende Landschaften, tauchst in die dominikanische Kultur ein und lebst deinen Abenteuergeist auf einer Offroad-Tour aus, die ihresgleichen sucht.\n\nDu fährst über schlammige Pisten, durch lebendige Dörfer und über üppig grüne Tropenpfade und besuchst faszinierende Orte wie eine **natürliche Höhle** mit kristallklarem Wasser. Zum krönenden Abschluss entspannst du am **Strand von Macao**, einem der schönsten Strände der Dominikanischen Republik.\n\nDiese Tour passt zu jedem Abenteurertyp – ob allein, zu zweit, mit der Familie oder mit Freunden. Wähle aus vier verschiedenen Fahrzeugoptionen, jede auf deine Wünsche zugeschnitten, damit dein Erlebnis unvergesslich wird:\n\n### Wähle dein Fahrzeug\n\n### 🚙 Einzel-Buggy – $85 pro Person\n\nPerfekt für alle, die den Nervenkitzel der vollen Kontrolle lieben. Fahr allein und meistere die Pisten auf eigene Faust!\n\n### 🚙 Doppel-Buggy – $60 pro Person\n\nIdeal für Paare oder Freunde, die Fahrt und Abenteuer miteinander teilen möchten.\n\n### 🚙 Familien-Buggy – $45 pro Person (bis zu 4 Personen)\n\nDie beste Wahl für Familien oder kleine Gruppen, die beim Erkunden des Hinterlands mehr Platz und Sicherheit wünschen.\n\n### 🚜 Safari-Buggy – $89 pro Person\n\nFür alle, die eine längere, intensivere Tour mit zusätzlichen Kulturstopps, Verkostungen lokaler Produkte und engerem Kontakt zu den Dorfgemeinschaften erleben möchten. Diese Variante umfasst außerdem einen **Ausritt**, ein **Zipline-Abenteuer** und **Erfrischungen** unterwegs.\n\n**Dauer:** 4 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Einzel-Buggy $85 · Doppel-Buggy (60 pro Person) $60 · Familien-Buggy $45 · Buggy + Safari $89\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Aufregende Buggyfahrt\n• Baden in einer Cenote\n• Besuch eines typischen Ladens\n• Spezialausrüstung inklusive\n• Eintritt in Domitai\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder\n• Schutzausrüstung\n• Kleidung, die schmutzig werden darf (das gehört zum Spaß dazu!)",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$85"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/adventure-boogies/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/adventure-boogies/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/adventure-boogies/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/adventure-boogies/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/adventure-boogies/5.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "half-day",
+      "water"
+    ],
+    "destination": "Punta Cana",
+    "duration": "4 Stunden"
+  },
+  {
+    "title": "Ausflug zur Insel Catalina",
+    "description": "**Ein verborgenes Juwel der Karibik.** Entdecke den Zauber der Insel Catalina – ein traumhaftes Tropenparadies direkt vor der Südostküste der Dominikanischen Republik, nahe La Romana. Berühmt für kristallklares, türkisfarbenes Wasser, puderweißen Sand und farbenprächtige Korallenriffe, ist Catalina ein Traumziel für Strandliebhaber, Schnorchelfans und alle, die einfach Ruhe und unberührte Natur suchen.\n\nDeine Reise beginnt mit einer malerischen Speedbootfahrt über das Karibische Meer. Unterwegs halten wir am atemberaubenden **Naturpool**, einer flachen Sandbank, auf der du durchs Wasser waten, einen Drink genießen und Sonne tanken kannst – ein echtes Stück Paradies!\n\nAuf der Insel Catalina erwartet dich ein **entspannter Strandtag** mit viel Zeit zum Relaxen, Schwimmen, Erkunden oder Schnorcheln an den lebendigen Riffen voller Meeresbewohner. Halte Ausschau nach bunten Tropenfischen – und vielleicht sogar nach den Überresten des legendären Schiffswracks von „Captain Kidd“!\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Bayahíbe\n\n**Preise:** Erwachsene (ab 11 Jahren) $115 · Kinder (3–11 Jahre) $60 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Speedbootfahrt hin und zurück\n• Stopp am Naturpool\n• Köstliches Mittagsbuffet auf der Insel\n• Open Bar (Bier, Rum, Wasser, Softdrinks)\n• Freizeit an Strand und Riff der Insel Catalina\n• Animationsteam und zertifizierte Guides\n• Animations- und Unterhaltungsteam\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$115"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/catalina-island-tour/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/catalina-island-tour/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/catalina-island-tour/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/catalina-island-tour/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/catalina-island-tour/5.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Bayahíbe",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Hochseeangeln",
+    "description": "Fang die Giganten der Karibik! Freu dich auf ein unvergessliches Hochseeangel-Abenteuer in einem der besten Angelreviere der Karibik – den traumhaften Gewässern vor Punta Cana. Ob du ein erfahrener Angler bist oder einfach den Nervenkitzel des Drills hautnah miterleben willst: Diese Tour bietet die perfekte Mischung aus Adrenalin und Entspannung.\n\nDu stichst ab **Cabeza de Toro oder der Marina Cap Cana** in See – beide bekannt als Austragungsorte renommierter internationaler Turniere. Hier hast du die Chance, die Giganten des Ozeans an den Haken zu bekommen – darunter **Weiße und Blaue Marline**, **Mahi-Mahi**, **Wahoo** und viele mehr.\n\n### Was wir das ganze Jahr über fangen\n\nMahi-Mahi (Dorado)\n\nWahoo\n\nFliegende Fische\n\nWeißer Marlin\n\nBlauer Marlin\n\n**Hinweis:** Wir praktizieren **Schleppangeln** mit Profi-Ausrüstung und Lebendködern – ideal für große Hochseefische.\n\n### Tour-Optionen\n\n**Angelteilnehmer:** — Sei mit der Rute in der Hand mittendrin. Die Boote bieten Platz für **6–8 Angler** pro Ausfahrt.\n\n**Beobachter/Zuschauer:** — Lehn dich zurück und genieße Fahrt, Kulisse und Spannung, ohne selbst zu angeln. Maximal **4 Zuschauer** pro Boot.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Ticket $170 · Nur Zuschauen $85\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Halbtägiger Hochseeangel-Ausflug\n• Professionelle Angelausrüstung\n• Lebendköder\n• Erfahrener Kapitän und Crew\n• Softdrinks und Wasser an Bord\n• Zuschauer-Option verfügbar (für Gäste, die nicht angeln)\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$170"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/deep-sea-fishing/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/deep-sea-fishing/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/deep-sea-fishing/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/deep-sea-fishing/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/deep-sea-fishing/5.webp"
+      }
+    ],
+    "tags": [
+      "half-day",
+      "water",
+      "adventure",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Scape Park · Komplettpaket",
+    "description": "**Abenteuer und Kultur in einem**\n\nTauch ein in ein Abenteuer, das actionreiche Aktivitäten mit einem tiefen Einblick in das kulturelle Erbe der Insel verbindet. Ob rasante Ziplines über Klippen, versteckte Höhlen oder ein Bad in unterirdischen Becken – dieses Komplettpaket für den Scape Park verspricht ein unvergessliches Erlebnis. Schwebe an Wasser-Ziplines durch die Luft, schaukle in Splash-Hängematten und entdecke die farbenprächtige Schönheit dieses grünen Paradieses. Unterwegs lernst du außerdem die reiche Geschichte und Kultur kennen, die diesen unglaublichen Ort prägen.\n\n### Was ist inbegriffen\n\nAlle Attraktionen an Land\n\nHin- und Rücktransport\n\n### Was du mitbringen solltest\n\nWasserschuhe\n\nBequeme Kleidung\n\nBadekleidung\n\nBargeld oder Karte für Essen, Getränke, Souvenirs und Fotos\n\n### Einschränkungen\n\nNicht geeignet für Menschen mit Behinderungen, Schwangere oder Personen mit schweren Erkrankungen\n\nZipline-Teilnehmer müssen mindestens 6 Jahre alt sein\n\nMaximalgewicht für die Zipline: 330 Pfund (ca. 150 kg)\n\nAlkohol und andere Rauschmittel sind nicht erlaubt\n\nEssen, Selfie-Sticks und Drohnen sind im Park nicht gestattet\n\n### Inbegriffene Attraktionen\n\n**Kulturroute**\nReise zurück in der Zeit und entdecke Nachbildungen von Häusern aus der Vergangenheit der Insel – von den Taíno-Ureinwohnern über die spanischen Konquistadoren und versklavten Afrikaner bis hin zu den dominikanischen Bauern. Diese einzigartige Verbindung von Geschichte und Natur ist eine faszinierende Art, das Erbe der Insel kennenzulernen.\n\n**Höhlenbad**\nGönn dir ein erfrischendes Bad in einer mystischen unterirdischen Quelle, die den Ureinwohnern einst heilig war. Das kühle, kristallklare Wasser schenkt dir pure Ruhe – perfekt, um wieder eins mit der Natur zu werden.\n\n**Saltos Azules**\nErlebe actionreiche Abenteuer wie die Mabo-Seilschaukel, die Macuya-Schaukel und die Monkey-Bar-Zipline. Rausche in Wasser-Hängematten durch kühles Nass, umgeben von eindrucksvollen Höhlen und Wasserfällen – erfrischend und aufregend zugleich.\n\n**Hoyo Azul**\nBestaune die atemberaubende Schönheit einer türkisfarbenen Cenote – ein Naturwunder, das das einzigartige Ökosystem der Insel zeigt. Ein unvergessliches Erlebnis, das dich direkt mit den Wundern der Natur verbindet.\n\n**Zip Line Eco Splash**\nSpür den Adrenalinkick, wenn du an acht Ziplines über die Baumwipfel entlang einer spektakulären Felsklippe fliegst. Dieses Abenteuer in luftiger Höhe ist ein Muss für alle, die den Nervenkitzel suchen.\n\n**Höhlenexpedition**\nErkunde die Unterwelt und bahne dir deinen Weg durch ein Netz aus Kammern und Tunneln mit beeindruckenden geologischen Formationen. Diese Reise in die Tiefe gewährt dir ehrfürchtige Einblicke in die verborgenen Wunder der Natur.\n\n**Iguanaland**\nTriff in dieser interaktiven Ausstellung die majestätischen Nashornleguane, die auf der Insel heimisch sind. Erfahrene Tierpfleger begleiten dich, sodass du diese faszinierenden Tiere in einem unterhaltsamen und lehrreichen Rahmen für alle Altersgruppen aus nächster Nähe erleben kannst.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $129 · Kinder (3–11 Jahre) $65 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$129"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/scape-park-full-admission/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/scape-park-full-admission/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/scape-park-full-admission/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/scape-park-full-admission/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/scape-park-full-admission/5.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Bebé-Katamaran-Tour",
+    "description": "Mach dich bereit, auf dem Wasser richtig aufzudrehen: Unsere Bebé-Catamarán-Tour ist eine halbtägige Partyfahrt für feierfreudige Reisende, die tanzen, trinken und Sonne tanken möchten, während sie an der traumhaften Küste von Punta Cana entlangsegeln.\n\nKomm an Bord unseres geräumigen Katamarans mit Live-DJ, Open Bar und einem Animationsteam, das weiß, wie man eine Party in Gang bringt. Wir gleiten durch das kristallklare Karibische Meer und halten an einem farbenprächtigen Schnorchelriff, wo du mit bunten Tropenfischen schwimmst und die Unterwasserwelt erkundest.\n\nDanach geht es zum berühmten Naturpool – einer flachen Sandbank, auf der die Party im hüfthohen, türkisfarbenen Wasser weitergeht. Schlürf deinen Lieblingscocktail, lern neue Leute kennen und schieß unvergessliche Fotos mitten im Paradies.\n\nOb Geburtstag, Junggesellinnenabschied oder einfach das Leben selbst – der Bebé Catamarán ist das ultimative tropische Partyerlebnis.\n\n**Dauer:** 4 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $90\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Katamaranfahrt mit Musik und Unterhaltung\n• Open Bar (Rum, Bier, Cocktails, Limo, Wasser)\n• Schnorchelstopp inklusive Ausrüstung\n• Stopp am Naturpool\n• Animationsteam & Live-DJ\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Sonnenschutz\n• Handtücher\n• Sonnenbrille\n• Bargeld für Trinkgeld",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$90"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/bebe-catamaran-tour/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/bebe-catamaran-tour/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/bebe-catamaran-tour/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/bebe-catamaran-tour/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/bebe-catamaran-tour/5.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "4 Stunden"
+  },
+  {
+    "title": "Bávaro Adventure Park",
+    "description": "Freu dich auf einen adrenalingeladenen Tag im **Bávaro Adventure Park**, dem ultimativen Spielplatz für Abenteuerlustige in Punta Cana. Dieses actionreiche Erlebnis ist deine Eintrittskarte zum Fahren, Rasen und Fliegen durch üppige Landschaften – an einem der aufregendsten Orte der Dominikanischen Republik.\n\nWir holen dich direkt an deinem Hotel ab und bringen dich mitten ins Geschehen. Bei der Ankunft beginnt der eigentliche Spaß! Ob du einen kraftvollen Buggy durch raues Gelände steuerst, an rasanten Ziplines über die Baumwipfel gleitest oder hoch zu Ross über malerische Pfade trabst – jeder Moment im Bávaro Adventure Park ist darauf ausgelegt, dein Herz höher schlagen zu lassen.\n\nDer Park bietet eine große Auswahl an Outdoor-Abenteuern mit Optionen für jedes Alter und jedes Wohlfühlniveau. Erkunde Naturpfade, begegne der heimischen Tierwelt und genieße die herrliche Tropenkulisse – alles in einer sicheren, professionell betreuten Umgebung.\n\nWenn du deinem Aufenthalt in Punta Cana noch mehr Nervenkitzel verleihen möchtest, darfst du dieses Erlebnis auf keinen Fall verpassen!\n\n**Dauer:** 8 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $199 · Kinder (3–11 Jahre) $110 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Buggy-Abenteuer für Speed-Fans\n• Zipline Mega Splash für den ultimativen Adrenalinkick\n• Ausritt durch wunderschöne Landschaften\n• Mittagessen\n• Baden in der Cenote Blue Lagoon\n• Genieße den Wasserfall am Dschungelfluss\n• Animation und Team für garantierten Spaß\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$199"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/bavaro-adventure-park/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/bavaro-adventure-park/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/bavaro-adventure-park/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/bavaro-adventure-park/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/bavaro-adventure-park/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/bavaro-adventure-park/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/bavaro-adventure-park/7.webp"
+      },
+      {
+        "role": "detail_8",
+        "localPath": "imgs/edt/tours/bavaro-adventure-park/8.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "full-day",
+      "water"
+    ],
+    "destination": "Punta Cana",
+    "duration": "8 Stunden"
+  },
+  {
+    "title": "Karibik-Piraten",
+    "description": "**Stich in See zu einem aufregenden Piratenabenteuer!**\n\nSegle an Bord des legendären Piratenschiffs Hispaniola, wo eine ausgelassene Piratencrew deine Reise mit Spannung und Abenteuer eröffnet. Sobald das Schiff ablegt, absolvierst du dein Piratentraining und lernst alle Kniffe, um ein echter Freibeuter zu werden. Außerdem zeigen wir dir, wie du deine Schnorchelausrüstung benutzt, denn deine erste Schatzkarten-Mission führt dich zu einem unberührten natürlichen Riff. Spring ins klare, einladende Wasser und entdecke eine unglaubliche Unterwasserwelt voller bunter Fische und atemberaubender Korallen.\n\nZurück an Bord genießt du erfrischende alkoholfreie Getränke, während die Spannung steigt. Doch die Schatzsuche ist noch nicht vorbei! Das Schiff nimmt Kurs auf Shark Island, wo der wahre Schatz wartet. Hier hast du die einzigartige Gelegenheit, mit Haien zu schwimmen und sicher mit Stachelrochen auf Tuchfühlung zu gehen – im sichersten Interaktionsprogramm der Welt. Aber Vorsicht: Abtrünnige Piraten könnten versuchen, deine Mission zu sabotieren! Mach dich bereit für spannende Schwertkämpfe, waghalsige Stunts und das ultimative Piratenerlebnis.\n\nWenn sich der Tag dem Ende neigt, feiern die Piraten ihre Beute mit einer ausgelassenen Party. Gäste und mutige neue Rekruten feiern mit, tanzen und genießen mitreißende Unterhaltung bis zum Sonnenuntergang.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $129 · Kinder (3–11 Jahre) $65 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Segeltörn an Bord der Hispaniola\n• Piratentraining und Schatzkarten-Suche\n• Schnorchelausrüstung für die Unterwasser-Erkundung\n• Schwimmen mit Haien und Stachelrochen\n• Interaktive Piratenshow\n• Alkoholfreie Getränke an Bord\n• Piratenparty mit Musik und Tanz\n• Obst, Snack, Limo, Wasser, Bier\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$129"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/caribbean-pirates/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/caribbean-pirates/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/caribbean-pirates/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/caribbean-pirates/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/caribbean-pirates/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/caribbean-pirates/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/caribbean-pirates/7.webp"
+      }
+    ],
+    "tags": [
+      "water",
+      "adventure",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Insel Catalina mit Langostinos",
+    "description": "Entdecke die ultimative Inselauszeit mit unserer Tour **Insel Catalina mit Langostinos** – einer veredelten Variante unseres klassischen Catalina-Erlebnisses. Dieser exklusive Ausflug bringt dich an die traumhaften Ufer der **Insel Catalina** vor der Südostküste der Dominikanischen Republik. Umgeben von türkisfarbenem Wasser und unberührter Natur ist die Insel bekannt für ihre **ruhigen Strände**, ihre **farbenprächtigen Korallenriffe** und ein Gefühl von **purem karibischem Glück**.\n\nWas macht diese Tour so besonders? Ein **kulinarisches Premium-Erlebnis**: ein frisch zubereitetes **Langostino-Mittagessen**, serviert direkt am Strand. Genieße die Aromen des Meeres mit **saftigen karibischen Hummerschwänzen**, perfekt gegrillt und mit Gourmet-Beilagen serviert – ein Fest für alle Sinne in unvergesslicher Kulisse.\n\nNeben dem **Schnorcheln** in kristallklarem Wasser und dem **Faulenzen** unter wiegenden Palmen legst du einen Stopp am berühmten **Naturpool** ein, schlürfst Cocktails an der **Open Bar** und genießt die **exklusive Atmosphäre** dieses luxuriösen Tagesausflugs.\n\nOb du etwas Besonderes feierst oder einfach das Beste erleben willst, was Catalina zu bieten hat – dieses Erlebnis ist gemacht, um zu beeindrucken. Und nur wenige kommen in seinen Genuss.\n\n**Dauer:** 10 Stunden\n\n**Abfahrt ab:** Bayahíbe\n\n**Preise:** Erwachsene (ab 11 Jahren) $150 · Kinder (3–11 Jahre) $75 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Speedbootfahrt\n• Stopp am spektakulären Naturpool\n• Frisches Langostino-Mittagessen (gegrillter karibischer Hummer)\n• Open Bar (lokale Getränke)\n• Zeit zum Entspannen und Genießen auf der Insel Catalina\n• Animations- und Unterhaltungsteam\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$150"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/catalina-island-langostino/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/catalina-island-langostino/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/catalina-island-langostino/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/catalina-island-langostino/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/catalina-island-langostino/5.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Bayahíbe",
+    "duration": "10 Stunden"
+  },
+  {
+    "title": "Insel Catalina · Schnorchelparadies",
+    "description": "**Ein ganztägiger Karibiktrip mit Kultur, Korallen & Komfort.** Starte dein Abenteuer mit einem Besuch im bezaubernden **Altos de Chavón**, der detailgetreuen Nachbildung eines mediterranen Dorfes aus dem 16. Jahrhundert hoch über dem Fluss Chavón. Dieses architektonische Meisterwerk, bekannt aus Filmen wie „Apocalypse Now“ und „Rambo II“, bietet atemberaubende Ausblicke und einen Eindruck von dominikanischer Kunst und Geschichte.\n\nVon dort geht es an Bord eines Katamarans durch kristallklares Wasser zur atemberaubenden **Insel Catalina**, einem der schönsten Inseljuwelen vor der Küste der Dominikanischen Republik. Nach der Ankunft erwartet dich ein unvergessliches Schnorchelerlebnis an einem der größten und farbenprächtigsten Korallenriffe der Karibik. Gleite über ein Kaleidoskop aus Tropenfischen und Meeresbewohnern – sicher und mit Guide, perfekt für Einsteiger wie für erfahrene Schnorchler.\n\nAn Land kannst du dich auf Catalinas weichem weißem Sand ausstrecken, im türkisfarbenen Meer schwimmen oder an der Open Bar einen Drink schlürfen und das Inselfeeling genießen. Ein **frisches Mittagsbuffet** am Strand macht dieses idyllische Erlebnis perfekt.\n\nOb du Abenteuer unter Wasser oder totale Entspannung suchst – diese Tour hat alles.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Bayahíbe\n\n**Preise:** Erwachsene (ab 11 Jahren) $120\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Tauchausrüstung inklusive\n• Tour durch Altos de Chavón\n• Open Bar (Wasser, Bier, Rum, Softdrinks)\n• Besuch der Insel Catalina\n• Freizeit auf der Insel\n• Animations- und Unterhaltungsteam\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
         "price": "$120"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "imgs/tours/tour_dolphin_detail_2.jpg"
+        "localPath": "imgs/edt/tours/catalina-island-snorkeling-paradise/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "imgs/tours/tour_dolphin_detail_3.jpg"
+        "localPath": "imgs/edt/tours/catalina-island-snorkeling-paradise/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "imgs/tours/tour_dolphin_detail_4.jpg"
+        "localPath": "imgs/edt/tours/catalina-island-snorkeling-paradise/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "imgs/tours/tour_dolphin_detail_5.jpg"
+        "localPath": "imgs/edt/tours/catalina-island-snorkeling-paradise/4.webp"
       },
       {
         "role": "detail_5",
-        "localPath": "imgs/tours/tour_dolphin_detail_6.jpg"
+        "localPath": "imgs/edt/tours/catalina-island-snorkeling-paradise/5.webp"
       }
-    ]
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Bayahíbe",
+    "duration": "9 Stunden"
   },
   {
-    "title": "Scuba Doo: Mit dem Unterwasser-Scooter übers Riff",
-    "description": "Kein Tauchschein, keine schwere Flasche, keine nassen Haare: Der Scuba Doo ist ein Unterwasser-Scooter mit einer klaren Luftkuppel über dem Kopf. Du atmest und sprichst ganz normal, während du ein paar Meter unter der Oberfläche über Bávaros Korallengarten gleitest.\n\n**Highlights:**\n• Kurze Fahrt mit dem Glasbodenboot hinaus zum Riff\n• Rund 15–20 Minuten am Steuer deines eigenen Scooters in etwa 3–4 Metern Tiefe, immer mit einem Tauchguide an deiner Seite\n• Papageifische, Sergeant-Majors und Hirnkorallen zum Greifen nah (bitte trotzdem nicht anfassen!)\n• Danach ein Schnorchelstopp, um dasselbe Riff von oben zu sehen\n\n**Dauer:** ca. 3,5 Stunden inklusive Hoteltransfer\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Sicherheitseinweisung auf Englisch und Spanisch\n• Scuba-Doo-Scooter mit Tauchguide an deiner Seite\n• Fahrt mit dem Glasbodenboot und Schnorchelausrüstung\n• Schwimmweste, Wasser und Softdrinks\n\n**Gut zu wissen:** Tauchen musst du nicht können – du solltest dich nur im Wasser wohlfühlen. Schwangere und Gäste mit Ohren- oder Herzproblemen fragen uns bitte vorher. Unterwasserfotos und Videos werden vor Ort gegen Aufpreis angeboten.",
+    "title": "Delfin-Begegnung",
+    "description": "**Eine magische Begegnung mit der Natur**\n\nTauch ein in ein einzigartiges Erlebnis, bei dem sich Zärtlichkeit und Abenteuer in der wunderschönen Umgebung von Punta Cana verbinden. Die Delfin-Begegnung ist ideal für Besucher jeden Alters, Schwimmkenntnisse sind nicht erforderlich. Von einer sicheren, flachen Plattform aus lernst du diese unglaublichen Tiere aus nächster Nähe kennen.\n\n### Ein Spaß für alle\n\nUnter Anleitung erfahrener Delfintrainer erfährst du Faszinierendes über Verhalten, Kommunikation und Pflege der Delfine. Beobachte, wie die verspielten Tiere schwimmen und miteinander interagieren, und genieße die unvergessliche Gelegenheit, sie zu berühren, zu begrüßen und sogar einen liebevollen Delfinkuss zu bekommen. Die Begegnung findet in natürlicher Umgebung statt und sorgt für einen sicheren, unvergesslichen Moment für die ganze Familie.\n\n**Dauer:** 3 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $199 · Kinder (1,01 m – 1,40 m) $150 · Kleinkinder (unter 1 m) kostenlos · Eintrittskarte (nur Zuschauen) $55\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Professionelle, zertifizierte Guides\n• Gießkannen für die Interaktion\n• Rettungsweste\n• Umarmung und Flossenschütteln mit dem Delfin\n• Kostenloses WLAN während des Erlebnisses\n• Schließfachgebühr: $10 USD (einlösbar für Speisen, Getränke oder Einkäufe in der Boutique)\n\n**Mitbringen:**\n• Fotos deines Delfin-Erlebnisses (gegen Aufpreis erhältlich).\n• Handtücher.\n• Speisen und Getränke.\n• Schließfachgebühr: $10 USD, die du während des Besuchs als Guthaben für Speisen und Getränke oder in der Boutique einlösen kannst.",
     "pricing": [
       {
-        "tier": "Personen",
-        "price": "$70"
+        "tier": "Persons",
+        "price": "$199"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "imgs/tours/tour_scuba_doo_detail_1.jpg"
+        "localPath": "imgs/edt/tours/dolphin-encounter/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "imgs/tours/tour_scuba_doo_detail_2.jpg"
+        "localPath": "imgs/edt/tours/dolphin-encounter/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "imgs/tours/tour_scuba_doo_detail_3.jpg"
+        "localPath": "imgs/edt/tours/dolphin-encounter/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "imgs/tours/tour_scuba_doo_detail_4.jpg"
+        "localPath": "imgs/edt/tours/dolphin-encounter/4.webp"
       },
       {
         "role": "detail_5",
-        "localPath": "imgs/tours/tour_scuba_doo_detail_5.jpg"
+        "localPath": "imgs/edt/tours/dolphin-encounter/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/dolphin-encounter/6.webp"
       }
-    ]
+    ],
+    "tags": [
+      "water",
+      "adventure",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "3 Stunden"
   },
   {
-    "title": "Hochseeangeln: Marlin, Mahi-Mahi & Wahoo vor Bávaro",
-    "description": "Nur wenige Meilen vor Bávaro fällt der Meeresboden steil ins tiefe Blau ab – und genau dort jagen die großen Sportfische. Du fährst auf einem kleinen, geteilten Angelboot mit erfahrenem dominikanischem Kapitän und Crew hinaus, die Schleppleinen gehen ins Wasser, und dann heißt es warten, bis die Rolle kreischt.\n\n**Highlights:**\n• Schleppangeln an der Abbruchkante auf Mahi-Mahi (Dorade), Wahoo, Thunfisch, Barrakuda und in der Saison Blauen und Weißen Marlin sowie Segelfisch\n• Jeder kommt an die Rute – die Crew bereitet die Köder vor und hilft beim Drill und beim Landen\n• Die Küste von Bávaro und Cabeza de Toro vom Wasser aus\n• Nur wenige Angler pro Boot, damit niemand lange warten muss\n\n**Dauer:** ca. 4 Stunden auf dem Wasser plus Hoteltransfer\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Sportangelboot mit Kapitän und Crew\n• Ruten, Rollen, Köder und Zubehör\n• Wasser, Softdrinks und einheimischer Rum\n\n**Gut zu wissen:** Einen Fang kann niemand garantieren – das ist Angeln –, aber die Crew kennt diese Gewässer. Begleitpersonen, die nicht angeln, können als Zuschauer mitfahren. Wer leicht seekrank wird, nimmt vorher am besten etwas ein: Draußen ist mehr Seegang als in der Lagune.",
+    "title": "Royal Swim mit Delfinen",
+    "description": "**Royal Swim mit Delfinen – das ultimative Delfinerlebnis. Eine Begegnung mit den beliebtesten Meeresbewohnern, die du nie vergessen wirst.** Mach deine Zeit in Punta Cana unvergesslich mit dem **Royal Swim mit Delfinen** – unserem umfassendsten und aufregendsten Delfinerlebnis für echte Meeresliebhaber. Bei diesem interaktiven Abenteuer kommst du diesen intelligenten Meeressäugern im tiefen Wasser ganz nah und erlebst herzerwärmende Nähe und mitreißende Action zugleich.\n\n### 🌊 Was dich erwartet\n\nNach einer Einweisung durch erfahrene Delfintrainer geht es ins Wasser – für eine unvergessliche 30-minütige Begegnung. Das ist kein gewöhnliches Treffen, sondern ein **dynamisches Schwimmerlebnis** mit:\n\n**Fußschub** — Spür die Kraft, wenn dich zwei Delfine an den Füßen über das Wasser schieben – ein echter Adrenalinkick!\n\n**Flossen-Ritt** — Halt dich an ihren Rückenflossen fest und gleite elegant durch die Lagune.\n\n**Verspielte Momente** — Freu dich auf Delfinküsse, Flossenschütteln, Bauchkraulen und spannende Tricks.\n\n**Lehrreicher Teil** — Unsere Meeresexperten verraten dir Faszinierendes über Verhalten, Kommunikation und Schutz der Delfine.\n\nDieses Erlebnis findet in einer großen, sicheren und natürlichen Salzwasserumgebung statt, die dem natürlichen Lebensraum der Delfine nachempfunden ist.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $199 · Kleinkinder (unter 1,00 m) kostenlos · Kinder (1,01 m – 1,40 m) $150 · Eintrittskarte (nur Zuschauen) $55\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• 30 Minuten Schwimmen und Interaktion mit Delfinen\n• Einweisung durch professionelle Trainer\n• Nutzung einer Rettungsweste\n• Zugang zu den Zuschauerbereichen für nicht schwimmende Begleitpersonen\n• Schließfächer und Duschen\n\n**Mitbringen:**\n• Fotos deines Delfin-Erlebnisses (gegen Aufpreis erhältlich). Handtücher.\n• Speisen und Getränke.\n• Rettungsweste\n• Umarmung\n• Flossenschütteln\n• WLAN\n• Schließfachgebühr: $10 USD, die du während des Besuchs als Guthaben für Speisen und Getränke oder in der Boutique einlösen kannst.",
     "pricing": [
       {
-        "tier": "Personen",
-        "price": "$120"
+        "tier": "Persons",
+        "price": "$199"
       }
     ],
     "images": [
       {
         "role": "detail_1",
-        "localPath": "imgs/tours/tour_fishing_detail_1.jpg"
+        "localPath": "imgs/edt/tours/dolphin-royal-swim/1.webp"
       },
       {
         "role": "detail_2",
-        "localPath": "imgs/tours/tour_fishing_detail_2.jpg"
-      }
-    ]
-  },
-  {
-    "title": "Bananenboot: Spritzen, Lachen, Wiederholen am Strand von Bávaro",
-    "description": "Sechs Freunde, eine riesige aufblasbare Banane und ein Motorboot, das richtig gut enge Kurven fahren kann. Das Bananenboot ist die einfachste, albernste und meistbelachte Fahrt am Strand – und sie endet fast immer damit, dass alle im warmen, türkisfarbenen Wasser landen.\n\n**Highlights:**\n• Rasante Fahrt im Schlepptau quer durch die Bucht von Bávaro, mit weit ausgeschwungenen Kurven\n• Der unvermeidliche (und optionale, wenn du dich gut festhältst) Sturz in die Karibik\n• Die ganze palmengesäumte Küste vom Wasser aus\n• Danach Zeit am Strand, um in der Sonne zu trocknen\n\n**Dauer:** ca. 15 Minuten Fahrt, insgesamt rund 2 Stunden mit Transfer und Strandzeit\n\n**Inklusive:**\n• Hin- und Rücktransfer zum Hotel\n• Bananenbootfahrt mit professionellem Bootsführer\n• Schwimmweste für alle und Sicherheitseinweisung\n• Wasser\n\n**Gut zu wissen:** Am schönsten in der Gruppe – die Banane fasst etwa 5 bis 8 Personen, und je mehr ihr seid, desto lauter wird es. Alle müssen schwimmen können, Kinder fahren mit einem Erwachsenen. Sonnenbrille und Handy bleiben am Strand: Die Banane kennt keine Gnade.",
-    "pricing": [
-      {
-        "tier": "Personen",
-        "price": "$70"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "imgs/tours/tour_banana_boat_detail_1.jpg"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "imgs/tours/tour_banana_boat_detail_2.jpg"
+        "localPath": "imgs/edt/tours/dolphin-royal-swim/2.webp"
       },
       {
         "role": "detail_3",
-        "localPath": "imgs/tours/tour_banana_boat_detail_3.jpg"
-      }
-    ]
-  },
-  {
-    "title": "Jetski-Safari: Geführte Tour entlang der Karibikküste",
-    "description": "Gas geben und die Karibik vorbeifliegen lassen: Bei dieser geführten Jetski-Safari fährst du deinen eigenen Jetski in einem kleinen Konvoi hinter einem Instruktor her – über türkisfarbenes Wasser zu einer Sandbank und einem Naturpool, die du vom Strand aus nie erreichen würdest.\n\n**Highlights:**\n• Dein eigener Jetski – allein oder zu zweit, getauscht wird beim Stopp\n• Geführter Konvoi entlang eines unbebauten Küstenabschnitts mit Fotostopps\n• Baden in einem flachen Naturpool, weit weg vom Trubel\n• Rund eine Stunde echte Fahrzeit, keine zehn Minuten im abgesperrten Viereck\n\n**Dauer:** ca. 5 Stunden insgesamt, davon etwa eine Stunde auf dem Jetski\n\n**Inklusive:**\n• Hin- und Rücktransfer vom Hotel zum Startpunkt\n• Jetski inklusive Treibstoff und Versicherung\n• Zweisprachiger Instruktor und ausführliche Sicherheitseinweisung\n• Schwimmwesten für alle\n• Wasser und Softdrinks\n\n**Gut zu wissen:** Der Preis gilt pro Jetski, für eine oder zwei Personen. Vor den Badestränden von Bávaro sind Jetskis nicht erlaubt, deshalb startet die Tour an einem Anleger in kurzer Fahrdistanz – genau deshalb ist das Wasser dort so leer. Fahren darf nur ein Erwachsener; Kinder fahren als Beifahrer mit.",
-    "pricing": [
-      {
-        "tier": "Jetski (1–2 Personen)",
-        "price": "$270"
-      }
-    ],
-    "images": [
-      {
-        "role": "detail_1",
-        "localPath": "imgs/tours/tour_jetski_detail_1.jpg"
-      },
-      {
-        "role": "detail_2",
-        "localPath": "imgs/tours/tour_jetski_detail_2.jpg"
-      },
-      {
-        "role": "detail_3",
-        "localPath": "imgs/tours/tour_jetski_detail_3.jpg"
+        "localPath": "imgs/edt/tours/dolphin-royal-swim/3.webp"
       },
       {
         "role": "detail_4",
-        "localPath": "imgs/tours/tour_jetski_detail_4.jpg"
+        "localPath": "imgs/edt/tours/dolphin-royal-swim/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/dolphin-royal-swim/5.webp"
       }
-    ]
+    ],
+    "tags": [
+      "half-day",
+      "water",
+      "adventure",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Fun Park · Viele Aktivitäten",
+    "description": "**Ein Tag voller Abenteuer und Entdeckungen**\n\nWenn du Abwechslung und Action liebst, ist dieses Erlebnis genau das Richtige für dich! Begib dich auf eine spannende Reise durch die malerischen Regionen Bávaro, Uvero Alto und Anamuya. Unsere Tour bietet eine Mischung aus Spaß und Abenteuer, die dir unvergessliche Erinnerungen beschert.\n\nLos geht’s mit einer Mini-Safari auf einem urigen Truck: Du erkundest traditionelle dominikanische Häuser und besuchst Zuckerrohr- und Kakaoplantagen – wichtige Produkte der Kultur unserer Insel. Anschließend geht es auf einen lokalen Bauernmarkt, wo du frisch zubereiteten Kaffee, Schokolade und Tabak direkt vom Erzeuger probieren kannst.\n\nWeiter geht die Action mit einer ganzen Reihe von Aktivitäten, darunter ein Zipline-Abenteuer mit 4 Strecken, ein malerischer 45-minütiger Ausritt und eine aufregende Stunde Buggyfahren über die Landstraßen. Zur Krönung genießt du ein köstliches dominikanisches Mittagsbuffet im Rancho Tours Point. Zum Schluss kühlst du dich bei einem erfrischenden 15-minütigen Bad am wunderschönen Strand von Macao ab. Lass dich vom Fun Park mitreißen und entfache deinen Abenteuergeist!\n\n**Dauer:** 4 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $169 · Kinder (3–11 Jahre) $85 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Wasser\n• Dominikanisches Mittagsbuffet.\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$169"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/fun-park-multiple-activities/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/fun-park-multiple-activities/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/fun-park-multiple-activities/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/fun-park-multiple-activities/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/fun-park-multiple-activities/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/fun-park-multiple-activities/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/fun-park-multiple-activities/7.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water"
+    ],
+    "destination": "Punta Cana",
+    "duration": "4 Stunden"
+  },
+  {
+    "title": "Stadttour Higüey",
+    "description": "Tauch mit unserer **Stadttour Higüey** in das kulturelle Herz der Dominikanischen Republik ein – eine Reise voller lebendiger Traditionen, lokalem Erbe und atemberaubender Sehenswürdigkeiten. Dieses intensive Halbtageserlebnis ist perfekt für alle, die den wahren Geist der Insel jenseits der Strände entdecken möchten.\n\nWir holen dich an deinem Hotel ab und fahren in die historische Stadt Higüey, nur eine Stunde von Punta Cana entfernt. Dein erster Stopp ist eine traditionelle dominikanische Plantage, auf der du siehst, wie Zuckerrohr und Tabak angebaut und verarbeitet werden. Außerdem besuchst du einen charmanten Kunsthandwerksladen, in dem einheimische Künstler stolz handgefertigte Souvenirs, Gemälde und Unikate präsentieren, die direkt vor Ort entstehen.\n\nWeiter geht es zur berühmten **Basilika Unserer Lieben Frau von Altagracia**, einer der heiligsten religiösen Stätten des Landes. Nimm dir Zeit, dieses architektonische Meisterwerk zu erkunden, und spüre die spirituelle Energie, die jedes Jahr Tausende Besucher anzieht.\n\nDanach geht es auf den örtlichen Lebensmittelmarkt, wo du eine Vielzahl frischer Tropenfrüchte probieren und die authentischen Klänge und Düfte des dominikanischen Alltags aufsaugen kannst. Genieße einen Panoramablick auf die **Kirche San Dionisio**, ein historisches Wahrzeichen – hier soll die Jungfrau von Altagracia zum ersten Mal erschienen sein.\n\nBevor es zurück ins Hotel geht, legen wir einen entspannten Stopp am malerischen **Strand von Macao** ein – perfekt für ein paar letzte Fotos oder um einfach die Meeresbrise zu genießen.\n\n**Dauer:** 5 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $65 · Kinder $40 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Hin- und Rücktransfer ab Hotel\n• Professioneller, zweisprachiger Guide\n• Besuch einer Zuckerrohr- und Tabakplantage\n• Eintritt in die Basilika von Higüey\n• Besuch der Kirche San Dionisio (Ansicht von außen)\n• Stopp auf einem lokalen Markt mit Obstverkostung\n• Zeit zum Souvenirshopping\n• Badestopp in Macao\n• Unterhaltung und Betreuung während der Tour\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$65"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/higuey-city-tour/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/higuey-city-tour/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/higuey-city-tour/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/higuey-city-tour/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/higuey-city-tour/5.webp"
+      }
+    ],
+    "tags": [
+      "cultural",
+      "half-day",
+      "full-day",
+      "adventure"
+    ],
+    "destination": "Punta Cana",
+    "duration": "5 Stunden"
+  },
+  {
+    "title": "Ausritt am Strand",
+    "description": "**Rauf aufs Pferd: ein traumhafter Ritt entlang der unberührten Strände von Punta Cana**\n\nErlebe den Nervenkitzel eines Ausritts entlang der atemberaubenden weißen Sandstrände von Punta Cana auf dieser malerischen und entspannten Tour. Ob du den Ritt mit deinem Lieblingsmenschen teilst oder ein Familienabenteuer daraus machst – dieser gut einstündige Ausflug führt dich an einer der schönsten Küsten der Karibik entlang.\n\nDein Abenteuer beginnt mit einer kurzen Einführung in die Grundlagen des Reitens, damit du dich wohlfühlst und startklar bist. Unsere erfahrenen Guides suchen das passende Pferd für dich aus und führen dich durch die ruhige Schönheit des **Strandes Uvero Alto**, einem der Geheimtipps von Punta Cana, fernab der überlaufenen Hotelzonen. Die sanfte Meeresbrise und die atemberaubenden Ausblicke machen diesen Ritt zu einem wahrhaft entspannten Erlebnis.\n\nOb im Schritt, im Trab oder sogar im Galopp entlang der Küste – du bist umgeben von der natürlichen Schönheit der Karibik mit ihrer üppigen heimischen Flora und Fauna. Die perfekte Gelegenheit, dich mit der Natur zu verbinden und die vielfältigen Ökosysteme dieses Tropenparadieses zu genießen.\n\nIdeal für Tierfreunde, Naturbegeisterte und alle, die eine abenteuerliche und doch ruhige Auszeit suchen: Der **Ausritt am Strand** bietet dir eine einzigartige Möglichkeit, die Schönheit von Punta Cana aus einer ganz neuen Perspektive zu erleben.\n\n**Dauer:** 3 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $80 · Kinder $40 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Ausritt am Strand Uvero Alto\n• Professioneller Guide für Sicherheit und Spaß\n• Pferd und Sicherheitsausrüstung\n• Wasser\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$80"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/horseback-ride/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/horseback-ride/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/horseback-ride/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/horseback-ride/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/horseback-ride/5.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water"
+    ],
+    "destination": "Punta Cana",
+    "duration": "3 Stunden"
+  },
+  {
+    "title": "Monkeyland Punta Cana",
+    "description": "Erlebe ein einzigartiges Abenteuer im Monkeyland Punta Cana, wo Natur, Kultur und Tierwelt zu einem fröhlichen, unvergesslichen Erlebnis verschmelzen! Diese geführte Tour bietet die perfekte Mischung aus dominikanischer Kultur und hautnahen Begegnungen mit unseren zutraulichen Totenkopfäffchen in üppiger tropischer Umgebung.\n\n### Hautnah bei den Totenkopfäffchen\n\nBetritt den natürlichen Lebensraum der Äffchen und erlebe diese neugierigen, verspielten Tiere ganz ohne Gitter. Sie springen dir fröhlich auf die Schultern, posieren für Selfies und fressen dir sogar aus der Hand – alles unter Aufsicht unseres geschulten Teams, damit das Erlebnis sicher und respektvoll bleibt.\n\n### Kulturerlebnis\n\nDeine Tour beginnt mit dem Besuch eines traditionellen dominikanischen Landhauses. Erfahre, wie einheimische Familien von dem leben, was das Land hergibt, wie sie Bio-Pflanzen anbauen und traditionelle Produkte wie Kaffee und Kakao herstellen. Dieser Teil der Tour gewährt dir einen einzigartigen Einblick in den Alltag und das Erbe der Dominikanischen Republik.\n\n### Was dich erwartet\n\nBesuch eines dominikanischen Landhauses\n\nKulturelle Vorführung von Landwirtschaft und lokalen Produkten\n\nInteraktiver Besuch bei den Totenkopfäffchen in ihrem natürlichen Lebensraum\n\nTour auf 5 Acres (rund 2 Hektar) wunderschönem Bergland\n\nAls geführte Tour mit Transport oder für Selbstfahrer buchbar (bitte beachte: Die geführte Tour hat eine feste Startzeit)\n\n**Dauer:** 5 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $95 · Kinder (3–11 Jahre) $60 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel (optional mit Transportpaket)\n• Transport im Safari-Truck (falls gewählt)\n• Eintritt ins Monkeyland und in die Kulturbereiche\n• Zertifizierte, zweisprachige Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$95"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/monkeyland-punta-cana/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/monkeyland-punta-cana/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/monkeyland-punta-cana/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/monkeyland-punta-cana/4.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water"
+    ],
+    "destination": "Punta Cana",
+    "duration": "5 Stunden"
+  },
+  {
+    "title": "Meeres-Spa & Doctor Fish",
+    "description": "**Ocean Spa Doctor Fish – das entspannendste Erlebnis der Karibik.** Eine schwimmende Wellness-Oase direkt auf dem Meer. Gönn dir ein wirklich einzigartiges Spa-Erlebnis mit dem **Dr. Fish Ocean Spa** – einer wohltuenden Reise, die Entspannung, Wellness und die friedliche Schönheit des Karibischen Meeres vereint. Perfekt für alle, die abschalten und neue Energie tanken möchten: Dieser Spa-Tag auf dem Wasser ist in Punta Cana einzigartig.\n\n### 💆 Was dich erwartet\n\nKomm an Bord eines komfortablen Katamarans, der zum Spa umgebaut wurde, und entdecke die ultimative Auszeit nur für dich.\n\n**Doctor-Fish-Therapie** — Zum Auftakt verwöhnen dich unsere freundlichen kleinen Fische mit einer Fußbehandlung und peelen deine Haut sanft – ganz natürlich und herrlich kitzelig.\n\n**Ocean Pilates** — Mach mit bei einer Bio-Pilates-Session unter Anleitung eines professionellen Trainers. Dehnen, atmen und spüren, wie deine Energie zurückkehrt.\n\n**Schwimmende Matratzen** — Lass dich auf dem Meer treiben, während dich die Wellen in tiefe Ruhe wiegen.\n\n**Körperpeeling & Massage** — Genieße ein belebendes Peeling mit natürlichen Produkten, gefolgt von einer entspannenden Ganzkörpermassage durch erfahrene Masseurinnen und Masseure.\n\n**Ionen-Detox** — Lass die Kraft der elektronischen Ionisierung Giftstoffe ausleiten, damit sich dein Körper leicht und ausgeglichen anfühlt.\n\nZum Abschluss deiner Spa-Kreuzfahrt erwartet dich ein **gesundes, leichtes Mittagessen mit erfrischenden Getränken** – während du durch türkisfarbenes Wasser gleitest.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene $169\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Gesunde Snacks und Mittagessen an Bord\n• Alkoholfreie Getränke\n• Bio-Pilates-Session\n• Doctor-Fish-Fußspa\n• Körperpeeling\n• Ganzkörpermassage\n• Ionen-Detox-Therapie\n• Zertifizierte Guides und Wellness-Profis\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$169"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/ocean-spa-doctor-fish/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/ocean-spa-doctor-fish/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/ocean-spa-doctor-fish/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/ocean-spa-doctor-fish/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/ocean-spa-doctor-fish/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/ocean-spa-doctor-fish/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/ocean-spa-doctor-fish/7.webp"
+      },
+      {
+        "role": "detail_8",
+        "localPath": "imgs/edt/tours/ocean-spa-doctor-fish/8.webp"
+      }
+    ],
+    "tags": [
+      "water",
+      "adventure",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Parasailing",
+    "description": "Flieg hoch hinaus und schwebe über das kristallklare Wasser der Karibik! Mach dich bereit für ein aufregendes Abenteuer, das den Nervenkitzel des Fliegens mit atemberaubenden Ausblicken auf die unberührten Strände von Punta Cana verbindet! **Parasailing Punta Cana** ist die ultimative Art, die wunderschöne Küste aus einer völlig neuen Perspektive zu erleben – ein unvergessliches Erlebnis für Adrenalinjunkies und Naturliebhaber gleichermaßen.\n\nDein Abenteuer beginnt mit einer kurzen, aber wichtigen Sicherheitseinweisung durch unsere erfahrenen Guides, damit du bestens auf den Flug vorbereitet bist. An Bord eines Speedboots bekommst du Gurtzeug und Fallschirm angelegt, bevor es hoch hinauf in den Himmel geht – über 100 Meter über dem Karibischen Meer! Beim Aufstieg erwarten dich Panoramablicke auf die atemberaubende Küste, weiße Sandstrände und das leuchtend türkisfarbene Meer. Vielleicht erhaschst du sogar einen Blick auf exklusive Resorts und die üppige Tropenvegetation entlang der Küste.\n\nDer Parasailing-Flug dauert in der Regel zwischen 10 und 15 Minuten – genug Zeit, um zu entspannen, die beeindruckende Szenerie zu genießen und das aufregende Gefühl des Fliegens auszukosten. Wer sich noch ein bisschen mehr Abenteuer wünscht: Manche Anbieter lassen dich kurz zum Wasser hinabsinken, bevor du wieder aufsteigst und zurückfliegst.\n\nDiese Aktivität ist ideal für **Familien**, **Paare** oder **Freunde**, die ein aufregendes und zugleich entspannendes Erlebnis teilen und die Schönheit der Dominikanischen Republik von oben genießen möchten.\n\nNach deinem Flug kehrst du aufs Boot zurück, entspannst auf dem Weg zurück an Land und lässt die unvergesslichen Momente deines Parasailing-Abenteuers Revue passieren.\n\n**Dauer:** 3 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $75 · Kinder (3–11 Jahre) $38 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Ankunft im Parasailing-Center\n• Ausrüstung\n• Landung\n• Parasailing-Flug\n• Sicherheitseinweisung\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$75"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/parasailing/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/parasailing/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/parasailing/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/parasailing/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/parasailing/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/parasailing/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/parasailing/7.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "3 Stunden"
+  },
+  {
+    "title": "Polaris VIP Punta Cana",
+    "description": "Sei dabei beim aufregenden **Polaris VIP Ride** und erlebe Offroad-Abenteuer wie nie zuvor! Dieses exklusive Erlebnis führt dich über eine atemberaubende Panoramaroute bis zu dem Punkt, an dem **das Karibische Meer auf den Atlantik trifft** – einem einzigartigen Ort namens Cabo Engaño.\n\nSpür das Adrenalin, wenn du an Bord eines leistungsstarken Polaris-Fahrzeugs über raues Gelände und Küstenpfade fährst. Diese Tour ist für alle gemacht, die eine kraftvolle Mischung aus **Abenteuer, Natur und Entspannung** suchen.\n\nNach der Fahrt kühlst du dich in unserem traumhaften **Wasserfall-Pool** ab, einer tropischen Oase mit über 400 Quadratmetern purer Ruhe. Genieße einen erfrischenden Drink, spring ins Wasser und lass dir anschließend ein **köstliches dominikanisches Mittagessen** inmitten der Natur schmecken.\n\nOb du auf Nervenkitzel aus bist oder das perfekte Foto am Meer suchst – Polaris VIP ist das ultimative Punta-Cana-Erlebnis.\n\n**Programm des Polaris VIP Ride**\n\n**Transport** — Hin- und Rücktransfer ab jedem Hotel in der Touristenzone Bávaro/Punta Cana in modernen, komfortablen Bussen mit erfahrenen Fahrern.\n\n**Sicherheitseinweisung** — Vor der Fahrt erhältst du Sicherheitshinweise und die komplette Schutzausrüstung – für ein sicheres und unbeschwertes Abenteuer.\n\n**Polaris VIP Ride** — Fahr über malerische Küstenpfade und erlebe den Nervenkitzel, Cabo Engaño zu erreichen – dort, wo sich zwei Ozeane treffen.\n\n**Wasserfall-Pool & Mittagessen** — Entspann dich nach der Fahrt in einem tropischen Wasserfall-Pool und genieße ein würziges dominikanisches Mittagessen.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $149 · Kinder (3–11 Jahre) $75 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Polaris-Aktivität (VIP-Route)\n• Besuch von Cabo Engaño\n• Zugang zum Wasserfall-Pool\n• Dominikanisches Mittagessen\n• Kostenloses Trinkwasser im gesamten Park\n• Zertifizierte Guides\n• 1 Helm pro Person\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder oder zusätzliche Einkäufe",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$149"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/polaris-vip-punta-cana/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/polaris-vip-punta-cana/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/polaris-vip-punta-cana/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/polaris-vip-punta-cana/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/polaris-vip-punta-cana/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/polaris-vip-punta-cana/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/polaris-vip-punta-cana/7.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water"
+    ],
+    "destination": "Punta Cana",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Safari-Tour",
+    "description": "### Safari-Abenteuer durch das dominikanische Hinterland\n\nEntdecke Herz und Seele der Dominikanischen Republik auf dieser intensiven Safari-Tour durch die reichen ländlichen Landschaften. Steig auf einen speziell ausgestatteten offenen Truck und fahr durch sanfte Hügel und farbenfrohes Hinterland – für einen Tag voller kultureller Entdeckungen, Naturschönheit und lokaler Genüsse.\n\nDein Abenteuer beginnt mit Besuchen auf lokalen Plantagen, wo du erfährst, wie Kaffee, Kakao und Zuckerrohr angebaut und verarbeitet werden – drei Grundpfeiler, die die Geschichte der Insel geprägt haben. Unterwegs hältst du in der lebendigen Stadt Higüey, um frische Tropenfrüchte und andere lokale Leckereien zu probieren.\n\nEin Highlight des Tages ist der Besuch bei einer dominikanischen Familie, die dich herzlich zu einer Tasse frisch gebrühtem Kaffee empfängt und dir Einblicke in den Alltag und die Traditionen der ländlichen Gemeinden der Insel gewährt.\n\nSpäter atmest du frische Bergluft, während du malerische Ranches in den Hügeln von Anamuya erkundest. Kühl dich bei einem erfrischenden Bad im Fluss Anamuya ab und genieße ein herzhaftes dominikanisches Mittagessen mit traditionellen Gerichten.\n\nDen Abschluss bildet der atemberaubende Strand von Macao, wo du auf puderweißem Sand entspannen oder ins türkisfarbene Karibikwasser springen kannst. Mit Stopps für handgerollte Zigarren und eine Zuckerrohrverkostung unterwegs bietet dieser Ausflug die perfekte Mischung aus Kultur, Natur und Entspannung.\n\n**Dauer:** 6 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $89 · Kinder $50 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Besuch der Basilika von Higüey\n• Typisch dominikanisches Mittagessen\n• Verkostung frischer Früchte\n• Besuch lokaler Plantagen\n• Besichtigung eines typischen Hauses\n• Guide und Team, die dich während der gesamten Tour begleiten\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$89"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/safari-tour/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/safari-tour/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/safari-tour/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/safari-tour/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/safari-tour/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/safari-tour/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/safari-tour/7.webp"
+      },
+      {
+        "role": "detail_8",
+        "localPath": "imgs/edt/tours/safari-tour/8.webp"
+      }
+    ],
+    "tags": [
+      "cultural",
+      "half-day",
+      "full-day",
+      "adventure"
+    ],
+    "destination": "Punta Cana",
+    "duration": "6 Stunden"
+  },
+  {
+    "title": "Samaná, Cayo Levantado & El Limón",
+    "description": "Samaná im Nordosten der Dominikanischen Republik ist ein malerisches Reiseziel, das für seine atemberaubende Natur bekannt ist. Besucher genießen herrliche Ausblicke über die Bucht von Samaná, in der sich Buckelwale während ihrer jährlichen Paarungszeit versammeln – ein überwältigendes Schauspiel, das Walbeobachter aus aller Welt anlockt.\n\nDie Tour führt dich nach **Cayo Levantado**, einer kleinen Insel mit unberührten Stränden und kristallklarem Wasser – perfekt zum Entspannen und Schwimmen. Hier kannst du die Seele baumeln lassen und die karibische Sonne an einem der ruhigsten Orte der Welt genießen.\n\n**Der Wasserfall El Limón**, eine der bekanntesten Attraktionen der Region, ist ein weiteres Highlight der Tour. Eingebettet in üppige tropische Vegetation und umgeben von unberührter Natur, lädt dieser traumhafte Wasserfall zu einem erfrischenden Bad in seinem kühlen Wasser ein.\n\n**Dauer:** 10 Stunden\n\n**Abfahrt ab:** Samaná\n\n**Preise:** Erwachsene (ab 11 Jahren) $125 · Kinder $65 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Mittagessen\n• Safari-Truck und Wasserfall El Limón\n• Erfrischendes Bad\n• Rückfahrt und typisches Mittagessen\n• Besuch von Cayo Levantado\n• Softdrinks\n• Zertifizierter Guide\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$125"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/samanacayo-levantadoel-limon/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/samanacayo-levantadoel-limon/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/samanacayo-levantadoel-limon/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/samanacayo-levantadoel-limon/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/samanacayo-levantadoel-limon/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/samanacayo-levantadoel-limon/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/samanacayo-levantadoel-limon/7.webp"
+      },
+      {
+        "role": "detail_8",
+        "localPath": "imgs/edt/tours/samanacayo-levantadoel-limon/8.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Samaná",
+    "duration": "10 Stunden"
+  },
+  {
+    "title": "Santo-Domingo-Tour · Privat",
+    "description": "Entdecke die reiche Geschichte und lebendige Kultur der dominikanischen Hauptstadt mit unserer **privaten Santo-Domingo-Tour**, die es in zwei exklusiven Varianten für kleine Gruppen von 1 bis 6 Personen gibt: **Privat Standard** und **Privat VIP**.\n\nDeine Reise beginnt mit dem Hin- und Rücktransfer ab deinem Hotel im Komfort eines privaten, klimatisierten Fahrzeugs. Du fährst in die Zona Colonial, ein UNESCO-Weltkulturerbe, in dem jahrhundertealte Architektur, Kopfsteinpflastergassen und historische Wahrzeichen auf dich warten.\n\n🟤 **Privattour (Minibus)**\nDiese Option umfasst den Transport in einem modernen privaten Minibus – perfekt für Familien oder Gruppen, die Komfort und Bequemlichkeit suchen. Dein persönlicher Guide begleitet dich zu jedem Stopp und erzählt dir Hintergründe und Geschichten, die die Stadt lebendig werden lassen.\n\n⚜️ **Private VIP-Tour (Suburban-SUV)**\nMach dein Erlebnis noch exklusiver mit unserer **VIP-Variante** und einer Fahrt in einem luxuriösen Suburban-SUV. Ideal für alle, die besonders viel Privatsphäre und Stil suchen – diese Tour bietet ein noch gehobeneres Premium-Erlebnis.\n\nWährend deiner Tour besuchst du Highlights wie den **Alcázar de Colón**, die **Catedral Primada de América**, die **Höhlen Los Tres Ojos** und den **Malecón** und vieles mehr. Außerdem genießt du ein traditionelles dominikanisches Mittagessen und hast Zeit zum Souvenirshopping auf lokalen Kunsthandwerksmärkten.\n\n**Dauer:** 10 Stunden\n\n**Abfahrt ab:** Santo Domingo\n\n**Preise:** Privat (1–6 Gäste) $700 pro Gruppe · Privat VIP (1–6 Gäste) $1,050 pro Gruppe\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Erfrischungen (Softdrinks, Wasser)\n• Privater Transport (max. 1–6 Personen)\n• Eintritt zu historischen Sehenswürdigkeiten\n• Typisch dominikanisches Mittagessen\n• Zertifizierter privater Guide\n\n**Die VIP-Version bietet zusätzlich:** private Hin- und Rückfahrt im Chevrolet Suburban, ein Premium-Mittagessen an einem exklusiven Ort und VIP-Service während des gesamten Erlebnisses.",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$700"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/santo-domingo-tour-private/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/santo-domingo-tour-private/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/santo-domingo-tour-private/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/santo-domingo-tour-private/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/santo-domingo-tour-private/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/santo-domingo-tour-private/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/santo-domingo-tour-private/7.webp"
+      }
+    ],
+    "tags": [
+      "cultural",
+      "full-day",
+      "water"
+    ],
+    "destination": "Santo Domingo",
+    "duration": "10 Stunden"
+  },
+  {
+    "title": "Ausflug zur Insel Saona · Hummer",
+    "description": "**Ein VIP-Karibiktrip mit frisch gegrilltem Hummer**. Gönn dir die ultimative Tropenauszeit mit unserem **Ausflug zur Insel Saona + Langosta** – einem luxuriösen Strandtag, der Naturschönheit, lebendige karibische Kultur und Genuss pur vereint, an einem der traumhaftesten Orte der Dominikanischen Republik.\n\nDein Abenteuer beginnt mit einer **malerischen Bootsfahrt** entlang der Südostküste mit Stopp am berühmten **Naturpool von Palmilla**, einer kristallklaren Sandbank mitten im Meer. Genieße einen erfrischenden Drink, spring ins ruhige Wasser und lass dich vom entspannten Inselfeeling treiben – umgeben von Seesternen und endlos blauem Himmel.\n\nWeiter geht es zur **Insel Saona**, wo puderweißer Sand, türkisfarbenes Wasser und wiegende Palmen auf dich warten. Entspann dich, sonn dich, erkunde die Küste oder spring ins warme Karibische Meer – die Insel gehört dir.\n\nDann folgt das Highlight deines Tages: ein **Mittagessen mit frisch gegrilltem Hummer**, direkt am Strand nur für dich zubereitet. Mit den Zehen im Sand und einem Drink in der Hand genießt du das Paradies mit Stil. Eine **Open Bar** und die gute Laune unseres herzlichen **Animationsteams** runden dieses unvergessliche Erlebnis ab.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Bayahíbe\n\n**Preise:** Erwachsene (ab 11 Jahren) $125 · Kinder (3–11 Jahre) $65 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Speedboot- oder Katamaranfahrt\n• Stopp am berühmten Naturpool von Palmilla\n• Individuelles Hummer-Mittagessen am Strand\n• Open Bar mit lokalem Rum, Bier, Softdrinks und Wasser\n• Freizeit an Strand und Meer der Insel Saona\n• Animationsteam und zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$125"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/saona-island-tour-langosta/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/saona-island-tour-langosta/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/saona-island-tour-langosta/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/saona-island-tour-langosta/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/saona-island-tour-langosta/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/saona-island-tour-langosta/6.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Bayahíbe",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Ausflug zur Insel Saona · Strand Palmilla",
+    "description": "Ab ins Paradies mit unserem Erlebnis „Insel Saona & Strand Palmilla“ – ein Tag voller Sonne, Meer und Naturschönheit an einem der berühmtesten Reiseziele der Dominikanischen Republik.\n\nDeine Reise beginnt mit einer malerischen Bootsfahrt entlang der Südostküste in Richtung Palmilla, einer atemberaubenden natürlichen Sandbank, die für ihr flaches, kristallklares Wasser und ihre lebendige Unterwasserwelt bekannt ist. Hier hast du Zeit zum Waten, Schwimmen und für einen erfrischenden Drink – wie in einem riesigen Naturpool mitten im Karibischen Meer.\n\nDanach geht es weiter zur Insel Saona, einem geschützten Naturreservat und Paradies wie aus dem Bilderbuch, berühmt für seine weißen Sandstrände, wiegenden Palmen und sein türkisfarbenes Wasser. Genieße die Zeit zum Entspannen, Sonnenbaden, Schwimmen oder einfach, um das Inselfeeling aufzusaugen. Ob du abschalten oder das perfekte Foto schießen willst – Saona macht Träume wahr.\n\nAuf der Insel erwartet dich ein köstliches dominikanisches Mittagessen, dazu Zugang zur Open Bar und Unterhaltung durch unser freundliches und erfahrenes Team. Da der Hin- und Rücktransfer ab Hotel inklusive ist, musst du dich nur noch zurücklehnen und das Abenteuer genießen.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Bayahíbe\n\n**Preise:** Erwachsene (ab 11 Jahren) $90 · Kinder (3–11 Jahre) $45 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Katamaran- oder Speedbootfahrt\n• Stopp am spektakulären Naturpool\n• Mittagessen\n• Open Bar\n• Zeit zum Entspannen und Genießen auf der Insel Saona\n• Animations- und Unterhaltungsteam\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$90"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/saona-island-tour-palmilla-beach/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/saona-island-tour-palmilla-beach/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/saona-island-tour-palmilla-beach/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/saona-island-tour-palmilla-beach/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/saona-island-tour-palmilla-beach/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/saona-island-tour-palmilla-beach/6.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Bayahíbe",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Insel Saona VIP · Privatbus",
+    "description": "Tritt ein in dein privates Paradies mit unserer VIP-Tour zur Insel Saona im Privatbus – ein Premium-Erlebnis für kleine Gruppen von 1 bis 6 Personen, die die berühmteste Insel der Dominikanischen Republik in vollem Komfort und ganz privat erkunden möchten.\n\nDein Abenteuer beginnt mit einem exklusiven Hin- und Rücktransfer in einem privaten, klimatisierten Fahrzeug – für eine entspannte Fahrt von deinem Hotel zum Abfahrtsort. Von dort geht es an Bord eines Speedboots oder Katamarans entlang der Karibikküste.\n\nDer erste Stopp ist der traumhafte Naturpool von Palmilla, wo du im flachen, türkisfarbenen Wasser schwimmen und mitten im Meer einen Drink genießen kannst. Anschließend geht es zur atemberaubenden Insel Saona, wo weißer Sand, kristallklares Wasser und wiegende Palmen auf dich warten.\n\nAls VIP-Gast genießt du einen reservierten Strandbereich, persönliche Betreuung und ein dominikanisches Mittagessen direkt am Meer. Die ideale Option für Paare, Familien oder Freunde, die ein privateres Premium-Erlebnis fernab der Massen suchen.\n\n**Optionales Extra**: Wer sich einen zusätzlichen Hauch Luxus gönnen möchte, kann das dominikanische Mittagessen gegen Aufpreis um Hummer ergänzen.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Bayahíbe\n\n**Preise:** Privatbus für deine Gruppe: $880 · mit gegrilltem Hummer zum Mittagessen $950\n\n**Inklusive:**\n• Privater Transport (1–6 Personen) in einem modernen, komfortablen Fahrzeug\n• Stopp am Naturpool von Palmilla\n• Speedboot- oder Katamaranfahrt\n• Dominikanisches Mittagessen\n• Mittagessen mit gegrilltem Hummer (gegen Aufpreis)\n• Open Bar mit lokalen Getränken\n• Zeit zum Entspannen und Genießen auf der Insel Saona\n• Animations- und Unterhaltungsteam\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$880"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/6.webp"
+      },
+      {
+        "role": "detail_7",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/7.webp"
+      },
+      {
+        "role": "detail_8",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/8.webp"
+      },
+      {
+        "role": "detail_9",
+        "localPath": "imgs/edt/tours/saona-island-vip-in-bus-privado/9.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Bayahíbe",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Speedboot & Schnorcheln",
+    "description": "Ein Abenteuer voller Adrenalin auf dem Karibischen Meer! Mach dich bereit für eine rasante Fahrt wie keine andere mit unserem Abenteuer **Speedboot & Schnorcheln**! Diese energiegeladene Aktivität verbindet den Kick einer Speedbootfahrt mit der Schönheit der farbenprächtigen Unterwasserwelt von Punta Cana. Spür den Wind in den Haaren und den Adrenalinrausch, wenn du über das kristallklare Wasser der Karibik jagst.\n\nDeine Tour beginnt mit einer aufregenden Speedbootfahrt, bei der du mit Vollgas über das offene Meer düst. Mit scharfen Kurven, Wellen und Sprüngen fühlt sich dieses Erlebnis an wie ein echtes Hochgeschwindigkeitsrennen! Die Karibikküste bildet die perfekte Kulisse für dieses Abenteuer und zeigt dir die traumhafte Umgebung von Punta Cana aus einer ganz besonderen Perspektive.\n\nNach dem Adrenalinkick legen wir eine Pause ein, um die Unterwasserwelt zu erkunden. Schnapp dir deine Schnorchelausrüstung und tauch ins türkisfarbene Wasser, um das reiche Meeresleben unter der Oberfläche zu entdecken. Ob erfahrener Schnorchler oder Neuling – so tauchst du perfekt in die Schönheit der Karibik ein.\n\nEin ideales Erlebnis für alle, die Natur, Abenteuer und Nervenkitzel in einem einzigen unvergesslichen Ausflug vereint erleben möchten.\n\n**Dauer:** 3 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $89 · Kinder (3–11 Jahre) $45\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Schnorchelausrüstung\n• Einweisung durch einen Profi\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$89"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/speed-boat-snorkel/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/speed-boat-snorkel/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/speed-boat-snorkel/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/speed-boat-snorkel/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/speed-boat-snorkel/5.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water",
+      "full-day"
+    ],
+    "destination": "Punta Cana",
+    "duration": "3 Stunden"
+  },
+  {
+    "title": "Fiestón · Insel Catalina",
+    "description": "Die Tour Fiestón Insel Catalina bietet dir die einmalige Gelegenheit, die Isla Catalina zu erkunden, die von den Ureinwohnern der Region auch Ikiita oder Toeya genannt wurde. Die traumhafte Insel liegt im Karibischen Meer südöstlich der Provinz La Romana in der Dominikanischen Republik und ist zu einem begehrten Ziel für Reisende geworden, die den authentischen Charme der Karibik erleben möchten.\n\nDie Isla Catalina ist berühmt für ihre puderweißen Sandstrände, ihr kristallklares, türkisfarbenes Wasser und ihre reiche Unterwasserwelt – ein perfekter Ort für Schnorchel- und Tauchfans. Im Rahmen der Fiestón-Tour tauchst du in die Naturwunder der Insel ein, unter anderem bei einem geführten Schnorchelabenteuer am Riff „La Pared“, auch „The Wall“ (die Mauer) genannt. Dieses Unterwasserparadies beherbergt eine große Vielfalt an bunten Korallen, Tropenfischen und farbenprächtigen Meeresbewohnern und gewährt dir unvergessliche Einblicke in das lebendige Ökosystem des Karibischen Meeres.\n\nKulturell sind die alternativen Namen der Insel, Ikiita und Toeya, von besonderer Bedeutung: Sie stammen aus der Sprache der Taíno und ehren die Ureinwohner, die die Insel einst bewohnten. Während des Ausflugs erfährst du womöglich auch mehr über die Geschichte der Insel und die Traditionen der Taíno – eine faszinierende kulturelle Ebene des Erlebnisses.\n\nAbseits des Wassers erwartet dich ein entspannter Strandtag mit Zugang zu Strandcabañas, köstlichen frischen Meeresfrüchten und mitreißender Unterhaltung mit lokaler Musik und Tanz. Die Tour Fiestón Insel Catalina bietet die perfekte Mischung aus Abenteuer, Entspannung und kultureller Entdeckung – ein unvergessliches Erlebnis für alle.\n\n**Dauer:** 9 Stunden\n\n**Abfahrt ab:** Bayahíbe\n\n**Preise:** Erwachsene $129\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Speedbootfahrt zur Insel Catalina\n• Stopp am spektakulären Naturpool\n• Köstliches Mittagessen auf der Insel\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$129"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/the-fieston-catalina-island/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/the-fieston-catalina-island/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/the-fieston-catalina-island/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/the-fieston-catalina-island/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/the-fieston-catalina-island/5.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Bayahíbe",
+    "duration": "9 Stunden"
+  },
+  {
+    "title": "Walbeobachtung in Samaná",
+    "description": "Zwischen Januar und März wird die Bucht von Samaná zur Bühne für ein überwältigendes Naturschauspiel: die Wanderung der Buckelwale. Bei unserer Walbeobachtungstour erlebst du diese Giganten der Meere, wie sie in ihrem natürlichen Lebensraum springen, planschen und singen.\n\nDein Abenteuer beginnt mit einem entspannten Transfer in die Region Samaná, gefolgt von einer malerischen Bootsfahrt in die Bucht. In Begleitung von Meeresexperten erhältst du faszinierende Einblicke in das Verhalten der Wale und genießt dabei die atemberaubende Aussicht auf die tropische Küste.\n\nDoch dieses Erlebnis ist mehr als nur Sightseeing – es ist eine Chance, der wilden Natur ganz nah zu sein. Einen Buckelwal direkt vor deinen Augen auftauchen zu sehen, ist eine Erinnerung, die dich ein Leben lang begleitet.\n\nZur Krönung beinhalten viele Touren einen Besuch auf Cayo Levantado (auch Bacardi-Insel genannt), einem karibischen Paradies mit puderweißem Sand und kristallklarem Wasser.\n\n**Dauer:** 10 Stunden\n\n**Abfahrt ab:** Samaná\n\n**Preise:** Erwachsene (ab 11 Jahren) $160 · Kinder (3–11 Jahre) $80 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Komfortabler Transport nach Samaná\n• Geführte Bootstour in der Bucht von Samaná\n• Walbeobachtung mit zertifizierten Meeresexperten\n• Leichter Snack oder Mittagessen (je nach Paket)\n• Optionaler Besuch von Cayo Levantado\n• Wasser in Flaschen und Softdrinks\n• Professionelle Guides\n\n**Mitbringen:**\n• Badekleidung\n• Handtücher\n• Sonnenbrille\n• Sonnencreme\n• Bargeld für Trinkgeld",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$160"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/whale-watching-in-samana-tour/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/whale-watching-in-samana-tour/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/whale-watching-in-samana-tour/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/whale-watching-in-samana-tour/4.webp"
+      },
+      {
+        "role": "detail_5",
+        "localPath": "imgs/edt/tours/whale-watching-in-samana-tour/5.webp"
+      },
+      {
+        "role": "detail_6",
+        "localPath": "imgs/edt/tours/whale-watching-in-samana-tour/6.webp"
+      }
+    ],
+    "tags": [
+      "full-day",
+      "water",
+      "adventure"
+    ],
+    "destination": "Samaná",
+    "duration": "10 Stunden"
+  },
+  {
+    "title": "Zipline Punta Cana",
+    "description": "Spür den Adrenalinkick, wenn du mit unserem Abenteuer **Zipline Punta Cana** über die Baumwipfel schwebst – eine aufregende Reise durch die üppigen Landschaften der Dominikanischen Republik. Mitten in den **Bergen von Anamuya** gelegen, bietet dieses Erlebnis die perfekte Mischung aus Nervenkitzel, Naturschönheit und unvergesslichen Ausblicken.\n\nDiese Tour ist für Abenteuerlustige und Zipline-Neulinge gleichermaßen gemacht und bietet eine **Reihe von Doppelseil-Ziplines**, sodass du Seite an Seite mit einem Freund oder Familienmitglied fliegen kannst. Mit Strecken von über **800 Metern Länge** und bis zu **200 Fuß Höhe** (rund 60 Meter) gleitest du über das Blätterdach des Dschungels und genießt Panoramablicke auf die umliegenden Berge und Tropenwälder.\n\nUnsere professionellen Guides sorgen von Anfang bis Ende für ein **sicheres und spaßiges** Erlebnis. Ob du deine Höhenangst besiegen willst oder auf der Jagd nach dem nächsten Kick bist – Zipline Punta Cana schenkt dir eine aufregende Auszeit, die dir den Atem raubt – im besten Sinne.\n\n**Dauer:** 5 Stunden\n\n**Abfahrt ab:** Punta Cana\n\n**Preise:** Erwachsene (ab 11 Jahren) $90 · Kinder (3–11 Jahre) $45 · Kleinkinder (0–2 Jahre) kostenlos\n\n**Inklusive:**\n• Abholung und Rückfahrt zum Hotel\n• Komplette Zipline- und Sicherheitsausrüstung\n• Wasser in Flaschen\n• Einweisung und Orientierung\n• Zertifizierte Guides\n\n**Mitbringen:**\n• Strandkleidung\n• Handtücher\n• Sonnenbrille\n• Sonnenschutz\n• Bargeld für Trinkgelder",
+    "pricing": [
+      {
+        "tier": "Persons",
+        "price": "$90"
+      }
+    ],
+    "images": [
+      {
+        "role": "detail_1",
+        "localPath": "imgs/edt/tours/zipline-punta-cana/1.webp"
+      },
+      {
+        "role": "detail_2",
+        "localPath": "imgs/edt/tours/zipline-punta-cana/2.webp"
+      },
+      {
+        "role": "detail_3",
+        "localPath": "imgs/edt/tours/zipline-punta-cana/3.webp"
+      },
+      {
+        "role": "detail_4",
+        "localPath": "imgs/edt/tours/zipline-punta-cana/4.webp"
+      }
+    ],
+    "tags": [
+      "adventure",
+      "water"
+    ],
+    "destination": "Punta Cana",
+    "duration": "5 Stunden"
   }
 ]

@@ -13,6 +13,8 @@ const RESOURCE_WITH_LOCALE = new Set([
   'intro-story',
   'story-nodes',
   'translations',
+  // About, FAQ, contact and the legal pages, for sites that keep them as data.
+  'site-pages',
 ]);
 
 /**
@@ -122,6 +124,7 @@ const FALLBACK_TO_ENGLISH = new Set([
   'story-elements',
   'intro-story',
   'story-nodes',
+  'site-pages',
 ]);
 
 const createErrorResponse = (message: string, status = 400) =>

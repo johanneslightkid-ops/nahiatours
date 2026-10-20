@@ -12,6 +12,9 @@ import { PlannerProvider } from './contexts/PlannerContext';
 import WhatsAppReturnGate from './components/WhatsAppReturnGate';
 // Asks "did the payment go through?" when a guest comes back from paying.
 import PaymentConfirmGate from './components/payment/PaymentConfirmGate';
+// "Inspire me": the full-screen show for the shop's TV. The show itself is a
+// separate chunk, fetched the first time somebody switches it on.
+import { InspireProvider } from './components/edt/inspire/InspireContext';
 
 /**
  * Every route but the home page is split out.
@@ -33,6 +36,10 @@ const ServiceDetails = lazy(() => import('./pages/ServiceDetails'));
 const AdminTransport = lazy(() => import('./pages/AdminTransport'));
 const PlanMyDay = lazy(() => import('./pages/PlanMyDay'));
 const Cart = lazy(() => import('./pages/Cart'));
+const About = lazy(() => import('./pages/About'));
+const Policy = lazy(() => import('./pages/Policy'));
+const AdminDestinations = lazy(() => import('./pages/AdminDestinations'));
+const AdminInspire = lazy(() => import('./pages/AdminInspire'));
 // The receipt shown when a guest comes back from Stripe, AZUL or CardNET.
 // Lazy like every other non-home route: nobody lands here first.
 const PaymentReturn = lazy(() => import('./components/PaymentReturn'));
@@ -69,6 +76,7 @@ const App = () => {
   return (
     <PlannerProvider>
       <Router>
+        <InspireProvider>
         <div className="flex min-h-screen flex-col">
           {/* The painted scene behind every page. */}
           <IllustratedBackdrop />
@@ -92,11 +100,16 @@ const App = () => {
                 <Route path="/payment/return" element={<PaymentReturn />} />
                 <Route path="/admin" element={<ProtectedRoute component={Admin} />} />
                 <Route path="/admin/transport" element={<ProtectedRoute component={AdminTransport} />} />
+                <Route path="/admin/destinations" element={<ProtectedRoute component={AdminDestinations} />} />
+                <Route path="/admin/inspire" element={<ProtectedRoute component={AdminInspire} />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/policies/:slug" element={<Policy />} />
               </Routes>
             </Suspense>
           </main>
           <Footer />
         </div>
+        </InspireProvider>
       </Router>
     </PlannerProvider>
   );

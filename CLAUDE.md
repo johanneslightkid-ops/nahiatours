@@ -2,7 +2,7 @@
 
 ## Branches are sites, not proposals
 
-Six branches of this repository are six live websites. They are permanent
+Seven branches of this repository are seven live websites. They are permanent
 and parallel: none of them is ever meant to be merged into another, and `main`
 is not "the truth" the others are drafts of — it is just the branch that
 happens to be nahia.tours.
@@ -15,6 +15,7 @@ happens to be nahia.tours.
 | `ldvip`           | `ldvip`           | (workers.dev only)    |
 | `amigotours`      | `amigotours`      | amigotours.vip        |
 | `elcortecito`     | `elcortecito`     | (workers.dev only)    |
+| `exclusive-dominican-tours` | `exclusive-tours` | (workers.dev only) |
 
 **Commit and push straight to the site branch. Never open a pull request.**
 There is nothing to review a site branch *into* — a PR against `main` would

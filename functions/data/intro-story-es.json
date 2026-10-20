@@ -1,169 +1,90 @@
 {
-  "storyTitle": "Un Día Caribeño Que Nunca Olvidarás",
-  "storyTagline": "Calma al amanecer, aventura tropical y momentos inolvidables en Bávaro",
+  "storyTitle": "¿Listo para tu día perfecto en el paraíso?",
+  "storyTagline": "Cuéntanos el día, el grupo y el ambiente que buscas; nosotros nos encargamos del resto, desde la recogida en el hotel hasta el último atardecer.",
   "elements": [
     {
-      "id": "element-2001",
+      "id": "edt-1",
       "type": "title",
       "order": 0,
       "content": {
-        "title": "La Luz Dorada de Punta Cana"
+        "title": "Adéntrate en el trópico salvaje"
       }
     },
     {
-      "id": "element-2002",
+      "id": "edt-2",
       "type": "image",
       "order": 1,
       "content": {
-        "imageUrl": "/imgs/tours/tour_saona_island_detail_12.jpg"
+        "imageUrl": "/imgs/edt/tours/adventure-boogies/1.webp"
       }
     },
     {
-      "id": "element-2003",
+      "id": "edt-3",
       "type": "text",
       "order": 2,
       "content": {
-        "text": "La mañana caribeña comienza lentamente. Las olas suaves llegan a la orilla mientras el sol pinta el mar de tonos dorados y turquesa. Después de varios días descansando en el resort, empiezas a sentir ganas de algo más: caminos abiertos, playas escondidas, senderos tropicales y experiencias que se sienten realmente vivas."
+        "text": "Barro rojo, senderos de selva y un cenote esperándote al final del camino. Nuestros tours en boogies y Polaris dejan atrás la zona hotelera y se adentran de lleno en el campo: casco puesto, motores rugiendo y un baño refrescante como recompensa."
       }
     },
     {
-      "id": "element-2004",
+      "id": "edt-4",
       "type": "title",
       "order": 3,
       "content": {
-        "title": "Un Día Que Vale la Pena Vivir"
+        "title": "Mar abierto, barra libre"
       }
     },
     {
-      "id": "element-2005",
+      "id": "edt-5",
       "type": "image",
       "order": 4,
       "content": {
-        "imageUrl": "/imgs/tours/tour_montaa_redonda_detail_7.jpg"
+        "imageUrl": "/imgs/edt/tours/saona-island-tour-palmilla-beach/1.webp"
       }
     },
     {
-      "id": "element-2006",
+      "id": "edt-6",
       "type": "text",
       "order": 5,
       "content": {
-        "text": "Tal vez buscas un momento romántico fuera del hotel. Tal vez tu grupo quiere emoción, música y recuerdos para contar durante años. Bávaro mezcla perfectamente descanso y aventura: mañanas tranquilas seguidas de tardes inolvidables."
+        "text": "Lancha rápida a la ida, catamarán a la vuelta. Saona, Catalina y las piscinas naturales del Parque Nacional Cotubanamá: estrellas de mar bajo tus pies, almuerzo en la arena y la música a todo volumen en el regreso."
       }
     },
     {
-      "id": "element-2007",
+      "id": "edt-7",
       "type": "title",
       "order": 6,
       "content": {
-        "title": "Aventura Salvaje en la Jungla"
+        "title": "Cinco siglos en un solo día"
       }
     },
     {
-      "id": "element-2008",
+      "id": "edt-8",
       "type": "image",
       "order": 7,
       "content": {
-        "imageUrl": "/imgs/tours/tour_buggies_detail_15.jpg"
+        "imageUrl": "/imgs/edt/tours/santo-domingo-tour/2.webp"
       }
     },
     {
-      "id": "element-2009",
+      "id": "edt-9",
       "type": "text",
       "order": 8,
       "content": {
-        "text": "Tu buggy atraviesa caminos llenos de barro rodeados de palmeras y paisajes tropicales. Cenotes escondidos y rutas rurales dominicanas convierten cada minuto en pura libertad. Regresas lleno de energía, riendo y con ganas de volver a salir."
+        "text": "La primera ciudad de las Américas: la Zona Colonial, el Alcázar de Colón, cigarros, cacao y merengue. Un día de República Dominicana que los resorts nunca te muestran."
       }
     },
     {
-      "id": "element-2011",
-      "type": "title",
+      "id": "edt-10",
+      "type": "cta",
       "order": 9,
       "content": {
-        "title": "Fiesta, Música y Mar Caribe"
-      }
-    },
-    {
-      "id": "element-2012",
-      "type": "image",
-      "order": 10,
-      "content": {
-        "imageUrl": "/imgs/tours/tour_party_boat_detail_11.jpg"
-      }
-    },
-    {
-      "id": "element-2013",
-      "type": "text",
-      "order": 11,
-      "content": {
-        "text": "El catamarán navega sobre aguas cristalinas mientras la música, el baile y las risas llenan el ambiente. Bebidas frescas, sol tropical, snorkel y playas de arena blanca crean un día que se siente relajado e inolvidable al mismo tiempo."
-      }
-    },
-    {
-      "id": "element-2014",
-      "type": "video",
-      "order": 12,
-      "content": {
-        "videoUrl": "https://www.tiktok.com/@yohan.tours.punta/video/7638277118144630024",
-        "videoSource": "tiktok",
-        "title": "Party Boat",
-        "videoOrientation": "vertical"
-      }
-    },
-    {
-      "id": "element-2015",
-      "type": "title",
-      "order": 13,
-      "content": {
-        "title": "Cascadas Secretas y Paz Tropical"
-      }
-    },
-    {
-      "id": "element-2016",
-      "type": "image",
-      "order": 14,
-      "content": {
-        "imageUrl": "/imgs/tours/tour_saman_detail_9.jpg"
-      }
-    },
-    {
-      "id": "element-2017",
-      "type": "text",
-      "order": 15,
-      "content": {
-        "text": "En medio de la jungla tropical, las cascadas caen hacia piscinas naturales rodeadas de vegetación exuberante. El sonido del agua reemplaza el ruido del mundo. Cada paso se siente tranquilo, fresco y conectado con la belleza natural de República Dominicana."
-      }
-    },
-    {
-      "id": "element-2019",
-      "type": "title",
-      "order": 16,
-      "content": {
-        "title": "El Regreso al Paraíso"
-      }
-    },
-    {
-      "id": "element-2020",
-      "type": "image",
-      "order": 17,
-      "content": {
-        "imageUrl": "/imgs/tours/tour_isla_saona_vip_detail_8.jpg"
-      }
-    },
-    {
-      "id": "element-2021",
-      "type": "text",
-      "order": 18,
-      "content": {
-        "text": "Cuando el sol comienza a bajar, regresas al resort sintiéndote completamente renovado. La brisa marina parece más cálida, las bebidas más frías y los recuerdos ya se sienten legendarios. Bávaro no es solamente un destino — se convierte en parte de tu historia."
-      }
-    },
-    {
-      "id": "element-2022",
-      "type": "cta",
-      "order": 19,
-      "content": {
-        "text": "Reserva Tu Aventura en Bávaro",
-        "action": "contact"
+        "buttons": [
+          {
+            "text": "Planear mi día",
+            "link": "/plan"
+          }
+        ]
       }
     }
   ]

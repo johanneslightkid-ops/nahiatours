@@ -1,44 +1,64 @@
 [
   {
     "id": 1,
-    "image": "https://cdn.pixabay.com/photo/2016/11/18/17/20/airport-1834685_1280.jpg",
-    "title": "Transfert privé (zone de Punta Cana)",
-    "description": "Navette privée depuis l’aéroport avec accueil personnalisé et aide pour les bagages.",
-    "price": "From USD 15",
+    "title": "Transferts privés",
+    "image": "/imgs/edt/vehicles/minivan.webp",
+    "description": "Un minivan privé et climatisé pour 1 à 8 passagers — aéroport, hôtel, villa ou n’importe quel point de l’île. Un service sûr et fiable, 24 heures sur 24.",
+    "price": "À partir de USD 38",
+    "details": {
+      "description": "Accueil personnalisé à l’aéroport international de Punta Cana (PUJ), aide avec vos bagages et trajet direct jusqu’à votre hôtel. Formules de 1 à 8 passagers, aller simple ou aller-retour, à toute heure du jour comme de la nuit.",
+      "images": [
+        "/imgs/edt/vehicles/minivan.webp",
+        "/imgs/edt/banners/transfers.webp"
+      ]
+    },
     "pricingOptions": [
       {
         "tier": "Personnes",
-        "price": "From USD 15",
-        "amount": 15
+        "price": "À partir de USD 38",
+        "amount": 38
       }
-    ],
-    "details": {
-      "description": "Transfert rapide et confortable depuis l’aéroport ou l’hôtel, avec chauffeur dédié et véhicule climatisé.",
-      "images": [
-        "https://cdn.pixabay.com/photo/2016/11/18/17/20/airport-1834685_1280.jpg",
-        "https://cdn.pixabay.com/photo/2016/11/29/09/16/airport-1867307_1280.jpg"
-      ]
-    }
+    ]
   },
   {
     "id": 2,
-    "image": "https://cdn.pixabay.com/photo/2016/11/29/09/32/car-1868725_1280.jpg",
-    "title": "Transfert de luxe",
-    "description": "SUV ou van haut de gamme pour les arrivées d’affaires et les grandes occasions.",
-    "price": "From USD 35",
+    "title": "Transferts de luxe",
+    "image": "/imgs/edt/vehicles/suburban.webp",
+    "description": "Chevrolet Suburban avec chauffeur professionnel pour 1 à 5 passagers. Ne vous contentez pas d’arriver — arrivez avec style.",
+    "price": "À partir de USD 80",
+    "details": {
+      "description": "Un Suburban noir, un chauffeur bilingue et de l’eau fraîche qui vous attend à bord. Pour les arrivées, les mariages, les journées de golf et chaque trajet qui mérite d’être aussi agréable que la destination.",
+      "images": [
+        "/imgs/edt/vehicles/suburban.webp",
+        "/imgs/edt/banners/transfers.webp"
+      ]
+    },
     "pricingOptions": [
       {
         "tier": "Personnes",
-        "price": "From USD 35",
-        "amount": 35
+        "price": "À partir de USD 80",
+        "amount": 80
       }
-    ],
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Transferts en autocar",
+    "image": "/imgs/edt/vehicles/bus.webp",
+    "description": "Un autocar grand format pour les groupes de 30 à 45 passagers — mariages, voyages incentive, familles qui voyagent ensemble.",
+    "price": "À partir de USD 159",
     "details": {
-      "description": "Offrez-vous une arrivée soignée avec un transfert VIP et un confort haut de gamme.",
+      "description": "Un seul autocar, un seul horaire, tout le monde ensemble : pour les groupes de 30 à 45 personnes, entre l’aéroport, les hôtels et chaque point de départ des excursions.",
       "images": [
-        "https://cdn.pixabay.com/photo/2016/11/29/09/32/car-1868725_1280.jpg",
-        "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"
+        "/imgs/edt/vehicles/bus.webp"
       ]
-    }
+    },
+    "pricingOptions": [
+      {
+        "tier": "Personnes",
+        "price": "À partir de USD 159",
+        "amount": 159
+      }
+    ]
   }
 ]

@@ -1,13 +1,30 @@
 {
-  "brandName": "Tours",
+  "brandName": "Exclusive Dominican Tours",
   "contactName": "",
-  "phoneNumber": "+1 (809) 555-0123",
-  "paypalMeLink": "https://www.paypal.com/paypalme/carlostours",
+  "phoneNumber": "+1 (829) 783-8842",
+  "paypalMeLink": "",
   "verifoneLink": "",
-  "brandicon": "",
+  "brandicon": "/imgs/edt/brand/mark.webp",
   "heroMedia": [
-    { "url": "/buggy.mp4", "type": "video", "alt": "Buggy adventure in Punta Cana" },
-    { "url": "/imgs/tours/tour_saona_island_detail_9.jpg", "type": "image", "alt": "Saona Island shore" },
-    { "url": "/imgs/tours/tour_speed_boat_detail_5.jpg", "type": "image", "alt": "Caribbean speedboat" }
-  ]
+    {
+      "url": "/imgs/edt/banners/excursions.webp",
+      "type": "image",
+      "alt": "Zipline over the Punta Cana jungle"
+    },
+    {
+      "url": "/imgs/edt/tours/adventure-boogies/1.webp",
+      "type": "image",
+      "alt": "Boogies on the jungle trail"
+    },
+    {
+      "url": "/imgs/edt/tours/saona-island-tour-palmilla-beach/1.webp",
+      "type": "image",
+      "alt": "Saona Island, Palmilla Beach"
+    }
+  ],
+  "heroRatingEnabled": true,
+  "heroRatingRange": {
+    "min": 3,
+    "max": 5
+  }
 }

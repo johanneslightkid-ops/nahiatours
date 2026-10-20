@@ -2,7 +2,7 @@ import { apiGet, apiPut } from './apiClient';
 
 // Social media platform types
 export interface SocialMediaAccount {
-  platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'twitter' | 'linkedin';
+  platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'twitter' | 'linkedin' | 'tripadvisor';
   username: string;
   url: string;
   enabled: boolean;

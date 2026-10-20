@@ -2,14 +2,26 @@
   "accounts": [
     {
       "platform": "instagram",
-      "username": "@yohantourspuntacana",
-      "url": "https://instagram.com/yohantourspuntacana",
+      "username": "@exclusivedominicantours",
+      "url": "https://www.instagram.com/exclusivedominicantours/",
       "enabled": true
     },
     {
       "platform": "facebook",
-      "username": "@yohantourspuntacana",
-      "url": "https://www.facebook.com/profile.php?id=61573413249374",
+      "username": "exclusivedominicantours",
+      "url": "https://www.facebook.com/exclusivedominicantours/",
+      "enabled": true
+    },
+    {
+      "platform": "tiktok",
+      "username": "@exclusivedominicantours",
+      "url": "https://www.tiktok.com/@exclusivedominicantours",
+      "enabled": true
+    },
+    {
+      "platform": "tripadvisor",
+      "username": "Exclusive Dominican Tours",
+      "url": "https://www.tripadvisor.es/Attraction_Review-g147293-d33094646-Reviews-Exclusive_Dominican_Tours-Punta_Cana_La_Altagracia_Province_Dominican_Republic.html",
       "enabled": true
     }
   ],

@@ -1,1 +1,47 @@
-[]
+[
+  {
+    "id": "edt-1",
+    "name": "María G. · Spain",
+    "email": "",
+    "review": "This company made our vacation amazing! Everything was well organized, the team was super friendly, and the excursions were unforgettable. We’ll definitely book with them again on our next trip.",
+    "rating": 5,
+    "createdAt": "2025-04-18",
+    "approved": true
+  },
+  {
+    "id": "edt-2",
+    "name": "Carlos R. · Mexico",
+    "email": "",
+    "review": "We had a fantastic time! The staff was helpful, the transportation was on time, and the guides were very knowledgeable. Highly recommended for families or couples visiting Punta Cana.",
+    "rating": 5,
+    "createdAt": "2025-04-18",
+    "approved": true
+  },
+  {
+    "id": "edt-3",
+    "name": "Sofía L. · Argentina",
+    "email": "",
+    "review": "Everything went smoothly from start to finish. They were quick to respond, very professional, and the tours were exactly what we hoped for. Thank you for such a great experience!",
+    "rating": 5,
+    "createdAt": "2025-04-18",
+    "approved": true
+  },
+  {
+    "id": "edt-4",
+    "name": "Andrés T. · USA",
+    "email": "",
+    "review": "The Saona Island tour was a dream come true. Beautiful scenery, great food, and an awesome crew. We felt safe, relaxed, and cared for the whole day. Can’t wait to return!",
+    "rating": 5,
+    "createdAt": "2025-04-18",
+    "approved": true
+  },
+  {
+    "id": "edt-5",
+    "name": "Camilo P. · Chile",
+    "email": "",
+    "review": "Booking was super easy, and they helped us pick the perfect activities. Communication was excellent, and every tour felt personalized. One of the best parts of our Dominican vacation!",
+    "rating": 5,
+    "createdAt": "2025-04-18",
+    "approved": true
+  }
+]

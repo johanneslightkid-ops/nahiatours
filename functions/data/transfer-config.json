@@ -3,100 +3,49 @@
   "currency": "USD",
   "vehicleTypes": [
     {
-      "key": "sedan",
-      "label": "Economy Sedan",
-      "multiplier": 1,
-      "pricePerKmMultiplier": 1,
-      "passengerThreshold": 4,
-      "passengerMultiplier": 2,
-      "maxPassengers": 3,
-      "typicalPassengers": [1, 3],
-      "description": "Perfect for 1–3 travelers with light luggage",
-      "image": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1779407712/transport_vehicles/xgi1geujrnyh771z9ehu.jpg"
-    },
-    {
-      "key": "suv",
-      "label": "SUV / Family",
-      "multiplier": 1.35,
-      "pricePerKmMultiplier": 1.05,
-      "passengerThreshold": 6,
-      "passengerMultiplier": 2,
-      "maxPassengers": 5,
-      "typicalPassengers": [3, 5],
-      "description": "Spacious for families or groups up to 5",
-      "image": ""
-    },
-    {
       "key": "minivan",
-      "label": "Minivan",
-      "multiplier": 1.65,
-      "pricePerKmMultiplier": 1.1,
+      "label": "Private Minivan",
+      "multiplier": 1.2,
+      "pricePerKmMultiplier": 1.05,
       "passengerThreshold": 9,
       "passengerMultiplier": 2,
       "maxPassengers": 8,
-      "typicalPassengers": [5, 7],
-      "description": "Comfortable for medium groups up to 7",
-      "image": ""
-    },
-    {
-      "key": "sprinter",
-      "label": "Sprinter / Group Van",
-      "multiplier": 2.2,
-      "pricePerKmMultiplier": 1.2,
-      "passengerThreshold": 15,
-      "passengerMultiplier": 2,
-      "maxPassengers": 14,
-      "typicalPassengers": [8, 14],
-      "description": "Ideal for larger groups up to 14",
-      "image": ""
-    },
-    {
-      "key": "minibus",
-      "label": "Mini Bus",
-      "multiplier": 3.2,
-      "pricePerKmMultiplier": 1.3,
-      "passengerThreshold": 25,
-      "passengerMultiplier": 2,
-      "maxPassengers": 24,
-      "typicalPassengers": [15, 24],
-      "description": "Best for large groups up to 24",
-      "image": ""
-    },
-    {
-      "key": "coach_bus",
-      "label": "Coach Bus",
-      "multiplier": 5.5,
-      "pricePerKmMultiplier": 1.5,
-      "passengerThreshold": 56,
-      "passengerMultiplier": 2,
-      "maxPassengers": 55,
-      "typicalPassengers": [25, 55],
-      "description": "Full-size coach for 25+ passengers",
-      "image": ""
-    },
-    {
-      "key": "vip_sports",
-      "label": "VIP / Sports Luxury",
-      "multiplier": 2.8,
-      "pricePerKmMultiplier": 1.6,
-      "passengerThreshold": 4,
-      "passengerMultiplier": 2,
-      "maxPassengers": 3,
-      "typicalPassengers": [1, 2],
-      "description": "Premium luxury experience for special occasions",
-      "image": ""
+      "typicalPassengers": [
+        1,
+        8
+      ],
+      "description": "Private transfer for 1 to 8 passengers, air-conditioned, 24 hours a day",
+      "image": "/imgs/edt/vehicles/minivan.webp"
     },
     {
       "key": "luxury_suv",
-      "label": "Luxury SUV",
-      "multiplier": 2.1,
-      "pricePerKmMultiplier": 1.25,
+      "label": "Luxury Suburban",
+      "multiplier": 2.5,
+      "pricePerKmMultiplier": 1.3,
       "passengerThreshold": 6,
       "passengerMultiplier": 2,
       "maxPassengers": 5,
-      "typicalPassengers": [2, 5],
-      "description": "Premium SUV with extra comfort and space",
-      "image": ""
+      "typicalPassengers": [
+        1,
+        5
+      ],
+      "description": "Chevrolet Suburban with professional driver for 1 to 5 passengers",
+      "image": "/imgs/edt/vehicles/suburban.webp"
+    },
+    {
+      "key": "coach_bus",
+      "label": "Transfers Bus",
+      "multiplier": 5,
+      "pricePerKmMultiplier": 1.5,
+      "passengerThreshold": 46,
+      "passengerMultiplier": 2,
+      "maxPassengers": 45,
+      "typicalPassengers": [
+        30,
+        45
+      ],
+      "description": "Coach for groups of 30 to 45 passengers",
+      "image": "/imgs/edt/vehicles/bus.webp"
     }
   ],
   "zones": [

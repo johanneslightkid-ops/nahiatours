@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaInstagram, FaTiktok, FaFacebook, FaYoutube, FaTwitter, FaLinkedin, FaTrash, FaPlus, FaLink } from 'react-icons/fa';
+import { FaInstagram, FaTiktok, FaFacebook, FaYoutube, FaTwitter, FaLinkedin, FaTripadvisor, FaTrash, FaPlus, FaLink } from 'react-icons/fa';
 import {
   getSocialMediaData,
   saveSocialMediaData,
@@ -19,7 +19,8 @@ const platformIcons: Record<string, React.ReactNode> = {
   facebook: <FaFacebook />,
   youtube: <FaYoutube />,
   twitter: <FaTwitter />,
-  linkedin: <FaLinkedin />
+  linkedin: <FaLinkedin />,
+  tripadvisor: <FaTripadvisor />
 };
 
 const platformColors: Record<string, string> = {
@@ -28,7 +29,8 @@ const platformColors: Record<string, string> = {
   facebook: 'from-blue-600 to-blue-800',
   youtube: 'from-red-600 to-red-800',
   twitter: 'from-blue-400 to-blue-600',
-  linkedin: 'from-blue-700 to-blue-900'
+  linkedin: 'from-blue-700 to-blue-900',
+  tripadvisor: 'from-emerald-500 to-emerald-700'
 };
 
 const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
@@ -254,6 +256,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
                 <option value="youtube">YouTube</option>
                 <option value="twitter">Twitter</option>
                 <option value="linkedin">LinkedIn</option>
+                <option value="tripadvisor">Tripadvisor</option>
               </select>
             </div>
 

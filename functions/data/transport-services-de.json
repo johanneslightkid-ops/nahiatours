@@ -1,44 +1,64 @@
 [
   {
     "id": 1,
-    "image": "https://cdn.pixabay.com/photo/2016/11/18/17/20/airport-1834685_1280.jpg",
-    "title": "Privater Transfer (Zone Punta Cana)",
-    "description": "Privater Flughafentransfer mit persönlichem Empfang und Hilfe beim Gepäck.",
-    "price": "From USD 15",
+    "title": "Privattransfers",
+    "image": "/imgs/edt/vehicles/minivan.webp",
+    "description": "Ein privater, klimatisierter Minivan für 1 bis 8 Personen – Flughafen, Hotel, Villa oder jeder andere Ort auf der Insel. Sicherer und zuverlässiger Service, 24 Stunden am Tag.",
+    "price": "Ab USD 38",
+    "details": {
+      "description": "Persönlicher Empfang am Internationalen Flughafen Punta Cana (PUJ), Hilfe mit deinem Gepäck und direkte Fahrt zu deinem Hotel. Optionen für 1 bis 8 Personen, einfache Fahrt oder Hin- und Rückfahrt, zu jeder Tages- und Nachtzeit.",
+      "images": [
+        "/imgs/edt/vehicles/minivan.webp",
+        "/imgs/edt/banners/transfers.webp"
+      ]
+    },
     "pricingOptions": [
       {
         "tier": "Personen",
-        "price": "From USD 15",
-        "amount": 15
+        "price": "Ab USD 38",
+        "amount": 38
       }
-    ],
-    "details": {
-      "description": "Schneller, bequemer Transfer vom Flughafen oder Hotel mit eigenem Fahrer und klimatisiertem Fahrzeug.",
-      "images": [
-        "https://cdn.pixabay.com/photo/2016/11/18/17/20/airport-1834685_1280.jpg",
-        "https://cdn.pixabay.com/photo/2016/11/29/09/16/airport-1867307_1280.jpg"
-      ]
-    }
+    ]
   },
   {
     "id": 2,
-    "image": "https://cdn.pixabay.com/photo/2016/11/29/09/32/car-1868725_1280.jpg",
-    "title": "Luxus-Transfer",
-    "description": "Premium-SUV oder Van für Geschäftsreisende und besondere Anlässe.",
-    "price": "From USD 35",
+    "title": "Luxustransfers",
+    "image": "/imgs/edt/vehicles/suburban.webp",
+    "description": "Chevrolet Suburban mit professionellem Fahrer für 1 bis 5 Personen. Komm nicht einfach nur an – komm mit Stil an.",
+    "price": "Ab USD 80",
+    "details": {
+      "description": "Ein schwarzer Suburban, ein zweisprachiger Chauffeur und kaltes Wasser, das an Bord auf dich wartet. Für Ankünfte, Hochzeiten, Golftage und jede Fahrt, die sich so gut anfühlen soll wie das Ziel selbst.",
+      "images": [
+        "/imgs/edt/vehicles/suburban.webp",
+        "/imgs/edt/banners/transfers.webp"
+      ]
+    },
     "pricingOptions": [
       {
         "tier": "Personen",
-        "price": "From USD 35",
-        "amount": 35
+        "price": "Ab USD 80",
+        "amount": 80
       }
-    ],
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Transferbus",
+    "image": "/imgs/edt/vehicles/bus.webp",
+    "description": "Ein großer Reisebus für Gruppen von 30 bis 45 Personen – für Hochzeiten, Incentive-Reisen und Familien, die gemeinsam unterwegs sind.",
+    "price": "Ab USD 159",
     "details": {
-      "description": "Mach deine Ankunft besonders: ein stilvoller VIP-Transfer mit erstklassigem Komfort.",
+      "description": "Ein Bus, ein Fahrplan, alle zusammen: für Gruppen von 30 bis 45 Gästen zwischen Flughafen, Hotels und allen Abfahrtsorten der Ausflüge.",
       "images": [
-        "https://cdn.pixabay.com/photo/2016/11/29/09/32/car-1868725_1280.jpg",
-        "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"
+        "/imgs/edt/vehicles/bus.webp"
       ]
-    }
+    },
+    "pricingOptions": [
+      {
+        "tier": "Personen",
+        "price": "Ab USD 159",
+        "amount": 159
+      }
+    ]
   }
 ]
