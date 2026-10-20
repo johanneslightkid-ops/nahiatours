@@ -91,6 +91,13 @@ export interface PaymentConfigStatus {
     currency: LocalCurrency;
     secretWordConfigured: boolean;
   };
+  /** PayPal through its Orders API — the guest's payment comes back verified. */
+  paypal: {
+    ready: boolean;
+    mode: GatewayMode;
+    clientId: string;
+    secretConfigured: boolean;
+  };
 }
 
 /** Everything the admin panel may send. Omitted fields stay as stored. */
@@ -119,6 +126,10 @@ export interface PaymentConfigPatch {
   /** Write-only. Empty string clears it. */
   verifoneSecretWord?: string;
   verifoneCurrency?: LocalCurrency;
+  paypalMode?: GatewayMode;
+  paypalClientId?: string;
+  /** Write-only. Empty string clears it. */
+  paypalSecret?: string;
 }
 
 /**
@@ -134,6 +145,8 @@ export interface PaymentsReady {
   dopPerUsd: number | null;
   /** Wallets the payment page offers: 'apple_pay', 'google_pay'. */
   wallets: Array<'apple_pay' | 'google_pay'>;
+  /** PayPal can be paid through its API, with the answer coming back here. */
+  paypal: boolean;
 }
 
 /** Where to send the guest: a hosted page to open, or a form to post to one. */
@@ -141,11 +154,33 @@ export type CardCheckoutStart =
   | { kind: 'redirect'; url: string }
   | { kind: 'form'; action: string; fields: Record<string, string>; amount: number; currency: string };
 
-/** What /api/payment-result says became of an Azul or CardNET payment. */
+/**
+ * Why a payment did not go through, in terms a guest can act on. Mirrors
+ * PaymentReason in shared/paymentOutcome.ts.
+ */
+export type PaymentReason =
+  | 'approved'
+  | 'declined'
+  | 'insufficient_funds'
+  | 'limit'
+  | 'expired_card'
+  | 'check_details'
+  | 'authentication'
+  | 'try_again'
+  | 'error'
+  | 'cancelled'
+  | '';
+
+/** What /api/payment-result says became of a payment that came back with `?payment_ref=`. */
 export interface BankPaymentResult {
-  provider: BankProvider;
-  status: 'pending' | 'paid' | 'declined' | 'cancelled' | 'unverified';
+  provider: BankProvider | 'stripe' | 'paypal';
+  /** What the guest chose: all the page may name. */
+  method: 'card' | 'paypal';
+  status: 'pending' | 'paid' | 'declined' | 'cancelled' | 'unverified' | 'error';
   paid: boolean;
+  reason: PaymentReason;
+  code: string;
+  returnPath: string;
   amountTotal: number;
   currency: LocalCurrency;
   usdTotal: number;
@@ -208,7 +243,7 @@ export const savePaymentConfig = async (patch: PaymentConfigPatch): Promise<Paym
   return body as PaymentConfigStatus;
 };
 
-const NOT_READY: PaymentsReady = { card: false, currency: 'USD', dopPerUsd: null, wallets: [] };
+const NOT_READY: PaymentsReady = { card: false, currency: 'USD', dopPerUsd: null, wallets: [], paypal: false };
 
 /**
  * Can the storefront take a card? A failure answers "no", so a hiccup hides
@@ -227,6 +262,7 @@ export const getPaymentsReady = async (): Promise<PaymentsReady> => {
       wallets: Array.isArray(body.wallets)
         ? body.wallets.filter((wallet: unknown): wallet is 'apple_pay' | 'google_pay' => wallet === 'apple_pay' || wallet === 'google_pay')
         : [],
+      paypal: body.paypal === true,
     };
   } catch {
     return NOT_READY;
@@ -253,6 +289,45 @@ export const startCardCheckout = async (booking: CheckoutBooking): Promise<CardC
     throw new Error(body?.error || 'Could not open the secure payment page.');
   }
   return body as CardCheckoutStart;
+};
+
+/**
+ * Pay with PayPal through its API. Answers with PayPal's approval page; the
+ * guest comes back to /api/pay-return, where the payment is captured.
+ */
+export const startPayPalCheckout = async (booking: CheckoutBooking): Promise<string> => {
+  const response = await fetch('/api/paypal-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    body: JSON.stringify({ ...booking, returnPath: booking.returnPath ?? window.location.pathname }),
+  });
+  const body = await response.json().catch(() => null);
+  if (!response.ok || typeof body?.url !== 'string') {
+    throw new Error(body?.error || 'Could not open PayPal.');
+  }
+  return body.url;
+};
+
+/** "Try again": the same booking, in a fresh payment. Throws with a guest-facing message. */
+export const retryPayment = async (ref: string): Promise<CardCheckoutStart> => {
+  const response = await fetch('/api/pay-retry', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    body: JSON.stringify({ ref }),
+  });
+  const body = await response.json().catch(() => null);
+  if (!response.ok || (body?.kind !== 'redirect' && body?.kind !== 'form')) {
+    throw new Error(body?.error || 'Could not open the secure payment page.');
+  }
+  return body as CardCheckoutStart;
+};
+
+/** Go wherever a checkout start says: a hosted page, or a form posted to one. */
+export const followCheckout = (start: CardCheckoutStart) => {
+  if (start.kind === 'redirect') window.location.href = start.url;
+  else postToGateway(start.action, start.fields);
 };
 
 /**

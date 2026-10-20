@@ -84,7 +84,8 @@ export const isPaymentMethodConfigured = (
   brandSettings: BrandSettings,
   method: PaymentMethodId,
   cardReady = false,
-  wallets: WalletId[] = []
+  wallets: WalletId[] = [],
+  paypalReady = false
 ): boolean => {
   switch (method) {
     case 'card':
@@ -93,7 +94,8 @@ export const isPaymentMethodConfigured = (
     case 'googlepay':
       return Boolean(brandSettings.stripeEnabled) && cardReady && wallets.includes(WALLET_OF[method]!);
     case 'paypal':
-      return hasValue(brandSettings.paypalMeLink);
+      // Through PayPal's API (configured in the payments admin), or a PayPal.Me link.
+      return paypalReady || hasValue(brandSettings.paypalMeLink);
     case 'cash':
       return hasValue(brandSettings.phoneNumber);
     default:
@@ -124,10 +126,11 @@ export const withPaymentMethodEnabled = (
 export const getPaymentMethodStates = (
   brandSettings: BrandSettings,
   cardReady = false,
-  wallets: WalletId[] = []
+  wallets: WalletId[] = [],
+  paypalReady = false
 ): PaymentMethodStates =>
   PAYMENT_METHOD_IDS.reduce((states, method) => {
-    const configured = isPaymentMethodConfigured(brandSettings, method, cardReady, wallets);
+    const configured = isPaymentMethodConfigured(brandSettings, method, cardReady, wallets, paypalReady);
     const enabled = isPaymentMethodEnabled(brandSettings, method);
     states[method] = { configured, enabled, visible: configured && enabled };
     return states;

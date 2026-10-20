@@ -37,18 +37,27 @@ import {
   cardnetApiBase,
 } from './paymentConfig';
 import type { PricedBooking } from './bookingPrice';
+import type { PaymentReason } from './paymentOutcome';
 
 export type BankProvider = 'azul' | 'cardnet' | 'verifone';
-export type OrderStatus = 'pending' | 'paid' | 'declined' | 'cancelled' | 'unverified';
+/**
+ * Every processor that hands the guest back to /api/pay-return. Stripe and
+ * PayPal keep an order too, so all of them come back the same way and the
+ * receipt, the decline message and "try again" work alike for each.
+ */
+export type OrderProvider = BankProvider | 'stripe' | 'paypal';
+/** `error`: the processor failed rather than the card — nothing was charged. */
+export type OrderStatus = 'pending' | 'paid' | 'declined' | 'cancelled' | 'unverified' | 'error';
 
 export interface PaymentOrder {
   id: string;
-  provider: BankProvider;
+  provider: OrderProvider;
   status: OrderStatus;
   createdAt: string;
   updatedAt: string;
   booking: PricedBooking;
-  currency: LocalCurrency;
+  /** LocalCurrency for the banks; Stripe's own currency for Stripe; USD for PayPal. */
+  currency: LocalCurrency | string;
   /** What the bank was asked to charge, in `currency`, e.g. 8650.25. */
   amount: number;
   /** The same in minor units, exactly as it was sent to the bank. */
@@ -57,13 +66,22 @@ export interface PaymentOrder {
   itbisMinor: number;
   /** Verifone only: the price exactly as it was signed into the buy-link. */
   signedPrice?: string;
-  /** CardNET only. */
+  /** CardNET's session, Stripe's Checkout Session, PayPal's order id. */
   session?: string;
+  /** CardNET only: reads the session's result back. */
   sessionKey?: string;
+  /** PayPal only: where the guest approves the order, to send them back to. */
+  approveUrl?: string;
+  /** Apple Pay or Google Pay, when the guest chose one; kept for "try again". */
+  wallet?: string;
   /** What the bank reported, when it reported. */
   authorizationCode?: string;
   reference?: string;
   message?: string;
+  /** The processor's own result code: ISO 8583 for the banks, an issue name for PayPal. */
+  code?: string;
+  /** What the code means for the guest. See shared/paymentOutcome.ts. */
+  reason?: PaymentReason;
 }
 
 const ORDER_PREFIX = 'payment-order:';
@@ -138,7 +156,7 @@ export const plainText = (value: string, max: number): string =>
     .slice(0, max);
 
 /** Where the bank sends the guest back to. A path, never a query string, so nobody's `?` collides with ours. */
-export const returnUrl = (origin: string, provider: BankProvider, id: string, outcome: string) =>
+export const returnUrl = (origin: string, provider: OrderProvider, id: string, outcome: string) =>
   `${origin}/api/pay-return/${provider}/${id}/${outcome}`;
 
 /** The page the guest booked from, with the order id the receipt looks up. */

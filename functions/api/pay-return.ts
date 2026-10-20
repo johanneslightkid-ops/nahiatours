@@ -1,28 +1,26 @@
-import { readPaymentSecrets, PaymentEnv } from '../../shared/paymentConfig';
-import {
-  guestLanding,
-  readCardnetResult,
-  readOrder,
-  saveOrder,
-  verifyAzulReturn,
-  verifyVerifoneReturn,
-  BankProvider,
-  OrderStatus,
-} from '../../shared/bankGateways';
+import { PaymentEnv } from '../../shared/paymentConfig';
+import { guestLanding, readOrder, saveOrder, OrderProvider } from '../../shared/bankGateways';
+import { readReturnParams, settleReturn } from '../../shared/paymentSettle';
 
 /**
- * Where AZUL and CARDNET send the guest back to:
+ * Where every processor sends the guest back to:
  *
  *   /api/pay-return/azul/<order>/approved|declined|cancelled
  *   /api/pay-return/cardnet/<order>/approved|cancelled
  *   /api/pay-return/verifone/<order>/approved
+ *   /api/pay-return/stripe/<order>/approved?session_id=…|cancelled
+ *   /api/pay-return/paypal/<order>/approved?token=…|cancelled
  *
- * The outcome in the path is only a hint. Azul's word counts once its AuthHash
- * checks out against the AuthKey; CardNET's counts once CardNET itself, asked
- * with the session key kept on the order, says so. Then the order is updated
- * and the guest is sent on to the page they booked from with `?payment_ref=`,
- * where the receipt asks /api/payment-result what really happened.
+ * The outcome in the path is only a hint; shared/paymentSettle.ts asks each
+ * processor (or checks its signature) before anything is called paid. Then
+ * the order is stored and the guest is sent on to the page they booked from
+ * with `?payment_ref=`, where the receipt asks /api/payment-result what really
+ * happened — and, if it did not work, why, and what they can do next.
+ *
+ * GET or POST: a processor that posts the guest back is read the same way.
  */
+
+const PROVIDERS: OrderProvider[] = ['azul', 'cardnet', 'verifone', 'stripe', 'paypal'];
 
 const redirect = (location: string) =>
   new Response(null, { status: 303, headers: { Location: location, 'Cache-Control': 'no-store' } });
@@ -32,12 +30,18 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
   const url = new URL(request.url);
   const [, , , provider, id, outcome] = url.pathname.split('/');
 
-  if ((provider !== 'azul' && provider !== 'cardnet' && provider !== 'verifone') || !id) {
+  if (!PROVIDERS.includes(provider as OrderProvider) || !id) {
     return redirect('/');
   }
 
   const order = await readOrder(env, id);
-  if (!order || order.provider !== (provider as BankProvider)) {
+  if (!order || order.provider !== provider) {
+    // A Stripe order that could not be stored still names its session: the
+    // older receipt asks Stripe by it.
+    const session = url.searchParams.get('session_id') ?? '';
+    if (provider === 'stripe' && session) {
+      return redirect(`/?paid=${outcome === 'cancelled' ? '0' : '1'}&session_id=${encodeURIComponent(session)}`);
+    }
     return redirect(`/?payment_ref=${encodeURIComponent(id)}`);
   }
 
@@ -47,48 +51,7 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
     return redirect(guestLanding(order));
   }
 
-  const secrets = await readPaymentSecrets(env);
-  let status: OrderStatus = order.status;
-
-  if (provider === 'azul') {
-    if (outcome === 'cancelled') {
-      status = 'cancelled';
-    } else {
-      const params = url.searchParams;
-      const { authentic, approved } = await verifyAzulReturn(params, order, secrets.azulAuthKey);
-      status = !authentic ? 'unverified' : approved ? 'paid' : 'declined';
-      order.authorizationCode = params.get('AuthorizationCode') || undefined;
-      order.reference = params.get('RRN') || undefined;
-      order.message = (params.get('ResponseMessage') || params.get('ErrorDescription') || '').slice(0, 120) || undefined;
-    }
-  } else if (provider === 'verifone') {
-    // 2Checkout only redirects here once an order has been placed. A
-    // signature that checks out, for this order and this price, is a payment;
-    // one that does not is left for the operator to confirm in 2Checkout's
-    // panel — never called paid on the strength of the query string alone.
-    const { authentic, sameOrder, reference } = await verifyVerifoneReturn(
-      url.searchParams,
-      order,
-      secrets.verifoneSecretWord
-    );
-    status = authentic && sameOrder ? 'paid' : 'unverified';
-    order.reference = reference || undefined;
-    order.message = authentic ? undefined : 'Confirm this order in the 2Checkout control panel.';
-  } else {
-    // CardNET uses its cancel address for declines as well, so the session is
-    // asked either way; the path only decides what to assume when it cannot be.
-    const result = await readCardnetResult(env, order, secrets);
-    if (result.known) {
-      status = result.approved ? 'paid' : outcome === 'cancelled' ? 'cancelled' : 'declined';
-      order.authorizationCode = result.authorizationCode;
-      order.reference = result.reference;
-      order.message = result.code ? `ResponseCode ${result.code}` : undefined;
-    } else {
-      status = outcome === 'cancelled' ? 'cancelled' : 'unverified';
-    }
-  }
-
-  order.status = status;
+  await settleReturn(env, order, outcome ?? '', await readReturnParams(request));
   order.updatedAt = new Date().toISOString();
   await saveOrder(env, order);
 

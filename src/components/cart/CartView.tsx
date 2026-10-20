@@ -109,7 +109,7 @@ const CartView: React.FC<{ locale: string }> = ({ locale }) => {
       ? formatCartDate(dated[0].date, locale)
       : `${formatCartDate(dated[0].date, locale)} – ${formatCartDate(dated[dated.length - 1].date, locale)}`;
 
-  const methods = getPaymentMethodStates(brandSettings, Boolean(ready?.card));
+  const methods = getPaymentMethodStates(brandSettings, Boolean(ready?.card), [], Boolean(ready?.paypal));
   const canPayOnline = methods.card.visible || methods.paypal.visible;
   const phone = brandSettings.phoneNumber || '';
   const telHref = phone ? `tel:${phone.replace(/[^\d+]/g, '')}` : '';

@@ -22,6 +22,8 @@ export type ActivityType =
   | 'pay_click'
   | 'pay_start'
   | 'pay_answer'
+  /** What the processor said when the guest came back: paid, declined (and why), cancelled. */
+  | 'pay_result'
   | 'summary_whatsapp'
   | 'summary_email'
   | 'contact';
@@ -34,7 +36,7 @@ interface QueuedEvent {
   data: Data;
 }
 
-const URGENT = new Set<ActivityType>(['pay_click', 'pay_start', 'pay_answer', 'reserve', 'checkout']);
+const URGENT = new Set<ActivityType>(['pay_click', 'pay_start', 'pay_answer', 'pay_result', 'reserve', 'checkout']);
 /** Worth sending only alongside something else. */
 const PASSIVE = new Set<ActivityType>(['cart_view']);
 const DELAY_MS = 6000;

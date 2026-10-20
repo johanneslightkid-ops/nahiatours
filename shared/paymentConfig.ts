@@ -130,6 +130,20 @@ export interface PaymentSecrets {
   /** Buy-Link Secret Word (Integrations → Webhooks & API). Never leaves the server. */
   verifoneSecretWord: string;
   verifoneCurrency: LocalCurrency;
+
+  /**
+   * PAYPAL, through its Orders API (Checkout): the server opens an order for
+   * the exact amount, PayPal sends the guest back here with it approved, and
+   * the server captures it — so the site knows the outcome rather than asking
+   * the guest. Without these the storefront falls back to the PayPal.Me link
+   * in the brand settings. Always charged in US dollars: PayPal does not take
+   * Dominican pesos.
+   */
+  paypalMode: GatewayMode;
+  /** REST app Client ID (developer.paypal.com → Apps & Credentials). */
+  paypalClientId: string;
+  /** The app's Secret. Never leaves the server. */
+  paypalSecret: string;
 }
 
 /** What the admin panel is allowed to know about the above. */
@@ -172,6 +186,12 @@ export interface PaymentConfigStatus {
     currency: LocalCurrency;
     secretWordConfigured: boolean;
   };
+  paypal: {
+    ready: boolean;
+    mode: GatewayMode;
+    clientId: string;
+    secretConfigured: boolean;
+  };
 }
 
 const DEFAULTS: PaymentSecrets = {
@@ -198,6 +218,9 @@ const DEFAULTS: PaymentSecrets = {
   verifoneMerchantCode: '',
   verifoneSecretWord: '',
   verifoneCurrency: 'USD',
+  paypalMode: 'test',
+  paypalClientId: '',
+  paypalSecret: '',
 };
 
 /** 2Checkout's hosted ConvertPlus cart — where a Verifone buy-link points. */
@@ -218,6 +241,11 @@ export const CARDNET_LAB_CREDENTIALS = {
 export const AZUL_HOSTS: Record<GatewayMode, string> = {
   test: 'https://pruebas.azul.com.do/PaymentPage/',
   live: 'https://pagos.azul.com.do/PaymentPage/Default.aspx',
+};
+
+export const PAYPAL_HOSTS: Record<GatewayMode, string> = {
+  test: 'https://api-m.sandbox.paypal.com',
+  live: 'https://api-m.paypal.com',
 };
 
 export const CARDNET_HOSTS: Record<GatewayMode, string> = {
@@ -249,6 +277,10 @@ export interface PaymentEnv {
   STRIPE_API_BASE?: string;
   /** Same idea for CardNET's session API. Unset in production. */
   CARDNET_API_BASE?: string;
+  /** And for PayPal's REST API. Unset in production. */
+  PAYPAL_API_BASE?: string;
+  /** The PayPal app Secret as a Worker secret, which wins over KV. */
+  PAYPAL_SECRET?: string;
   [key: string]: unknown;
 }
 
@@ -261,6 +293,11 @@ export const stripeApiBase = (env: PaymentEnv): string => {
 export const cardnetApiBase = (env: PaymentEnv, mode: GatewayMode): string => {
   const override = typeof env.CARDNET_API_BASE === 'string' ? env.CARDNET_API_BASE.trim() : '';
   return (override || CARDNET_HOSTS[mode]).replace(/\/+$/, '');
+};
+
+export const paypalApiBase = (env: PaymentEnv, mode: GatewayMode): string => {
+  const override = typeof env.PAYPAL_API_BASE === 'string' ? env.PAYPAL_API_BASE.trim() : '';
+  return (override || PAYPAL_HOSTS[mode]).replace(/\/+$/, '');
 };
 
 /** Same binding order as functions/api/data.ts. */
@@ -313,6 +350,10 @@ const normalize = (input: unknown): PaymentSecrets => {
     verifoneMerchantCode: text(source.verifoneMerchantCode, 40).replace(/\s+/g, ''),
     verifoneSecretWord: text(source.verifoneSecretWord, 400),
     verifoneCurrency: currency(source.verifoneCurrency, DEFAULTS.verifoneCurrency),
+
+    paypalMode: mode(source.paypalMode),
+    paypalClientId: text(source.paypalClientId, 200).replace(/\s+/g, ''),
+    paypalSecret: text(source.paypalSecret, 200).replace(/\s+/g, ''),
   };
 };
 
@@ -342,6 +383,10 @@ export const readPaymentSecrets = async (env: PaymentEnv): Promise<PaymentSecret
   const verifoneFromEnv = typeof env.VERIFONE_SECRET_WORD === 'string' ? env.VERIFONE_SECRET_WORD.trim() : '';
   if (verifoneFromEnv) {
     stored.verifoneSecretWord = verifoneFromEnv;
+  }
+  const paypalFromEnv = typeof env.PAYPAL_SECRET === 'string' ? env.PAYPAL_SECRET.trim() : '';
+  if (paypalFromEnv) {
+    stored.paypalSecret = paypalFromEnv;
   }
 
   return stored;
@@ -400,6 +445,10 @@ export const isVerifoneReady = (secrets: PaymentSecrets): boolean =>
       secrets.verifoneSecretWord &&
       currencyUsable(secrets.verifoneCurrency, secrets)
   );
+
+/** PayPal's API, as opposed to the PayPal.Me link kept in the brand settings. */
+export const isPayPalReady = (secrets: PaymentSecrets): boolean =>
+  Boolean(secrets.paypalClientId && secrets.paypalSecret);
 
 export const processorReady = (secrets: PaymentSecrets): Record<CardProcessor, boolean> => ({
   stripe: secrets.stripeSecretKey.length > 0,
@@ -481,6 +530,12 @@ export const describePaymentConfig = async (env: PaymentEnv): Promise<PaymentCon
       merchantCode: secrets.verifoneMerchantCode,
       currency: secrets.verifoneCurrency,
       secretWordConfigured: secrets.verifoneSecretWord.length > 0,
+    },
+    paypal: {
+      ready: isPayPalReady(secrets),
+      mode: secrets.paypalMode,
+      clientId: secrets.paypalClientId,
+      secretConfigured: secrets.paypalSecret.length > 0,
     },
   };
 };

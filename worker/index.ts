@@ -41,6 +41,8 @@ import { onRequest as handleVerifoneCheckout } from '../functions/api/verifone-c
 import { onRequest as handleCardnetCheckout } from '../functions/api/cardnet-checkout';
 import { onRequest as handlePayReturn } from '../functions/api/pay-return';
 import { onRequest as handlePaymentResult } from '../functions/api/payment-result';
+import { onRequest as handlePayPalCheckout } from '../functions/api/paypal-checkout';
+import { onRequest as handlePayRetry } from '../functions/api/pay-retry';
 import { onRequest as handleContactRequest } from '../functions/api/contact-request';
 import { onRequest as handleNotifyConfig } from '../functions/api/notify-config';
 import { onRequest as handlePayAttempt, sweepOverdue } from '../functions/api/pay-attempt';
@@ -100,6 +102,10 @@ const ROUTES: Record<string, RouteHandler> = {
   '/api/verifone-checkout': handleVerifoneCheckout,
   '/api/cardnet-checkout': handleCardnetCheckout,
   '/api/payment-result': handlePaymentResult,
+  // PayPal through its API (captured here on return), and "try again" on an
+  // order that did not go through.
+  '/api/paypal-checkout': handlePayPalCheckout,
+  '/api/pay-retry': handlePayRetry,
   '/api/contact-request': handleContactRequest,
   // The shopping cart's side of things: who to tell (and how), payment
   // presses and their answers, what guests did, a summary by email.
@@ -123,8 +129,8 @@ const resolveHandler = (url: URL): RouteHandler | undefined => {
   if (route) {
     return route;
   }
-  // The banks send the guest back to /api/pay-return/<bank>/<order>/<outcome>:
-  // a path rather than a query string, because both append their own.
+  // Every processor sends the guest back to /api/pay-return/<provider>/<order>/<outcome>:
+  // a path rather than a query string, because they append their own.
   if (url.pathname.startsWith('/api/pay-return/')) {
     return handlePayReturn;
   }

@@ -9,6 +9,7 @@ import { getPaymentMethodStates, getCardPaymentLink, PaymentMethodId, WalletId }
 import {
   getPaymentsReady,
   startCardCheckout,
+  startPayPalCheckout,
   postToGateway,
   fillPaymentLink,
   PaymentsReady,
@@ -123,6 +124,7 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalTitle: 'Pay with PayPal',
     paypalGo: 'Continue to PayPal',
     paypalNote: 'PayPal opens in a new tab. Come back here afterwards.',
+    paypalNoteBack: 'You come back here automatically once PayPal is done.',
     applepay: 'Apple Pay',
     applepayHint: 'Face ID or Touch ID — no card to type',
     googlepay: 'Google Pay',
@@ -163,6 +165,7 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalTitle: 'Pagar con PayPal',
     paypalGo: 'Continuar a PayPal',
     paypalNote: 'PayPal se abre en otra pestaña. Vuelve aquí después.',
+    paypalNoteBack: 'Al terminar en PayPal vuelves aquí automáticamente.',
     applepay: 'Apple Pay',
     applepayHint: 'Face ID o Touch ID, sin escribir la tarjeta',
     googlepay: 'Google Pay',
@@ -203,6 +206,7 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalTitle: 'Mit PayPal bezahlen',
     paypalGo: 'Weiter zu PayPal',
     paypalNote: 'PayPal öffnet sich in einem neuen Tab. Kommen Sie danach hierher zurück.',
+    paypalNoteBack: 'Nach PayPal kommen Sie automatisch hierher zurück.',
     applepay: 'Apple Pay',
     applepayHint: 'Face ID oder Touch ID — ohne Kartennummer',
     googlepay: 'Google Pay',
@@ -243,6 +247,7 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalTitle: 'Payer avec PayPal',
     paypalGo: 'Continuer vers PayPal',
     paypalNote: 'PayPal s’ouvre dans un nouvel onglet. Revenez ici ensuite.',
+    paypalNoteBack: 'Une fois sur PayPal terminé, vous revenez ici automatiquement.',
     applepay: 'Apple Pay',
     applepayHint: 'Face ID ou Touch ID, sans saisir de carte',
     googlepay: 'Google Pay',
@@ -334,10 +339,12 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
 
   const cardReady = ready?.card ?? false;
   // A wallet the payment page offers but this device cannot use is not offered.
+  const paypalApi = ready?.paypal ?? false;
   const methods = getPaymentMethodStates(
     brandSettings,
     cardReady,
-    (ready?.wallets ?? []).filter((id) => deviceWallets.includes(id))
+    (ready?.wallets ?? []).filter((id) => deviceWallets.includes(id)),
+    paypalApi
   );
   if (allowedMethods) {
     for (const id of Object.keys(methods) as PaymentMethodId[]) {
@@ -452,13 +459,55 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     setIsOpen(false);
     setPrePayError('');
     refreshPrePay();
+    setCardError('');
     track('pay_click', { method: 'paypal', title: excursionTitle, total: totalUsd ?? 0, source, locale: lang });
     setPaypalModalOpen(true);
   };
 
-  const handlePayPalProceed = () => {
+  /** The booking as the server prices it, for the card page and PayPal alike. */
+  const checkoutBooking = () => ({
+    category,
+    serviceId,
+    title: excursionTitle,
+    persons,
+    quantities,
+    date: bookingDate,
+    amount: totalUsd ?? undefined,
+    locale: lang,
+    ...(items && items.length > 0
+      ? {
+          items: items.map((line) => ({
+            category: line.category ?? 'tours',
+            serviceId: line.serviceId,
+            title: line.title,
+            persons: Math.max(1, line.persons ?? 1),
+            quantities: line.quantities,
+            date: line.date,
+            amount: line.total ?? undefined,
+          })),
+        }
+      : {}),
+  });
+
+  const handlePayPalProceed = async () => {
     playClickFx();
     if (!prePayOk()) return;
+    if (paypalApi) {
+      // PayPal's own order, in this tab: PayPal brings the guest back to
+      // /api/pay-return, the payment is captured there, and the receipt says
+      // what happened — no "did it go through?" needed.
+      setStarting(true);
+      setCardError('');
+      try {
+        const url = await startPayPalCheckout(checkoutBooking());
+        recordAttempt('paypal');
+        window.location.href = url;
+      } catch (error: any) {
+        setStarting(false);
+        setCardError(error?.message || t.failed);
+      }
+      return;
+    }
     const targetUrl = buildDynamicPayPalUrl(brandSettings.paypalMeLink, totalUsd);
     recordAttempt('paypal', targetUrl || undefined);
     if (targetUrl) window.open(targetUrl, '_blank');
@@ -530,30 +579,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     setStarting(true);
     setCardError('');
     try {
-      const start = await startCardCheckout({
-        category,
-        serviceId,
-        title: excursionTitle,
-        persons,
-        quantities,
-        date: bookingDate,
-        amount: totalUsd ?? undefined,
-        locale: lang,
-        ...(wallet ? { wallet } : {}),
-        ...(items && items.length > 0
-          ? {
-              items: items.map((line) => ({
-                category: line.category ?? 'tours',
-                serviceId: line.serviceId,
-                title: line.title,
-                persons: Math.max(1, line.persons ?? 1),
-                quantities: line.quantities,
-                date: line.date,
-                amount: line.total ?? undefined,
-              })),
-            }
-          : {}),
-      });
+      const start = await startCardCheckout({ ...checkoutBooking(), ...(wallet ? { wallet } : {}) });
       // Recorded once the payment page is certain, right before leaving for it.
       recordAttempt('card');
       if (start.kind === 'redirect') window.location.href = start.url;
@@ -832,14 +858,19 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
               <div className="mt-4 rounded-xl border-2 border-mango-light/50 bg-mango/20 p-3 text-xs text-mango-light">{prePayError}</div>
             )}
 
+            {paypalApi && cardError && (
+              <div className="mt-4 rounded-xl border-2 border-hibiscus-light/50 bg-hibiscus/20 p-3 text-xs text-paper">{cardError}</div>
+            )}
+
             <div className="mt-5 space-y-3">
               <button
                 onClick={handlePayPalProceed}
-                className="w-full rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon-light py-3 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:bg-mango-light"
+                disabled={starting}
+                className="w-full rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon-light py-3 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:bg-mango-light disabled:opacity-60"
               >
-                {t.paypalGo} · {displayPrice}
+                {starting ? '…' : `${t.paypalGo} · ${displayPrice}`}
               </button>
-              <p className="text-center text-[0.65rem] text-paper/60">{t.paypalNote}</p>
+              <p className="text-center text-[0.65rem] text-paper/60">{paypalApi ? t.paypalNoteBack : t.paypalNote}</p>
             </div>
           </div>
         </div>,

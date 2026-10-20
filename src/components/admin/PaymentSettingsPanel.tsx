@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaCreditCard, FaCheck, FaLock, FaUniversity, FaFlask, FaLink } from 'react-icons/fa';
+import { FaCreditCard, FaCheck, FaLock, FaUniversity, FaFlask, FaLink, FaPaypal, FaUndo } from 'react-icons/fa';
 import { BrandSettings, saveBrandSettings } from '../../services/brandService';
 import WalletSettingsPanel from './WalletSettingsPanel';
 import {
@@ -40,7 +40,7 @@ const METHOD_LABELS: Record<PaymentMethodId, { name: string; requirement: string
   },
   paypal: {
     name: 'PayPal',
-    requirement: 'Necesita un enlace de PayPal.Me',
+    requirement: 'Necesita la app de PayPal (abajo) o un enlace de PayPal.Me',
   },
   cash: {
     name: 'Concierge / efectivo por WhatsApp',
@@ -151,7 +151,8 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
   const methods = getPaymentMethodStates(
     brandSettings,
     Boolean(status?.activeCardProcessor),
-    WALLETS_BY_PROCESSOR[String(status?.activeCardProcessor ?? '')] ?? []
+    WALLETS_BY_PROCESSOR[String(status?.activeCardProcessor ?? '')] ?? [],
+    Boolean(status?.paypal?.ready)
   );
 
   const run = async (setNotice: (notice: Notice) => void, work: () => Promise<string>) => {
@@ -255,6 +256,31 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
       setVerifoneSecret('');
       return clearSecret ? 'Palabra secreta de Verifone eliminada.' : 'Datos de Verifone guardados.';
     });
+
+  // ── PayPal (Orders API) ───────────────────────────────────────────────
+  const [paypalClientId, setPaypalClientId] = useState('');
+  const [paypalSecret, setPaypalSecret] = useState('');
+  const [paypalMode, setPaypalMode] = useState<GatewayMode>('test');
+  const [paypalMessage, setPaypalMessage] = useState<Notice>(null);
+  useEffect(() => {
+    if (!status?.paypal) return;
+    setPaypalClientId(status.paypal.clientId);
+    setPaypalMode(status.paypal.mode);
+  }, [status?.paypal?.clientId, status?.paypal?.mode]);
+
+  const handleSavePayPal = (clearSecret = false) =>
+    run(setPaypalMessage, async () => {
+      const patch: PaymentConfigPatch = { paypalClientId: paypalClientId.trim(), paypalMode };
+      // Write-only, like the Stripe key: only sent when something was typed.
+      if (clearSecret) patch.paypalSecret = '';
+      else if (paypalSecret.trim()) patch.paypalSecret = paypalSecret.trim();
+      const next = await savePaymentConfig(patch);
+      setStatus(next);
+      setPaypalSecret('');
+      return clearSecret ? 'Secret de PayPal eliminado.' : 'Datos de PayPal guardados.';
+    });
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
   const handleSaveBrand = () =>
     run(setBrandMessage, async () => {
@@ -703,6 +729,95 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           )}
           <NoticeLine value={verifoneMessage} />
         </div>
+      </div>
+
+      {/* ── PayPal (Orders API) ────────────────────────────────────────── */}
+      <div className="mt-5 rounded-3xl border border-ink/10 bg-paper-warm/40 p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h4 className="flex items-center gap-2 font-semibold text-ink">
+              <FaPaypal className="text-sky-dark" /> PayPal · cobro con respuesta
+            </h4>
+            <p className="max-w-2xl text-xs text-ink-soft">
+              Con una app de PayPal, cada reserva abre un pedido de PayPal por el importe exacto; PayPal devuelve
+              al visitante a este sitio y el cobro se confirma aquí mismo — pagado, rechazado o cancelado — sin
+              tener que preguntarle si funcionó. Sin la app se sigue usando el enlace de PayPal.Me, que no
+              devuelve ninguna respuesta. PayPal cobra siempre en dólares.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <ReadyChip ready={Boolean(status?.paypal?.ready)} mode={status?.paypal?.mode} />
+            <ModeSwitch value={paypalMode} onChange={setPaypalMode} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className={label}>
+            <span className={labelText}>Client ID</span>
+            <input className={field} value={paypalClientId} onChange={(e) => setPaypalClientId(e.target.value)} placeholder="AX…" autoComplete="off" />
+          </label>
+          <label className={label}>
+            <span className={labelText}>Secret {status?.paypal?.secretConfigured && '(guardado)'}</span>
+            <input
+              type="password"
+              className={field}
+              value={paypalSecret}
+              onChange={(e) => setPaypalSecret(e.target.value)}
+              placeholder={status?.paypal?.secretConfigured ? 'Dejar vacío para conservar' : 'Secret de la app'}
+              autoComplete="off"
+            />
+          </label>
+        </div>
+
+        <p className="mt-3 flex items-start gap-2 text-xs text-ink-light">
+          <FaLock className="mt-0.5 shrink-0" />
+          <span>
+            En <em>developer.paypal.com → Apps &amp; Credentials</em> crea una app (en <em>Sandbox</em> para pruebas,
+            en <em>Live</em> para cobrar) y copia su Client ID y su Secret. El Secret se queda en el servidor. La
+            cuenta de PayPal debe ser de empresa (Business).
+          </span>
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => handleSavePayPal()}
+            disabled={saving}
+            className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            {saving ? 'Guardando…' : 'Guardar PayPal'}
+          </button>
+          {status?.paypal?.secretConfigured && (
+            <button
+              onClick={() => window.confirm('¿Borrar el Secret? PayPal volverá al enlace de PayPal.Me hasta que guardes otro.') && handleSavePayPal(true)}
+              disabled={saving}
+              className="rounded-full border border-sunset-dark/40 px-5 py-2 text-sm font-semibold text-sunset-dark disabled:opacity-50"
+            >
+              Borrar el Secret
+            </button>
+          )}
+          <NoticeLine value={paypalMessage} />
+        </div>
+      </div>
+
+      {/* ── Where each processor sends the guest back ───────────────────── */}
+      <div className="mt-5 rounded-3xl border border-ink/10 p-5">
+        <h4 className="flex items-center gap-2 font-semibold text-ink">
+          <FaUndo className="text-lagoon-dark" /> Regreso al sitio después de pagar
+        </h4>
+        <p className="mt-1 max-w-2xl text-xs text-ink-soft">
+          Cada procesador devuelve al visitante a una de estas direcciones; el sitio comprueba allí el resultado
+          con el procesador y le muestra un mensaje según el código — pagado, rechazado (fondos, límite, tarjeta
+          vencida, datos, verificación del banco), cancelado o error — con qué hacer después: reintentar, otra
+          forma de pago, WhatsApp o el carrito. Se envían solas con cada pago; si un banco te pide registrarlas,
+          son estas (<code>{'{pedido}'}</code> es el número de cada pago):
+        </p>
+        <ul className="mt-3 space-y-1 break-all font-mono text-[0.7rem] text-ink-soft">
+          <li>AZUL: {origin}/api/pay-return/azul/{'{pedido}'}/approved · /declined · /cancelled</li>
+          <li>CardNET: {origin}/api/pay-return/cardnet/{'{pedido}'}/approved · /cancelled</li>
+          <li>Verifone: {origin}/api/pay-return/verifone/{'{pedido}'}/approved</li>
+          <li>Stripe: {origin}/api/pay-return/stripe/{'{pedido}'}/approved · /cancelled</li>
+          <li>PayPal: {origin}/api/pay-return/paypal/{'{pedido}'}/approved · /cancelled</li>
+        </ul>
       </div>
 
       {/* ── Payment links, visibility ──────────────────────────────────── */}

@@ -12,6 +12,7 @@ import {
   getPaymentsReady,
   postToGateway,
   startCardCheckout,
+  startPayPalCheckout,
   PaymentsReady,
 } from '../../services/paymentService';
 import { submitContactRequest } from '../../services/contactRequestService';
@@ -106,7 +107,7 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
   };
 
   const cardReady = Boolean(ready?.card);
-  const methods = getPaymentMethodStates(brandSettings, cardReady);
+  const methods = getPaymentMethodStates(brandSettings, cardReady, [], Boolean(ready?.paypal));
   const cardLink = getCardPaymentLink(brandSettings);
   const value = Number(String(amount).replace(',', '.'));
   const valid = Number.isFinite(value) && value >= MIN && value <= MAX;
@@ -181,10 +182,24 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
     }
   };
 
-  const payByPayPal = () => {
+  const payByPayPal = async () => {
     if (!valid) return setError(t.badAmount);
     setError('');
     record('PayPal');
+    if (ready?.paypal) {
+      // PayPal's own order, in this tab; PayPal brings the guest back and the
+      // payment is captured and confirmed on the way in.
+      setBusy(true);
+      try {
+        const url = await startPayPalCheckout({ category: 'custom', title: label, persons: 1, amount: value, locale, returnPath: '/contact' });
+        attempt('paypal');
+        window.location.href = url;
+      } catch (failure: any) {
+        setBusy(false);
+        setError(failure?.message || 'PayPal could not be opened.');
+      }
+      return;
+    }
     const url = payPalUrl(brandSettings.paypalMeLink ?? '', value);
     if (url) {
       attempt('paypal', url);

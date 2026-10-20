@@ -37,6 +37,8 @@ const TEXT_FIELDS: Partial<Record<keyof PaymentSecrets, number>> = {
   cardnetAcquirer: 3,
   verifoneMerchantCode: 40,
   verifoneSecretWord: 400,
+  paypalClientId: 200,
+  paypalSecret: 200,
 };
 export async function onRequest(context: { request: Request; env: PaymentEnv }) {
   const { request, env } = context;
@@ -107,7 +109,7 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
       patch.cardProcessor = body.cardProcessor as PaymentSecrets['cardProcessor'];
     }
 
-    for (const field of ['azulMode', 'cardnetMode', 'verifoneMode'] as const) {
+    for (const field of ['azulMode', 'cardnetMode', 'verifoneMode', 'paypalMode'] as const) {
       if (body[field] === 'test' || body[field] === 'live') patch[field] = body[field] as 'test' | 'live';
     }
     for (const field of ['azulCurrency', 'cardnetCurrency', 'verifoneCurrency'] as const) {
