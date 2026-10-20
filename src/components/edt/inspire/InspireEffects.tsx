@@ -6,6 +6,9 @@ import type { InspireEffect } from '../../../edt/inspireConfig';
  * if the screen were under a metre of Caribbean, a slow sun flare with light
  * leaks, or drifting bokeh — always with a few motes of light rising.
  *
+ * `resolution` and `fps` come from the show's quality level (useShowQuality),
+ * which lowers both before it turns the light off on a TV that struggles.
+ *
  * It draws only light (black is "no change") and the canvas is blended with
  * `screen`, so it brightens the photograph and never covers it. It renders
  * at a fraction of the screen's resolution and at most 30 frames a second —
@@ -107,7 +110,13 @@ void main() {
 
 const MODES: Record<InspireEffect, number> = { caustics: 0, sunglow: 1, bokeh: 2, none: 3 };
 
-const InspireEffects: React.FC<{ effect: InspireEffect; intensity: number; className?: string }> = ({ effect, intensity, className = '' }) => {
+const InspireEffects: React.FC<{ effect: InspireEffect; intensity: number; resolution?: number; fps?: number; className?: string }> = ({
+  effect,
+  intensity,
+  resolution = 0.6,
+  fps = 30,
+  className = '',
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -152,7 +161,7 @@ const InspireEffects: React.FC<{ effect: InspireEffect; intensity: number; class
 
     // A fraction of the real resolution: the light is soft, the TV is big.
     const resize = () => {
-      const scale = Math.min(0.6, 1 / Math.max(1, window.devicePixelRatio * 0.9));
+      const scale = Math.min(resolution, 1 / Math.max(1, window.devicePixelRatio * 0.9));
       canvas.width = Math.max(2, Math.round(canvas.clientWidth * scale));
       canvas.height = Math.max(2, Math.round(canvas.clientHeight * scale));
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -166,7 +175,7 @@ const InspireEffects: React.FC<{ effect: InspireEffect; intensity: number; class
     const start = performance.now();
     const draw = (now: number) => {
       frame = requestAnimationFrame(draw);
-      if (document.hidden || now - last < 33) return;
+      if (document.hidden || now - last < 1000 / fps - 2) return;
       last = now;
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -181,7 +190,7 @@ const InspireEffects: React.FC<{ effect: InspireEffect; intensity: number; class
       gl.deleteShader(vs);
       gl.deleteShader(fs);
     };
-  }, [effect, intensity]);
+  }, [effect, intensity, resolution, fps]);
 
   if (effect === 'none') return null;
   return <canvas ref={canvasRef} className={`pointer-events-none absolute inset-0 h-full w-full ${className}`} style={{ mixBlendMode: 'screen' }} aria-hidden="true" />;

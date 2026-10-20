@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
+import { LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import { FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import { HiCheck, HiChevronLeft, HiChevronRight, HiClock, HiLocationMarker, HiPlay } from 'react-icons/hi';
 import { useI18n, type Locale } from '../../../contexts/I18nContext';
@@ -8,9 +8,13 @@ import type { Tour } from '../../../services/toursService';
 import { DEFAULT_INSPIRE, getInspireConfig, InspireConfig } from '../../../edt/inspireConfig';
 import { descriptionField, excerpt, includedItems, loadTours, smallImage } from '../../../edt/useTours';
 import { useSocialAccounts } from '../brand';
+import { bigScreenImage, isBigScreen } from '../../../edt/bigScreen';
 import InspireEffects from './InspireEffects';
 import InspireMusic from './InspireMusic';
+import InspireSlideshow from './InspireSlideshow';
+import InspireVisualizer from './InspireVisualizer';
 import { InspireToggle } from './InspireContext';
+import { useShowQuality } from './useShowQuality';
 
 type L = Record<Locale, string>;
 type View = 'carousel' | 'tour' | 'videos' | 'video';
@@ -65,6 +69,8 @@ const Carousel: React.FC<{
 }> = ({ tours, index, setIndex, onOpen, seconds, headline, locale }) => {
   const reduced = useReducedMotion();
   const count = tours.length;
+  // A card is about 600 pixels across on a TV: the small copy would be stretched.
+  const big = useMemo(isBigScreen, []);
   return (
     <div className="relative flex h-full flex-col">
       <motion.h2
@@ -103,7 +109,7 @@ const Carousel: React.FC<{
             >
               <motion.img
                 layoutId={`inspire-image-${tour.id}`}
-                src={smallImage(tour.image)}
+                src={big ? tour.image : smallImage(tour.image)}
                 alt=""
                 className={`absolute inset-0 h-full w-full object-cover ${front && !reduced ? 'inspire-card-zoom' : ''}`}
               />
@@ -142,16 +148,26 @@ const Carousel: React.FC<{
 };
 
 /** ── One tour, for reading from across the shop. ────────────────────────── */
-const TourStage: React.FC<{ tour: Tour; locale: Locale; phone: string; onVideos: () => void }> = ({ tour, locale, phone, onVideos }) => {
+const PHOTO_SECONDS = 6.5;
+
+const TourStage: React.FC<{
+  tour: Tour;
+  locale: Locale;
+  phone: string;
+  onVideos: () => void;
+  config: InspireConfig;
+  quality: number;
+}> = ({ tour, locale, phone, onVideos, config, quality }) => {
   const images = tour.details.images.length ? tour.details.images : [tour.image];
+  const large = useMemo(() => images.map((src) => bigScreenImage(src, config.cloudinaryAiUpscale)), [images, config.cloudinaryAiUpscale]);
   const [image, setImage] = useState(0);
   const reduced = useReducedMotion();
   useEffect(() => setImage(0), [tour.id]);
   useEffect(() => {
     if (reduced || images.length < 2) return undefined;
-    const timer = window.setInterval(() => setImage((value) => (value + 1) % images.length), 6500);
+    const timer = window.setInterval(() => setImage((value) => (value + 1) % images.length), (PHOTO_SECONDS + config.transitionSeconds) * 1000);
     return () => window.clearInterval(timer);
-  }, [images.length, reduced, image]);
+  }, [images.length, reduced, image, config.transitionSeconds]);
 
   const duration = tour.duration || descriptionField(tour.description, 'duration');
   const departs = tour.destination || descriptionField(tour.description, 'departs');
@@ -160,36 +176,27 @@ const TourStage: React.FC<{ tour: Tour; locale: Locale; phone: string; onVideos:
   return (
     <div className="grid h-full grid-cols-[55%,45%] items-center gap-[3vw] px-[4vw] pb-[10vh] pt-[12vh]">
       <div className="relative h-full max-h-[78vh] overflow-hidden rounded-[10px] shadow-ink-xl">
-        <motion.img
-          layoutId={`inspire-image-${tour.id}`}
-          src={images[0] === tour.image ? smallImage(tour.image) : images[0]}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ opacity: image === 0 ? 1 : 0 }}
+        {/* The first photo flies in from the carousel card; the rest arrive with the show's transition. */}
+        <motion.img layoutId={`inspire-image-${tour.id}`} src={large[0]} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <InspireSlideshow
+          key={tour.id}
+          slides={large}
+          index={image}
+          transition={config.transition}
+          transitionSeconds={config.transitionSeconds}
+          holdSeconds={PHOTO_SECONDS}
+          drift={quality < 3}
+          startEmpty
         />
-        <AnimatePresence>
-          {image > 0 && (
-            <motion.img
-              key={images[image]}
-              src={images[image]}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.9 }}
-            />
-          )}
-        </AnimatePresence>
         {images.length > 1 && (
           <>
-            <button type="button" className="inspire-round absolute left-4 top-1/2 -translate-y-1/2" onClick={() => setImage((image - 1 + images.length) % images.length)} aria-label="Previous photo">
+            <button type="button" className="inspire-round absolute left-4 top-1/2 z-10 -translate-y-1/2" onClick={() => setImage((image - 1 + images.length) % images.length)} aria-label="Previous photo">
               <HiChevronLeft className="h-8 w-8" />
             </button>
-            <button type="button" className="inspire-round absolute right-4 top-1/2 -translate-y-1/2" onClick={() => setImage((image + 1) % images.length)} aria-label="Next photo">
+            <button type="button" className="inspire-round absolute right-4 top-1/2 z-10 -translate-y-1/2" onClick={() => setImage((image + 1) % images.length)} aria-label="Next photo">
               <HiChevronRight className="h-8 w-8" />
             </button>
-            <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
+            <div className="absolute inset-x-0 bottom-4 z-10 flex justify-center gap-2">
               {images.map((src, i) => (
                 <button key={src} type="button" onClick={() => setImage(i)} className={`h-1.5 rounded-full transition-all ${i === image ? 'w-10 bg-mango' : 'w-4 bg-white/50'}`} aria-label={`Photo ${i + 1}`} />
               ))}
@@ -306,6 +313,35 @@ const InspireOverlay: React.FC = () => {
   const [videos, setVideos] = useState<Video[] | null>(null);
   const [video, setVideo] = useState<Video | null>(null);
   const [backgroundReady, setBackgroundReady] = useState(false);
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
+  const quality = useShowQuality(config.quality);
+  const [music, setMusic] = useState<{ audible: boolean; analyser: AnalyserNode | null }>({ audible: false, analyser: null });
+  // The visualiser switch lives in the music player and is remembered by this screen.
+  const [visualizerOn, setVisualizerOn] = useState<boolean | null>(() => {
+    try {
+      const stored = localStorage.getItem('inspire_visualizer');
+      return stored === null ? null : stored === '1';
+    } catch {
+      return null;
+    }
+  });
+  const showVisualizer = visualizerOn ?? config.visualizer.enabled;
+  const toggleVisualizer = useCallback(() => {
+    setVisualizerOn((current) => {
+      const next = !(current ?? config.visualizer.enabled);
+      try {
+        localStorage.setItem('inspire_visualizer', next ? '1' : '0');
+      } catch {
+        /* remembered for this visit only */
+      }
+      return next;
+    });
+  }, [config.visualizer.enabled]);
+  const onAudio = useCallback((state: { audible: boolean; analyser: AnalyserNode | null }) => setMusic(state), []);
+  const slides = useMemo(
+    () => config.backgroundSlides.map((src) => bigScreenImage(src, config.cloudinaryAiUpscale)),
+    [config.backgroundSlides, config.cloudinaryAiUpscale]
+  );
   const lastInput = useRef(Date.now());
   const videoCache = useRef(new Map<number, Video[]>());
 
@@ -321,6 +357,16 @@ const InspireOverlay: React.FC = () => {
     return picked.length ? picked : allTours;
   }, [allTours, config.tourIds]);
   const tour = tours[index % Math.max(1, tours.length)];
+
+  // The background's stills, one after another.
+  useEffect(() => {
+    if (slides.length < 2) return undefined;
+    const timer = window.setTimeout(
+      () => setBackgroundIndex((value) => (value + 1) % slides.length),
+      (config.backgroundSeconds + config.transitionSeconds) * 1000
+    );
+    return () => window.clearTimeout(timer);
+  }, [slides.length, backgroundIndex, config.backgroundSeconds, config.transitionSeconds]);
 
   // The ring turns by itself while nobody is looking at a tour.
   useEffect(() => {
@@ -405,10 +451,19 @@ const InspireOverlay: React.FC = () => {
       aria-modal="true"
       aria-label="Inspire me"
     >
-      {/* The animated background, its poster underneath until it arrives. */}
+      {/* The background: its stills as a slideshow, or the animated picture, a poster underneath until it arrives. */}
       <div className="absolute inset-0" aria-hidden="true">
-        <img src={config.backgroundPoster} alt="" className="inspire-bg absolute inset-0 h-full w-full object-cover" />
-        {config.background && (
+        <img src={config.backgroundPoster} alt="" className={`absolute inset-0 h-full w-full object-cover ${quality < 3 ? 'inspire-bg' : ''}`} />
+        {slides.length > 0 ? (
+          <InspireSlideshow
+            slides={slides}
+            index={backgroundIndex}
+            transition={config.transition}
+            transitionSeconds={config.transitionSeconds}
+            holdSeconds={config.backgroundSeconds}
+            drift={quality < 3}
+          />
+        ) : config.background && (
           <img
             src={config.background}
             alt=""
@@ -417,10 +472,22 @@ const InspireOverlay: React.FC = () => {
           />
         )}
       </div>
-      <InspireEffects effect={config.effect} intensity={config.effectIntensity} />
+      {/* The light steps down first when the TV struggles: lower resolution, then none. */}
+      <InspireEffects
+        effect={quality >= 2 ? 'none' : config.effect}
+        intensity={config.effectIntensity}
+        resolution={quality >= 1 ? 0.35 : 0.6}
+        fps={quality >= 1 ? 24 : 30}
+      />
       <div
         className={`pointer-events-none absolute inset-0 transition-colors duration-700 ${view === 'carousel' ? 'bg-ink/35' : 'bg-ink/70'}`}
         style={{ backgroundImage: 'radial-gradient(ellipse at 50% 40%, transparent 35%, rgb(20 22 26 / 0.75) 100%)' }}
+      />
+      <InspireVisualizer
+        analyser={music.analyser}
+        active={showVisualizer && music.audible && view !== 'video'}
+        settings={config.visualizer}
+        fps={quality >= 3 ? 20 : 30}
       />
 
       {/* Breadcrumbs, always; and the switch that closes the show. */}
@@ -465,7 +532,9 @@ const InspireOverlay: React.FC = () => {
               locale={locale}
             />
           )}
-          {tour && view === 'tour' && <TourStage tour={tour} locale={locale} phone={brandSettings.phoneNumber} onVideos={openVideos} />}
+          {tour && view === 'tour' && (
+            <TourStage tour={tour} locale={locale} phone={brandSettings.phoneNumber} onVideos={openVideos} config={config} quality={quality} />
+          )}
           {view === 'videos' && (
             <VideoWall
               videos={videos}
@@ -487,7 +556,15 @@ const InspireOverlay: React.FC = () => {
       </LayoutGroup>
 
       <div className="absolute bottom-[2.4vh] left-[3vw] z-30">
-        <InspireMusic tracks={config.tracks} volume={config.volume} duck={view === 'videos' ? config.duckLevel : 1} suspended={view === 'video'} />
+        <InspireMusic
+          tracks={config.tracks}
+          volume={config.volume}
+          duck={view === 'videos' ? config.duckLevel : 1}
+          suspended={view === 'video'}
+          visualizer={showVisualizer}
+          onVisualizerToggle={toggleVisualizer}
+          onAudio={onAudio}
+        />
       </div>
     </motion.div>
   );

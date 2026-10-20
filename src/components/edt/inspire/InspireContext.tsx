@@ -18,7 +18,56 @@ interface InspireContextValue {
    * refused sound on Safari.
    */
   audio: React.MutableRefObject<HTMLAudioElement | null>;
+  /**
+   * A second player, routed through Web Audio so the visualiser can hear it:
+   * element → analyser (what is drawn) and → gain → speakers (the volume, set
+   * after the analyser, so a quieter show still draws full bars). Only for
+   * tracks that may be read across origins — this site's own files and
+   * Cloudinary's, which send CORS headers. Any other track plays through
+   * `audio`, untouched, because Web Audio turns a track it may not read into
+   * silence. Null where the browser has no Web Audio.
+   */
+  graph: React.MutableRefObject<AudioGraph | null>;
 }
+
+export interface AudioGraph {
+  context: AudioContext;
+  element: HTMLAudioElement;
+  analyser: AnalyserNode;
+  gain: GainNode;
+}
+
+/** Can this track go through Web Audio without being silenced? */
+export const corsReadable = (url: string): boolean => {
+  try {
+    const parsed = new URL(url, window.location.href);
+    return parsed.origin === window.location.origin || parsed.hostname === 'res.cloudinary.com';
+  } catch {
+    return false;
+  }
+};
+
+const createGraph = (): AudioGraph | null => {
+  const Context = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Context) return null;
+  try {
+    const context = new Context();
+    const element = new Audio();
+    element.crossOrigin = 'anonymous';
+    element.preload = 'auto';
+    const source = context.createMediaElementSource(element);
+    const analyser = context.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.78;
+    const gain = context.createGain();
+    source.connect(analyser);
+    source.connect(gain);
+    gain.connect(context.destination);
+    return { context, element, analyser, gain };
+  } catch {
+    return null;
+  }
+};
 
 const InspireContext = createContext<InspireContextValue | null>(null);
 
@@ -61,6 +110,7 @@ export const InspireProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [active, setActive] = useState(false);
   const [available, setAvailable] = useState(true);
   const audio = useRef<HTMLAudioElement | null>(null);
+  const graph = useRef<AudioGraph | null>(null);
 
   useEffect(() => {
     getInspireConfig().then((config) => setAvailable(config.enabled));
@@ -69,6 +119,9 @@ export const InspireProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const close = useCallback(() => {
     setActive(false);
     audio.current?.pause();
+    graph.current?.element.pause();
+    // A suspended context costs the TV nothing while the show is closed.
+    graph.current?.context.suspend().catch(() => undefined);
     leaveFullscreen();
   }, []);
 
@@ -76,6 +129,8 @@ export const InspireProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setActive((on) => {
       if (on) {
         audio.current?.pause();
+        graph.current?.element.pause();
+        graph.current?.context.suspend().catch(() => undefined);
         leaveFullscreen();
         return false;
       }
@@ -87,6 +142,14 @@ export const InspireProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const element = audio.current;
       element.muted = true;
       element.play().then(() => element.pause()).catch(() => undefined).finally(() => { element.muted = false; });
+      // The Web Audio player is made and unlocked in the same click.
+      graph.current ??= createGraph();
+      if (graph.current) {
+        const routed = graph.current.element;
+        graph.current.context.resume().catch(() => undefined);
+        routed.muted = true;
+        routed.play().then(() => routed.pause()).catch(() => undefined).finally(() => { routed.muted = false; });
+      }
       enterFullscreen();
       return true;
     });
@@ -113,7 +176,7 @@ export const InspireProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, [active, close]);
 
-  const value = useMemo(() => ({ active, available, toggle, close, audio }), [active, available, toggle, close]);
+  const value = useMemo(() => ({ active, available, toggle, close, audio, graph }), [active, available, toggle, close]);
 
   return (
     <InspireContext.Provider value={value}>

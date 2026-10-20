@@ -2826,7 +2826,7 @@ html.is-presenting::-webkit-scrollbar {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  width: 21rem;
+  width: 23.5rem;
   max-width: 80vw;
   border-radius: 999px;
   background: rgb(20 22 26 / 0.62);
@@ -2834,6 +2834,179 @@ html.is-presenting::-webkit-scrollbar {
   box-shadow: inset 0 0 0 1px rgb(198 161 91 / 0.45), 0 14px 30px -16px rgb(0 0 0 / 0.8);
 }
 
+
+/* ── "Inspire me": transitions between pictures (InspireSlideshow) ───────
+   Transform and opacity only, so a TV's compositor does the work. --dir is
+   1 going forwards and -1 going back; distances and pivots multiply by it. */
+
+.tr-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  perspective: 1800px;
+  contain: strict;
+}
+
+.tr-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.tr-picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation-fill-mode: both;
+  animation-timing-function: linear;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.tr-anim {
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform, opacity;
+}
+
+.tr-anim > .tr-picture {
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@keyframes tr-dissolve-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tr-dissolve-out { from { opacity: 1; } to { opacity: 1; } }
+
+@keyframes tr-push-in {
+  from { transform: translate3d(calc(var(--dir, 1) * 100%), 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+@keyframes tr-push-out {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(calc(var(--dir, 1) * -100%), 0, 0); }
+}
+
+/* Slide over: the new picture covers the old, which sinks back and dims. */
+@keyframes tr-cover-in {
+  from { transform: translate3d(calc(var(--dir, 1) * 100%), 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+@keyframes tr-cover-out {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: translate3d(calc(var(--dir, 1) * -6%), 0, 0) scale(0.9); opacity: 0.3; }
+}
+
+/* A zoom without blur: scale and opacity only. */
+@keyframes tr-zoom-in {
+  from { transform: scale(1.22); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes tr-zoom-out {
+  from { transform: scale(1); }
+  to { transform: scale(0.88); }
+}
+
+/* Wipe: the frame slides in while the picture inside slides the other way,
+   so the picture stands still and only its edge sweeps across. */
+@keyframes tr-wipe-in {
+  from { transform: translate3d(calc(var(--dir, 1) * -100%), 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+@keyframes tr-wipe-inner {
+  from { transform: translate3d(calc(var(--dir, 1) * 100%), 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+@keyframes tr-wipe-out { from { opacity: 1; } to { opacity: 1; } }
+
+/* Iris: a circle opening from the centre, the picture settling inside it.
+   The stage's size comes from InspireSlideshow (--tr-w, --tr-h, --tr-d). */
+.tr-layer.tr-iris {
+  inset: auto;
+  left: calc((var(--tr-w) - var(--tr-d)) / 2);
+  top: calc((var(--tr-h) - var(--tr-d)) / 2);
+  width: var(--tr-d);
+  height: var(--tr-d);
+  border-radius: 50%;
+}
+.tr-iris > .tr-picture {
+  inset: auto;
+  left: calc((var(--tr-d) - var(--tr-w)) / 2);
+  top: calc((var(--tr-d) - var(--tr-h)) / 2);
+  width: var(--tr-w);
+  height: var(--tr-h);
+}
+@keyframes tr-iris-in { from { transform: scale(0.001); } to { transform: scale(1); } }
+@keyframes tr-iris-inner { from { transform: scale(1.35); } to { transform: scale(1); } }
+@keyframes tr-iris-out { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+/* Cube: the two pictures are neighbouring faces turning on their shared edge. */
+@keyframes tr-cube-in {
+  from {
+    transform-origin: calc(50% - var(--dir, 1) * 50%) 50%;
+    transform: translate3d(calc(var(--dir, 1) * 100%), 0, 0) rotateY(calc(var(--dir, 1) * 90deg));
+  }
+  to {
+    transform-origin: calc(50% - var(--dir, 1) * 50%) 50%;
+    transform: translate3d(0, 0, 0) rotateY(0deg);
+  }
+}
+@keyframes tr-cube-out {
+  from {
+    transform-origin: calc(50% + var(--dir, 1) * 50%) 50%;
+    transform: translate3d(0, 0, 0) rotateY(0deg);
+  }
+  to {
+    transform-origin: calc(50% + var(--dir, 1) * 50%) 50%;
+    transform: translate3d(calc(var(--dir, 1) * -100%), 0, 0) rotateY(calc(var(--dir, 1) * -90deg));
+  }
+}
+
+/* Flip: one card, the new picture on its back. */
+@keyframes tr-flip-in {
+  from { transform: rotateY(calc(var(--dir, 1) * 180deg)); }
+  to { transform: rotateY(0deg); }
+}
+@keyframes tr-flip-out {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(calc(var(--dir, 1) * -180deg)); }
+}
+
+/* Ken Burns: four slow drifts, taken in turn. */
+@keyframes tr-drift-0 {
+  from { transform: scale(1.02) translate3d(0, 0, 0); }
+  to { transform: scale(1.14) translate3d(-1.6%, -1%, 0); }
+}
+@keyframes tr-drift-1 {
+  from { transform: scale(1.14) translate3d(1.6%, 0.6%, 0); }
+  to { transform: scale(1.03) translate3d(0, 0, 0); }
+}
+@keyframes tr-drift-2 {
+  from { transform: scale(1.04) translate3d(-1.2%, 1%, 0); }
+  to { transform: scale(1.15) translate3d(1.6%, -1.2%, 0); }
+}
+@keyframes tr-drift-3 {
+  from { transform: scale(1.12) translate3d(0, -1.4%, 0); }
+  to { transform: scale(1.02) translate3d(-1%, 1%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tr-anim,
+  .tr-picture {
+    animation-duration: 1ms !important;
+  }
+}
+
+/* The music, drawn: a canvas over the background (InspireVisualizer). */
+.inspire-visualizer {
+  position: absolute;
+  inset-inline: 0;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 600ms ease;
+}
 
 /* The tour page's booking buttons, in this site's button language. */
 .dv-book-cart,

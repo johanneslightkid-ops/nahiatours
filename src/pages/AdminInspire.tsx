@@ -2,7 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { HiArrowDown, HiArrowUp, HiMusicNote, HiPlus, HiTrash, HiUpload } from 'react-icons/hi';
 import { useI18n, type Locale } from '../contexts/I18nContext';
 import { adminLang } from '../lib/adminNav';
-import { DEFAULT_INSPIRE, getInspireConfig, InspireConfig, InspireEffect, saveInspireConfig } from '../edt/inspireConfig';
+import {
+  DEFAULT_INSPIRE,
+  getInspireConfig,
+  INSPIRE_TRANSITIONS,
+  InspireConfig,
+  InspireEffect,
+  InspireQuality,
+  InspireTransition,
+  saveInspireConfig,
+  VisualizerPosition,
+  VisualizerStyle,
+} from '../edt/inspireConfig';
+import InspireSlideshow from '../components/edt/inspire/InspireSlideshow';
 import { adminText, uploadAdminFile } from '../edt/adminUpload';
 import { getTours, Tour } from '../services/toursService';
 import { getAdminPassword } from '../services/authStore';
@@ -10,6 +22,42 @@ import { useInspire } from '../components/edt/inspire/InspireContext';
 
 const LANGS: Locale[] = ['en', 'es', 'fr', 'de'];
 const EFFECTS: InspireEffect[] = ['caustics', 'sunglow', 'bokeh', 'none'];
+
+const TRANSITION_NAMES: Record<InspireTransition, { en: string; es: string }> = {
+  kenburns: { en: 'Ken Burns (dissolve and slow drift)', es: 'Ken Burns (fundido y deriva lenta)' },
+  dissolve: { en: 'Cross-dissolve', es: 'Fundido encadenado' },
+  push: { en: 'Push', es: 'Empujar' },
+  cover: { en: 'Slide over', es: 'Deslizar encima' },
+  zoom: { en: 'Zoom', es: 'Zoom' },
+  wipe: { en: 'Wipe', es: 'Barrido' },
+  iris: { en: 'Iris (circle)', es: 'Iris (círculo)' },
+  cube: { en: 'Cube', es: 'Cubo' },
+  flip: { en: 'Flip', es: 'Voltear' },
+  random: { en: 'A different one each time', es: 'Una distinta cada vez' },
+};
+
+/** A small live preview of the chosen transition, on the show's own stills. */
+const TransitionPreview: React.FC<{ config: InspireConfig }> = ({ config }) => {
+  const slides = config.backgroundSlides.length ? config.backgroundSlides.slice(0, 4) : DEFAULT_INSPIRE.backgroundSlides.slice(0, 4);
+  const [index, setIndex] = useState(0);
+  const hold = 1.4;
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIndex((value) => (value + 1) % slides.length), (hold + config.transitionSeconds) * 1000);
+    return () => window.clearTimeout(timer);
+  }, [index, slides.length, config.transitionSeconds]);
+  return (
+    <div className="relative aspect-video overflow-hidden rounded-md bg-ink">
+      <InspireSlideshow
+        slides={slides}
+        index={index}
+        transition={config.transition}
+        transitionSeconds={config.transitionSeconds}
+        holdSeconds={hold}
+        drift
+      />
+    </div>
+  );
+};
 
 /**
  * Admin → Inspire: everything about the full-screen show for the shop's TV.
@@ -171,6 +219,141 @@ const AdminInspire: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Slideshow and transitions */}
+        <div className={card}>
+          <h2 className="font-display text-xl uppercase">{say({ en: 'Background slideshow & transitions', es: 'Fondo en diapositivas y transiciones' })}</h2>
+          <p className="mt-1 max-w-2xl text-sm text-ink-soft">
+            {say({
+              en: 'The stills behind the show, one after another, and how each picture gives way to the next — the same transition is used for a tour’s photos. With stills here, they replace the animated background above.',
+              es: 'Las fotos detrás del show, una tras otra, y cómo cada imagen da paso a la siguiente — la misma transición se usa en las fotos de cada tour. Si hay fotos aquí, sustituyen al fondo animado de arriba.',
+            })}
+          </p>
+          <div className="mt-4 grid gap-4 md:grid-cols-[18rem,1fr]">
+            <TransitionPreview config={config} />
+            <div className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <label className="text-xs font-semibold text-ink-soft sm:col-span-3">
+                  {say({ en: 'Transition', es: 'Transición' })}
+                  <select className={field} value={config.transition} onChange={(event) => set({ transition: event.target.value as InspireTransition })}>
+                    {INSPIRE_TRANSITIONS.map((name) => (
+                      <option key={name} value={name}>{say(TRANSITION_NAMES[name])}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-xs font-semibold text-ink-soft">
+                  {say({ en: 'Seconds per picture', es: 'Segundos por imagen' })}
+                  <input type="number" min={3} max={60} className={field} value={config.backgroundSeconds} onChange={(event) => set({ backgroundSeconds: Number(event.target.value) })} />
+                </label>
+                <label className="text-xs font-semibold text-ink-soft">
+                  {say({ en: 'Transition length (s)', es: 'Duración de la transición (s)' })}
+                  <input type="number" min={0.3} max={5} step={0.1} className={field} value={config.transitionSeconds} onChange={(event) => set({ transitionSeconds: Number(event.target.value) })} />
+                </label>
+                <label className="text-xs font-semibold text-ink-soft">
+                  {say({ en: 'Quality on this TV', es: 'Calidad en esta TV' })}
+                  <select className={field} value={config.quality} onChange={(event) => set({ quality: event.target.value as InspireQuality })}>
+                    <option value="auto">{say({ en: 'Automatic (steps down if the TV struggles)', es: 'Automática (baja sola si la TV no puede)' })}</option>
+                    <option value="high">{say({ en: 'Full', es: 'Completa' })}</option>
+                    <option value="balanced">{say({ en: 'Balanced (softer light effect)', es: 'Equilibrada (efecto de luz más suave)' })}</option>
+                    <option value="lite">{say({ en: 'Light (no light effect, no drift)', es: 'Ligera (sin efecto de luz ni deriva)' })}</option>
+                  </select>
+                </label>
+              </div>
+              <label className="block text-xs font-semibold text-ink-soft">
+                {say({ en: 'Stills, one URL per line (empty: use the animated background)', es: 'Fotos, una URL por línea (vacío: usar el fondo animado)' })}
+                <textarea
+                  rows={4}
+                  className={`${field} font-mono text-xs`}
+                  value={config.backgroundSlides.join('\n')}
+                  onChange={(event) => set({ backgroundSlides: event.target.value.split('\n').map((line) => line.trim()).filter(Boolean) })}
+                />
+              </label>
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-ink px-3 py-2 text-xs font-semibold text-paper">
+                  <HiUpload /> {busy === 'slide' ? '…' : say({ en: 'Add a still', es: 'Añadir una foto' })}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(event) =>
+                      event.target.files?.[0] &&
+                      upload(event.target.files[0], 'inspire', (url) => set({ backgroundSlides: [...config.backgroundSlides, url] }), 'slide')
+                    }
+                  />
+                </label>
+                <label className="flex items-center gap-2 text-xs font-semibold text-ink-soft">
+                  <input type="checkbox" checked={config.cloudinaryAiUpscale} onChange={(event) => set({ cloudinaryAiUpscale: event.target.checked })} />
+                  {say({
+                    en: 'AI upscaling for uploaded photos on the TV (Cloudinary e_upscale, uses credits)',
+                    es: 'Escalado con IA para fotos subidas en la TV (Cloudinary e_upscale, consume créditos)',
+                  })}
+                </label>
+              </div>
+              <p className="text-xs text-ink-light">
+                {say({
+                  en: 'On a big screen, the site’s own photos are shown from upscaled, sharpened copies (-uhd), and uploaded ones are scaled and sharpened by Cloudinary.',
+                  es: 'En una pantalla grande, las fotos propias del sitio se muestran desde copias ampliadas y enfocadas (-uhd), y las subidas las amplía y enfoca Cloudinary.',
+                })}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Visualizer */}
+        <div className={card}>
+          <h2 className="font-display text-xl uppercase">{say({ en: 'Music visualizer', es: 'Visualizador de música' })}</h2>
+          <p className="mt-1 max-w-2xl text-sm text-ink-soft">
+            {say({
+              en: 'The music, drawn over the background while it plays. It can be switched on and off from the music player in the show; this is how it starts and how it looks. Songs uploaded here can be drawn; a song linked from another site may not allow it, and plays without.',
+              es: 'La música, dibujada sobre el fondo mientras suena. Se enciende y apaga desde el reproductor del show; aquí decides cómo empieza y cómo se ve. Las canciones subidas aquí se pueden dibujar; una enlazada desde otro sitio puede no permitirlo, y suena sin él.',
+            })}
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            <label className="flex items-center gap-2 text-sm font-semibold sm:col-span-3 lg:col-span-6">
+              <input type="checkbox" checked={config.visualizer.enabled} onChange={(event) => set({ visualizer: { ...config.visualizer, enabled: event.target.checked } })} />
+              {say({ en: 'On when the show starts', es: 'Encendido al empezar el show' })}
+            </label>
+            <label className="text-xs font-semibold text-ink-soft">
+              {say({ en: 'Style', es: 'Estilo' })}
+              <select className={field} value={config.visualizer.style} onChange={(event) => set({ visualizer: { ...config.visualizer, style: event.target.value as VisualizerStyle } })}>
+                <option value="bars">{say({ en: 'Spectrum bars', es: 'Barras de espectro' })}</option>
+                <option value="mirror">{say({ en: 'Mirrored bars', es: 'Barras en espejo' })}</option>
+                <option value="wave">{say({ en: 'Waveform', es: 'Forma de onda' })}</option>
+              </select>
+            </label>
+            <label className="text-xs font-semibold text-ink-soft">
+              {say({ en: 'Position', es: 'Posición' })}
+              <select className={field} value={config.visualizer.position} onChange={(event) => set({ visualizer: { ...config.visualizer, position: event.target.value as VisualizerPosition } })}>
+                <option value="bottom">{say({ en: 'Bottom', es: 'Abajo' })}</option>
+                <option value="middle">{say({ en: 'Middle', es: 'Centro' })}</option>
+                <option value="top">{say({ en: 'Top', es: 'Arriba' })}</option>
+              </select>
+            </label>
+            <label className="text-xs font-semibold text-ink-soft">
+              {say({ en: 'Opacity', es: 'Opacidad' })} · {Math.round(config.visualizer.opacity * 100)}%
+              <input type="range" min={0.05} max={1} step={0.05} value={config.visualizer.opacity} onChange={(event) => set({ visualizer: { ...config.visualizer, opacity: Number(event.target.value) } })} className="mt-2 w-full" />
+            </label>
+            <label className="text-xs font-semibold text-ink-soft">
+              {say({ en: 'Height', es: 'Altura' })} · {Math.round(config.visualizer.height * 100)}%
+              <input type="range" min={0.08} max={0.5} step={0.02} value={config.visualizer.height} onChange={(event) => set({ visualizer: { ...config.visualizer, height: Number(event.target.value) } })} className="mt-2 w-full" />
+            </label>
+            <label className="text-xs font-semibold text-ink-soft">
+              {say({ en: 'Colour, bottom', es: 'Color, abajo' })}
+              <input type="color" className="mt-1 block h-9 w-full cursor-pointer rounded-md" value={config.visualizer.colorFrom} onChange={(event) => set({ visualizer: { ...config.visualizer, colorFrom: event.target.value } })} />
+            </label>
+            <label className="text-xs font-semibold text-ink-soft">
+              {say({ en: 'Colour, top', es: 'Color, arriba' })}
+              <input type="color" className="mt-1 block h-9 w-full cursor-pointer rounded-md" value={config.visualizer.colorTo} onChange={(event) => set({ visualizer: { ...config.visualizer, colorTo: event.target.value } })} />
+            </label>
+          </div>
+          <button
+            type="button"
+            onClick={() => set({ visualizer: DEFAULT_INSPIRE.visualizer })}
+            className="mt-3 text-xs font-semibold text-ink-soft underline underline-offset-2"
+          >
+            {say({ en: 'Back to the brand’s amber and gold', es: 'Volver al ámbar y oro de la marca' })}
+          </button>
         </div>
 
         {/* Tours */}
