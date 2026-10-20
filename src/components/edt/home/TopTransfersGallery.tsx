@@ -38,16 +38,18 @@ const TransferCard: React.FC<{ service: Tour; locale: Locale; phone: string }> =
   const pax = paxOf(service.description);
   return (
     <article className="transfer-card group w-[19rem] sm:w-[24rem]">
-      <div className="relative aspect-[3/2] overflow-hidden bg-white">
+      <Link to={path} onClick={() => playClickFx()} className="relative block aspect-[3/2] overflow-hidden bg-white no-underline" draggable={false} aria-label={`${service.title} — ${COPY.details[locale]}`}>
         <img src={smallImage(service.image)} alt={service.title} loading="lazy" decoding="async" draggable={false} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
         {pax && (
           <span className="absolute left-3 top-3 badge badge-ink">
             <HiUserGroup className="h-3.5 w-3.5 text-mango-light" /> {pax[1]}–{pax[2]}
           </span>
         )}
-      </div>
+      </Link>
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-display text-[1.6rem] uppercase leading-none text-ink">{service.title}</h3>
+        <h3 className="font-display text-[1.6rem] uppercase leading-none text-ink">
+          <Link to={path} onClick={() => playClickFx()} className="text-ink no-underline hover:text-mango-dark" draggable={false}>{service.title}</Link>
+        </h3>
         <p className="mt-3 line-clamp-3 text-[0.95rem] leading-relaxed text-ink-soft">{service.description}</p>
         <div className="mt-auto flex items-end justify-between gap-3 pt-5">
           <span className="font-display text-3xl leading-none text-ink">{service.price}</span>
@@ -65,7 +67,12 @@ const TransferCard: React.FC<{ service: Tour; locale: Locale; phone: string }> =
   );
 };
 
-/** Above the recognition: the fleet, as a reel. With three services it shows the chauffeur photograph between them. */
+/**
+ * Above the recognition: the fleet, as a reel. With three services it shows the
+ * chauffeur photograph between them. With the pointer anywhere over the
+ * section the half it is on steers the reel (left half: it runs back, right
+ * half: on), and the photograph of a vehicle opens its page like the arrow does.
+ */
 const TopTransfersGallery: React.FC = () => {
   const { locale } = useI18n();
   const { brandSettings } = useBrand();
@@ -111,7 +118,6 @@ const TopTransfersGallery: React.FC = () => {
         }
         regionRef={region}
         speed={28}
-        direction={-1}
         label={COPY.label[locale]}
       />
       <div className="section-shell mt-10">

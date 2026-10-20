@@ -197,7 +197,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-paper/55 sm:flex-row sm:items-center sm:justify-between">
+          <div id="footer-bar" className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-paper/55 sm:flex-row sm:items-center sm:justify-between">
             <span>© {year} {brandSettings.brandName}. {t(locale, COPY.rights)}</span>
             <Link to="/admin" className="inline-flex items-center gap-1 text-sm font-medium text-paper/45 no-underline hover:text-mango-light">
               <MdAdminPanelSettings /> Admin

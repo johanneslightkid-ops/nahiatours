@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { getBrandSettings, saveBrandSettings, BrandSettings, uploadBrandIcon } from '../services/brandService';
 import { showsBrandName } from '../lib/brandDisplay';
 import BrandIconEditor from '../components/admin/BrandIconEditor';
-import HeroMediaAdmin from '../components/admin/HeroMediaAdmin';
 import { getTours, saveTours, Tour } from '../services/toursService';
 import { useI18n } from '../contexts/I18nContext';
 import ServiceAdminPanel from '../components/admin/ServiceAdminPanel';
@@ -172,7 +171,10 @@ const Admin: React.FC = () => {
                   placeholder="Enlace de PayPal"
                   className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
                 />
-                <HeroMediaAdmin brandSettings={brandSettings} setBrandSettings={setBrandSettings} />
+                <p className="md:col-span-2 rounded-2xl bg-paper-warm/60 px-4 py-3 text-sm text-ink-soft">
+                  El fondo de la portada (fotos y videos) se cambia en{' '}
+                  <a href="/admin/look" className="font-bold text-lagoon-dark underline">Admin › Aspecto</a>.
+                </p>
                 <div className="flex gap-3">
                   <button
                     onClick={async () => {

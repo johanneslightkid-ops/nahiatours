@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { HiChevronLeft, HiChevronRight, HiX } from 'react-icons/hi';
+import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { MdFullscreen } from 'react-icons/md';
-import { useReducedMotion } from 'framer-motion';
+import { AnimatePresence, useReducedMotion } from 'framer-motion';
 import { localeText } from '../../lib/localeText';
+import CoverflowLightbox from '../edt/CoverflowLightbox';
+import { useGalleryMotion } from '../../edt/galleryConfig';
 
 /**
  * The photographs of a tour, one at a time.
@@ -11,8 +12,12 @@ import { localeText } from '../../lib/localeText';
  * A row of full-width slides in a native scroll-snap track: a finger swipes
  * it, a trackpad scrolls it, the arrows, the dots, the thumbnails and the
  * keyboard move it, and the browser does the moving — nothing is animated by
- * script. Only the first photograph is fetched up front. A tap opens the same
- * track full screen.
+ * script. Only the first photograph is fetched up front. A tap opens the
+ * photographs on the full-screen stage (CoverflowLightbox).
+ *
+ * It advances on its own (Admin → Look: on/off, seconds per photograph, the
+ * direction). With the pointer over it, it slows by the admin's share and the
+ * half the pointer is on lights that side's arrow and sets the direction.
  *
  * The look of every part (frame, arrows, dots, thumbnails) comes from the
  * site's own `.dv-carousel*` rules in globals.css; the layout here works
@@ -119,12 +124,13 @@ const Slides: React.FC<{
   );
 };
 
-const Controls: React.FC<{ count: number; index: number; go: (next: number) => void; locale: string; dark?: boolean }> = ({ count, index, go, locale }) =>
+const Controls: React.FC<{ count: number; index: number; go: (next: number) => void; locale: string; lit?: -1 | 0 | 1 }> = ({ count, index, go, locale, lit = 0 }) =>
   count > 1 ? (
     <>
       <button
         type="button"
         onClick={() => go(index - 1)}
+        data-on={lit === -1}
         className="dv-carousel-arrow dv-carousel-prev absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center"
         aria-label={localeText(locale, { en: 'Previous photo', es: 'Foto anterior', de: 'Vorheriges Foto', fr: 'Photo précédente' })}
       >
@@ -133,6 +139,7 @@ const Controls: React.FC<{ count: number; index: number; go: (next: number) => v
       <button
         type="button"
         onClick={() => go(index + 1)}
+        data-on={lit === 1}
         className="dv-carousel-arrow dv-carousel-next absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center"
         aria-label={localeText(locale, { en: 'Next photo', es: 'Foto siguiente', de: 'Nächstes Foto', fr: 'Photo suivante' })}
       >
@@ -157,43 +164,45 @@ const Controls: React.FC<{ count: number; index: number; go: (next: number) => v
     </>
   ) : null;
 
-const Lightbox: React.FC<{ images: string[]; title: string; startAt: number; locale: string; onClose: () => void }> = ({ images, title, startAt, locale, onClose }) => {
-  const { track, index, go, onKeyDown } = useTrack(images.length);
-  useEffect(() => {
-    const root = document.documentElement;
-    const previous = { body: document.body.style.overflow, root: root.style.overflow };
-    document.body.style.overflow = 'hidden';
-    root.style.overflow = 'hidden';
-    const onKey = (event: KeyboardEvent) => event.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    track.current?.focus();
-    return () => {
-      document.body.style.overflow = previous.body;
-      root.style.overflow = previous.root;
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [onClose, track]);
-  return createPortal(
-    <div className="dv-lightbox fixed inset-0 z-[120] bg-ink/95" role="dialog" aria-modal="true" aria-label={title}>
-      <Slides images={images} title={title} track={track} onKeyDown={onKeyDown} fit="contain" startAt={startAt} label={title} />
-      <Controls count={images.length} index={index} go={go} locale={locale} dark />
-      <button
-        type="button"
-        onClick={onClose}
-        className="dv-carousel-arrow dv-lightbox-close absolute left-3 top-3 z-20 grid h-11 w-11 place-items-center"
-        aria-label={localeText(locale, { en: 'Close', es: 'Cerrar', de: 'Schließen', fr: 'Fermer' })}
-      >
-        <HiX className="h-6 w-6" />
-      </button>
-    </div>,
-    document.body
-  );
-};
-
 const DetailCarousel: React.FC<Props> = ({ images, title, locale }) => {
   const { track, index, go, onKeyDown } = useTrack(images.length);
   const [open, setOpen] = useState<number | null>(null);
   const thumbs = useRef<HTMLDivElement>(null);
+  const frame = useRef<HTMLDivElement>(null);
+  const motion = useGalleryMotion();
+  const reduced = useReducedMotion();
+  const [hover, setHover] = useState(false);
+  const [lit, setLit] = useState<-1 | 0 | 1>(0);
+  const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const base: 1 | -1 = motion.direction === 'ltr' ? -1 : 1;
+
+  useEffect(() => {
+    const element = frame.current;
+    if (!element) return undefined;
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { threshold: 0.4 });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  // On its own, one photograph after another; slower under the pointer, which also picks the way.
+  useEffect(() => {
+    if (!motion.detailAutoplay || reduced || images.length < 2 || open !== null || !visible || focused) return undefined;
+    if (hover && motion.hoverSlowdown <= 0) return undefined;
+    const seconds = motion.detailSeconds / (hover ? motion.hoverSlowdown : 1);
+    const step = hover && motion.followPointer && lit !== 0 ? lit : base;
+    const timer = window.setTimeout(() => go(index + step), seconds * 1000);
+    return () => window.clearTimeout(timer);
+  }, [motion, reduced, images.length, open, visible, focused, hover, lit, base, index, go]);
+
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'mouse') return;
+    setHover(true);
+    const box = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - box.left) / box.width;
+    if (motion.followPointer) setLit(x < 0.5 ? -1 : 1);
+    else setLit(base);
+  };
 
   // Keep the current thumbnail in view as the photos change.
   useEffect(() => {
@@ -206,9 +215,20 @@ const DetailCarousel: React.FC<Props> = ({ images, title, locale }) => {
 
   return (
     <div className="dv-carousel" role="region" aria-roledescription="carousel" aria-label={title}>
-      <div className="dv-carousel-frame relative aspect-[4/3] overflow-hidden sm:aspect-[16/10]">
+      <div
+        ref={frame}
+        className="dv-carousel-frame relative aspect-[4/3] overflow-hidden sm:aspect-[16/10]"
+        onPointerMove={onPointerMove}
+        onPointerLeave={() => {
+          setHover(false);
+          setLit(0);
+        }}
+        // A keyboard user reading a photograph should not have it move away; a click is not that.
+        onFocus={(event) => setFocused(event.target.matches(':focus-visible'))}
+        onBlur={() => setFocused(false)}
+      >
         <Slides images={images} title={title} track={track} onKeyDown={onKeyDown} onOpen={setOpen} fit="cover" label={title} />
-        <Controls count={images.length} index={index} go={go} locale={locale} />
+        <Controls count={images.length} index={index} go={go} locale={locale} lit={lit} />
         <button
           type="button"
           onClick={() => setOpen(index)}
@@ -237,7 +257,19 @@ const DetailCarousel: React.FC<Props> = ({ images, title, locale }) => {
         </div>
       )}
 
-      {open !== null && <Lightbox images={images} title={title} startAt={open} locale={locale} onClose={() => setOpen(null)} />}
+      <AnimatePresence>
+        {open !== null && (
+          <CoverflowLightbox
+            items={images.map((src, photo) => ({ src, caption: `${title} — ${photo + 1}` }))}
+            startAt={open}
+            onClose={() => setOpen(null)}
+            label={title}
+            closeLabel={localeText(locale, { en: 'Close', es: 'Cerrar', de: 'Schließen', fr: 'Fermer' })}
+            previousLabel={localeText(locale, { en: 'Previous photo', es: 'Foto anterior', de: 'Vorheriges Foto', fr: 'Photo précédente' })}
+            nextLabel={localeText(locale, { en: 'Next photo', es: 'Foto siguiente', de: 'Nächstes Foto', fr: 'Photo suivante' })}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

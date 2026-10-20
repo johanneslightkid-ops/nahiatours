@@ -1,22 +1,27 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
+import { useGalleryMotion } from '../../edt/galleryConfig';
 
 interface AutoScrollGalleryProps<T> {
   items: T[];
   renderItem: (item: T, index: number) => React.ReactNode;
   /** Key of an item; clones get a suffix. */
   itemKey: (item: T, index: number) => string;
-  /** Pixels per second while it drives itself. */
+  /** Pixels per second while it drives itself, before the admin's speed factor. */
   speed?: number;
-  /** 1 runs right to left (the content travels left), -1 the other way. */
+  /**
+   * 1 runs right to left (the content travels left), -1 the other way.
+   * Leave it out to follow the site's setting (Admin → Look).
+   */
   direction?: 1 | -1;
   /** Tailwind classes for the gap between items, e.g. "gap-5". */
   gapClassName?: string;
   className?: string;
-  /** Pause and hand over control while the pointer is over this element instead of the strip itself. */
+  /** Slow down, and let the pointer steer, while it is over this element instead of the strip itself. */
   regionRef?: React.RefObject<HTMLElement>;
+  /** The two direction cues at the sides, lit by the half the pointer is on. */
   arrows?: boolean;
-  /** Arrow buttons on a dark band. */
+  /** Cues on a dark band. */
   tone?: 'light' | 'dark';
   label: string;
 }
@@ -24,29 +29,39 @@ interface AutoScrollGalleryProps<T> {
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-/** How close to an edge the pointer has to be to steer, as a share of the width. */
-const EDGE = 0.2;
+/**
+ * Every reel runs a third faster than it was first designed to; the admin's
+ * factor goes on top of that.
+ */
+const PACE = 4 / 3;
+
+/** How long manual scrolling (touch, wheel, drag) keeps the autopilot off, in ms. */
+const HANDS_OFF_MS = 2400;
 
 /**
- * A strip of cards that drives itself, and hands the wheel over the moment
- * you reach for it.
+ * A strip of cards that drives itself.
  *
  * It runs on its own, endlessly (three copies of the items, re-centred
- * whenever it nears either end). Put the pointer anywhere over the section and
- * it stops dead; from then on it is yours: hold the pointer near the left or
- * right edge and it glides that way — the closer, the faster — drag it, swipe
- * it, use the arrows or a trackpad. Take the pointer away and it carries on.
+ * whenever it nears either end), in the direction set in the admin. With the
+ * pointer over its section it slows down (by the admin's share) and, unless
+ * the admin turned it off, the half of the strip the pointer is on decides
+ * which way it runs — the further out, the faster. The cue on that side
+ * lights up to say so. Drag it, swipe it, or use a trackpad and it hands
+ * over until you let go.
  *
- * It moves by scrolling, not by animating a transform, so every manual way
- * of moving a list (touch, trackpad, keyboard, the arrows) works on the very
- * same position the autopilot drives. Off screen it does nothing at all.
+ * The speed is eased towards its target every frame rather than switched, so
+ * slowing down, turning round and picking up again glide instead of jerk.
+ *
+ * It moves by scrolling, not by animating a transform, so every manual way of
+ * moving a list (touch, trackpad, keyboard) works on the very same position
+ * the autopilot drives. Off screen it does nothing at all.
  */
 function AutoScrollGallery<T>({
   items,
   renderItem,
   itemKey,
   speed = 38,
-  direction = 1,
+  direction,
   gapClassName = 'gap-5',
   className = '',
   regionRef,
@@ -54,15 +69,24 @@ function AutoScrollGallery<T>({
   tone = 'light',
   label,
 }: AutoScrollGalleryProps<T>) {
+  const motion = useGalleryMotion();
   const scroller = useRef<HTMLDivElement>(null);
   const firstSet = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState(false);
+  const [lit, setLit] = useState<-1 | 0 | 1>(0);
   const hoverRef = useRef(false);
-  const steer = useRef(0);
+  /** Where the pointer is across the strip, 0–1; null when it is not over the region. */
+  const pointerX = useRef<number | null>(null);
+  const steerSign = useRef<1 | -1>(1);
+  const velocity = useRef(0);
   const touchedAt = useRef(0);
   const inView = useRef(false);
   const position = useRef(0);
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
+
+  const baseDirection: 1 | -1 = direction ?? (motion.direction === 'ltr' ? -1 : 1);
+  const settings = useRef({ speed: speed * PACE * motion.speed, base: baseDirection, slow: motion.hoverSlowdown, follow: motion.followPointer });
+  settings.current = { speed: speed * PACE * motion.speed, base: baseDirection, slow: motion.hoverSlowdown, follow: motion.followPointer };
 
   const copies = useMemo(() => (items.length ? [0, 1, 2] : []), [items.length]);
 
@@ -88,19 +112,19 @@ function AutoScrollGallery<T>({
     const strip = scroller.current;
     if (!strip || !items.length) return undefined;
     // Start in the middle copy.
-    const start = () => {
-      const width = setWidth();
-      if (width) {
-        strip.scrollLeft = width;
-        position.current = strip.scrollLeft;
-      }
-    };
-    start();
+    const width = setWidth();
+    if (width) {
+      strip.scrollLeft = width;
+      position.current = strip.scrollLeft;
+    }
     const observer = new IntersectionObserver(([entry]) => {
       inView.current = entry.isIntersecting;
     });
     observer.observe(strip);
-    const onResize = () => recentre();
+    const onResize = () => {
+      recentre();
+      position.current = strip.scrollLeft;
+    };
     window.addEventListener('resize', onResize);
     return () => {
       observer.disconnect();
@@ -108,7 +132,7 @@ function AutoScrollGallery<T>({
     };
   }, [items.length, recentre, setWidth]);
 
-  // The autopilot and the edge steering share one frame loop.
+  // One frame loop: work out the speed it should have, ease towards it, move.
   useEffect(() => {
     if (!items.length) return undefined;
     const reduced = prefersReducedMotion();
@@ -121,25 +145,49 @@ function AutoScrollGallery<T>({
       if (strip && inView.current && !drag.current) {
         // Someone scrolled it by hand since the last frame: take their position.
         if (Math.abs(strip.scrollLeft - position.current) > 2) position.current = strip.scrollLeft;
-        const idle = Date.now() - touchedAt.current > 2600;
-        let velocity = 0;
-        if (hoverRef.current) velocity = steer.current;
-        else if (idle && !reduced) velocity = speed * direction;
-        if (velocity) {
-          position.current += velocity * dt;
+        const { speed: pace, base, slow, follow } = settings.current;
+        const handsOff = Date.now() - touchedAt.current > HANDS_OFF_MS;
+        let target = 0;
+        if (handsOff && !reduced) {
+          if (hoverRef.current) {
+            let sign: 1 | -1 = base;
+            let boost = 1;
+            const x = pointerX.current;
+            if (follow && x !== null) {
+              // A narrow dead band in the middle keeps the direction it had,
+              // so a pointer resting near the centre does not flicker it.
+              if (x < 0.46) steerSign.current = -1;
+              else if (x > 0.54) steerSign.current = 1;
+              sign = steerSign.current;
+              const out = Math.max(0, (Math.abs(x - 0.5) - 0.1) / 0.4);
+              boost = 1 + 1.6 * out * out;
+            }
+            target = pace * slow * boost * sign;
+          } else {
+            target = pace * base;
+          }
+        }
+        // Ease the speed: about a quarter of a second to settle.
+        velocity.current += (target - velocity.current) * (1 - Math.exp(-dt * 5));
+        if (Math.abs(velocity.current) > 0.05) {
+          position.current += velocity.current * dt;
           strip.scrollLeft = position.current;
           const before = strip.scrollLeft;
           recentre();
-          if (strip.scrollLeft !== before) position.current = strip.scrollLeft;
+          if (strip.scrollLeft !== before) position.current += strip.scrollLeft - before;
         }
       }
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [items.length, speed, direction, recentre]);
+  }, [items.length, recentre]);
 
-  // Hovering the region (or the strip) stops it and turns the edges into a throttle.
+  // The pointer over the region slows the strip and, if allowed, steers it.
+  // Re-run once the items arrive: before that there is no strip to measure,
+  // and reels whose cards are fetched (the fleet, the tours) used to end up
+  // with no pointer handling at all.
+  const hasItems = items.length > 0;
   useEffect(() => {
     const region = regionRef?.current ?? scroller.current;
     const strip = scroller.current;
@@ -151,20 +199,21 @@ function AutoScrollGallery<T>({
     };
     const leave = () => {
       hoverRef.current = false;
-      steer.current = 0;
+      pointerX.current = null;
       setHover(false);
+      setLit(0);
     };
     const move = (event: PointerEvent) => {
       if (event.pointerType !== 'mouse') return;
-      const box = strip.getBoundingClientRect();
-      if (event.clientY < box.top - 40 || event.clientY > box.bottom + 40) {
-        steer.current = 0;
-        return;
+      if (!hoverRef.current) {
+        hoverRef.current = true;
+        setHover(true);
       }
-      const x = (event.clientX - box.left) / box.width;
-      if (x < EDGE) steer.current = -((EDGE - x) / EDGE) * speed * 9;
-      else if (x > 1 - EDGE) steer.current = ((x - (1 - EDGE)) / EDGE) * speed * 9;
-      else steer.current = 0;
+      const box = strip.getBoundingClientRect();
+      const x = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width));
+      pointerX.current = x;
+      if (settings.current.follow) setLit(x < 0.46 ? -1 : x > 0.54 ? 1 : (steerSign.current as -1 | 1));
+      else setLit(settings.current.base);
     };
     region.addEventListener('pointerenter', enter);
     region.addEventListener('pointerleave', leave);
@@ -174,7 +223,7 @@ function AutoScrollGallery<T>({
       region.removeEventListener('pointerleave', leave);
       region.removeEventListener('pointermove', move);
     };
-  }, [regionRef, speed]);
+  }, [regionRef, hasItems]);
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     touchedAt.current = Date.now();
@@ -190,6 +239,7 @@ function AutoScrollGallery<T>({
     if (drag.current.moved) {
       strip.scrollLeft = drag.current.left - dx;
       position.current = strip.scrollLeft;
+      velocity.current = 0;
     }
   };
 
@@ -200,6 +250,8 @@ function AutoScrollGallery<T>({
     recentre();
     position.current = scroller.current?.scrollLeft ?? 0;
     if (moved) {
+      // Hand straight back to the pointer rather than waiting out the touch pause.
+      touchedAt.current = 0;
       // Swallow the click that ends a drag, so dragging over a card does not open it.
       const swallow = (event: MouseEvent) => {
         event.preventDefault();
@@ -210,36 +262,22 @@ function AutoScrollGallery<T>({
     }
   };
 
-  const nudge = (sign: 1 | -1) => {
-    const strip = scroller.current;
-    if (!strip) return;
-    touchedAt.current = Date.now();
-    strip.scrollBy({ left: sign * strip.clientWidth * 0.8, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
-    window.setTimeout(() => {
-      recentre();
-      position.current = strip.scrollLeft;
-    }, 650);
-  };
-
   if (!items.length) return null;
-
-  const arrowClass =
-    tone === 'dark'
-      ? 'bg-white/10 text-white ring-1 ring-white/30 hover:bg-white hover:text-ink'
-      : 'bg-white text-ink ring-1 ring-ink/10 hover:bg-ink hover:text-paper';
 
   return (
     <div className={`relative ${className}`} role="region" aria-label={label}>
       <div
         ref={scroller}
-        className={`edt-gallery flex overflow-x-auto overscroll-x-contain ${hover ? 'cursor-grab' : ''}`}
+        tabIndex={0}
+        className={`edt-gallery flex overflow-x-auto overscroll-x-contain outline-none ${hover ? 'cursor-grab' : ''}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         onPointerLeave={endDrag}
         onTouchStart={() => { touchedAt.current = Date.now(); }}
-        onWheel={() => { touchedAt.current = Date.now(); }}
+        onWheel={(event) => { if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) touchedAt.current = Date.now(); }}
+        onKeyDown={() => { touchedAt.current = Date.now(); }}
       >
         {copies.map((copy) => (
           <div
@@ -258,23 +296,15 @@ function AutoScrollGallery<T>({
       </div>
 
       {arrows && (
-        <div className={`pointer-events-none absolute inset-y-0 left-0 right-0 hidden items-center justify-between px-2 transition-opacity duration-300 md:flex ${hover ? 'opacity-100' : 'opacity-0'}`}>
-          <button
-            type="button"
-            onClick={() => nudge(-1)}
-            className={`pointer-events-auto grid h-12 w-12 place-items-center rounded-full shadow-ink transition ${arrowClass}`}
-            aria-label="Previous"
-          >
-            <HiChevronLeft className="h-6 w-6" />
-          </button>
-          <button
-            type="button"
-            onClick={() => nudge(1)}
-            className={`pointer-events-auto grid h-12 w-12 place-items-center rounded-full shadow-ink transition ${arrowClass}`}
-            aria-label="Next"
-          >
-            <HiChevronRight className="h-6 w-6" />
-          </button>
+        // Not buttons: they show which way the reel is going, and the pointer
+        // being on their half is what turns them on.
+        <div className={`gallery-cues pointer-events-none absolute inset-y-0 left-0 right-0 hidden md:block ${hover ? 'is-hover' : ''}`} data-tone={tone} aria-hidden="true">
+          <span className="gallery-cue gallery-cue-left" data-on={lit === -1}>
+            <HiChevronLeft className="gallery-cue-icon" />
+          </span>
+          <span className="gallery-cue gallery-cue-right" data-on={lit === 1}>
+            <HiChevronRight className="gallery-cue-icon" />
+          </span>
         </div>
       )}
     </div>

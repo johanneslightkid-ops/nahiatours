@@ -1442,6 +1442,18 @@ a:hover {
 .dv-carousel-arrow:hover {
   transform: translateY(-50%) scale(1.08);
 }
+/* The arrow on the half the pointer is on lights up: that is the way the photos go. */
+.dv-carousel-arrow {
+  cursor: default;
+  transition: transform 0.35s var(--ease-out), background-color 0.35s ease, color 0.35s ease;
+}
+.dv-carousel-arrow[data-on='true'] {
+  background: var(--mango);
+  color: var(--ink);
+  transform: translateY(-50%) scale(1.1);
+}
+.dv-carousel-prev[data-on='true'] svg { animation: cue-nudge-left 1s ease-in-out infinite; }
+.dv-carousel-next[data-on='true'] svg { animation: cue-nudge-right 1s ease-in-out infinite; }
 .dv-carousel-zoom:hover,
 .dv-lightbox-close:hover {
   transform: scale(1.08);
@@ -1829,6 +1841,10 @@ a:hover {
 /* ── Galleries ──────────────────────────────────────────────────────────── */
 
 .edt-gallery {
+  /* The reels are driven a frame at a time by script. With the site-wide
+     smooth scrolling every one of those writes started a new smooth scroll
+     that the next frame cancelled, and the reels crawled at a pixel a second. */
+  scroll-behavior: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-left: max(1.25rem, calc((100vw - 80rem) / 2 + 2rem));
@@ -1845,10 +1861,189 @@ a:hover {
   -webkit-user-drag: none;
 }
 
+/* The direction cues at the sides of a reel. They are not buttons: the
+   half of the reel the pointer is on lights its cue and sets the direction. */
+.gallery-cue {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgb(255 255 255 / 0.82);
+  box-shadow: 0 0 0 1px rgb(20 22 26 / 0.08), var(--shade-sm);
+  opacity: 0;
+  transform: translateY(-50%) scale(0.86);
+  transition: opacity 0.35s ease, transform 0.45s var(--ease-out), background-color 0.35s ease, color 0.35s ease;
+  overflow: hidden;
+}
+.gallery-cue-left { left: 1rem; }
+.gallery-cue-right { right: 1rem; }
+.gallery-cues[data-tone='dark'] .gallery-cue {
+  color: #ffffff;
+  background: rgb(255 255 255 / 0.12);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25);
+}
+.gallery-cues.is-hover .gallery-cue {
+  opacity: 0.55;
+  transform: translateY(-50%) scale(0.92);
+}
+.gallery-cues .gallery-cue[data-on='true'] {
+  opacity: 1;
+  color: var(--ink);
+  background: var(--mango);
+  transform: translateY(-50%) scale(1.06);
+}
+/* A ring that keeps rippling out of the lit cue. */
+.gallery-cue::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--mango);
+  opacity: 0;
+}
+.gallery-cue[data-on='true']::after {
+  animation: cue-ripple 1.4s ease-out infinite;
+}
+.gallery-cue-icon {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+.gallery-cue-left[data-on='true'] .gallery-cue-icon {
+  animation: cue-nudge-left 1s ease-in-out infinite;
+}
+.gallery-cue-right[data-on='true'] .gallery-cue-icon {
+  animation: cue-nudge-right 1s ease-in-out infinite;
+}
+@keyframes cue-ripple {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+@keyframes cue-nudge-left {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-4px); }
+}
+@keyframes cue-nudge-right {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-cue::after,
+  .gallery-cue-icon { animation: none !important; }
+}
+
+/* While the "Inspire me" show is up, the page behind it has no scrollbar. */
+html.is-presenting {
+  scrollbar-width: none;
+}
+html.is-presenting::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── The full-screen photo stage ──────────────────────────────────────── */
+.coverflow {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgb(52 56 64 / 0.9) 0%, rgb(14 15 18 / 0.98) 70%),
+    #0e0f12;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.coverflow-card {
+  position: absolute;
+  display: block;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  will-change: transform, opacity;
+}
+.coverflow-card.is-current {
+  cursor: default;
+}
+.coverflow-mount {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  background: #f4f1ea;
+  box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.7);
+}
+.coverflow-mount img {
+  background: #e9e4d8;
+  border-radius: 1px;
+}
+/* The middle one gets the frame: a wider mount, a gold fillet and a deep shadow. */
+.coverflow-card.is-current .coverflow-mount {
+  padding: clamp(10px, 1.6vw, 22px);
+  background: linear-gradient(145deg, #fbf8f1 0%, #ece6d8 100%);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.6) inset,
+    0 0 0 4px var(--ink),
+    0 0 0 5px var(--gold),
+    0 40px 90px -25px rgb(0 0 0 / 0.85);
+}
+.coverflow-card.is-current .coverflow-mount img {
+  box-shadow: 0 0 0 1px var(--gold), 0 2px 10px rgb(0 0 0 / 0.25);
+}
+.coverflow-plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  height: max-content;
+  border-top: 2px solid var(--gold);
+  padding: 0.7rem 1.1rem 0;
+  text-align: center;
+}
+.coverflow-btn {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgb(255 255 255 / 0.08);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.22);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.35s var(--ease-out);
+}
+.coverflow-btn:hover {
+  color: var(--ink);
+  background: var(--mango);
+}
+.coverflow-arrow {
+  width: 3.5rem;
+  height: 3.5rem;
+  transform: translateY(-50%);
+}
+.coverflow-arrow:hover {
+  transform: translateY(-50%) scale(1.08);
+}
+
+.moment-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--condensed);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.moment-row-label::before {
+  content: '';
+  width: 1.75rem;
+  height: 2px;
+  background: var(--mango);
+}
+
 .moment-card {
   position: relative;
   display: block;
-  height: 15rem;
+  height: 12.5rem;
   flex-shrink: 0;
   overflow: hidden;
   border-radius: 6px;
@@ -1859,7 +2054,7 @@ a:hover {
 
 @media (min-width: 640px) {
   .moment-card {
-    height: 19rem;
+    height: 15.5rem;
   }
 }
 

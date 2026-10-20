@@ -1,4 +1,4 @@
-import { FaMapMarkedAlt, FaTv } from 'react-icons/fa';
+import { FaMapMarkedAlt, FaPalette, FaTv } from 'react-icons/fa';
 import type { AdminNavItem } from '../lib/adminNav';
 
 /**
@@ -8,5 +8,7 @@ import type { AdminNavItem } from '../lib/adminNav';
  */
 export const SITE_ADMIN_NAV: AdminNavItem[] = [
   { section: null, path: '/admin/destinations', icon: FaMapMarkedAlt, label: { en: 'Destinations', es: 'Destinos', fr: 'Destinations', de: 'Ziele' } },
+  // The home page's background and how every gallery moves.
+  { section: null, path: '/admin/look', icon: FaPalette, label: { en: 'Look', es: 'Aspecto', fr: 'Style', de: 'Look' } },
   { section: null, path: '/admin/inspire', icon: FaTv, label: { en: 'Inspire', es: 'Inspírame', fr: 'Inspire', de: 'Inspire' } },
 ];

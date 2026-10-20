@@ -94,14 +94,21 @@ export const InspireProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     if (!active) return undefined;
-    const previous = document.body.style.overflow;
+    // The page scrolls on the root element, so locking only <body> left its
+    // scrollbar showing beside the show, doing nothing. Lock both.
+    const root = document.documentElement;
+    const previous = { body: document.body.style.overflow, root: root.style.overflow };
     document.body.style.overflow = 'hidden';
+    root.style.overflow = 'hidden';
+    root.classList.add('is-presenting');
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !fullscreenElement()) close();
     };
     window.addEventListener('keydown', onKey);
     return () => {
-      document.body.style.overflow = previous;
+      document.body.style.overflow = previous.body;
+      root.style.overflow = previous.root;
+      root.classList.remove('is-presenting');
       window.removeEventListener('keydown', onKey);
     };
   }, [active, close]);

@@ -113,7 +113,7 @@ const buildResourceKey = (resource: string, locale?: string) => {
  * admin session and taught operators to ignore the console, which is where the
  * real failures are printed.
  */
-const EMPTY_WHEN_UNSET = new Set(['social-api-settings', 'ai-settings', 'payment-config-public']);
+const EMPTY_WHEN_UNSET = new Set(['social-api-settings', 'ai-settings', 'payment-config-public', 'gallery-config']);
 
 /** Content that is better read in English than not at all. */
 const FALLBACK_TO_ENGLISH = new Set([

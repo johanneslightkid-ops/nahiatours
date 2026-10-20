@@ -113,17 +113,29 @@ const normalizePaymentVisibility = (input: unknown): PaymentVisibility => {
   };
 };
 
-const normalizeHeroMedia = (input: unknown): HeroMediaItem[] => {
-  if (!Array.isArray(input)) return defaultHeroMedia;
+/** The most slides a hero takes; each one is a full-screen download. */
+export const MAX_HERO_MEDIA = 8;
 
-  return defaultHeroMedia.map((fallback, index) => {
-    const item = input[index] as Partial<HeroMediaItem> | undefined;
+/**
+ * Any number of slides from one to eight. The first three fall back to the
+ * defaults slot by slot (a record saved by the old three-card editor with one
+ * URL blank keeps that card); further slides without a URL are dropped.
+ */
+const normalizeHeroMedia = (input: unknown): HeroMediaItem[] => {
+  if (!Array.isArray(input) || input.length === 0) return defaultHeroMedia;
+
+  const items = input.slice(0, MAX_HERO_MEDIA).map((raw, index) => {
+    const item = raw as Partial<HeroMediaItem> | undefined;
+    const fallback = defaultHeroMedia[index];
+    const url = typeof item?.url === 'string' && item.url.trim() ? item.url.trim() : fallback?.url ?? '';
     return {
-      url: typeof item?.url === 'string' && item.url.trim() ? item.url.trim() : fallback.url,
-      type: item?.type === 'video' ? 'video' : item?.type === 'image' ? 'image' : fallback.type,
-      alt: typeof item?.alt === 'string' ? item.alt.trim() : fallback.alt,
-    };
+      url,
+      type: item?.type === 'video' ? 'video' : item?.type === 'image' ? 'image' : fallback?.type ?? (/\.(mp4|webm|mov)(\?|$)/i.test(url) ? 'video' : 'image'),
+      alt: typeof item?.alt === 'string' ? item.alt.trim() : fallback?.alt ?? '',
+    } as HeroMediaItem;
   });
+  const usable = items.filter((item) => item.url);
+  return usable.length ? usable : defaultHeroMedia;
 };
 
 const normalizeHeroRatingRange = (input: unknown): HeroRatingRange => {
