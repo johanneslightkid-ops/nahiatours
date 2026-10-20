@@ -127,12 +127,15 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
         {media.map((item, index) => {
           const on = index === slide;
           return (
-            <div key={`${item.url}-${index}`} className={`hero-slide ${on ? 'is-on' : ''}`}>
+            <div key={`${item.url}-${index}`} className={`hero-slide ${index % 2 ? 'is-back' : ''} ${on ? 'is-on' : ''}`}>
               {item.type === 'video' && showVideo ? (
                 <video className="h-full w-full object-cover" src={item.url} autoPlay muted loop playsInline preload="metadata" />
               ) : item.type === 'video' ? null : (
                 <img
                   src={item.url}
+                  // A phone gets the half-size copy where the site has one.
+                  srcSet={/^\/imgs\/edt\/banners\/hero-[a-z-]+\.webp$/.test(item.url) ? `${item.url.replace(/\.webp$/, '-sm.webp')} 1200w, ${item.url} 2400w` : undefined}
+                  sizes={/^\/imgs\/edt\/banners\/hero-[a-z-]+\.webp$/.test(item.url) ? '100vw' : undefined}
                   alt=""
                   className="h-full w-full object-cover"
                   fetchPriority={index === 0 ? 'high' : 'low'}

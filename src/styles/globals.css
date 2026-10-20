@@ -2354,13 +2354,22 @@ html.is-presenting::-webkit-scrollbar {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transform: scale(1.08);
-  transition: opacity 1.6s ease, transform 8s linear;
+  transform: scale(1.1) translate3d(2%, 0, 0);
+  transition: opacity 1.6s ease, transform 9s linear;
 }
 
 .hero-slide.is-on {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1.02) translate3d(-1%, 0, 0);
+}
+
+/* Every other picture drifts the other way: there, and back again. */
+.hero-slide.is-back {
+  transform: scale(1.1) translate3d(-2%, 0, 0);
+}
+
+.hero-slide.is-back.is-on {
+  transform: scale(1.02) translate3d(1%, 0, 0);
 }
 
 .hero-grain {

@@ -1,5 +1,6 @@
 import { apiGet, apiPut } from './apiClient';
 import { getAdminPassword } from './authStore';
+import { SITE_DEFAULTS } from '../config/siteDefaults';
 
 /** Per-method show/hide switches. A missing entry means "show when configured". */
 export interface PaymentVisibility {
@@ -22,7 +23,8 @@ export interface HeroMediaItem {
   alt?: string;
 }
 
-export const defaultHeroMedia: HeroMediaItem[] = [
+/** A site's own (src/config/siteDefaults.ts) when it sets them; these otherwise. */
+export const defaultHeroMedia: HeroMediaItem[] = (SITE_DEFAULTS as { heroMedia?: HeroMediaItem[] }).heroMedia ?? [
   { url: '/buggy.mp4', type: 'video', alt: 'Buggy adventure in Punta Cana' },
   { url: '/imgs/tours/tour_saona_island_detail_9.jpg', type: 'image', alt: 'Saona Island shore' },
   { url: '/imgs/tours/tour_speed_boat_detail_5.jpg', type: 'image', alt: 'Caribbean speedboat' },

@@ -22,7 +22,7 @@ import PromisesSection from '../components/edt/home/PromisesSection';
 import TopTransfersGallery from '../components/edt/home/TopTransfersGallery';
 import RecognitionSection from '../components/edt/home/RecognitionSection';
 
-const HERO_BACKGROUND_IMAGE = '/imgs/edt/banners/excursions.webp';
+const HERO_BACKGROUND_IMAGE = '/imgs/edt/banners/hero-party.webp';
 
 /**
  * The landing page, top to bottom: the hero (with the "Inspire me" switch),

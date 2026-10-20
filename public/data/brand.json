@@ -7,19 +7,14 @@
   "brandicon": "/imgs/edt/brand/mark.webp",
   "heroMedia": [
     {
-      "url": "/imgs/edt/banners/excursions.webp",
+      "url": "/imgs/edt/banners/hero-party.webp",
       "type": "image",
-      "alt": "Zipline over the Punta Cana jungle"
+      "alt": "A party catamaran off Bávaro beach"
     },
     {
-      "url": "/imgs/edt/tours/adventure-boogies/1.webp",
+      "url": "/imgs/edt/banners/hero-catamaran.webp",
       "type": "image",
-      "alt": "Boogies on the jungle trail"
-    },
-    {
-      "url": "/imgs/edt/tours/saona-island-tour-palmilla-beach/1.webp",
-      "type": "image",
-      "alt": "Saona Island, Palmilla Beach"
+      "alt": "Guests in the turquoise water beside a catamaran"
     }
   ],
   "heroRatingEnabled": true,
