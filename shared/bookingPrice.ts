@@ -34,6 +34,8 @@ export interface BookingRequest {
   locale?: string;
   /** Where to send the guest back to, e.g. "/tours". Path only. */
   returnPath?: string;
+  /** 'apple_pay' | 'google_pay' when the guest chose a wallet; noted on the payment. */
+  wallet?: string;
 }
 
 export interface PricedBooking {

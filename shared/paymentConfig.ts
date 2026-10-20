@@ -40,7 +40,12 @@ export const PAYMENT_SECRETS_KEY = 'payment-secrets';
  * Resources the generic data endpoint must never read or write, whatever it is
  * asked for. Everything in here holds a credential.
  */
-export const PROTECTED_RESOURCES = new Set([PAYMENT_SECRETS_KEY, 'admin-password']);
+export const PROTECTED_RESOURCES = new Set([
+  PAYMENT_SECRETS_KEY,
+  'admin-password',
+  // Written only through /api/wallet-config (functions/api/wallet-config.ts).
+  'apple-pay-domain-association',
+]);
 
 /**
  * KV key prefixes the generic data endpoint must never name either. Pending
@@ -357,6 +362,19 @@ export const resolveCardProcessor = (secrets: PaymentSecrets): CardProcessor | n
       ? CARD_PROCESSOR_ORDER
       : [secrets.cardProcessor, ...CARD_PROCESSOR_ORDER.filter((p) => p !== secrets.cardProcessor)];
   return order.find((processor) => ready[processor]) ?? null;
+};
+
+/**
+ * The wallets a processor's hosted payment page offers on a device that has
+ * them: Stripe Checkout and Verifone's buy-link both show Apple Pay and Google
+ * Pay above the card form. The banks' pages take cards only. Mirrored for the
+ * browser in src/utils/paymentMethods.ts (WALLETS_BY_PROCESSOR).
+ */
+export const CARD_WALLETS: Record<CardProcessor, Array<'apple_pay' | 'google_pay'>> = {
+  stripe: ['apple_pay', 'google_pay'],
+  verifone: ['apple_pay', 'google_pay'],
+  azul: [],
+  cardnet: [],
 };
 
 /** What the chosen processor charges in, for showing a guest the amount before they leave. */

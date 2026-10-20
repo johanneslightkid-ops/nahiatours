@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaCreditCard, FaCheck, FaLock, FaUniversity, FaFlask, FaLink } from 'react-icons/fa';
 import { BrandSettings, saveBrandSettings } from '../../services/brandService';
+import WalletSettingsPanel from './WalletSettingsPanel';
 import {
   getPaymentConfigStatus,
   savePaymentConfig,
@@ -13,6 +14,7 @@ import {
 } from '../../services/paymentService';
 import {
   getPaymentMethodStates,
+  WALLETS_BY_PROCESSOR,
   withPaymentMethodEnabled,
   PaymentMethodId,
   PAYMENT_METHOD_IDS,
@@ -27,6 +29,14 @@ const METHOD_LABELS: Record<PaymentMethodId, { name: string; requirement: string
   card: {
     name: 'Tarjeta de crédito / débito',
     requirement: 'Necesita "Aceptar tarjetas" y un procesador configurado (o un enlace de pago)',
+  },
+  applepay: {
+    name: 'Apple Pay',
+    requirement: 'Necesita tarjetas activas con Stripe o Verifone (su página de pago lo ofrece en iPhone, iPad y Mac)',
+  },
+  googlepay: {
+    name: 'Google Pay',
+    requirement: 'Necesita tarjetas activas con Stripe o Verifone (su página de pago lo ofrece en Android y Chrome)',
   },
   paypal: {
     name: 'PayPal',
@@ -136,7 +146,11 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
     azul: status?.azul?.ready ?? false,
     cardnet: status?.cardnet?.ready ?? false,
   };
-  const methods = getPaymentMethodStates(brandSettings, Boolean(status?.activeCardProcessor));
+  const methods = getPaymentMethodStates(
+    brandSettings,
+    Boolean(status?.activeCardProcessor),
+    WALLETS_BY_PROCESSOR[String(status?.activeCardProcessor ?? '')] ?? []
+  );
 
   const run = async (setNotice: (notice: Notice) => void, work: () => Promise<string>) => {
     setSaving(true);
@@ -604,6 +618,11 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
             <span className={labelText}>Otro (Stripe Payment Link, etc.)</span>
             <input className={field} value={brandSettings.verifoneLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, verifoneLink: e.target.value })} placeholder="https://…" />
           </label>
+        </div>
+
+        {/* Apple Pay & Google Pay: what they need beyond the card processor. */}
+        <div className="mt-6">
+          <WalletSettingsPanel />
         </div>
 
         <h4 className="mb-4 mt-6 font-semibold text-ink">Qué ve el visitante</h4>
