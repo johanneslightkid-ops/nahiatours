@@ -2034,6 +2034,14 @@ a:hover {
   border-bottom: 1px solid var(--line);
 }
 
+/* Under the four numbers on a phone; their fifth column from 768px. */
+.hero-stat-cta {
+  grid-column: span 2;
+  align-items: flex-start;
+  background: var(--paper);
+  transition: background-color 0.2s ease;
+}
+
 @media (min-width: 768px) {
   .hero-stat {
     padding: 1.5rem 1.75rem;
@@ -2043,13 +2051,6 @@ a:hover {
   .hero-stat-cta {
     grid-column: auto;
   }
-}
-
-.hero-stat-cta {
-  grid-column: span 2;
-  align-items: flex-start;
-  background: var(--paper);
-  transition: background-color 0.2s ease;
 }
 
 .hero-stat-cta:hover {
