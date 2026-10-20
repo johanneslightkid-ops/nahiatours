@@ -24,6 +24,8 @@ import { useI18n } from '../../contexts/I18nContext';
 import { getFlowCopy } from '../../planner/flowCopy';
 import type { StepId } from '../../planner/questions';
 import { STEP_ICONS } from '../../planner/icons';
+import { localeText } from '../../lib/localeText';
+import { TbFileTypePdf } from 'react-icons/tb';
 
 /** A refine tile's symbol: the question's own line icon. */
 const RefineIcon: React.FC<{ step: StepId }> = ({ step }) => {
@@ -56,6 +58,7 @@ export const PlanResult: React.FC = () => {
   const { locale } = useI18n();
   const flow = getFlowCopy(locale);
   const [showRuledOut, setShowRuledOut] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
 
   const whatsappUrl = useMemo(() => {
     if (!plan) return '';
@@ -471,6 +474,30 @@ export const PlanResult: React.FC = () => {
         >
           <FaWhatsapp className="h-5 w-5" /> {copy.result.book}
         </a>
+
+        <button
+          type="button"
+          disabled={pdfBusy}
+          onClick={async () => {
+            playClickFx();
+            setPdfBusy(true);
+            try {
+              const { downloadPlanPdf } = await import('../../planner/planPdf');
+              await downloadPlanPdf({ plan, profile, locale, brandName: brandSettings.brandName, phone: brandSettings.phoneNumber });
+            } catch (error) {
+              console.error('The plan PDF could not be made:', error);
+              window.alert(localeText(locale, { en: 'The PDF could not be made. Please try again.', es: 'No se pudo crear el PDF. Inténtalo de nuevo.', de: 'Das PDF konnte nicht erstellt werden. Bitte erneut versuchen.', fr: 'Le PDF n’a pas pu être créé. Réessayez.' }));
+            } finally {
+              setPdfBusy(false);
+            }
+          }}
+          className="planner-cta-ghost inline-flex items-center gap-2 !px-6 !py-3 !text-sm disabled:opacity-60"
+        >
+          <TbFileTypePdf className="h-5 w-5" aria-hidden="true" />
+          {pdfBusy
+            ? localeText(locale, { en: 'Making your PDF…', es: 'Creando tu PDF…', de: 'PDF wird erstellt…', fr: 'Création du PDF…' })
+            : localeText(locale, { en: 'Download the plan (PDF, with maps)', es: 'Descargar el plan (PDF, con mapas)', de: 'Plan herunterladen (PDF, mit Karten)', fr: 'Télécharger le plan (PDF, avec cartes)' })}
+        </button>
 
         <Link to="/tours#top" onClick={() => playClickFx()} className="planner-cta-ghost !text-xs">
           {copy.hero.browse}
