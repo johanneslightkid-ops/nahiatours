@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import PageHeader from '../components/layout/PageHeader';
-import { Sailboat, Starfish, PalmTree, Pelican } from '../components/ui/Illustrations';
+import { HiArrowRight, HiBriefcase, HiCalendar, HiCheck, HiFlag, HiLocationMarker, HiMap, HiMoon, HiSparkles, HiSwitchVertical } from 'react-icons/hi';
+import { FaCarSide, FaChild, FaPlaneArrival, FaShuttleVan, FaWhatsapp } from 'react-icons/fa';
+import { MdPriceCheck } from 'react-icons/md';
 import { Reveal } from '../components/nature/Nature';
 import { getTransferConfig, vehicleText } from '../services/transferConfigService';
 import { calculateDistancePrice } from '../services/transferPricingEngine';
@@ -18,6 +20,7 @@ import RouteMap from '../components/RouteMap';
 import PaymentDropdown from '../components/ui/PaymentDropdown';
 import AddToCartButton from '../components/cart/AddToCartButton';
 import { vehicleImage } from '../lib/vehicleImage';
+import { localeText } from '../lib/localeText';
 
 /**
  * Airport transfers — El Cortecito's own page.
@@ -56,7 +59,8 @@ function digitsOnly(value: string): string {
 /** Shorter place names for the pass and the payment line: "Iberostar Selection, Bávaro, …" → "Iberostar Selection". */
 const shortPlace = (value: string) => value.split(',')[0].trim() || value;
 
-const STEP_ICONS = ['📍', '📅', '🚐', '✨', '🧳'];
+/** One icon per step, drawn like the rest of the site's line icons. */
+const STEP_ICONS = [HiLocationMarker, HiCalendar, FaShuttleVan, HiSparkles, HiBriefcase];
 
 const Transport: React.FC = () => {
   const intl = useIntl();
@@ -221,6 +225,7 @@ const Transport: React.FC = () => {
   };
   const nightPercent = Math.round(((config?.modifiers.nightFeeMultiplier ?? 1.15) - 1) * 100);
   const vehicleLabel = selectedVehicleText?.label ?? priceResult?.vehicleLabel ?? '';
+  const selectedVehiclePhoto = selectedVehicle && !brokenImages[selectedVehicle.key] ? vehicleImage(selectedVehicle) : '';
   const when = `${departureDate}${departureTime ? ` ${departureTime}` : ''}`.trim();
 
   /** The operator reads Spanish; everyone else writes in English. */
@@ -319,23 +324,27 @@ const Transport: React.FC = () => {
     : '';
   const tripLabel = tripType === 'round-trip' ? t('roundTrip', 'Round Trip') : t('oneWay', 'One Way');
 
-  const StepHead = ({ n, title, hint }: { n: number; title: string; hint?: string }) => (
-    <div className="mb-5 flex items-start gap-3">
-      <span className="transfer-step-badge" aria-hidden="true">
-        <span>{n}</span>
-      </span>
-      <div>
-        <h2 className="font-display text-xl font-bold text-ink md:text-2xl">
-          <span className="mr-1.5" aria-hidden="true">{STEP_ICONS[n - 1]}</span>
-          {title}
-        </h2>
-        {hint && <p className="mt-0.5 text-sm text-ink-soft">{hint}</p>}
+  const StepHead = ({ n, title, hint }: { n: number; title: string; hint?: string }) => {
+    const Icon = STEP_ICONS[n - 1];
+    return (
+      <div className="mb-6 flex items-start gap-4">
+        <span className="transfer-step-badge" aria-hidden="true">
+          <span>{String(n).padStart(2, '0')}</span>
+        </span>
+        <div className="min-w-0">
+          <span className="flex items-center gap-1.5 font-condensed text-[0.7rem] font-bold uppercase tracking-[0.22em] text-gold-dark">
+            <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+            {localeText(locale, { en: 'Step', es: 'Paso', fr: 'Étape', de: 'Schritt' })} {n} / 5
+          </span>
+          <h2 className="mt-1 font-display text-2xl uppercase leading-none text-ink md:text-[1.9rem]">{title}</h2>
+          {hint && <p className="mt-1.5 text-sm text-ink-soft">{hint}</p>}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const field =
-    'w-full rounded-2xl border border-ink/15 bg-white/90 px-4 py-3.5 text-base text-ink outline-none transition focus:border-lagoon focus:bg-white';
+    'w-full rounded-[6px] border border-ink/15 bg-white px-4 py-3.5 text-base text-ink outline-none transition focus:border-mango focus:ring-2 focus:ring-mango/30';
 
   return (
     <div className="min-h-screen bg-paper pb-28 lg:pb-16">
@@ -348,36 +357,39 @@ const Transport: React.FC = () => {
           'subtitle',
           'Private transfers from Punta Cana Airport (PUJ) to any destination. Reliable, comfortable, and affordable.'
         )}
-        artLeft={<Sailboat className="h-28 w-28 animate-bob" />}
-        artRight={<Starfish className="h-20 w-20 animate-sway" />}
       />
 
       {/* The promises, before the form: what booking here gets you. */}
-      <div className="section-shell relative z-10 -mt-14 mb-10 max-w-6xl">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="section-shell relative z-10 -mt-12 mb-12 max-w-6xl">
+        <div className="transfer-promises">
           {[
-            ['💵', t('trustPriceTitle', 'Price before you book'), t('trustPriceText', 'Worked out from your real route before you commit to anything.')],
-            ['✈️', t('trustFlightTitle', 'Timed to your flight'), t('trustFlightText', 'Add your flight number and the pickup is planned around your landing.')],
-            ['🚐', t('trustPrivateTitle', 'Private, door to door'), t('trustPrivateText', 'Only your group on board, from the terminal to your hotel door.')],
-            ['🧸', t('trustKidsTitle', 'Kids welcome'), t('trustKidsText', 'Child seats on request — just add them under Extras.')],
-          ].map(([icon, title, text], index) => (
-            <Reveal key={title} delay={index * 0.06} y={16}>
-              <div className="transfer-promise h-full">
-                <h3 className="flex items-center gap-2 font-display text-sm font-bold leading-tight text-ink sm:block sm:text-base">
-                  <span className="text-xl sm:block sm:text-2xl" aria-hidden="true">{icon}</span>
-                  <span className="sm:mt-2 sm:block">{title}</span>
-                </h3>
-                <p className="mt-1 hidden text-sm leading-5 text-ink-soft sm:block">{text}</p>
-              </div>
-            </Reveal>
-          ))}
+            [MdPriceCheck, t('trustPriceTitle', 'Price before you book'), t('trustPriceText', 'Worked out from your real route before you commit to anything.')],
+            [FaPlaneArrival, t('trustFlightTitle', 'Timed to your flight'), t('trustFlightText', 'Add your flight number and the pickup is planned around your landing.')],
+            [FaCarSide, t('trustPrivateTitle', 'Private, door to door'), t('trustPrivateText', 'Only your group on board, from the terminal to your hotel door.')],
+            [FaChild, t('trustKidsTitle', 'Kids welcome'), t('trustKidsText', 'Child seats on request — just add them under Extras.')],
+          ].map(([Icon, title, text], index) => {
+            const Glyph = Icon as React.ComponentType<{ className?: string }>;
+            return (
+              <Reveal key={String(title)} delay={index * 0.06} y={16}>
+                <div className="transfer-promise h-full">
+                  <span className="transfer-promise-icon" aria-hidden="true">
+                    <Glyph className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="font-display text-[1.05rem] uppercase leading-tight text-ink sm:text-lg">{title as string}</h3>
+                    <p className="mt-1 hidden text-sm leading-5 text-ink-soft sm:block">{text as string}</p>
+                  </div>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
 
       <div className="section-shell max-w-6xl">
         {!mapsAvailable && (
-          <div className="mb-5 rounded-2xl bg-mango-light/60 px-4 py-3 text-sm font-semibold text-ink">
-            ⚠️ {t('mapsUnavailable', 'Map services are unavailable. Enter your pickup and drop-off manually below.')}
+          <div className="mb-5 rounded-[6px] border-l-4 border-mango bg-mango-light/40 px-4 py-3 text-sm font-semibold text-ink">
+            {t('mapsUnavailable', 'Map services are unavailable. Enter your pickup and drop-off manually below.')}
           </div>
         )}
 
@@ -393,7 +405,7 @@ const Transport: React.FC = () => {
                 <StepHead n={1} title={t('pickupDropoff', 'Pickup & Drop-off')} hint={t('pickupHint', 'From the airport, a hotel, or any address in the east.')} />
                 <div className="transfer-route">
                   <div className="transfer-route-stop">
-                    <span className="transfer-route-dot" aria-hidden="true">✈</span>
+                    <span className="transfer-route-dot" aria-hidden="true"><FaPlaneArrival className="h-4 w-4" /></span>
                     <div className="min-w-0 flex-1">
                       <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-ink-light">
                         {t('origin', 'Pickup location')}
@@ -409,7 +421,7 @@ const Transport: React.FC = () => {
                         }}
                       />
                       {form.originMunicipio && (
-                        <span className="mt-2 inline-flex rounded-full bg-lagoon-light/60 px-3 py-1 text-xs font-semibold text-lagoon-dark">
+                        <span className="transfer-tag mt-2">
                           {t('originMunicipio', 'Origin municipio')}: {form.originMunicipio}
                         </span>
                       )}
@@ -418,7 +430,7 @@ const Transport: React.FC = () => {
 
                   <div className="transfer-route-gap">
                     <button type="button" onClick={swapEnds} className="transfer-swap" aria-label={t('swap', 'Swap pickup and drop-off')} title={t('swap', 'Swap pickup and drop-off')}>
-                      ⇅
+                      <HiSwitchVertical className="h-4 w-4" />
                     </button>
                     {priceResult && (
                       <span className="text-xs font-semibold text-ink-soft">
@@ -428,7 +440,7 @@ const Transport: React.FC = () => {
                   </div>
 
                   <div className="transfer-route-stop">
-                    <span className="transfer-route-dot transfer-route-dot-end" aria-hidden="true">⚑</span>
+                    <span className="transfer-route-dot transfer-route-dot-end" aria-hidden="true"><HiFlag className="h-4 w-4" /></span>
                     <div className="min-w-0 flex-1">
                       <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-ink-light">
                         {t('destination', 'Drop-off location')}
@@ -444,7 +456,7 @@ const Transport: React.FC = () => {
                         }}
                       />
                       {form.destinationMunicipio && (
-                        <span className="mt-2 inline-flex rounded-full bg-mango-light/60 px-3 py-1 text-xs font-semibold text-mango-dark">
+                        <span className="transfer-tag mt-2">
                           {t('destMunicipio', 'Destination municipio')}: {form.destinationMunicipio}
                         </span>
                       )}
@@ -455,7 +467,7 @@ const Transport: React.FC = () => {
 
               <section className="transfer-page-card">
                 <StepHead n={2} title={t('dateTime', 'Date & Time')} />
-                <div className="mb-5 grid grid-cols-2 gap-2 rounded-full border border-ink/10 bg-paper-warm/70 p-1.5" role="radiogroup" aria-label={t('tripType', 'Trip Type')}>
+                <div className="mb-5 grid grid-cols-2 gap-1 rounded-[6px] border border-ink/10 bg-paper-warm/70 p-1" role="radiogroup" aria-label={t('tripType', 'Trip Type')}>
                   {(['round-trip', 'one-way'] as TripType[]).map((type) => (
                     <button
                       key={type}
@@ -463,8 +475,8 @@ const Transport: React.FC = () => {
                       role="radio"
                       aria-checked={tripType === type}
                       onClick={() => setTripType(type)}
-                      className={`rounded-full px-4 py-3 text-sm font-extrabold transition sm:text-base ${
-                        tripType === type ? 'bg-lagoon text-white shadow-[var(--shade-sm)]' : 'text-ink-soft hover:text-ink'
+                      className={`rounded-[4px] px-4 py-3 font-condensed text-sm font-bold uppercase tracking-[0.14em] transition sm:text-base ${
+                        tripType === type ? 'bg-ink text-white shadow-[var(--shade-sm)]' : 'text-ink-soft hover:text-ink'
                       }`}
                     >
                       {type === 'round-trip' ? `⇄ ${t('roundTrip', 'Round Trip')}` : `→ ${t('oneWay', 'One Way')}`}
@@ -532,17 +544,17 @@ const Transport: React.FC = () => {
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <span className="text-4xl" aria-hidden="true">🚐</span>
+                            <FaShuttleVan className="h-9 w-9 text-ink-light" aria-hidden="true" />
                           )}
                         </span>
                         <span className="min-w-0 flex-1 text-left">
-                          <span className="block font-display text-base font-bold text-ink">{text.label}</span>
+                          <span className="block font-display text-lg uppercase leading-none text-ink">{text.label}</span>
                           <span className="mt-0.5 block text-xs leading-5 text-ink-soft">{text.description}</span>
-                          <span className={`mt-2 inline-flex rounded-full px-2.5 py-0.5 text-[0.7rem] font-bold ${tooSmall ? 'bg-mango-light/70 text-mango-dark' : 'bg-lagoon-light/50 text-lagoon-dark'}`}>
+                          <span className={`transfer-tag mt-2 ${tooSmall ? 'transfer-tag-warn' : ''}`}>
                             👥 {t('upTo', 'up to {max}', { max: vt.maxPassengers })}
                           </span>
                         </span>
-                        {active && <span className="transfer-vehicle-check" aria-hidden="true">✓</span>}
+                        {active && <span className="transfer-vehicle-check" aria-hidden="true"><HiCheck className="h-4 w-4" /></span>}
                       </button>
                     );
                   })}
@@ -573,7 +585,7 @@ const Transport: React.FC = () => {
                       className="h-5 w-5 accent-lagoon-dark"
                     />
                     <span>
-                      <span className="block text-sm font-bold text-ink">🌙 {t('nightTransfer', 'Night Transfer')}</span>
+                      <span className="flex items-center gap-1.5 text-sm font-bold text-ink"><HiMoon className="h-4 w-4 text-gold-dark" aria-hidden="true" /> {t('nightTransfer', 'Night Transfer')}</span>
                       <span className="block text-xs text-ink-soft">
                         {t('nightSurchargeNote', '+{percent}% after 10 PM', { percent: nightPercent })}
                       </span>
@@ -676,7 +688,7 @@ const Transport: React.FC = () => {
                           <div className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-ink-light">
                             {t('estimatedPrice', 'Estimated total price')}
                           </div>
-                          <div className="font-display text-4xl font-bold leading-none text-lagoon-dark">
+                          <div className="font-display text-5xl leading-none text-ink">
                             {money(priceResult.estimatedPrice)}
                           </div>
                         </div>
@@ -706,7 +718,7 @@ const Transport: React.FC = () => {
                         )}
                         {needsTwoVehicles && (
                           <li className="flex justify-between gap-3 text-mango-dark">
-                            <span>🚐🚐 {t('doubleVehicle', 'Double vehicle')}</span>
+                            <span>{t('doubleVehicle', 'Double vehicle')}</span>
                             <span className="font-semibold">{t('includedInTotal', 'included')}</span>
                           </li>
                         )}
@@ -715,7 +727,9 @@ const Transport: React.FC = () => {
                     </>
                   ) : (
                     <div className="py-4 text-center">
-                      <PalmTree className="mx-auto mb-2 h-16 w-16 opacity-80" />
+                      <span className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full bg-paper-warm text-gold-dark ring-1 ring-gold/40" aria-hidden="true">
+                        <HiMap className="h-7 w-7" />
+                      </span>
                       <p className="text-sm text-ink-soft">
                         {priceError === 'needBoth'
                           ? t('selectBoth', 'Choose both the pickup and the drop-off — exact places give the best price.')
@@ -741,7 +755,7 @@ const Transport: React.FC = () => {
                         hideWhenEmpty
                         buttonLabel={t('payNow', 'Book & pay now')}
                         className="w-full"
-                        buttonClassName="flex w-full items-center justify-between gap-2.5 rounded-full bg-lagoon px-6 py-4 font-extrabold text-white shadow-[var(--shade)] transition hover:-translate-y-0.5 hover:bg-lagoon-dark active:translate-y-0"
+                        buttonClassName="btn-amber flex w-full items-center justify-between gap-2.5"
                       />
                     )}
                     {quoteReady && priceResult && (
@@ -766,18 +780,14 @@ const Transport: React.FC = () => {
                     <button
                       onClick={handleBookNow}
                       disabled={!quoteReady || !waPhone}
-                      className={`w-full rounded-full px-6 py-4 text-center text-base font-bold transition active:scale-[0.98] ${
-                        quoteReady && waPhone
-                          ? 'border border-jungle/30 bg-jungle text-white hover:bg-jungle-dark'
-                          : 'cursor-not-allowed bg-ink/10 text-ink-light'
-                      }`}
+                      className={`w-full justify-center ${quoteReady && waPhone ? 'btn-wa' : 'btn-wa cursor-not-allowed opacity-40'}`}
                     >
-                      💬 {t('bookNow', 'Book via WhatsApp')}
+                      <FaWhatsapp className="h-5 w-5" aria-hidden="true" /> {t('bookNow', 'Book via WhatsApp')}
                     </button>
                     <button
                       onClick={handleChatOnWhatsApp}
                       disabled={!waPhone}
-                      className="w-full rounded-full border border-ink/15 bg-white/80 px-6 py-3 text-center text-sm font-semibold text-lagoon-dark transition hover:bg-lagoon-light/40 disabled:opacity-50"
+                      className="w-full rounded-[3px] border border-ink/20 bg-white px-6 py-3 text-center font-condensed text-sm font-bold uppercase tracking-[0.14em] text-ink transition hover:bg-ink hover:text-paper disabled:opacity-50"
                     >
                       {t('chatOnWhatsApp', 'Chat / Question')}
                     </button>
@@ -794,15 +804,22 @@ const Transport: React.FC = () => {
                       origin={originLatLng ?? undefined}
                       destination={destLatLng ?? undefined}
                       geometry={routeGeometry}
-                      className="mt-5 h-40 overflow-hidden rounded-[22px_16px_24px_14px] border border-ink/10"
+                      className="mt-5 h-40 overflow-hidden rounded-[6px] border border-ink/10"
                     />
                   )}
                 </div>
               </div>
 
-              <div className="pointer-events-none mt-6 hidden justify-end lg:flex" aria-hidden="true">
-                <Pelican className="h-20 w-20 animate-bob" />
-              </div>
+              {/* The vehicle being booked, as a photograph — where a cartoon used to be. */}
+              {selectedVehiclePhoto && (
+                <figure className="transfer-pass-photo mt-5 hidden lg:block">
+                  <img src={selectedVehiclePhoto} alt={vehicleLabel} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                  <figcaption>
+                    <span className="font-condensed text-[0.65rem] font-bold uppercase tracking-[0.22em] text-mango-light">{localeText(locale, { en: 'Your vehicle', es: 'Tu vehículo', fr: 'Votre véhicule', de: 'Dein Fahrzeug' })}</span>
+                    <span className="font-display text-xl uppercase leading-none text-white">{vehicleLabel}</span>
+                  </figcaption>
+                </figure>
+              )}
             </aside>
           </div>
         )}
@@ -819,8 +836,8 @@ const Transport: React.FC = () => {
               {quoteReady && priceResult ? money(priceResult.estimatedPrice) : t('mobilePrompt', 'Pick your route')}
             </div>
           </div>
-          <button type="button" onClick={scrollToPass} className="shrink-0 rounded-full bg-lagoon px-5 py-3 text-sm font-extrabold text-white">
-            {quoteReady ? t('mobileCta', 'Book') : t('mobileSee', 'See pass')} ↓
+          <button type="button" onClick={scrollToPass} className="inline-flex shrink-0 items-center gap-1.5 rounded-[3px] bg-mango px-5 py-3 font-condensed text-sm font-bold uppercase tracking-[0.14em] text-ink">
+            {quoteReady ? t('mobileCta', 'Book') : t('mobileSee', 'See pass')} <HiArrowRight className="h-4 w-4 rotate-90" aria-hidden="true" />
           </button>
         </div>
       )}
