@@ -8,6 +8,8 @@ export interface PaymentVisibility {
   cash?: boolean;
   azul?: boolean;
   cardnet?: boolean;
+  applepay?: boolean;
+  googlepay?: boolean;
 }
 
 export type HeroMediaType = 'image' | 'video';
@@ -106,6 +108,8 @@ const normalizePaymentVisibility = (input: unknown): PaymentVisibility => {
     cash: typeof source.cash === 'boolean' ? source.cash : true,
     azul: typeof source.azul === 'boolean' ? source.azul : true,
     cardnet: typeof source.cardnet === 'boolean' ? source.cardnet : true,
+    applepay: typeof source.applepay === 'boolean' ? source.applepay : true,
+    googlepay: typeof source.googlepay === 'boolean' ? source.googlepay : true,
   };
 };
 
