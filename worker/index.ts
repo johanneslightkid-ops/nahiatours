@@ -34,6 +34,7 @@ import { onRequest as handleStripeSession } from '../functions/api/stripe-sessio
 import { onRequest as handleStripeReady } from '../functions/api/stripe-ready';
 import { onRequest as handlePaymentConfig } from '../functions/api/payment-config';
 import { onRequest as handlePaymentsReady } from '../functions/api/payments-ready';
+import { onRequest as handleWalletConfig, onAppleAssociation, APPLE_PAY_ASSOCIATION_PATH } from '../functions/api/wallet-config';
 import { onRequest as handleCardCheckout } from '../functions/api/card-checkout';
 import { onRequest as handleAzulCheckout } from '../functions/api/azul-checkout';
 import { onRequest as handleVerifoneCheckout } from '../functions/api/verifone-checkout';
@@ -88,6 +89,9 @@ const ROUTES: Record<string, RouteHandler> = {
   // One card endpoint for the storefront; the processor (Stripe, Azul or
   // CardNET) is the operator's choice. See shared/cardCheckout.ts.
   '/api/payments-ready': handlePaymentsReady,
+  // Apple Pay & Google Pay settings (admin), and Apple's domain file (public).
+  '/api/wallet-config': handleWalletConfig,
+  [APPLE_PAY_ASSOCIATION_PATH]: onAppleAssociation,
   '/api/card-checkout': handleCardCheckout,
   '/api/azul-checkout': handleAzulCheckout,
   '/api/verifone-checkout': handleVerifoneCheckout,

@@ -23,9 +23,30 @@ import { BrandSettings } from '../services/brandService';
  * payment link from a processor's portal.
  */
 
-export type PaymentMethodId = 'card' | 'paypal' | 'cash';
+export type PaymentMethodId = 'card' | 'applepay' | 'googlepay' | 'paypal' | 'cash';
 
-export const PAYMENT_METHOD_IDS: PaymentMethodId[] = ['card', 'paypal', 'cash'];
+export const PAYMENT_METHOD_IDS: PaymentMethodId[] = ['card', 'applepay', 'googlepay', 'paypal', 'cash'];
+
+/**
+ * APPLE PAY and GOOGLE PAY are the card payment too, paid from a wallet: the
+ * guest goes to the same hosted payment page, which offers the wallet on a
+ * device that has it. So they are "configured" when cards are, AND the
+ * processor's page takes wallets (Stripe, Verifone — not the banks' pages).
+ * Whether this particular device can use one is a separate question, asked
+ * in the browser (src/lib/wallets.ts), so the admin still sees them as
+ * available from a laptop without Apple Pay.
+ */
+export type WalletId = 'apple_pay' | 'google_pay';
+
+export const WALLET_OF: Partial<Record<PaymentMethodId, WalletId>> = { applepay: 'apple_pay', googlepay: 'google_pay' };
+
+/** Mirrors CARD_WALLETS in shared/paymentConfig.ts, for the admin panel. */
+export const WALLETS_BY_PROCESSOR: Record<string, WalletId[]> = {
+  stripe: ['apple_pay', 'google_pay'],
+  verifone: ['apple_pay', 'google_pay'],
+  azul: [],
+  cardnet: [],
+};
 
 export interface PaymentMethodState {
   /** The method has everything it needs to actually take a payment. */
@@ -62,11 +83,15 @@ export const getCardCheckoutLink = getCardPaymentLink;
 export const isPaymentMethodConfigured = (
   brandSettings: BrandSettings,
   method: PaymentMethodId,
-  cardReady = false
+  cardReady = false,
+  wallets: WalletId[] = []
 ): boolean => {
   switch (method) {
     case 'card':
       return Boolean(brandSettings.stripeEnabled) && (cardReady || hasValue(getCardPaymentLink(brandSettings)));
+    case 'applepay':
+    case 'googlepay':
+      return Boolean(brandSettings.stripeEnabled) && cardReady && wallets.includes(WALLET_OF[method]!);
     case 'paypal':
       return hasValue(brandSettings.paypalMeLink);
     case 'cash':
@@ -96,9 +121,13 @@ export const withPaymentMethodEnabled = (
   paymentVisibility: { ...brandSettings.paymentVisibility, [visibilityKey(method)]: enabled },
 });
 
-export const getPaymentMethodStates = (brandSettings: BrandSettings, cardReady = false): PaymentMethodStates =>
+export const getPaymentMethodStates = (
+  brandSettings: BrandSettings,
+  cardReady = false,
+  wallets: WalletId[] = []
+): PaymentMethodStates =>
   PAYMENT_METHOD_IDS.reduce((states, method) => {
-    const configured = isPaymentMethodConfigured(brandSettings, method, cardReady);
+    const configured = isPaymentMethodConfigured(brandSettings, method, cardReady, wallets);
     const enabled = isPaymentMethodEnabled(brandSettings, method);
     states[method] = { configured, enabled, visible: configured && enabled };
     return states;
@@ -107,9 +136,10 @@ export const getPaymentMethodStates = (brandSettings: BrandSettings, cardReady =
 export const isPaymentMethodVisible = (
   brandSettings: BrandSettings,
   method: PaymentMethodId,
-  cardReady = false
+  cardReady = false,
+  wallets: WalletId[] = []
 ): boolean =>
-  isPaymentMethodConfigured(brandSettings, method, cardReady) && isPaymentMethodEnabled(brandSettings, method);
+  isPaymentMethodConfigured(brandSettings, method, cardReady, wallets) && isPaymentMethodEnabled(brandSettings, method);
 
 /** False when every method is unconfigured or hidden — the storefront then offers WhatsApp only. */
 export const hasVisiblePaymentMethod = (brandSettings: BrandSettings, cardReady = false): boolean =>
