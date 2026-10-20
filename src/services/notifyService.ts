@@ -111,6 +111,12 @@ export interface ActivityBatch {
 export const listActivity = (cursor?: string) =>
   adminCall<{ batches: ActivityBatch[]; cursor: string | null }>(`/api/activity?limit=80${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`);
 
+/** One row per visit, for the charts (shared/activityRollup.ts). `partial`: more to fold — ask again. */
+export const getActivitySummary = (since: string) =>
+  adminCall<{ rows: import('../lib/activityInsights').SessionRow[]; partial: boolean; folded: number }>(
+    `/api/activity?summary=1&since=${encodeURIComponent(since)}`
+  );
+
 export type AttemptStatus = 'pending' | 'paid' | 'problem' | 'later' | 'unconfirmed' | 'verified' | 'cancelled';
 
 export interface PayAttemptRecord {

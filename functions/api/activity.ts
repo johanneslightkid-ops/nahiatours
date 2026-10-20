@@ -1,5 +1,6 @@
 import { verifyAdminRequest } from '../../shared/adminAuth';
 import { kvOf, NotifyEnv } from '../../shared/notify';
+import { readActivityRows } from '../../shared/activityRollup';
 
 /**
  * What guests do with the cart and the booking buttons: items added and
@@ -12,8 +13,17 @@ import { kvOf, NotifyEnv } from '../../shared/notify';
  * is read and rewritten, so there is no shared list to lose events from, and
  * the free plan's 1000 writes a day go to visitors who actually did something.
  *
- *   POST (public)  { session, events: [{ type, at, data }] }
+ *   POST (public)  { session, visitor, events: [{ type, at, data }] }
  *   GET  (admin)   the latest batches, newest first (?limit=, ?cursor=).
+ *   GET  (admin)   ?summary=1&since=YYYY-MM-DD — one row per visit, for the
+ *                  charts; finished days are folded into monthly roll-ups
+ *                  (shared/activityRollup.ts) that outlive the 60 days.
+ *
+ * Browsing alone — a tour page opened, a plan made — is sent once, when the
+ * guest leaves the page or with the next real event, never on its own timer.
+ * And batches holding nothing but browsing are sampled once an isolate has
+ * stored LAZY_PER_HOUR of them, so a busy day spends the write budget on the
+ * visitors who book.
  */
 
 const TYPES = new Set([
@@ -31,7 +41,15 @@ const TYPES = new Set([
   'summary_whatsapp',
   'summary_email',
   'contact',
+  'pay_result',
+  'tour_view',
+  'plan_profile',
 ]);
+/** Browsing, as opposed to doing: worth keeping, not worth the write budget at any price. */
+const LAZY = new Set(['tour_view', 'plan_profile', 'cart_view']);
+const LAZY_PER_HOUR = 40;
+let lazyHour = 0;
+let lazyCount = 0;
 const MAX_EVENTS = 40;
 const TTL = 60 * 24 * 3600;
 const PER_HOUR = 30;
@@ -46,10 +64,10 @@ const text = (value: unknown, max: number) =>
     .slice(0, max);
 
 /** Event data is a flat bag of short strings and numbers. */
-const clean = (data: unknown) => {
+const clean = (data: unknown, keys = 12) => {
   const out: Record<string, string | number | boolean> = {};
   if (!data || typeof data !== 'object') return out;
-  for (const [key, value] of Object.entries(data as Record<string, unknown>).slice(0, 12)) {
+  for (const [key, value] of Object.entries(data as Record<string, unknown>).slice(0, keys)) {
     const name = text(key, 24);
     if (!name) continue;
     if (typeof value === 'number' && Number.isFinite(value)) out[name] = Math.round(value * 100) / 100;
@@ -90,14 +108,25 @@ export async function onRequest(context: { request: Request; env: NotifyEnv }) {
       .map((event: any) => ({
         type: event.type,
         at: Number.isFinite(Number(event.at)) ? Number(event.at) : Date.now(),
-        data: clean(event.data),
+        // The planner's answers are one event with a few more fields.
+        data: clean(event.data, event.type === 'plan_profile' ? 20 : 12),
       }));
     if (events.length === 0) return json({ ok: true, stored: 0 });
+    if (events.every((event: any) => LAZY.has(event.type))) {
+      const hour = Math.floor(Date.now() / 3600_000);
+      if (hour !== lazyHour) {
+        lazyHour = hour;
+        lazyCount = 0;
+      }
+      lazyCount += 1;
+      if (lazyCount > LAZY_PER_HOUR) return json({ ok: true, dropped: true });
+    }
 
     const now = Date.now();
     const batch = {
       at: now,
       session: text(body.session, 40),
+      visitor: text(body.visitor, 40),
       locale: text(body.locale, 5),
       page: text(body.page, 120),
       country: text((request as any).cf?.country ?? request.headers.get('CF-IPCountry'), 4),
@@ -114,6 +143,12 @@ export async function onRequest(context: { request: Request; env: NotifyEnv }) {
     const auth = await verifyAdminRequest(env as any, request);
     if (!auth.ok) return json({ error: auth.error }, auth.status);
     const params = new URL(request.url).searchParams;
+    if (params.get('summary') === '1') {
+      const since = /^\d{4}-\d{2}-\d{2}$/.test(params.get('since') ?? '')
+        ? (params.get('since') as string)
+        : new Date(Date.now() - 90 * 24 * 3600_000).toISOString().slice(0, 10);
+      return json(await readActivityRows(kv as any, since));
+    }
     const limit = Math.min(100, Math.max(1, Number(params.get('limit')) || 60));
     const listing = await kv.list({ prefix: 'act:', limit, cursor: params.get('cursor') || undefined });
     const batches = (

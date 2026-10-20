@@ -14,6 +14,7 @@ import { buildCatalogue, loadPlannerCatalogue } from '../planner/catalogueSource
 import { defaultsForParty, refineSteps, StepDef, StepId, stepById, visibleSteps } from '../planner/questions';
 import { CatalogueEntry, DayPlan, EMPTY_PROFILE, TravelProfile } from '../planner/types';
 import type { PartyType } from '../planner/tourProfiles';
+import { track } from '../lib/activity';
 
 export type PlannerStage = 'intro' | 'questions' | 'result';
 
@@ -254,6 +255,42 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (catalogue.length === 0) return null;
     return buildPlan(catalogue, profile, copy, locale, { pinned, banned });
   }, [catalogue, banned, pinned, profile, copy, locale]);
+
+  // What the guest told the planner, for the admin's charts: the answers
+  // only — party, ages as bands, interests, budget, occasion, timing — never
+  // a name or a contact. Once per distinct set of answers, after they settle.
+  const lastProfileSent = useRef('');
+  useEffect(() => {
+    if (stage !== 'result' || !plan || !profile.partyType) return;
+    const lead = profile.startDate ? Math.round((Date.parse(profile.startDate) - Date.now()) / 86_400_000) : undefined;
+    const answers = {
+      party: profile.partyType,
+      adults: profile.adults,
+      children: profile.children,
+      kids: profile.kidAges.join(','),
+      adultAge: profile.adultAge,
+      energy: profile.energy,
+      interests: profile.interests.join(','),
+      aim: profile.aim,
+      dayShape: profile.dayShape,
+      days: profile.days,
+      budget: profile.budget,
+      transport: profile.transport,
+      occasion: profile.occasion,
+      constraints: profile.constraints.join(','),
+      travelMonth: profile.startDate ? profile.startDate.slice(0, 7) : undefined,
+      leadDays: lead !== undefined && Number.isFinite(lead) ? Math.max(0, lead) : undefined,
+      tours: plan.days.reduce((sum, day) => sum + day.items.length, 0),
+      locale,
+    };
+    const signature = JSON.stringify(answers);
+    if (signature === lastProfileSent.current) return;
+    const timer = window.setTimeout(() => {
+      lastProfileSent.current = signature;
+      track('plan_profile', answers);
+    }, 3000);
+    return () => window.clearTimeout(timer);
+  }, [stage, plan, profile, locale]);
 
   // Count what is on screen, not what was requested: hand-picked excursions can
   // have grown the plan already, and the button must always move the number.

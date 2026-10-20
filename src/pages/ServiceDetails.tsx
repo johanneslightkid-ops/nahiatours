@@ -17,6 +17,7 @@ import TourGuideSections, { GuideFacts } from '../components/details/TourGuideSe
 import { TOUR_PROFILES, matchTourProfile } from '../planner/tourProfiles';
 import { TourGuide, langOf, loadTourGuide } from '../lib/tourGuide';
 import { playClickFx } from '../lib/soundEngine';
+import { track } from '../lib/activity';
 
 /**
  * One tour (or transfer), with everything needed to choose it and book it:
@@ -69,6 +70,13 @@ const ServiceDetails: React.FC = () => {
   const routeId = id.split('-')[0];
   const index = services.findIndex((item) => String(item.id) === routeId);
   const service = index >= 0 ? services[index] : null;
+
+  // Which tours are looked at, and from where: sent with the visit's next
+  // event or when the page is left, never on its own (src/lib/activity.ts).
+  useEffect(() => {
+    if (!service) return;
+    track('tour_view', { title: service.title, category, locale });
+  }, [service?.id, category]);
 
   const profileOf = (tour: Tour) => matchTourProfile(englishTitles.get(tour.id) ?? tour.title);
   const profile = service && isTour ? profileOf(service) : null;

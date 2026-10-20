@@ -8,6 +8,7 @@ import {
   setPayAttemptStatus,
 } from '../../services/notifyService';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
+import ActivityInsights from './ActivityInsights';
 
 /**
  * What guests did: every payment button pressed and what came of it, and the
@@ -40,6 +41,9 @@ const EVENT: Record<string, string> = {
   summary_whatsapp: '📲 Resumen a su WhatsApp',
   summary_email: '✉️ Resumen por email',
   contact: '📞 Pidió contacto',
+  pay_result: '🏦 Resultado del pago',
+  tour_view: '🔎 Vio un tour',
+  plan_profile: '🧭 Usó el planificador',
 };
 
 const when = (value: string | number) => {
@@ -57,6 +61,9 @@ const describe = (data: Record<string, string | number | boolean>) => {
   if (data.title) parts.push(String(data.title));
   if (data.method) parts.push(String(data.method));
   if (data.outcome) parts.push(String(data.outcome));
+  if (data.status) parts.push(String(data.status));
+  if (data.reason && data.reason !== 'approved') parts.push(String(data.reason));
+  if (data.party) parts.push(String(data.party));
   if (data.date) parts.push(`📅 ${data.date}`);
   if (data.persons) parts.push(`👥 ${data.persons}`);
   if (data.items) parts.push(`${data.items} ítems`);
@@ -140,6 +147,7 @@ const SalesActivityPanel: React.FC = () => {
 
   return (
     <div className="mb-8 space-y-6">
+      <ActivityInsights />
       <div className="rounded-3xl border border-ink/15 bg-paper p-6 shadow-ink-sm">
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <h2 className="flex-1 text-2xl font-bold text-ink">Pagos y carrito</h2>
@@ -234,7 +242,7 @@ const SalesActivityPanel: React.FC = () => {
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <h2 className="flex-1 text-2xl font-bold text-ink">Actividad de clientes</h2>
           <label className="flex items-center gap-2 text-sm text-ink-soft">
-            <input type="checkbox" checked={showViews} onChange={(e) => setShowViews(e.target.checked)} /> Mostrar visitas al carrito
+            <input type="checkbox" checked={showViews} onChange={(e) => setShowViews(e.target.checked)} /> Mostrar visitas a tours y al carrito
           </label>
         </div>
         <p className="mb-4 text-sm text-ink-soft">
@@ -245,7 +253,7 @@ const SalesActivityPanel: React.FC = () => {
         ) : (
           <ul className="space-y-3">
             {batches.map((batch, index) => {
-              const events = batch.events.filter((event) => showViews || event.type !== 'cart_view');
+              const events = batch.events.filter((event) => showViews || (event.type !== 'cart_view' && event.type !== 'tour_view'));
               if (events.length === 0) return null;
               return (
                 <li key={`${batch.at}-${index}`} className="rounded-2xl border border-ink/10 p-3 text-sm">

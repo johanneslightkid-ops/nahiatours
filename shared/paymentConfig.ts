@@ -58,10 +58,11 @@ export const PROTECTED_RESOURCES = new Set([
  * bank payments are kept under `payment-order:<id>` — they hold the CardNET
  * session key and the booking — and are read only by the payment endpoints.
  * Payment attempts (`pay:`), the activity log (`act:`) and rate-limit counters
- * (`rl:`) are guests' own details and stay with their endpoints too, and so
+ * (`rl:`) are guests' own details and stay with their endpoints too — the
+ * activity's monthly roll-ups (`actm:`) as well — and so
  * does the admin's wastebasket (`trash:`, functions/api/trash.ts).
  */
-export const PROTECTED_PREFIXES = ['payment-order:', 'pay:', 'act:', 'rl:', 'trash:'];
+export const PROTECTED_PREFIXES = ['payment-order:', 'pay:', 'act:', 'actm:', 'rl:', 'trash:'];
 
 export const isProtectedResource = (key: string): boolean =>
   PROTECTED_RESOURCES.has(key) || PROTECTED_PREFIXES.some((prefix) => key.startsWith(prefix));
