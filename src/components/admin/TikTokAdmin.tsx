@@ -67,6 +67,7 @@ const TikTokAdmin: React.FC<TikTokAdminProps> = ({ onSave }) => {
   };
 
   const handleDeleteVideo = (id: string) => {
+    if (!window.confirm('¿Quitar este video de la lista?')) return;
     const updated = videos.filter(v => v.id !== id);
     setVideos(updated);
     onSave?.(updated);

@@ -111,7 +111,7 @@ const TransferConfigAdminPanel: React.FC = () => {
           />
         </label>
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-ink-soft">Distancia donde el descuento llega al tope (km)</span>
+          <span className="text-sm font-semibold text-ink-soft">Ritmo del descuento por distancia (km)</span>
           <input
             type="number"
             min={1}
@@ -120,7 +120,31 @@ const TransferConfigAdminPanel: React.FC = () => {
             onChange={(event) => updateField('distanceDiscountSaturationKm', event.target.value)}
             className="w-full rounded-2xl border border-ink/15 px-4 py-3"
           />
+          <span className="block text-xs leading-relaxed text-ink-soft">
+            Cuanto más largo el viaje, más barato sale cada km. El descuento crece rápido al principio y se acerca poco a poco al
+            máximo de arriba: con esta distancia ya va por el 63 % del máximo, con el doble por el 86 %, con el triple por el 95 %.
+            Un número menor da el descuento antes (viajes cortos más baratos); uno mayor lo reserva para los viajes largos.
+          </span>
         </label>
+        {(() => {
+          // The same formula as the price calculator (services/transferPricingEngine.ts).
+          const max = Number(draftModifiers.distanceDiscountMaxPercent) || 0;
+          const pace = Math.max(1, Number(draftModifiers.distanceDiscountSaturationKm) || 1);
+          const at = (km: number) => max * (1 - Math.exp(-km / pace));
+          return (
+            <div className="space-y-2 rounded-2xl bg-paper-warm/70 p-4 md:col-span-2">
+              <span className="text-sm font-semibold text-ink-soft">Así queda el descuento por km con estos valores</span>
+              <div className="grid grid-cols-3 gap-2 text-center sm:grid-cols-6">
+                {[5, 15, 30, 60, 100, 200].map((km) => (
+                  <div key={km} className="rounded-xl bg-white px-2 py-2 ring-1 ring-ink/10">
+                    <span className="block text-xs text-ink-soft">{km} km</span>
+                    <span className="font-bold text-ink">−{at(km).toFixed(1)} %</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
         <label className="space-y-2">
           <span className="text-sm font-semibold text-ink-soft">Multiplicador de descuento ida y vuelta</span>
           <input

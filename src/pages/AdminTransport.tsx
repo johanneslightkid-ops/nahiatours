@@ -1,42 +1,22 @@
-import React, { useCallback, useState } from 'react';
-import { useI18n } from '../contexts/I18nContext';
-import ServiceAdminPanel from '../components/admin/ServiceAdminPanel';
+import React from 'react';
 import TransferConfigAdminPanel from '../components/admin/TransferConfigAdminPanel';
 import VehicleAdminPanel from '../components/admin/VehicleAdminPanel';
 import MunicipioPriceAdminPanel from '../components/admin/MunicipioPriceAdminPanel';
-import { getTransportServices, saveTransportServices, Tour } from '../services/toursService';
 
-const AdminTransport: React.FC = () => {
-  const { locale } = useI18n();
-  const [services, setServices] = useState<Tour[]>([]);
-
-  const loadServices = useCallback(async () => {
-    const fetchedServices = await getTransportServices(locale);
-    setServices(fetchedServices);
-  }, [locale]);
-
-  return (
-    <div className="min-h-screen bg-paper-warm py-6">
-      <div className="container mx-auto px-4 space-y-8">
-        {/* The fleet comes first: it is the thing with pictures, and the
-            pricing panels below are meaningless until the vehicles exist. */}
-        <VehicleAdminPanel />
-        <TransferConfigAdminPanel />
-        <MunicipioPriceAdminPanel />
-        <ServiceAdminPanel
-          title="Transporte"
-          category="transport"
-          services={services}
-          setServices={setServices}
-          loadServices={loadServices}
-          locale={locale}
-          loadTranslation={(to) => getTransportServices(to, true)}
-          saveTranslation={(items, to) => saveTransportServices(items, to)}
-          saveServices={(nextServices) => saveTransportServices(nextServices, locale)}
-        />
-      </div>
+/**
+ * Admin › Transport. The fleet first — each vehicle with its public page, in
+ * one card (VehicleAdminPanel) — then the numbers the price calculator uses.
+ * There is no separate tours-style "Transporte" list any more: it edited the
+ * same vehicles' pages a second way.
+ */
+const AdminTransport: React.FC = () => (
+  <div className="min-h-screen bg-paper-warm py-6">
+    <div className="container mx-auto space-y-8 px-4">
+      <VehicleAdminPanel />
+      <TransferConfigAdminPanel />
+      <MunicipioPriceAdminPanel />
     </div>
-  );
-};
+  </div>
+);
 
 export default AdminTransport;

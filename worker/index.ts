@@ -47,6 +47,7 @@ import { onRequest as handlePayAttempt, sweepOverdue } from '../functions/api/pa
 import { onRequest as handleActivity } from '../functions/api/activity';
 import { onRequest as handleSendSummary } from '../functions/api/send-summary';
 import { onRequest as handleYoutube } from '../functions/api/youtube';
+import { onRequest as handleTrash } from '../functions/api/trash';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
 import { robotsResponse, sitemapResponse, withPageSeo } from '../shared/seo';
 
@@ -105,6 +106,8 @@ const ROUTES: Record<string, RouteHandler> = {
   '/api/notify-config': handleNotifyConfig,
   '/api/pay-attempt': handlePayAttempt,
   '/api/activity': handleActivity,
+  // The admin's wastebasket: what the admin pages delete, kept to restore.
+  '/api/trash': handleTrash,
   '/api/send-summary': handleSendSummary,
   '/api/cf-ai': handleCfAi,
   '/api/upload': handleUpload,

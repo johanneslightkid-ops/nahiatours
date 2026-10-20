@@ -154,7 +154,7 @@ const NotifySettingsPanel: React.FC = () => {
               Probar WhatsApp
             </button>
             {view.callmebotKeySet && (
-              <button type="button" disabled={busy} onClick={() => save({ clearCallmebotApiKey: true })} className="rounded-full px-4 py-1.5 text-sm font-semibold text-hibiscus-dark">
+              <button type="button" disabled={busy} onClick={() => window.confirm('¿Borrar esta clave? Los avisos por este canal se detendrán.') && save({ clearCallmebotApiKey: true })} className="rounded-full px-4 py-1.5 text-sm font-semibold text-hibiscus-dark">
                 Borrar clave
               </button>
             )}
@@ -199,7 +199,7 @@ const NotifySettingsPanel: React.FC = () => {
                   Probar correo
                 </button>
                 {view.emailKeySet && (
-                  <button type="button" disabled={busy} onClick={() => save({ clearEmailApiKey: true })} className="rounded-full px-4 py-1.5 text-sm font-semibold text-hibiscus-dark">
+                  <button type="button" disabled={busy} onClick={() => window.confirm('¿Borrar esta clave? Los avisos por este canal se detendrán.') && save({ clearEmailApiKey: true })} className="rounded-full px-4 py-1.5 text-sm font-semibold text-hibiscus-dark">
                     Borrar clave
                   </button>
                 )}

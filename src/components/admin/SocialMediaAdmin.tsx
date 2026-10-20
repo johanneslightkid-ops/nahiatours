@@ -329,7 +329,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
                       Visitar
                     </a>
                     <button
-                      onClick={() => handleRemoveAccount(account.platform)}
+                      onClick={() => window.confirm(`¿Quitar la cuenta de ${account.platform}?`) && handleRemoveAccount(account.platform)}
                       className="px-4 py-2 bg-red-500 hover:bg-sunset-dark rounded transition-all"
                     >
                       <FaTrash />
@@ -442,7 +442,7 @@ const SocialMediaAdmin: React.FC<SocialMediaAdminProps> = ({ onSave }) => {
                         Ver
                       </a>
                       <button
-                        onClick={() => handleRemoveVideo(video.id)}
+                        onClick={() => window.confirm('¿Quitar este video?') && handleRemoveVideo(video.id)}
                         className="px-3 py-2 bg-sunset-dark text-white rounded hover:bg-[#9d3d26] transition-all"
                       >
                         <FaTrash />

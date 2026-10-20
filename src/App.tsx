@@ -41,6 +41,7 @@ const Policy = lazy(() => import('./pages/Policy'));
 const AdminDestinations = lazy(() => import('./pages/AdminDestinations'));
 const AdminInspire = lazy(() => import('./pages/AdminInspire'));
 const AdminLook = lazy(() => import('./pages/AdminLook'));
+const AdminTrash = lazy(() => import('./pages/AdminTrash'));
 // The receipt shown when a guest comes back from Stripe, AZUL or CardNET.
 // Lazy like every other non-home route: nobody lands here first.
 const PaymentReturn = lazy(() => import('./components/PaymentReturn'));
@@ -104,6 +105,7 @@ const App = () => {
                 <Route path="/admin/destinations" element={<ProtectedRoute component={AdminDestinations} />} />
                 <Route path="/admin/inspire" element={<ProtectedRoute component={AdminInspire} />} />
                 <Route path="/admin/look" element={<ProtectedRoute component={AdminLook} />} />
+                <Route path="/admin/trash" element={<ProtectedRoute component={AdminTrash} />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/policies/:slug" element={<Policy />} />
               </Routes>

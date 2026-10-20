@@ -5,6 +5,7 @@ import { FaTrash, FaEye, FaEyeSlash } from 'react-icons/fa';
 import TranslateBar from './TranslateBar';
 import { useTranslationSync } from './useTranslationSync';
 import { Lang, sameProse, translateRecord } from '../../lib/autoTranslate';
+import { confirmAndTrash } from '../../lib/trash';
 
 const BlogAdminPanel: React.FC = () => {
   const { locale } = useI18n();
@@ -54,7 +55,8 @@ const BlogAdminPanel: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Seguro que quieres eliminar esta entrada del blog para siempre?')) return;
+    const article = articles.find((a) => a.id === id);
+    if (!article || !(await confirmAndTrash('blog', article.title, article, locale))) return;
     const success = await deleteBlogArticle(id, locale);
     if (success) {
       setArticles(prev => prev.filter(a => a.id !== id));

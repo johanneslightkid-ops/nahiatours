@@ -1,5 +1,5 @@
 import type { IconType } from 'react-icons';
-import { MdSettings, MdTour, MdLocalTaxi } from 'react-icons/md';
+import { MdSettings, MdTour, MdLocalTaxi, MdDeleteOutline } from 'react-icons/md';
 import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaQuoteRight, FaLanguage, FaCashRegister } from 'react-icons/fa';
 import { SITE_ADMIN_NAV } from '../config/siteAdmin';
 
@@ -47,6 +47,8 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { section: 'aiBlogGen', icon: FaMagic, label: { en: 'Blog', es: 'Blog', fr: 'Blog', de: 'Blog' } },
   // Pages only this site has (src/config/siteAdmin.ts — a per-branch file).
   ...SITE_ADMIN_NAV,
+  // What the other pages deleted, to restore or delete for good.
+  { section: null, path: '/admin/trash', icon: MdDeleteOutline, label: { en: 'Trash', es: 'Papelera', fr: 'Corbeille', de: 'Papierkorb' } },
 ];
 
 /** The admin's own language. Anything unknown reads Spanish — these sites are Dominican. */

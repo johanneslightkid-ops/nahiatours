@@ -4,6 +4,7 @@ import { useI18n, type Locale } from '../contexts/I18nContext';
 import { adminLang } from '../lib/adminNav';
 import { DEFAULT_DESTINATIONS, DestinationItem, DestinationsConfig, getDestinations, saveDestinations } from '../edt/destinations';
 import { adminText, uploadAdminFile } from '../edt/adminUpload';
+import { confirmAndTrash } from '../lib/trash';
 import { smallImage } from '../edt/useTours';
 
 const LANGS: Locale[] = ['en', 'es', 'fr', 'de'];
@@ -148,7 +149,14 @@ const AdminDestinations: React.FC = () => {
                 </label>
                 <button type="button" onClick={() => move(index, -1)} className="rounded-md p-2 ring-1 ring-ink/15" aria-label="Up"><HiArrowUp /></button>
                 <button type="button" onClick={() => move(index, 1)} className="rounded-md p-2 ring-1 ring-ink/15" aria-label="Down"><HiArrowDown /></button>
-                <button type="button" onClick={() => setConfig({ ...config, items: config.items.filter((_, i) => i !== index) })} className="rounded-md p-2 text-hibiscus-dark ring-1 ring-hibiscus/40" aria-label="Delete"><HiTrash /></button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    // Ask and keep a copy first; the removal is published with the page's save.
+                    if (!(item.name.trim() || item.image.trim()) || (await confirmAndTrash('destinations', item.name || item.image, item))) {
+                      setConfig({ ...config, items: config.items.filter((_, i) => i !== index) });
+                    }
+                  }} className="rounded-md p-2 text-hibiscus-dark ring-1 ring-hibiscus/40" aria-label="Delete"><HiTrash /></button>
               </div>
             </div>
           </div>

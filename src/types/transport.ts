@@ -15,6 +15,12 @@ export interface VehicleType {
    * and `label` is still what the vehicle key is derived from.
    */
   translations?: Partial<Record<string, { label?: string; description?: string }>>;
+  /**
+   * The id of this vehicle's public page in the transport catalogue
+   * (transport-services): its photos, price and long description. The admin
+   * edits both as one; unset on older records, which pair them by position.
+   */
+  serviceId?: number;
 }
 
 export interface TransferRoute {

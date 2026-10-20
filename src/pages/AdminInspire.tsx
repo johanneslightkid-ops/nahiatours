@@ -208,7 +208,7 @@ const AdminInspire: React.FC = () => {
                 <input className={`${field} flex-1`} value={track.url} placeholder="https://…" onChange={(event) => set({ tracks: config.tracks.map((t, i) => (i === index ? { ...t, url: event.target.value } : t)) })} />
                 <button type="button" onClick={() => moveTrack(index, -1)} className="rounded-md p-2 ring-1 ring-ink/15" aria-label="Up"><HiArrowUp /></button>
                 <button type="button" onClick={() => moveTrack(index, 1)} className="rounded-md p-2 ring-1 ring-ink/15" aria-label="Down"><HiArrowDown /></button>
-                <button type="button" onClick={() => set({ tracks: config.tracks.filter((_, i) => i !== index) })} className="rounded-md p-2 text-hibiscus-dark ring-1 ring-hibiscus/40" aria-label="Delete"><HiTrash /></button>
+                <button type="button" onClick={() => window.confirm(say({ en: `Remove “${track.title || track.url}” from the queue?`, es: `¿Quitar «${track.title || track.url}» de la lista?` })) && set({ tracks: config.tracks.filter((_, i) => i !== index) })} className="rounded-md p-2 text-hibiscus-dark ring-1 ring-hibiscus/40" aria-label="Delete"><HiTrash /></button>
               </div>
             ))}
           </div>

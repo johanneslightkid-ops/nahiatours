@@ -440,7 +440,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           </button>
           {status?.stripeSecretConfigured && (
             <button
-              onClick={handleClearStripe}
+              onClick={() => window.confirm('¿Borrar esta clave? El método de pago dejará de funcionar hasta que guardes otra.') && handleClearStripe()}
               disabled={saving}
               className="rounded-full border border-sunset-dark/40 px-5 py-2 text-sm font-semibold text-sunset-dark disabled:opacity-50"
             >
@@ -613,7 +613,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
             </button>
             {status.azul.authKeyConfigured && (
               <button
-                onClick={() => handleSaveBanks({ azulAuthKey: '' })}
+                onClick={() => window.confirm('¿Borrar esta clave? El método de pago dejará de funcionar hasta que guardes otra.') && handleSaveBanks({ azulAuthKey: '' })}
                 disabled={saving}
                 className="rounded-full border border-sunset-dark/40 px-5 py-2 text-sm font-semibold text-sunset-dark disabled:opacity-50"
               >
@@ -694,7 +694,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           </button>
           {status?.verifone?.secretWordConfigured && (
             <button
-              onClick={() => handleSaveVerifone(true)}
+              onClick={() => window.confirm('¿Borrar esta clave? El método de pago dejará de funcionar hasta que guardes otra.') && handleSaveVerifone(true)}
               disabled={saving}
               className="rounded-full border border-sunset-dark/40 px-5 py-2 text-sm font-semibold text-sunset-dark disabled:opacity-50"
             >

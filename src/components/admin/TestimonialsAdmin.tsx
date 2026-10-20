@@ -15,6 +15,7 @@ import {
   TestimonialRecord,
 } from '../../services/testimonialService';
 import { useI18n } from '../../contexts/I18nContext';
+import { confirmAndTrash } from '../../lib/trash';
 
 /**
  * Reseñas — the panel that did not exist.
@@ -88,7 +89,12 @@ const TestimonialsAdmin: React.FC = () => {
   const update = (id: string, patch: Partial<TestimonialRecord>) =>
     setItems((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
 
-  const remove = (id: string) => setItems((prev) => prev.filter((t) => t.id !== id));
+  // Ask and keep a copy first; the removal itself is published with "Guardar".
+  const remove = async (id: string) => {
+    const item = items.find((t) => t.id === id);
+    if (item && (item.name.trim() || item.review.trim()) && !(await confirmAndTrash('testimonials', `${item.name} — ${item.review.slice(0, 60)}`, item, locale))) return;
+    setItems((prev) => prev.filter((t) => t.id !== id));
+  };
 
   const save = async () => {
     setSaving(true);

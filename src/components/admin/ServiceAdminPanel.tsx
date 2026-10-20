@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import TranslateBar from './TranslateBar';
 import { useTranslationSync } from './useTranslationSync';
 import { uploadImage, Tour, PricingOption } from '../../services/toursService';
 import MarkdownEditor from '../ui/MarkdownEditor';
 import { Lang, describeSync, fillMissingList, syncList, ListSyncOptions } from '../../lib/autoTranslate';
+import { confirmAndTrash } from '../../lib/trash';
 
 type Category = 'tours' | 'transport';
 
@@ -98,6 +99,8 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [draft, setDraft] = useState<Tour>(createEmptyService());
   const isEditing = editingId !== null;
+  /** The editor at the top: pressing "Editar" on a card further down brings it into view. */
+  const editor = useRef<HTMLDivElement>(null);
   const sync = useTranslationSync(locale ?? 'es');
   const translatable = Boolean(locale && loadTranslation && saveTranslation);
 
@@ -113,6 +116,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
   };
 
   const startEditing = (service: Tour) => {
+    window.requestAnimationFrame(() => editor.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     setEditingId(service.id);
     setDraft({
       ...service,
@@ -223,7 +227,26 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
     translateChange(before, nextServices);
   };
 
+  /**
+   * Ask, keep a copy in the wastebasket, then delete. The languages' lists are
+   * paired by position and a deletion is carried into all of them, so the
+   * copy holds the service in every language, and its position, to put it
+   * back the same way.
+   */
   const handleDelete = async (id: number) => {
+    const position = services.findIndex((service) => service.id === id);
+    const service = services[position];
+    if (!service) return;
+    const byLocale: Partial<Record<Lang, Tour>> = locale ? { [locale]: service } : {};
+    if (locale && loadTranslation) {
+      for (const to of (['en', 'es', 'fr', 'de'] as Lang[]).filter((lang) => lang !== locale)) {
+        const other = await loadTranslation(to).catch(() => [] as Tour[]);
+        if (other[position]) byLocale[to] = other[position];
+      }
+    }
+    const kept = await confirmAndTrash(category === 'transport' ? 'transport' : 'tours', service.title, { position, byLocale, fallback: service }, locale);
+    if (!kept) return;
+    if (editingId === id) resetDraft();
     const before = services;
     const nextServices = services.filter((service) => service.id !== id);
     setServices(nextServices);
@@ -252,7 +275,7 @@ const ServiceAdminPanel: React.FC<ServiceAdminPanelProps> = ({
         />
       )}
 
-      <div className="rounded-3xl bg-paper-card p-6 shadow-lg">
+      <div ref={editor} className="scroll-mt-28 rounded-3xl bg-paper-card p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold text-ink">
           {isEditing
             ? category === 'transport'
