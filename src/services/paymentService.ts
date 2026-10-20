@@ -29,7 +29,9 @@ export interface CheckoutBooking {
   /** Path on this site to come back to. Defaults to wherever we are now. */
   returnPath?: string;
   /** A whole cart in one payment; each item is priced by the server on its own. */
-  items?: Array<Omit<CheckoutBooking, 'items' | 'locale' | 'returnPath'>>;
+  items?: Array<Omit<CheckoutBooking, 'items' | 'locale' | 'returnPath' | 'wallet'>>;
+  /** The guest chose Apple Pay or Google Pay over typing a card. */
+  wallet?: 'apple_pay' | 'google_pay';
 }
 
 /** What Stripe says happened, as reported by /api/stripe-session. */
@@ -130,6 +132,8 @@ export interface PaymentsReady {
   currency: string;
   /** Pesos per catalogue dollar, when the card is charged in pesos. */
   dopPerUsd: number | null;
+  /** Wallets the payment page offers: 'apple_pay', 'google_pay'. */
+  wallets: Array<'apple_pay' | 'google_pay'>;
 }
 
 /** Where to send the guest: a hosted page to open, or a form to post to one. */
@@ -204,7 +208,7 @@ export const savePaymentConfig = async (patch: PaymentConfigPatch): Promise<Paym
   return body as PaymentConfigStatus;
 };
 
-const NOT_READY: PaymentsReady = { card: false, currency: 'USD', dopPerUsd: null };
+const NOT_READY: PaymentsReady = { card: false, currency: 'USD', dopPerUsd: null, wallets: [] };
 
 /**
  * Can the storefront take a card? A failure answers "no", so a hiccup hides
@@ -220,6 +224,9 @@ export const getPaymentsReady = async (): Promise<PaymentsReady> => {
       card: Boolean(body.card),
       currency: typeof body.currency === 'string' && body.currency ? body.currency.toUpperCase() : 'USD',
       dopPerUsd: typeof body.dopPerUsd === 'number' && body.dopPerUsd > 0 ? body.dopPerUsd : null,
+      wallets: Array.isArray(body.wallets)
+        ? body.wallets.filter((wallet: unknown): wallet is 'apple_pay' | 'google_pay' => wallet === 'apple_pay' || wallet === 'google_pay')
+        : [],
     };
   } catch {
     return NOT_READY;

@@ -73,7 +73,8 @@ export const startStripe = async (
   env: PaymentEnv,
   secrets: PaymentSecrets,
   booking: PricedBooking,
-  origin: string
+  origin: string,
+  wallet?: string
 ): Promise<CardCheckout> => {
   const { title, persons, unitPrice, total, breakdown, returnPath, priceSource, date, locale, category } = booking;
   // Priced rate by rate, the booking is one line for its total; otherwise one
@@ -101,6 +102,9 @@ export const startStripe = async (
     'metadata[date]': date,
     'metadata[category]': category,
     'metadata[price_source]': priceSource,
+    // The guest picked Apple Pay or Google Pay; Checkout shows it on the
+    // devices that have it, and the operator sees which one was chosen.
+    ...(wallet ? { 'metadata[wallet]': wallet } : {}),
   });
 
   try {
@@ -244,5 +248,6 @@ export const startCardCheckout = async (
   if (processor === 'cardnet') {
     return startCardnet(env, secrets, priced.booking, origin, request.headers.get('CF-Connecting-IP') ?? '');
   }
-  return startStripe(env, secrets, priced.booking, origin);
+  const wallet = body.wallet === 'apple_pay' || body.wallet === 'google_pay' ? body.wallet : undefined;
+  return startStripe(env, secrets, priced.booking, origin, wallet);
 };

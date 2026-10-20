@@ -192,7 +192,7 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
           category="tours"
           serviceId={service.id}
           locale={locale}
-          methods={['card', 'paypal']}
+          methods={['card', 'applepay', 'googlepay', 'paypal']}
           hideWhenEmpty
           className="w-full"
         />
