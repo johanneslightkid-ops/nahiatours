@@ -1,4 +1,4 @@
-import { readPaymentSecrets, resolveCardProcessor, cardChargeCurrency, PaymentEnv } from '../../shared/paymentConfig';
+import { readPaymentSecrets, resolveCardProcessor, cardChargeCurrency, CARD_WALLETS, PaymentEnv } from '../../shared/paymentConfig';
 
 /**
  * Can the storefront take a card, and in what currency — the guest's page's
@@ -29,6 +29,8 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
       card: processor !== null,
       currency,
       dopPerUsd: currency === 'DOP' && secrets.dopPerUsd > 0 ? secrets.dopPerUsd : null,
+      // Apple Pay / Google Pay, when the processor's payment page offers them.
+      wallets: processor ? CARD_WALLETS[processor] : [],
     }),
     {
       status: 200,

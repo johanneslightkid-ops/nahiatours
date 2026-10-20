@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FaPaypal, FaCreditCard, FaWhatsapp, FaChevronDown, FaShieldAlt, FaCopy } from 'react-icons/fa';
+import { FaPaypal, FaCreditCard, FaWhatsapp, FaChevronDown, FaShieldAlt, FaCopy, FaApple, FaGoogle } from 'react-icons/fa';
+import { useDeviceWallets } from '../../lib/wallets';
 import { useBrand } from '../../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
-import { getPaymentMethodStates, getCardPaymentLink, PaymentMethodId } from '../../utils/paymentMethods';
+import { getPaymentMethodStates, getCardPaymentLink, PaymentMethodId, WalletId } from '../../utils/paymentMethods';
 import {
   getPaymentsReady,
   startCardCheckout,
@@ -122,6 +123,13 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalTitle: 'Pay with PayPal',
     paypalGo: 'Continue to PayPal',
     paypalNote: 'PayPal opens in a new tab. Come back here afterwards.',
+    applepay: 'Apple Pay',
+    applepayHint: 'Face ID or Touch ID — no card to type',
+    googlepay: 'Google Pay',
+    googlepayHint: 'The cards saved in your Google account',
+    walletTitle: 'Pay with {wallet}',
+    walletNote: 'On the secure payment page, choose {wallet} at the top.',
+    walletPay: 'Continue to {wallet} · {amount}',
   },
   es: {
     trigger: 'Reservar y pagar',
@@ -155,6 +163,13 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalTitle: 'Pagar con PayPal',
     paypalGo: 'Continuar a PayPal',
     paypalNote: 'PayPal se abre en otra pestaña. Vuelve aquí después.',
+    applepay: 'Apple Pay',
+    applepayHint: 'Face ID o Touch ID, sin escribir la tarjeta',
+    googlepay: 'Google Pay',
+    googlepayHint: 'Las tarjetas guardadas en tu cuenta de Google',
+    walletTitle: 'Pagar con {wallet}',
+    walletNote: 'En la página de pago segura, elige {wallet} arriba.',
+    walletPay: 'Continuar con {wallet} · {amount}',
   },
   de: {
     trigger: 'Buchen & bezahlen',
@@ -188,6 +203,13 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalTitle: 'Mit PayPal bezahlen',
     paypalGo: 'Weiter zu PayPal',
     paypalNote: 'PayPal öffnet sich in einem neuen Tab. Kommen Sie danach hierher zurück.',
+    applepay: 'Apple Pay',
+    applepayHint: 'Face ID oder Touch ID — ohne Kartennummer',
+    googlepay: 'Google Pay',
+    googlepayHint: 'Die in Ihrem Google-Konto gespeicherten Karten',
+    walletTitle: 'Mit {wallet} bezahlen',
+    walletNote: 'Wählen Sie auf der sicheren Zahlungsseite oben {wallet}.',
+    walletPay: 'Weiter zu {wallet} · {amount}',
   },
   fr: {
     trigger: 'Réserver et payer',
@@ -221,6 +243,13 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalTitle: 'Payer avec PayPal',
     paypalGo: 'Continuer vers PayPal',
     paypalNote: 'PayPal s’ouvre dans un nouvel onglet. Revenez ici ensuite.',
+    applepay: 'Apple Pay',
+    applepayHint: 'Face ID ou Touch ID, sans saisir de carte',
+    googlepay: 'Google Pay',
+    googlepayHint: 'Les cartes enregistrées dans votre compte Google',
+    walletTitle: 'Payer avec {wallet}',
+    walletNote: 'Sur la page de paiement sécurisée, choisissez {wallet} en haut.',
+    walletPay: 'Continuer avec {wallet} · {amount}',
   },
 };
 
@@ -277,6 +306,9 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   const [copied, setCopied] = useState(false);
   const [ready, setReady] = useState<PaymentsReady | null>(null);
   const [paypalModalOpen, setPaypalModalOpen] = useState(false);
+  /** Apple Pay or Google Pay, when the guest chose a wallet rather than the card form. */
+  const [wallet, setWallet] = useState<WalletId | null>(null);
+  const deviceWallets = useDeviceWallets();
   const [prePay, setPrePay] = useState<PrePayState>(initialPrePay);
   const [prePayError, setPrePayError] = useState('');
   const [flags, setFlags] = useState<NotifyFlags>({ guestEmail: false, operatorAlerts: false });
@@ -301,7 +333,12 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   }, []);
 
   const cardReady = ready?.card ?? false;
-  const methods = getPaymentMethodStates(brandSettings, cardReady);
+  // A wallet the payment page offers but this device cannot use is not offered.
+  const methods = getPaymentMethodStates(
+    brandSettings,
+    cardReady,
+    (ready?.wallets ?? []).filter((id) => deviceWallets.includes(id))
+  );
   if (allowedMethods) {
     for (const id of Object.keys(methods) as PaymentMethodId[]) {
       if (!allowedMethods.includes(id)) methods[id] = { ...methods[id], visible: false };
@@ -438,8 +475,20 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     openWhatsAppConfirmation('VIP Concierge / Cash');
   };
 
+  const handleWallet = (id: WalletId) => {
+    playClickFx();
+    setIsOpen(false);
+    setWallet(id);
+    setCardError('');
+    setPrePayError('');
+    refreshPrePay();
+    track('pay_click', { method: id, title: excursionTitle, total: totalUsd ?? 0, source, locale: lang });
+    setCardModalOpen(true);
+  };
+
   const handleCard = () => {
     playClickFx();
+    setWallet(null);
     setIsOpen(false);
     setCardError('');
     setPrePayError('');
@@ -490,6 +539,7 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
         date: bookingDate,
         amount: totalUsd ?? undefined,
         locale: lang,
+        ...(wallet ? { wallet } : {}),
         ...(items && items.length > 0
           ? {
               items: items.map((line) => ({
@@ -591,6 +641,10 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
 
           {methods.card.visible &&
             methodButton('card', handleCard, <FaCreditCard className="h-4 w-4" />, 'bg-sky/25 text-sky-light', t.card, t.cardHint)}
+          {methods.applepay.visible &&
+            methodButton('applepay', () => handleWallet('apple_pay'), <FaApple className="h-4 w-4" />, 'bg-paper/15 text-white', t.applepay, t.applepayHint)}
+          {methods.googlepay.visible &&
+            methodButton('googlepay', () => handleWallet('google_pay'), <FaGoogle className="h-4 w-4" />, 'bg-paper/15 text-white', t.googlepay, t.googlepayHint)}
           {methods.paypal.visible &&
             methodButton('paypal', handlePayPal, <FaPaypal className="h-4 w-4" />, 'bg-sky-dark/30 text-sky-light', t.paypal, t.paypalHint)}
           {methods.cash.visible &&
@@ -614,10 +668,12 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
             </button>
             <div className="mb-5 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky/25 text-sky-light font-bold">
-                💳
+                {wallet === 'apple_pay' ? <FaApple className="h-5 w-5 text-white" /> : wallet === 'google_pay' ? <FaGoogle className="h-4 w-4 text-white" /> : '💳'}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{t.cardTitle}</h3>
+                <h3 className="text-lg font-bold text-white">
+                  {wallet ? t.walletTitle.replace('{wallet}', wallet === 'apple_pay' ? t.applepay : t.googlepay) : t.cardTitle}
+                </h3>
                 <p className="text-xs text-paper/70">{excursionTitle}</p>
               </div>
             </div>
@@ -701,10 +757,16 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
                 {starting
                   ? t.opening
                   : cardReady
-                  ? t.payWith.replace('{amount}', chargedInPesos !== null ? formatMoney(chargedInPesos, 'DOP', lang) : displayPrice)
+                  ? (wallet ? t.walletPay.replace('{wallet}', wallet === 'apple_pay' ? t.applepay : t.googlepay) : t.payWith).replace(
+                      '{amount}',
+                      chargedInPesos !== null ? formatMoney(chargedInPesos, 'DOP', lang) : displayPrice
+                    )
                   : t.continue}
               </button>
-              <p className="text-center text-[0.65rem] text-paper/60">{cardReady ? t.note : t.linkNote}</p>
+              <p className="text-center text-[0.65rem] text-paper/60">
+                {wallet ? `${t.walletNote.replace('{wallet}', wallet === 'apple_pay' ? t.applepay : t.googlepay)} ` : ''}
+                {cardReady ? t.note : t.linkNote}
+              </p>
             </div>
           </div>
         </div>,
