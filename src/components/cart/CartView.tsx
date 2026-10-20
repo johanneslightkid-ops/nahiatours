@@ -597,7 +597,7 @@ const CartView: React.FC<{ locale: string }> = ({ locale }) => {
                 source="cart"
                 clearsCart
                 prePayDefaults={details}
-                methods={['card', 'paypal']}
+                methods={['card', 'applepay', 'googlepay', 'paypal']}
                 hideWhenEmpty
                 buttonLabel={L({ en: `Pay all now · ${usd(total)}`, es: `Pagar todo ahora · ${usd(total)}`, de: `Alles jetzt bezahlen · ${usd(total)}`, fr: `Tout payer maintenant · ${usd(total)}` })}
                 className="w-full"

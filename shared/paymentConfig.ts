@@ -47,6 +47,8 @@ export const PROTECTED_RESOURCES = new Set([
   'contact-requests',
   'notify-config',
   'pay-attempts',
+  // Written only through /api/wallet-config (functions/api/wallet-config.ts).
+  'apple-pay-domain-association',
   // A site's YouTube Data API key (functions/api/youtube.ts).
   'youtube-secret',
 ]);
@@ -417,6 +419,19 @@ export const resolveCardProcessor = (secrets: PaymentSecrets): CardProcessor | n
       ? CARD_PROCESSOR_ORDER
       : [secrets.cardProcessor, ...CARD_PROCESSOR_ORDER.filter((p) => p !== secrets.cardProcessor)];
   return order.find((processor) => ready[processor]) ?? null;
+};
+
+/**
+ * The wallets a processor's hosted payment page offers on a device that has
+ * them: Stripe Checkout and Verifone's buy-link both show Apple Pay and Google
+ * Pay above the card form. The banks' pages take cards only. Mirrored for the
+ * browser in src/utils/paymentMethods.ts (WALLETS_BY_PROCESSOR).
+ */
+export const CARD_WALLETS: Record<CardProcessor, Array<'apple_pay' | 'google_pay'>> = {
+  stripe: ['apple_pay', 'google_pay'],
+  verifone: ['apple_pay', 'google_pay'],
+  azul: [],
+  cardnet: [],
 };
 
 /** What the chosen processor charges in, for showing a guest the amount before they leave. */
