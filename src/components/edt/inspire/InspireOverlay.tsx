@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import { FaWhatsapp, FaYoutube } from 'react-icons/fa';
-import { HiCheck, HiChevronLeft, HiChevronRight, HiClock, HiLocationMarker, HiPlay } from 'react-icons/hi';
+import { HiArrowsExpand, HiCheck, HiChevronLeft, HiChevronRight, HiClock, HiLocationMarker, HiPlay } from 'react-icons/hi';
 import { useI18n, type Locale } from '../../../contexts/I18nContext';
 import { useBrand } from '../../../contexts/BrandContext';
 import type { Tour } from '../../../services/toursService';
@@ -13,7 +13,9 @@ import InspireEffects from './InspireEffects';
 import InspireMusic from './InspireMusic';
 import InspireSlideshow from './InspireSlideshow';
 import InspireVisualizer from './InspireVisualizer';
-import { InspireToggle } from './InspireContext';
+import { enterFullscreen, fullscreenElement, InspireToggle, useInspire } from './InspireContext';
+import TvVideoPlayer from './TvVideoPlayer';
+import { learnTv, useTvPlayer } from './tvMode';
 import { useShowQuality } from './useShowQuality';
 
 type L = Record<Locale, string>;
@@ -45,7 +47,14 @@ const COPY = {
   shorts: { en: 'Short', es: 'Short', fr: 'Short', de: 'Short' },
   popular: { en: 'Popular', es: 'Popular', fr: 'Populaire', de: 'Beliebt' },
   views: { en: 'views', es: 'vistas', fr: 'vues', de: 'Aufrufe' },
+  fullscreen: { en: 'Full screen', es: 'Pantalla completa', fr: 'Plein écran', de: 'Vollbild' },
+  backToFullscreen: { en: 'Back to full screen', es: 'Volver a pantalla completa', fr: 'Revenir en plein écran', de: 'Zurück zum Vollbild' },
 };
+
+/** How deep each screen of the show is: each step in is one entry in the browser's history. */
+const LEVEL: Record<View, number> = { carousel: 0, tour: 1, videos: 2, video: 3 };
+const BY_LEVEL: View[] = ['carousel', 'tour', 'videos', 'video'];
+type ShowState = { inspire?: View } | null;
 
 const IDLE_MS = 75_000;
 
@@ -54,7 +63,7 @@ const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3
 /** A YouTube player with sound, as the shop's TV shows it. */
 const embed = (id: string, preview: boolean) =>
   `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3${
-    preview ? `&controls=0&loop=1&playlist=${id}` : '&controls=1'
+    preview ? `&controls=0&loop=1&playlist=${id}` : '&controls=1&fs=0'
   }`;
 
 /** ── The carousel: a slow ring of tours, the one in front large. ───────── */
@@ -240,9 +249,23 @@ const TourStage: React.FC<{
 };
 
 /** ── Videos about the tour; pointing at one plays it, with sound. ───────── */
-const VideoWall: React.FC<{ videos: Video[] | null; locale: Locale; onPlay: (video: Video) => void }> = ({ videos, locale, onPlay }) => {
+const VideoWall: React.FC<{ videos: Video[] | null; locale: Locale; onPlay: (video: Video) => void; tv: boolean }> = ({ videos, locale, onPlay, tv }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const hover = useRef(0);
+  const first = useRef<HTMLButtonElement>(null);
+  const hasVideos = Boolean(videos?.length);
+  // On a TV the remote's focus starts on the first video, so the arrows move across the wall.
+  useEffect(() => {
+    if (tv && hasVideos) first.current?.focus({ preventScroll: true });
+  }, [tv, hasVideos]);
+  const startPreview = (id: string) => {
+    window.clearTimeout(hover.current);
+    hover.current = window.setTimeout(() => setPreview(id), 350);
+  };
+  const stopPreview = (id: string) => {
+    window.clearTimeout(hover.current);
+    setPreview((current) => (current === id ? null : current));
+  };
   if (videos === null) return <div className="grid h-full place-items-center font-condensed text-[1.6vw] uppercase tracking-[0.2em] text-white/80">{COPY.loading[locale]}</div>;
   if (!videos.length) return <div className="grid h-full place-items-center text-[1.6vw] text-white/80">{COPY.none[locale]}</div>;
   const label = (from: Video['from']) => (from === 'channel' ? COPY.channel[locale] : from === 'shorts' ? COPY.shorts[locale] : COPY.popular[locale]);
@@ -253,25 +276,25 @@ const VideoWall: React.FC<{ videos: Video[] | null; locale: Locale; onPlay: (vid
         {videos.slice(0, 12).map((video, i) => (
           <motion.button
             key={video.id}
+            ref={i === 0 ? first : undefined}
             type="button"
             className="inspire-video group"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
-            onPointerEnter={() => {
-              window.clearTimeout(hover.current);
-              hover.current = window.setTimeout(() => setPreview(video.id), 350);
-            }}
-            onPointerLeave={() => {
-              window.clearTimeout(hover.current);
-              setPreview((current) => (current === video.id ? null : current));
-            }}
+            onPointerEnter={() => startPreview(video.id)}
+            onPointerLeave={() => stopPreview(video.id)}
+            onFocus={() => startPreview(video.id)}
+            onBlur={() => stopPreview(video.id)}
             onClick={() => onPlay(video)}
           >
             {preview === video.id ? (
+              // A preview is only looked at: neither the pointer nor the remote's focus can enter it.
               <iframe
+                ref={(frame) => frame?.setAttribute('inert', '')}
                 src={embed(video.id, true)}
                 title={video.title}
+                tabIndex={-1}
                 className="pointer-events-none absolute inset-0 h-full w-full"
                 allow="autoplay; encrypted-media; picture-in-picture"
               />
@@ -344,6 +367,88 @@ const InspireOverlay: React.FC = () => {
   );
   const lastInput = useRef(Date.now());
   const videoCache = useRef(new Map<number, Video[]>());
+  const { close } = useInspire();
+  const closeRef = useRef(close);
+  closeRef.current = close;
+  const tvPlayer = useTvPlayer(config.youtube.tvPlayer);
+  const tvRef = useRef(tvPlayer);
+  tvRef.current = tvPlayer;
+
+  /**
+   * The remote's Back is the browser's Back. So every step into the show —
+   * tour, videos, one video — is an entry in the browser's history, and Back
+   * steps out of the show one screen at a time instead of leaving the page;
+   * from the ring of tours it closes the show. The entries carry nothing but
+   * the screen (the address does not change), and stepping out with the
+   * show's own buttons goes back through them, so the history stays in step.
+   */
+  const viewRef = useRef<View>('carousel');
+  viewRef.current = view;
+  const go = useCallback((target: View) => {
+    const from = LEVEL[viewRef.current];
+    const to = LEVEL[target];
+    viewRef.current = target;
+    setView(target);
+    if (to > from) {
+      for (let level = from + 1; level <= to; level += 1) {
+        window.history.pushState({ ...(window.history.state ?? {}), inspire: BY_LEVEL[level] }, '');
+      }
+    } else if (to < from) {
+      window.history.go(to - from);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.history.pushState({ ...(window.history.state ?? {}), inspire: 'carousel' }, '');
+    const onPop = (event: PopStateEvent) => {
+      const target = (event.state as ShowState)?.inspire;
+      // Back pressed while the remote was caught inside YouTube's own player:
+      // that is the TV trap, so this device gets the TV player from now on.
+      if (viewRef.current === 'video' && target !== 'video' && !tvRef.current && document.activeElement?.tagName === 'IFRAME') learnTv();
+      if (!target) {
+        closeRef.current();
+        return;
+      }
+      viewRef.current = target;
+      setView(target);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => {
+      window.removeEventListener('popstate', onPop);
+      // Closed with its switch: take the show's entries back out of the history.
+      const current = (window.history.state as ShowState)?.inspire;
+      if (current) window.history.go(-(LEVEL[current] + 1));
+    };
+  }, []);
+
+  // Lost full screen (the remote's Back, or Escape): offer it back, big and focused on a TV.
+  const [fullscreen, setFullscreen] = useState(() => Boolean(fullscreenElement()));
+  const [offerFullscreen, setOfferFullscreen] = useState(false);
+  const fullscreenButton = useRef<HTMLButtonElement>(null);
+  const canFullscreen =
+    typeof document !== 'undefined' &&
+    Boolean(document.documentElement.requestFullscreen || (document.documentElement as HTMLElement & { webkitRequestFullscreen?: unknown }).webkitRequestFullscreen);
+  useEffect(() => {
+    const onChange = () => setFullscreen(Boolean(fullscreenElement()));
+    document.addEventListener('fullscreenchange', onChange);
+    document.addEventListener('webkitfullscreenchange', onChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onChange);
+      document.removeEventListener('webkitfullscreenchange', onChange);
+    };
+  }, []);
+  useEffect(() => {
+    // Not while the show is still asking for full screen as it opens.
+    if (fullscreen || !canFullscreen) {
+      setOfferFullscreen(false);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => setOfferFullscreen(true), 1500);
+    return () => window.clearTimeout(timer);
+  }, [fullscreen, canFullscreen]);
+  useEffect(() => {
+    if (offerFullscreen && tvPlayer && view !== 'video') fullscreenButton.current?.focus({ preventScroll: true });
+  }, [offerFullscreen, tvPlayer, view]);
 
   useEffect(() => {
     getInspireConfig().then(setConfig);
@@ -384,7 +489,7 @@ const InspireOverlay: React.FC = () => {
     window.addEventListener('pointerdown', touch);
     window.addEventListener('keydown', touch);
     const timer = window.setInterval(() => {
-      if ((view === 'tour' || view === 'videos') && Date.now() - lastInput.current > IDLE_MS) setView('carousel');
+      if ((view === 'tour' || view === 'videos') && Date.now() - lastInput.current > IDLE_MS) go('carousel');
     }, 5000);
     return () => {
       window.removeEventListener('pointermove', touch);
@@ -392,11 +497,11 @@ const InspireOverlay: React.FC = () => {
       window.removeEventListener('keydown', touch);
       window.clearInterval(timer);
     };
-  }, [view]);
+  }, [view, go]);
 
-  const openVideos = useCallback(() => {
+  /** The videos about the tour in front, fetched once per tour. */
+  const loadVideos = useCallback(() => {
     if (!tour) return;
-    setView('videos');
     const cached = videoCache.current.get(tour.id);
     if (cached) {
       setVideos(cached);
@@ -419,21 +524,34 @@ const InspireOverlay: React.FC = () => {
       .catch(() => setVideos([]));
   }, [tour, config.youtube, youtubeAccount]);
 
+  const openVideos = useCallback(() => {
+    loadVideos();
+    go('videos');
+  }, [loadVideos, go]);
+
+  const wall = useMemo(() => (videos ?? []).slice(0, 12), [videos]);
+  /** Videos skipped in a row because they would not play: after a full round, back to the wall. */
+  const skipped = useRef(0);
+  const nextVideo = useMemo(() => {
+    if (!video || wall.length < 2) return null;
+    const at = wall.findIndex((item) => item.id === video.id);
+    return wall[(at + 1) % wall.length];
+  }, [video, wall]);
+
   // Keys: arrows move, Escape goes one step back.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight' && view === 'carousel') setIndex((value) => (value + 1) % Math.max(1, tours.length));
       if (event.key === 'ArrowLeft' && view === 'carousel') setIndex((value) => (value - 1 + tours.length) % Math.max(1, tours.length));
-      if (event.key === 'Enter' && view === 'carousel') setView('tour');
-      if (event.key === 'Backspace' || (event.key === 'Escape' && document.fullscreenElement)) {
-        if (view === 'video') setView('videos');
-        else if (view === 'videos') setView('tour');
-        else if (view === 'tour') setView('carousel');
+      if (event.key === 'Enter' && view === 'carousel' && !(event.target instanceof HTMLButtonElement)) go('tour');
+      if ((event.key === 'Backspace' || (event.key === 'Escape' && fullscreenElement())) && LEVEL[view] > 0) {
+        event.preventDefault();
+        window.history.back();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [view, tours.length]);
+  }, [view, tours.length, go]);
 
   const headline = config.headline[locale] || config.headline.en || '';
   const crumbs: Array<{ label: string; view: View }> = [{ label: COPY.showcase[locale], view: 'carousel' }];
@@ -500,10 +618,7 @@ const InspireOverlay: React.FC = () => {
                 {i > 0 && <HiChevronRight className="h-[1.2vw] w-[1.2vw] shrink-0 text-gold" />}
                 <button
                   type="button"
-                  onClick={() => {
-                    if (crumb.view === 'videos') openVideos();
-                    else setView(crumb.view);
-                  }}
+                  onClick={() => go(crumb.view)}
                   disabled={last}
                   className={`truncate rounded-[3px] px-2 py-1 transition ${last ? 'max-w-[34vw] text-white' : 'text-white/65 hover:bg-white/10 hover:text-white'}`}
                 >
@@ -513,7 +628,14 @@ const InspireOverlay: React.FC = () => {
             );
           })}
         </nav>
-        <InspireToggle />
+        <div className="flex shrink-0 items-center gap-3">
+          {offerFullscreen && !tvPlayer && (
+            <button type="button" onClick={enterFullscreen} className="inspire-fs-pill">
+              <HiArrowsExpand className="h-4 w-4" /> {COPY.fullscreen[locale]}
+            </button>
+          )}
+          <InspireToggle />
+        </div>
       </div>
 
       <LayoutGroup>
@@ -525,7 +647,7 @@ const InspireOverlay: React.FC = () => {
               setIndex={setIndex}
               onOpen={(i) => {
                 setIndex(i);
-                setView('tour');
+                go('tour');
               }}
               seconds={config.slideSeconds}
               headline={headline}
@@ -539,13 +661,36 @@ const InspireOverlay: React.FC = () => {
             <VideoWall
               videos={videos}
               locale={locale}
+              tv={tvPlayer}
               onPlay={(picked) => {
+                skipped.current = 0;
                 setVideo(picked);
-                setView('video');
+                go('video');
               }}
             />
           )}
-          {view === 'video' && video && (
+          {view === 'video' && video && tvPlayer && (
+            <TvVideoPlayer
+              video={video}
+              locale={locale}
+              hasNext={Boolean(nextVideo)}
+              onBack={() => go('videos')}
+              onNext={() => {
+                skipped.current = 0;
+                if (nextVideo) setVideo(nextVideo);
+              }}
+              onEnded={() => go('videos')}
+              onUnplayable={() => {
+                skipped.current += 1;
+                if (nextVideo && skipped.current < wall.length) setVideo(nextVideo);
+                else {
+                  skipped.current = 0;
+                  go('videos');
+                }
+              }}
+            />
+          )}
+          {view === 'video' && video && !tvPlayer && (
             <div className="flex h-full items-center justify-center px-[4vw] pb-[5vh] pt-[11vh]">
               <div className={`overflow-hidden rounded-[10px] bg-black shadow-ink-xl ${video.short ? 'aspect-[9/16] h-full' : 'aspect-video w-full max-w-[86vw] max-h-full'}`}>
                 <iframe src={embed(video.id, false)} title={video.title} className="h-full w-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
@@ -554,6 +699,14 @@ const InspireOverlay: React.FC = () => {
           )}
         </div>
       </LayoutGroup>
+
+      {offerFullscreen && tvPlayer && view !== 'video' && (
+        <div className="absolute inset-x-0 bottom-[3vh] z-40 flex justify-center">
+          <button ref={fullscreenButton} type="button" onClick={enterFullscreen} className="inspire-fs-prompt">
+            <HiArrowsExpand className="h-[2vw] w-[2vw] min-h-6 min-w-6" /> {COPY.backToFullscreen[locale]}
+          </button>
+        </div>
+      )}
 
       <div className="absolute bottom-[2.4vh] left-[3vw] z-30">
         <InspireMusic

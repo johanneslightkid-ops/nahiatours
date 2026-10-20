@@ -14,6 +14,7 @@ import {
   trackAddedAt,
   VisualizerPosition,
   VisualizerStyle,
+  TvPlayerMode,
 } from '../edt/inspireConfig';
 import InspireSlideshow from '../components/edt/inspire/InspireSlideshow';
 import { adminText, uploadAdminFile } from '../edt/adminUpload';
@@ -555,6 +556,24 @@ const AdminInspire: React.FC = () => {
             <label className="text-xs font-semibold text-ink-soft">
               {say({ en: 'Videos per tour', es: 'Videos por tour' })}
               <input type="number" min={3} max={30} className={field} value={config.youtube.maxResults} onChange={(event) => set({ youtube: { ...config.youtube, maxResults: Number(event.target.value) } })} />
+            </label>
+            <label className="text-xs font-semibold text-ink-soft sm:col-span-2">
+              {say({ en: 'TV player', es: 'Reproductor para TV' })}
+              <select
+                className={field}
+                value={config.youtube.tvPlayer}
+                onChange={(event) => set({ youtube: { ...config.youtube, tvPlayer: event.target.value as TvPlayerMode } })}
+              >
+                <option value="auto">{say({ en: 'Automatic: every screen but computers, phones and tablets', es: 'Automático: toda pantalla menos computadoras, móviles y tabletas' })}</option>
+                <option value="on">{say({ en: 'Always (every screen)', es: 'Siempre (en cualquier pantalla)' })}</option>
+                <option value="off">{say({ en: 'Never (YouTube’s own controls)', es: 'Nunca (controles propios de YouTube)' })}</option>
+              </select>
+              <span className="mt-1 block font-normal">
+                {say({
+                  en: 'On a TV, YouTube’s own controls can capture the pointer and the remote until Back leaves the show. The TV player hides them and puts large buttons under the video instead: back, pause, sound, volume, ±10 s, from the start, next. Automatic gives it to any screen that is not plainly a computer, phone or tablet — so a TV of any brand, LG, Samsung, Android, Hisense, TCL, Xiaomi… — and to a screen whose remote gives it away. One device can also be told once by opening the site with ?tv=1 at the end of the address (?tv=0 undoes it, ?tv=auto goes back to automatic).',
+                  es: 'En un televisor, los controles propios de YouTube pueden atrapar el puntero y el mando hasta que «Atrás» saca del show. El reproductor para TV los oculta y pone botones grandes debajo del video: volver, pausa, sonido, volumen, ±10 s, desde el principio, siguiente. Automático lo usa en toda pantalla que no sea claramente una computadora, un móvil o una tableta —un televisor de cualquier marca: LG, Samsung, Android, Hisense, TCL, Xiaomi…— y en la que su mando la delate. A un aparato concreto también se le puede indicar una vez abriendo la web con ?tv=1 al final de la dirección (?tv=0 lo deshace, ?tv=auto vuelve a automático).',
+                })}
+              </span>
             </label>
           </div>
           <div className="mt-5 rounded-md bg-paper p-4">

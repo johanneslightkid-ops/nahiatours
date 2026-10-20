@@ -77,10 +77,10 @@ export const useInspire = () => {
   return value;
 };
 
-const fullscreenElement = () =>
+export const fullscreenElement = () =>
   document.fullscreenElement ?? (document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement ?? null;
 
-const enterFullscreen = () => {
+export const enterFullscreen = () => {
   const root = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => void };
   try {
     if (root.requestFullscreen) root.requestFullscreen({ navigationUI: 'hide' }).catch(() => undefined);

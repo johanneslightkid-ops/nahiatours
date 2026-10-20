@@ -52,6 +52,13 @@ export type VisualizerPosition = 'bottom' | 'middle' | 'top';
  */
 export type InspireQuality = 'auto' | 'high' | 'balanced' | 'lite';
 
+/**
+ * The TV player: YouTube's own controls, keys and fullscreen button off, the
+ * player out of reach of the pointer and the remote's focus, and the show's
+ * own control bar under the video. 'auto' uses it on TV browsers only.
+ */
+export type TvPlayerMode = 'auto' | 'on' | 'off';
+
 export interface InspireConfig {
   enabled: boolean;
   /** Animated WebP (or any image) behind everything. */
@@ -111,6 +118,7 @@ export interface InspireConfig {
     searchSuffix: string;
     preferShorts: boolean;
     maxResults: number;
+    tvPlayer: TvPlayerMode;
   };
   headline: Partial<Record<Locale, string>>;
 }
@@ -133,7 +141,7 @@ export const DEFAULT_INSPIRE: InspireConfig = {
   tracks: [],
   volume: 0.6,
   duckLevel: 0.2,
-  youtube: { channel: '', searchSuffix: 'Punta Cana Bávaro tour', preferShorts: true, maxResults: 12 },
+  youtube: { channel: '', searchSuffix: 'Punta Cana Bávaro tour', preferShorts: true, maxResults: 12, tvPlayer: 'auto' },
   headline: { en: 'Your Caribbean, your way' },
 };
 
@@ -204,6 +212,7 @@ export const normalizeInspire = (input: unknown): InspireConfig => {
       searchSuffix: String(youtube.searchSuffix ?? DEFAULT_INSPIRE.youtube.searchSuffix).trim(),
       preferShorts: youtube.preferShorts !== false,
       maxResults: clamp(youtube.maxResults, 3, 30, DEFAULT_INSPIRE.youtube.maxResults),
+      tvPlayer: youtube.tvPlayer === 'on' || youtube.tvPlayer === 'off' ? youtube.tvPlayer : 'auto',
     },
     headline: record.headline && typeof record.headline === 'object' ? record.headline : DEFAULT_INSPIRE.headline,
   };
