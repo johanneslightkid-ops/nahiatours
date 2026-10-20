@@ -10,6 +10,7 @@ import { Toucan, PalmFrond } from '../components/ui/Illustrations';
 import { getContentLocale, useI18n } from '../contexts/I18nContext';
 import { useBlog } from '../contexts/BlogContext';
 import { generateBlogPageMeta, generateBlogListStructuredData } from '../utils/seoHelpers';
+import ArticleGallery from '../components/edt/blog/ArticleGallery';
 import ArticleBody from '../components/ui/ArticleBody';
 import type { BlogArticle } from '../services/blogService';
 import {
@@ -693,6 +694,8 @@ const Blog = () => {
                           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                           className="border-t border-ink/10 px-4 pb-6 pt-4 sm:px-8 sm:pb-10"
                         >
+                          {/* The article's pictures in miniature, under its title (they stay in the text too). */}
+                          <ArticleGallery images={article.images} body={article.post} title={article.title} locale={locale} />
                           {(article.tags ?? []).length > 0 && (
                             <div className="mb-5 flex flex-wrap gap-1.5">
                               {(article.tags ?? []).map((tag) => (

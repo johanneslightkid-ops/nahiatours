@@ -1943,6 +1943,34 @@ html.is-presenting::-webkit-scrollbar {
   display: none;
 }
 
+/* The blog article's miniature gallery. */
+.article-thumb {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 7.5rem;
+  height: 5rem;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--paper-deep);
+  box-shadow: 0 0 0 1px rgb(20 22 26 / 0.08);
+  transition: transform 0.35s var(--ease-out), box-shadow 0.35s ease;
+}
+.article-thumb:hover,
+.article-thumb:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 2px var(--mango);
+}
+@media (min-width: 640px) {
+  .article-thumb {
+    width: 9.5rem;
+    height: 6.25rem;
+  }
+}
+.article-reel .edt-gallery {
+  padding-left: 1rem;
+}
+
 /* ── The full-screen photo stage ──────────────────────────────────────── */
 .coverflow {
   background:
