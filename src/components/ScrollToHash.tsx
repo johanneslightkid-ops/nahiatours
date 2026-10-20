@@ -1,6 +1,14 @@
 import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-import { REMEMBERED_PAGES, cancelPageScroll, scrollMemoryKey, scrollPageToTop } from '../lib/navScroll';
+import { useLocation, useNavigationType } from 'react-router-dom';
+import {
+  REMEMBERED_PAGES,
+  cancelPageScroll,
+  isRememberable,
+  isSubpage,
+  scrollMemoryKey,
+  scrollPageToTop,
+  writeReturnTrail,
+} from '../lib/navScroll';
 
 const readMemory = (pathname: string): number => {
   try {
@@ -31,32 +39,47 @@ const ScrollToHash = () => {
   const location = useLocation();
   /** True while a remembered position is being restored, so it is not overwritten. */
   const restoring = useRef(false);
+  const navigationType = useNavigationType();
+  /** The page being left and how far down it was, for the way back from a subpage. */
+  const left = useRef<{ path: string; pathname: string; y: number } | null>(null);
+  const fullPath = useRef('');
+  fullPath.current = `${location.pathname}${location.search}`;
 
   useEffect(() => {
     if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
   }, []);
 
-  // Remember the tours page's position while it is open.
+  // Remember every page's position while it is open; on leaving, note where
+  // it was (the next page may be a subpage that wants to lead back here).
   useEffect(() => {
     const { pathname } = location;
-    if (!REMEMBERED_PAGES.has(pathname)) return undefined;
+    const path = fullPath.current;
+    let y = window.scrollY;
+    if (!isRememberable(pathname)) return undefined;
     let frame = 0;
     const onScroll = () => {
       if (restoring.current || frame) return;
       frame = window.requestAnimationFrame(() => {
         frame = 0;
-        writeMemory(pathname, window.scrollY);
+        y = window.scrollY;
+        writeMemory(pathname, y);
       });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', onScroll);
       if (frame) window.cancelAnimationFrame(frame);
+      left.current = { path, pathname, y };
     };
   }, [location.pathname]);
 
   useEffect(() => {
     cancelPageScroll();
+    // Opening a subpage from an ordinary page: remember where the guest was,
+    // so the subpage's back link returns exactly there rather than to a list.
+    const from = left.current;
+    if (from && isSubpage(location.pathname) && !isSubpage(from.pathname)) writeReturnTrail({ path: from.path, y: from.y });
+
     // "#top" is how older links say "the start of the page": treated as no
     // hash, so the tours page still comes back where it was.
     const hash = location.hash.replace('#', '');
@@ -68,7 +91,14 @@ const ScrollToHash = () => {
       }
     }
 
-    const remembered = REMEMBERED_PAGES.has(location.pathname) ? readMemory(location.pathname) : 0;
+    // The tours page always comes back where it was; any other page does when
+    // it is reached with the back button or a back link.
+    const state = location.state as { restoreScroll?: boolean; y?: number } | null;
+    const comingBack = navigationType === 'POP' || Boolean(state?.restoreScroll);
+    let remembered = 0;
+    if (isRememberable(location.pathname) && (REMEMBERED_PAGES.has(location.pathname) || comingBack)) {
+      remembered = state?.restoreScroll && typeof state.y === 'number' ? state.y : readMemory(location.pathname);
+    }
     if (remembered <= 0) {
       scrollPageToTop();
       return undefined;

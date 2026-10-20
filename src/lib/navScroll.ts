@@ -65,6 +65,49 @@ export const onNavLinkClick = (event: React.MouseEvent, to: string, pathname: st
   }
 };
 
-/** Pages that come back at the position they were left at. */
+/**
+ * Pages that come back at the position they were left at however they are
+ * reached. Every other page comes back where it was left when it is reached
+ * with the browser's back button or a "back" link (state `{ restoreScroll: true }`),
+ * and starts at its top when it is opened afresh.
+ */
 export const REMEMBERED_PAGES = new Set(['/tours']);
 export const scrollMemoryKey = (pathname: string) => `scroll-memory:${pathname}`;
+
+/** Admin pages are tools, not reading: nothing about them is remembered. */
+export const isRememberable = (pathname: string) => !pathname.startsWith('/admin');
+
+/** Pages one opens from somewhere to read one thing, and goes back from. */
+export const isSubpage = (pathname: string) => pathname.startsWith('/details/');
+
+/**
+ * Where a guest was when they opened a subpage: the page, its query and the
+ * scroll position. Walking from one subpage to the next (previous / next
+ * tour) keeps it, so "back" still leads to where the walk began.
+ */
+export interface ReturnTrail {
+  path: string;
+  y: number;
+}
+
+const TRAIL_KEY = 'return-trail';
+
+export const readReturnTrail = (): ReturnTrail | null => {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(TRAIL_KEY) ?? 'null') as ReturnTrail | null;
+    return value && typeof value.path === 'string' ? value : null;
+  } catch {
+    return null;
+  }
+};
+
+export const writeReturnTrail = (trail: ReturnTrail) => {
+  try {
+    sessionStorage.setItem(TRAIL_KEY, JSON.stringify(trail));
+  } catch {
+    /* private mode: the back link falls back to the list */
+  }
+};
+
+/** Router state that asks the page to come back where it was left. */
+export const RESTORE_STATE = { restoreScroll: true } as const;
