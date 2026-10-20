@@ -2,9 +2,11 @@
   "nav": {
     "home": "Inicio",
     "tours": "Tours",
-    "transport": "Transporte",
+    "transport": "Traslados",
     "blog": "Blog",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "plan": "Planea mi día",
+    "cart": "Carrito"
   },
   "hero": {
     "title": "Descubre {brand}",

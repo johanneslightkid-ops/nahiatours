@@ -208,9 +208,11 @@ const Tours: React.FC = () => {
               )}
             </label>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setShowFilters((value) => !value)} aria-expanded={showFilters} className="btn-outline btn-sm md:hidden">
-                <HiAdjustments className="h-4 w-4" /> {COPY.filters[locale]}
-              </button>
+              <span className="md:hidden">
+                <button type="button" onClick={() => setShowFilters((value) => !value)} aria-expanded={showFilters} className="btn-outline btn-sm h-full">
+                  <HiAdjustments className="h-4 w-4" /> {COPY.filters[locale]}
+                </button>
+              </span>
               <select value={sort} onChange={(event) => setSort(event.target.value as SortKey)} className="finder-select flex-1 md:flex-none" aria-label={COPY.sort[locale]}>
                 <option value="popular">{COPY.popular[locale]}</option>
                 <option value="cheap">{COPY.cheap[locale]}</option>

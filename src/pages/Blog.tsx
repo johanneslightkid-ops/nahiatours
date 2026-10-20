@@ -383,9 +383,10 @@ const Blog = () => {
   const filtersActive = Boolean(query.trim() || tags.length || tourFilter);
 
   return (
-    <div className="page-top bg-paper pb-16 md:pb-24">
+    <div className="bg-paper pb-16 md:pb-24">
       <PageHeader
-        kicker={localeText(locale, { en: 'Stories from the coast', es: 'Historias de la costa', de: 'Geschichten von der Küste', fr: 'Récits de la côte' })}
+        image="/imgs/edt/dest/punta-cana-views.webp"
+        kicker={localeText(locale, { en: 'Trip ideas', es: 'Ideas de viaje', de: 'Reiseideen', fr: 'Idées de voyage' })}
         title={<FormattedMessage id="blog.title" defaultMessage="Blog" />}
         subtitle={<FormattedMessage id="blog.description" values={{ brand: brandSettings.brandName }} />}
         artLeft={<Toucan className="h-28 w-32 animate-bob" />}

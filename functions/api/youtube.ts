@@ -224,9 +224,29 @@ const rank = (lists: { own: Array<Omit<Video, 'from'>>; popular: Array<Omit<Vide
         }
       });
   add(lists.own, 'channel');
-  if (shorts) add([...lists.short, ...lists.popular.filter((video) => video.short)], 'shorts');
-  add(lists.popular, 'popular');
+  // Only what really is a Short: a "#shorts" search also returns ordinary videos.
+  if (shorts) add([...lists.short, ...lists.popular].filter((video) => video.short), 'shorts');
+  add([...lists.popular, ...lists.short], 'popular');
   return out.slice(0, max);
+};
+
+/**
+ * Drop the videos whose owners do not allow them to be played on other
+ * sites — on the TV they would show "Video unavailable". YouTube's oEmbed
+ * answers 401 for exactly those, without a key.
+ */
+const embeddable = async (videos: Video[], max: number): Promise<Video[]> => {
+  const checked = await Promise.all(
+    videos.map(async (video) => {
+      try {
+        const response = await fetch(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${video.id}`)}`);
+        return response.ok ? video : null;
+      } catch {
+        return video;
+      }
+    })
+  );
+  return checked.filter(Boolean).slice(0, max) as Video[];
 };
 
 const storedKey = async (env: Env): Promise<string> => {
@@ -278,14 +298,14 @@ export const onRequest = async ({ request, env, waitUntil }: { request: Request;
   try {
     if (key) {
       try {
-        videos = rank(await fromApi(query, channel, shorts, key), shorts, max);
+        videos = await embeddable(rank(await fromApi(query, channel, shorts, key), shorts, max * 2), max);
       } catch {
         // A key over its quota should not blank the TV: fall back to the pages.
         source = 'pages';
-        videos = rank(await fromPages(query, channel, shorts), shorts, max);
+        videos = await embeddable(rank(await fromPages(query, channel, shorts), shorts, max * 2), max);
       }
     } else {
-      videos = rank(await fromPages(query, channel, shorts), shorts, max);
+      videos = await embeddable(rank(await fromPages(query, channel, shorts), shorts, max * 2), max);
     }
   } catch (error) {
     return json({ videos: [], source, error: error instanceof Error ? error.message : String(error) }, 200, { 'Cache-Control': 'no-store' });

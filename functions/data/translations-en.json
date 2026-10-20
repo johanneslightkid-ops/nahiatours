@@ -2,9 +2,11 @@
   "nav": {
     "home": "Home",
     "tours": "Tours",
-    "transport": "Transport",
+    "transport": "Transfers",
     "blog": "Blog",
-    "contact": "Contact"
+    "contact": "Contact",
+    "plan": "Plan my day",
+    "cart": "Cart"
   },
   "hero": {
     "title": "Discover {brand}",

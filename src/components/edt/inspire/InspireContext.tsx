@@ -1,11 +1,14 @@
 import React, { Suspense, createContext, lazy, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { HiSparkles } from 'react-icons/hi';
 import { useI18n, type Locale } from '../../../contexts/I18nContext';
+import { getInspireConfig } from '../../../edt/inspireConfig';
 
 const InspireOverlay = lazy(() => import('./InspireOverlay'));
 
 interface InspireContextValue {
   active: boolean;
+  /** The admin can take the switch off the site (Admin → Inspire). */
+  available: boolean;
   toggle: () => void;
   close: () => void;
   /**
@@ -56,7 +59,12 @@ const leaveFullscreen = () => {
  */
 export const InspireProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [active, setActive] = useState(false);
+  const [available, setAvailable] = useState(true);
   const audio = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    getInspireConfig().then((config) => setAvailable(config.enabled));
+  }, []);
 
   const close = useCallback(() => {
     setActive(false);
@@ -98,7 +106,7 @@ export const InspireProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, [active, close]);
 
-  const value = useMemo(() => ({ active, toggle, close, audio }), [active, toggle, close]);
+  const value = useMemo(() => ({ active, available, toggle, close, audio }), [active, available, toggle, close]);
 
   return (
     <InspireContext.Provider value={value}>
@@ -121,9 +129,10 @@ const LABEL: Record<Locale, { on: string; off: string }> = {
 
 /** The switch that opens and closes the show — the only control that stays on screen in both. */
 export const InspireToggle: React.FC<{ className?: string }> = ({ className = '' }) => {
-  const { active, toggle } = useInspire();
+  const { active, available, toggle } = useInspire();
   const { locale } = useI18n();
   const label = LABEL[locale] ?? LABEL.en;
+  if (!available && !active) return null;
   return (
     <button
       type="button"

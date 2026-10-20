@@ -149,7 +149,7 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
         <div className="hero-grain absolute inset-0" />
       </motion.div>
 
-      <div className="section-shell relative flex min-h-[88svh] flex-col justify-end pb-10 pt-28 sm:pb-12 lg:min-h-[94vh] lg:justify-center lg:pb-44 lg:pt-40">
+      <div className="section-shell relative flex min-h-[88svh] flex-col justify-end pb-10 pt-28 sm:pb-12 lg:min-h-[100vh] lg:justify-center lg:pb-36 lg:pt-36">
         <div className="grid items-end gap-10 lg:grid-cols-12">
           <motion.div style={{ y: copyY }} className="lg:col-span-8">
             <motion.span

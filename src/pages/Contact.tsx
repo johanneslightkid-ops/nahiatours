@@ -10,10 +10,11 @@ const Contact = () => {
   const { brandSettings } = useBrand();
 
   return (
-    <div className="page-top pb-20">
+    <div className="pb-20">
       <PageHeader
         tone="mango"
-        kicker="Say hola"
+        image="/imgs/edt/gallery/beach-walk.webp"
+        kicker="Hola"
         title={<FormattedMessage id="contact.title" />}
         subtitle={<FormattedMessage id="contact.description" />}
         artLeft={<Toucan className="h-28 w-32 animate-bob" />}

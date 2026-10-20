@@ -126,7 +126,7 @@ const TourCard: React.FC<TourCardProps> = ({
           </span>
         )}
         {lasts && (
-          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 font-condensed text-[0.8rem] font-bold uppercase tracking-[0.16em] text-white">
+          <span className="absolute left-3 top-3 badge badge-ink">
             <HiClock className="h-3.5 w-3.5 text-mango-light" /> {lasts}
           </span>
         )}

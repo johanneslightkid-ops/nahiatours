@@ -103,7 +103,7 @@ const PathwaysSection: React.FC = () => {
   });
 
   return (
-    <section id="plan-my-day" className="home-section relative overflow-hidden bg-paper-warm py-20 sm:py-28">
+    <section id="plan-my-day" className="home-section relative overflow-hidden bg-paper py-20 sm:py-28">
       <div className="section-shell relative">
         <div className="mb-12 grid gap-6 lg:grid-cols-[1.2fr,1fr] lg:items-end">
           <div>

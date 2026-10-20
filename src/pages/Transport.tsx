@@ -338,9 +338,10 @@ const Transport: React.FC = () => {
     'w-full rounded-2xl border border-ink/15 bg-white/90 px-4 py-3.5 text-base text-ink outline-none transition focus:border-lagoon focus:bg-white';
 
   return (
-    <div className="page-top min-h-screen bg-paper pb-28 lg:pb-16">
+    <div className="min-h-screen bg-paper pb-28 lg:pb-16">
       <PageHeader
         tone="lagoon"
+        image="/imgs/edt/banners/transfers.webp"
         kicker={t('kicker', 'Door to door')}
         title={t('title', 'Airport Transfers')}
         subtitle={t(

@@ -96,7 +96,7 @@ const Carousel: React.FC<{
                 y: '-50%',
                 rotateY: offset * -24,
                 scale: front ? 1 : 1 - distance * 0.13,
-                opacity: distance > 2 ? 0 : 1 - distance * 0.28,
+                opacity: distance > 2 ? 0 : 1,
               }}
               transition={{ type: 'spring', stiffness: 70, damping: 18, mass: 0.9 }}
               aria-label={tour.title}
@@ -108,6 +108,8 @@ const Carousel: React.FC<{
                 className={`absolute inset-0 h-full w-full object-cover ${front && !reduced ? 'inspire-card-zoom' : ''}`}
               />
               <span className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" />
+              {/* Cards further back are darker, not see-through. */}
+              <motion.span className="pointer-events-none absolute inset-0 z-10 bg-ink" animate={{ opacity: distance * 0.32 }} transition={{ duration: 0.6 }} />
               <span className="absolute left-5 top-5 font-display text-[3.4vw] leading-none text-transparent [-webkit-text-stroke:1.5px_#fff]">
                 #{String(i + 1).padStart(2, '0')}
               </span>

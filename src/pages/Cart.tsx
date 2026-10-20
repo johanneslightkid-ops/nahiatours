@@ -9,9 +9,10 @@ import CartView from '../components/cart/CartView';
 const Cart = () => {
   const { locale } = useI18n();
   return (
-    <div className="page-top pb-20">
+    <div className="pb-20">
       <PageHeader
         tone="lagoon"
+        image="/imgs/edt/tours/bebe-catamaran-tour/1.webp"
         kicker={localeText(locale, { en: 'Your trip', es: 'Tu viaje', de: 'Ihre Reise', fr: 'Votre voyage' })}
         title={localeText(locale, { en: 'Your cart', es: 'Tu carrito', de: 'Ihr Warenkorb', fr: 'Votre panier' })}
         subtitle={localeText(locale, {

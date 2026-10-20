@@ -287,15 +287,18 @@ const Header: React.FC = () => {
               <div className="hidden lg:block">
                 <LanguageSwitcher tone={overPhoto ? 'light' : 'dark'} />
               </div>
-              <a
-                href={generateWhatsAppMessage(brandSettings.phoneNumber, WA_HELLO[locale])}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => playClickFx()}
-                className="btn-wa btn-sm hidden sm:inline-flex"
-              >
-                <FaWhatsapp className="h-4 w-4" /> {BOOK_LABEL[locale]}
-              </a>
+              {/* Wrapped: the button's own display would override `hidden`. */}
+              <span className="hidden sm:block">
+                <a
+                  href={generateWhatsAppMessage(brandSettings.phoneNumber, WA_HELLO[locale])}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => playClickFx()}
+                  className="btn-wa btn-sm"
+                >
+                  <FaWhatsapp className="h-4 w-4" /> {BOOK_LABEL[locale]}
+                </a>
+              </span>
               <button
                 type="button"
                 onClick={() => {
