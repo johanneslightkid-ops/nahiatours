@@ -802,8 +802,36 @@ a:hover {
 }
 
 .planner-option[data-selected='true'] {
-  background: linear-gradient(135deg, #fff4dd, var(--mango-light));
-  border-color: var(--mango);
+  background: #ffffff;
+  border-color: var(--ink);
+  box-shadow: inset 0 -4px 0 var(--mango), 0 8px 18px -12px rgb(0 0 0 / 0.5);
+}
+
+/* The answer's symbol: an ink tile with an amber line icon; amber when chosen. */
+.planner-option-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 4px;
+  background: var(--ink);
+  font-size: 1.5rem;
+  transition: background-color 0.25s ease, transform 0.35s var(--ease-out);
+}
+.planner-option .planner-option-icon,
+.planner-option .planner-option-icon * {
+  color: var(--mango) !important;
+}
+.planner-option:hover .planner-option-icon {
+  transform: scale(1.06);
+}
+.planner-option[data-selected='true'] .planner-option-icon {
+  background: var(--mango);
+}
+.planner-option[data-selected='true'] .planner-option-icon,
+.planner-option[data-selected='true'] .planner-option-icon * {
+  color: var(--ink) !important;
 }
 
 .planner-option,
@@ -835,6 +863,13 @@ a:hover {
 
 .planner-chip[data-selected='true'] {
   background: var(--mango);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+.planner-chip svg {
+  color: var(--mango-dark);
+}
+.planner-chip[data-selected='true'] svg {
   color: var(--ink);
 }
 
@@ -1298,7 +1333,7 @@ a:hover {
 }
 
 .planner-stones-fill {
-  background: linear-gradient(90deg, var(--lagoon-light), var(--lagoon), var(--jungle));
+  background: linear-gradient(90deg, var(--ink), var(--mango));
   transform-origin: left center;
   transition: transform 0.45s var(--ease-out);
 }
@@ -1321,7 +1356,8 @@ a:hover {
 }
 
 .planner-stone[data-state='done'] {
-  background: var(--mango-light);
+  background: var(--ink);
+  color: var(--mango);
 }
 
 .planner-stone[data-state='here'] {
@@ -2042,6 +2078,71 @@ html.is-presenting::-webkit-scrollbar {
 }
 .article-reel .edt-gallery {
   padding-left: 1rem;
+}
+
+/* The planner's two round buttons in the top bar. */
+.planner-bar-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--mango);
+  box-shadow: 0 0 0 2px var(--mango), var(--shade-sm);
+  transition: transform 0.3s var(--ease-out), background-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+}
+.planner-bar-btn:hover {
+  transform: scale(1.06);
+}
+.planner-bar-btn[data-on='true'] {
+  background: var(--mango);
+  color: var(--ink);
+}
+.planner-bar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+.planner-bar-next {
+  background: var(--mango);
+  color: var(--ink);
+  box-shadow: 0 0 0 2px var(--ink), var(--shade-sm);
+}
+.planner-bar-key {
+  position: absolute;
+  bottom: -0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: var(--ink);
+  padding: 0 0.3rem;
+  font-family: var(--condensed);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+/* While the guide is talking, a ring keeps breathing out of the pause button. */
+.planner-bar-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--mango);
+  animation: cue-ripple 1.6s ease-out infinite;
+  pointer-events: none;
+}
+@media (min-width: 1024px) {
+  .planner-bar-btn {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .planner-bar-pulse { animation: none; }
 }
 
 /* ── The full-screen photo stage ──────────────────────────────────────── */

@@ -9,6 +9,19 @@ import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 import { useI18n } from '../../contexts/I18nContext';
 import { getFlowCopy } from '../../planner/flowCopy';
 import { primeVoiceGuide } from './VoiceGuide';
+import { TbCalculator, TbCalendar, TbCompass } from 'react-icons/tb';
+
+const INTRO_ICONS = [TbCompass, TbCalculator, TbCalendar];
+
+/** The three promises' symbols: an ink tile with an amber line icon, like the answers. */
+const IntroIcon: React.FC<{ index: number }> = ({ index }) => {
+  const Icon = INTRO_ICONS[index % INTRO_ICONS.length];
+  return (
+    <span className="grid h-12 w-12 place-items-center rounded-[4px] bg-mango text-ink" aria-hidden="true">
+      <Icon className="h-6 w-6" strokeWidth={1.7} />
+    </span>
+  );
+};
 
 /** Slow drifting strip of real catalogue photography behind the intro. */
 const CatalogueDrift: React.FC<{ images: string[] }> = ({ images }) => {
@@ -126,7 +139,7 @@ export const PlannerIntro: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.15 + index * 0.08 }}
             className="planner-panel-soft px-6 py-6"
           >
-            <div className="text-3xl">{bullet.emoji}</div>
+            <IntroIcon index={index} />
             <h3 className="mt-3 font-display text-lg font-bold text-paper">{bullet.title}</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-paper/85">{bullet.text}</p>
           </motion.div>

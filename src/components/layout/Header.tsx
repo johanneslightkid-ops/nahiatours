@@ -16,6 +16,7 @@ import { playClickFx } from '../../lib/soundEngine';
 import { getAdminPassword, clearAdminPassword } from '../../services/authStore';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import { BrandLogo, CONTACT, SocialIcons } from '../edt/brand';
+import PlannerBarControls from '../edt/PlannerBarControls';
 
 /**
  * A thin black line of contact details, and under it the bar: clear over the
@@ -270,6 +271,8 @@ const Header: React.FC = () => {
             </nav>
 
             <div className="flex items-center gap-2">
+              {/* The planner's voice play/pause and Enter, there only. */}
+              {location.pathname.startsWith('/plan') && <PlannerBarControls tone={overPhoto ? 'light' : 'dark'} />}
               <Link
                 to="/cart"
                 onClick={(event) => {

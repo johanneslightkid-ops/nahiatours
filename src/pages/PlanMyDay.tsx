@@ -10,22 +10,13 @@ import { PlanResult } from '../components/planner/PlanResult';
 import { ProfileChips } from '../components/planner/ProfileChips';
 import FABWhatsApp from '../components/FABWhatsApp';
 import { useBrand } from '../contexts/BrandContext';
+import { STEP_ICONS } from '../planner/icons';
 import type { StepId } from '../planner/questions';
 
-const STEP_EMOJI: Record<StepId, string> = {
-  partyType: '👥',
-  headcount: '🔢',
-  interests: '💚',
-  energy: '🌡️',
-  adultAge: '🎂',
-  days: '🗓️',
-  occasion: '🎉',
-  constraints: '🛟',
-  budget: '💵',
-  dayShape: '⚖️',
-  aim: '🧭',
-  transport: '🚐',
-  logistics: '📍',
+
+const StepIcon: React.FC<{ id: StepId }> = ({ id }) => {
+  const Icon = STEP_ICONS[id];
+  return <Icon className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} aria-hidden="true" />;
 };
 
 const PlanMyDay: React.FC = () => {
@@ -66,11 +57,11 @@ const PlanMyDay: React.FC = () => {
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div
           className="planner-glow left-[-10%] top-24 h-[28rem] w-[28rem]"
-          style={{ background: '#7FE3DA' }}
+          style={{ background: 'var(--paper-deep)' }}
         />
         <div
           className="planner-glow bottom-10 right-[-8%] h-[24rem] w-[24rem]"
-          style={{ background: '#FFC861' }}
+          style={{ background: 'var(--mango-light)' }}
         />
       </div>
 
@@ -89,7 +80,7 @@ const PlanMyDay: React.FC = () => {
                   className="planner-stone"
                   data-state={index < stepIndex ? 'done' : index === stepIndex ? 'here' : 'ahead'}
                 >
-                  {STEP_EMOJI[step.id]}
+                  <StepIcon id={step.id} />
                 </li>
               ))}
             </ol>

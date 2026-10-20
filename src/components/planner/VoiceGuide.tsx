@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { HiMicrophone, HiRefresh, HiVolumeOff, HiVolumeUp } from 'react-icons/hi';
 import { useI18n } from '../../contexts/I18nContext';
+import { resetPlannerBar, setPlannerBar } from '../../planner/plannerBar';
 import { getFlowCopy } from '../../planner/flowCopy';
 import { haptic, HAPTIC } from '../../planner/haptics';
 import { lineHash, VoiceSegment } from '../../planner/voiceScript';
@@ -602,6 +603,27 @@ export const VoiceGuide: React.FC<VoiceGuideProps> = ({ stepKey, segments, onSeg
     document.addEventListener('visibilitychange', onHide);
     return () => document.removeEventListener('visibilitychange', onHide);
   }, [stopAll]);
+
+  // The top bar's big play/pause (planner page only): on → off stops reading
+  // and listening; off → on starts reading this question, inside the tap.
+  const toggleFromBar = useRef<() => void>(() => undefined);
+  toggleFromBar.current = () => {
+    haptic(HAPTIC.tap);
+    if (enabled) {
+      stopAll();
+      setEnabled(false);
+      setAudioSession('auto');
+    } else {
+      setAudioSession('play-and-record');
+      startedByTap.current = true;
+      readAndListen(latest.current.segments);
+      setEnabled(true);
+    }
+  };
+  useEffect(() => {
+    setPlannerBar({ audioAvailable: Boolean(synth), audioOn: enabled, toggleAudio: () => toggleFromBar.current() });
+  }, [enabled, synth]);
+  useEffect(() => () => resetPlannerBar(['audioAvailable', 'audioOn', 'toggleAudio']), []);
 
   if (!synth) return null;
 

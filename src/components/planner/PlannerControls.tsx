@@ -1,4 +1,5 @@
 import React from 'react';
+import type { IconType } from 'react-icons';
 import { HiCheck, HiMinus, HiPlus } from 'react-icons/hi';
 import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 import { haptic, HAPTIC } from '../../planner/haptics';
@@ -7,6 +8,8 @@ interface OptionCardProps {
   /** Lets the voice guide find and light up this option while reading it. */
   voiceId?: string;
   emoji: string;
+  /** Drawn in place of the emoji when there is one (src/planner/icons.ts). */
+  icon?: IconType;
   label: string;
   description?: string;
   selected: boolean;
@@ -17,6 +20,7 @@ interface OptionCardProps {
 export const OptionCard: React.FC<OptionCardProps> = ({
   voiceId,
   emoji,
+  icon: Icon,
   label,
   description,
   selected,
@@ -36,8 +40,8 @@ export const OptionCard: React.FC<OptionCardProps> = ({
     }}
     aria-pressed={selected}
   >
-    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-2 border-paper/25 bg-paper/10 text-2xl">
-      {emoji}
+    <span className="planner-option-icon" aria-hidden="true">
+      {Icon ? <Icon className="h-6 w-6" strokeWidth={1.6} /> : emoji}
     </span>
 
     <span className="min-w-0 flex-1">
@@ -51,7 +55,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 
     <span className="ml-1 shrink-0 self-center">
       {selected ? (
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-lagoon-light text-ink">
+        <span className="grid h-7 w-7 place-items-center rounded-[3px] bg-ink text-mango">
           <HiCheck className="h-4 w-4" />
         </span>
       ) : (
@@ -66,6 +70,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 interface ChipToggleProps {
   voiceId?: string;
   emoji?: string;
+  icon?: IconType;
   label: string;
   selected: boolean;
   disabled?: boolean;
@@ -75,6 +80,7 @@ interface ChipToggleProps {
 export const ChipToggle: React.FC<ChipToggleProps> = ({
   voiceId,
   emoji,
+  icon: Icon,
   label,
   selected,
   disabled = false,
@@ -94,7 +100,7 @@ export const ChipToggle: React.FC<ChipToggleProps> = ({
     }}
     aria-pressed={selected}
   >
-    {emoji && <span className="text-base leading-none">{emoji}</span>}
+    {Icon ? <Icon className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.7} aria-hidden="true" /> : emoji && <span className="text-base leading-none">{emoji}</span>}
     <span>{label}</span>
   </button>
 );

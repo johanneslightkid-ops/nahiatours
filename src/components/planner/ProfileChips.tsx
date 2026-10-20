@@ -3,11 +3,20 @@ import { HiPencil } from 'react-icons/hi';
 import { usePlanner } from '../../contexts/PlannerContext';
 import { usePlannerCopy } from '../../planner/usePlannerCopy';
 import type { StepId } from '../../planner/questions';
+import { STEP_ICONS, optionIcon } from '../../planner/icons';
+
+/** The answer's symbol, or its question's. */
+const ChipIcon: React.FC<{ step: StepId; option?: string }> = ({ step, option }) => {
+  const Icon = (option && optionIcon(step, option)) || STEP_ICONS[step];
+  return <Icon className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />;
+};
 
 interface Chip {
   step: StepId;
   emoji: string;
   text: string;
+  /** The answer's own key, where it has a symbol of its own (src/planner/icons.ts). */
+  option?: string;
 }
 
 /**
@@ -91,6 +100,7 @@ export const ProfileChips: React.FC<{ compact?: boolean }> = ({ compact = false 
   profile.constraints.forEach((key) => {
     chips.push({
       step: 'constraints',
+      option: key,
       emoji: copy.questions.constraints.options[key].emoji,
       text: copy.questions.constraints.options[key].label,
     });
@@ -115,7 +125,7 @@ export const ProfileChips: React.FC<{ compact?: boolean }> = ({ compact = false 
             className="planner-chip !py-1.5 !text-xs"
             title={copy.ui.editAnswers}
           >
-            <span>{chip.emoji}</span>
+            <ChipIcon step={chip.step} option={chip.option} />
             <span className="max-w-[14rem] truncate">{chip.text}</span>
           </button>
         ))}

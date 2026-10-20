@@ -23,14 +23,16 @@ import { playClickFx, playHoverFx } from '../../lib/soundEngine';
 import { useI18n } from '../../contexts/I18nContext';
 import { getFlowCopy } from '../../planner/flowCopy';
 import type { StepId } from '../../planner/questions';
+import { STEP_ICONS } from '../../planner/icons';
 
-const REFINE_EMOJI: Partial<Record<StepId, string>> = {
-  budget: '💵',
-  dayShape: '⚖️',
-  aim: '🧭',
-  transport: '🚐',
-  occasion: '🎉',
-  logistics: '📍',
+/** A refine tile's symbol: the question's own line icon. */
+const RefineIcon: React.FC<{ step: StepId }> = ({ step }) => {
+  const Icon = STEP_ICONS[step];
+  return (
+    <span className="grid h-9 w-9 place-items-center rounded-[4px] bg-ink text-mango" aria-hidden="true">
+      <Icon className="h-5 w-5" strokeWidth={1.8} />
+    </span>
+  );
 };
 
 export const PlanResult: React.FC = () => {
@@ -171,7 +173,7 @@ export const PlanResult: React.FC = () => {
                   data-set={Boolean(answer)}
                   className="planner-refine text-left"
                 >
-                  <span className="text-xl leading-none">{answer?.emoji ?? REFINE_EMOJI[step.id]}</span>
+                  <RefineIcon step={step.id} />
                   <span className="mt-2 block text-[0.66rem] font-extrabold uppercase tracking-[0.14em] text-paper/60">
                     {flow.refine.label[step.id]}
                   </span>

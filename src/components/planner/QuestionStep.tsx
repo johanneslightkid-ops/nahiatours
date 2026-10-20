@@ -25,6 +25,8 @@ import { echoLine, feedbackLines, stepVoice } from '../../planner/voiceScript';
 import { ChipToggle, CountStepper, EnergyScale, OptionCard } from './PlannerControls';
 import { VoiceGuide, VoiceOutcome } from './VoiceGuide';
 import { playClickFx } from '../../lib/soundEngine';
+import { optionIcon } from '../../planner/icons';
+import { resetPlannerBar, setPlannerBar } from '../../planner/plannerBar';
 
 interface OptionEntry {
   id: string;
@@ -63,13 +65,12 @@ const TakingShape: React.FC<{ spark?: string }> = ({ spark }) => {
               transition={{ duration: 0.35, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
               className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-paper/10 px-3 py-1.5 text-xs font-bold text-paper"
             >
-              <span className="text-base leading-none">{item.entry.profile.emoji}</span>
               <span className="truncate">{shortTitle(item.entry.tour.title)}</span>
             </motion.span>
           ))}
         </div>
       )}
-      {spark && <p className="mt-3 border-t border-paper/15 pt-3 text-xs leading-relaxed text-paper/75">🌴 {spark}</p>}
+      {spark && <p className="mt-3 border-t border-paper/15 pt-3 text-xs leading-relaxed text-paper/75">{spark}</p>}
     </div>
   );
 };
@@ -215,6 +216,18 @@ export const QuestionStep: React.FC = () => {
     setAnswer('constraints', []);
     advance();
   }, [advance, setAnswer]);
+
+  // The top bar's "continue" does what Enter does.
+  const nextFromBar = useRef<() => void>(() => undefined);
+  nextFromBar.current = () => {
+    if (!canContinue) return;
+    playClickFx();
+    advance();
+  };
+  useEffect(() => {
+    setPlannerBar({ canContinue, skip: Boolean(currentStep?.optional), next: () => nextFromBar.current() });
+  }, [canContinue, currentStep?.optional]);
+  useEffect(() => () => resetPlannerBar(['canContinue', 'skip', 'next']), []);
 
   // Keyboard: 1–9 picks an option, Enter continues, ← goes back.
   useEffect(() => {
@@ -383,7 +396,7 @@ export const QuestionStep: React.FC = () => {
 
       <header className="mb-7">
         <div className="mb-3 flex flex-wrap items-center gap-3">
-          <span className="rounded-full border-2 border-lagoon-light/50 bg-lagoon-light/20 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-lagoon-light">
+          <span className="rounded-[3px] bg-mango px-2.5 py-1 font-condensed text-[0.72rem] font-bold uppercase tracking-[0.2em] text-ink">
             {refining ? flow.fineTune : copy.ui.stepOf(stepIndex + 1, steps.length)}
           </span>
           {currentStep.optional && (
@@ -417,6 +430,7 @@ export const QuestionStep: React.FC = () => {
               key={entry.id}
               voiceId={entry.id}
               emoji={entry.emoji}
+              icon={optionIcon(stepId ?? '', entry.id)}
               label={entry.label}
               description={entry.desc}
               index={index + 1}
@@ -436,6 +450,7 @@ export const QuestionStep: React.FC = () => {
                 key={key}
                 voiceId={key}
                 emoji={copy.interests[key].emoji}
+                icon={optionIcon('interests', key)}
                 label={copy.interests[key].label}
                 selected={profile.interests.includes(key)}
                 disabled={profile.interests.length >= MAX_INTERESTS}
@@ -463,7 +478,7 @@ export const QuestionStep: React.FC = () => {
               }}
               className="planner-cta w-full !py-4 !text-base sm:w-auto"
             >
-              ✨ {flow.nothingApplies}
+              {flow.nothingApplies}
             </button>
           )}
           <div className="grid gap-3 sm:grid-cols-2">
@@ -472,6 +487,7 @@ export const QuestionStep: React.FC = () => {
                 key={key}
                 voiceId={key}
                 emoji={copy.questions.constraints.options[key].emoji}
+                icon={optionIcon('constraints', key)}
                 label={copy.questions.constraints.options[key].label}
                 description={copy.questions.constraints.options[key].desc}
                 index={index + 1}
@@ -586,7 +602,7 @@ export const QuestionStep: React.FC = () => {
       {/* ── What the answers have built so far ────────────────────────── */}
       {!refining && stepIndex > 0 && <TakingShape spark={spark} />}
       {!refining && stepIndex === 0 && spark && (
-        <p className="mt-6 text-xs leading-relaxed text-paper/70">🌴 {spark}</p>
+        <p className="mt-6 text-xs leading-relaxed text-paper/70">{spark}</p>
       )}
 
       {/* ── Footer nav ────────────────────────────────────────────────── */}
