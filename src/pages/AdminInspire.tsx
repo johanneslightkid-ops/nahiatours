@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { HiArrowDown, HiArrowUp, HiMusicNote, HiPlus, HiTrash, HiUpload } from 'react-icons/hi';
+import { HiArrowDown, HiArrowUp, HiMenu, HiMusicNote, HiPlus, HiSwitchVertical, HiTrash, HiUpload } from 'react-icons/hi';
 import { useI18n, type Locale } from '../contexts/I18nContext';
 import { adminLang } from '../lib/adminNav';
 import {
@@ -11,6 +11,7 @@ import {
   InspireQuality,
   InspireTransition,
   saveInspireConfig,
+  trackAddedAt,
   VisualizerPosition,
   VisualizerStyle,
 } from '../edt/inspireConfig';
@@ -77,6 +78,9 @@ const AdminInspire: React.FC = () => {
   const [busy, setBusy] = useState<string | null>(null);
   const [hasKey, setHasKey] = useState<boolean | null>(null);
   const [apiKey, setApiKey] = useState('');
+  /** The song being dragged, and the row it hovers over. */
+  const [dragging, setDragging] = useState<number | null>(null);
+  const [dropAt, setDropAt] = useState<number | null>(null);
 
   useEffect(() => {
     getInspireConfig(true)
@@ -147,6 +151,40 @@ const AdminInspire: React.FC = () => {
     [tracks[index], tracks[target]] = [tracks[target], tracks[index]];
     set({ tracks });
   };
+
+  /** Move one song to another position (drag and drop). */
+  const placeTrack = (from: number, to: number) => {
+    if (from === to) return;
+    const tracks = [...config.tracks];
+    const [moved] = tracks.splice(from, 1);
+    tracks.splice(to, 0, moved);
+    set({ tracks });
+  };
+
+  /**
+   * Reorder the whole queue. By date: newest or oldest first, songs whose
+   * date is unknown keep their relative order at the end.
+   */
+  const sortTracks = (how: 'reverse' | 'newest' | 'oldest' | 'title') => {
+    const tracks = [...config.tracks];
+    if (how === 'reverse') return set({ tracks: tracks.reverse() });
+    if (how === 'title') {
+      return set({ tracks: tracks.sort((a, b) => (a.title || a.url).localeCompare(b.title || b.url, undefined, { sensitivity: 'base', numeric: true })) });
+    }
+    const dated = tracks.map((track, index) => ({ track, index, at: trackAddedAt(track) }));
+    dated.sort((a, b) => {
+      const known = Number(Number.isFinite(b.at)) - Number(Number.isFinite(a.at));
+      if (known) return known;
+      if (!Number.isFinite(a.at)) return a.index - b.index;
+      return how === 'newest' ? b.at - a.at : a.at - b.at;
+    });
+    set({ tracks: dated.map((entry) => entry.track) });
+  };
+
+  const addedLabel = (at: number) =>
+    Number.isFinite(at)
+      ? new Intl.DateTimeFormat(lang === 'es' ? 'es-DO' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(at))
+      : say({ en: 'date unknown', es: 'fecha desconocida' });
 
   const toggleTour = (id: number) =>
     set({ tourIds: config.tourIds.includes(id) ? config.tourIds.filter((value) => value !== id) : [...config.tourIds, id] });
@@ -381,14 +419,65 @@ const AdminInspire: React.FC = () => {
         <div className={card}>
           <h2 className="font-display text-xl uppercase">{say({ en: 'Music', es: 'Música' })}</h2>
           <p className="mt-1 text-sm text-ink-soft">
-            {say({ en: 'Plays in this order, over and over. Upload MP3 / M4A / OGG files, or paste links.', es: 'Suena en este orden, una y otra vez. Sube archivos MP3 / M4A / OGG o pega enlaces.' })}
+            {say({
+              en: 'Plays in this order, over and over. Drag a song by its handle, use the arrows, or sort the whole list. Upload MP3 / M4A / OGG files, or paste links. Remember to save.',
+              es: 'Suena en este orden, una y otra vez. Arrastra una canción por su asa, usa las flechas u ordena toda la lista. Sube archivos MP3 / M4A / OGG o pega enlaces. No olvides guardar.',
+            })}
           </p>
-          <div className="mt-4 space-y-2">
+          {config.tracks.length > 1 && (
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold">
+              <span className="text-ink-soft">{say({ en: 'Sort:', es: 'Ordenar:' })}</span>
+              <button type="button" onClick={() => sortTracks('reverse')} className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 ring-1 ring-ink/15 hover:bg-paper-warm">
+                <HiSwitchVertical /> {say({ en: 'Reverse', es: 'Invertir' })}
+              </button>
+              <button type="button" onClick={() => sortTracks('newest')} className="rounded-md px-3 py-1.5 ring-1 ring-ink/15 hover:bg-paper-warm">
+                {say({ en: 'Newest upload first', es: 'Más recientes primero' })}
+              </button>
+              <button type="button" onClick={() => sortTracks('oldest')} className="rounded-md px-3 py-1.5 ring-1 ring-ink/15 hover:bg-paper-warm">
+                {say({ en: 'Oldest upload first', es: 'Más antiguas primero' })}
+              </button>
+              <button type="button" onClick={() => sortTracks('title')} className="rounded-md px-3 py-1.5 ring-1 ring-ink/15 hover:bg-paper-warm">
+                {say({ en: 'Title A–Z', es: 'Título A–Z' })}
+              </button>
+            </div>
+          )}
+          <div className="mt-3 space-y-2">
             {config.tracks.map((track, index) => (
-              <div key={track.id} className="flex flex-wrap items-center gap-2 rounded-md p-2 ring-1 ring-ink/10">
+              <div
+                key={track.id}
+                draggable
+                onDragStart={(event) => {
+                  setDragging(index);
+                  event.dataTransfer.effectAllowed = 'move';
+                  event.dataTransfer.setData('text/plain', String(index));
+                }}
+                onDragOver={(event) => {
+                  if (dragging === null) return;
+                  event.preventDefault();
+                  setDropAt(index);
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  if (dragging !== null) placeTrack(dragging, index);
+                  setDragging(null);
+                  setDropAt(null);
+                }}
+                onDragEnd={() => {
+                  setDragging(null);
+                  setDropAt(null);
+                }}
+                className={`flex flex-wrap items-center gap-2 rounded-md p-2 ring-1 transition ${
+                  dragging === index ? 'opacity-40 ring-ink/10' : dropAt === index && dragging !== null ? 'bg-mango-light/40 ring-mango' : 'ring-ink/10'
+                }`}
+              >
+                <span className="cursor-grab p-1 text-ink-light active:cursor-grabbing" title={say({ en: 'Drag to reorder', es: 'Arrastra para reordenar' })} aria-hidden="true">
+                  <HiMenu />
+                </span>
+                <span className="w-6 text-right text-xs font-bold tabular-nums text-ink-soft">{index + 1}</span>
                 <HiMusicNote className="text-gold-dark" />
                 <input className={`${field} max-w-[14rem]`} value={track.title} placeholder={say({ en: 'Title', es: 'Título' })} onChange={(event) => set({ tracks: config.tracks.map((t, i) => (i === index ? { ...t, title: event.target.value } : t)) })} />
                 <input className={`${field} flex-1`} value={track.url} placeholder="https://…" onChange={(event) => set({ tracks: config.tracks.map((t, i) => (i === index ? { ...t, url: event.target.value } : t)) })} />
+                <span className="w-32 text-[11px] leading-tight text-ink-light" title={say({ en: 'Added', es: 'Añadida' })}>{addedLabel(trackAddedAt(track))}</span>
                 <button type="button" onClick={() => moveTrack(index, -1)} className="rounded-md p-2 ring-1 ring-ink/15" aria-label="Up"><HiArrowUp /></button>
                 <button type="button" onClick={() => moveTrack(index, 1)} className="rounded-md p-2 ring-1 ring-ink/15" aria-label="Down"><HiArrowDown /></button>
                 <button type="button" onClick={() => window.confirm(say({ en: `Remove “${track.title || track.url}” from the queue?`, es: `¿Quitar «${track.title || track.url}» de la lista?` })) && set({ tracks: config.tracks.filter((_, i) => i !== index) })} className="rounded-md p-2 text-hibiscus-dark ring-1 ring-hibiscus/40" aria-label="Delete"><HiTrash /></button>
@@ -410,7 +499,12 @@ const AdminInspire: React.FC = () => {
                   for (const file of files) {
                     try {
                       const url = await uploadAdminFile(file, 'inspire-music');
-                      added.push({ id: `track-${Date.now().toString(36)}-${added.length}`, title: file.name.replace(/\.[^.]+$/, ''), url });
+                      added.push({
+                        id: `track-${Date.now().toString(36)}-${added.length}`,
+                        title: file.name.replace(/\.[^.]+$/, ''),
+                        url,
+                        addedAt: new Date().toISOString(),
+                      });
                     } catch (error) {
                       fail(error);
                     }
@@ -420,7 +514,7 @@ const AdminInspire: React.FC = () => {
                 }}
               />
             </label>
-            <button type="button" onClick={() => set({ tracks: [...config.tracks, { id: `track-${Date.now().toString(36)}`, title: '', url: '' }] })} className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold ring-1 ring-ink/15">
+            <button type="button" onClick={() => set({ tracks: [...config.tracks, { id: `track-${Date.now().toString(36)}`, title: '', url: '', addedAt: new Date().toISOString() }] })} className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold ring-1 ring-ink/15">
               <HiPlus /> {say({ en: 'Add a link', es: 'Añadir enlace' })}
             </button>
           </div>

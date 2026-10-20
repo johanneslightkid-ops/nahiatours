@@ -9,7 +9,28 @@ export interface InspireTrack {
   id: string;
   title: string;
   url: string;
+  /** When it was added to the queue (ISO). Older records: see trackAddedAt. */
+  addedAt?: string;
 }
+
+/**
+ * When a song was added, in ms — for sorting the queue by upload date. Songs
+ * saved before `addedAt` existed still know it: a Cloudinary upload carries
+ * its upload time in the URL (`/upload/v<seconds>/`), and an id made by the
+ * admin is `track-<time in base 36>`. NaN when nothing tells.
+ */
+export const trackAddedAt = (track: InspireTrack): number => {
+  const stored = track.addedAt ? Date.parse(track.addedAt) : NaN;
+  if (Number.isFinite(stored)) return stored;
+  const version = track.url.match(/\/upload\/(?:[^/]+\/)*v(\d{9,11})\//);
+  if (version) return Number(version[1]) * 1000;
+  const fromId = track.id.match(/^track-([0-9a-z]{6,})(?:-|$)/);
+  if (fromId) {
+    const time = parseInt(fromId[1], 36);
+    if (time > 1_500_000_000_000 && time < 4_000_000_000_000) return time;
+  }
+  return NaN;
+};
 
 export type InspireEffect = 'caustics' | 'sunglow' | 'bokeh' | 'none';
 
@@ -169,7 +190,12 @@ export const normalizeInspire = (input: unknown): InspireConfig => {
     tracks: Array.isArray(record.tracks)
       ? record.tracks
           .filter((track) => track && typeof track.url === 'string' && track.url.trim())
-          .map((track, index) => ({ id: String(track.id || `track-${index + 1}`), title: String(track.title ?? '').trim(), url: track.url.trim() }))
+          .map((track, index) => ({
+            id: String(track.id || `track-${index + 1}`),
+            title: String(track.title ?? '').trim(),
+            url: track.url.trim(),
+            ...(typeof track.addedAt === 'string' && Number.isFinite(Date.parse(track.addedAt)) ? { addedAt: track.addedAt } : {}),
+          }))
       : [],
     volume: clamp(record.volume, 0, 1, DEFAULT_INSPIRE.volume),
     duckLevel: clamp(record.duckLevel, 0, 1, DEFAULT_INSPIRE.duckLevel),
