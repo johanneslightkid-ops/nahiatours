@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { FaCreditCard, FaCheck, FaLock, FaUniversity, FaFlask, FaLink, FaPaypal, FaUndo } from 'react-icons/fa';
 import { BrandSettings, saveBrandSettings } from '../../services/brandService';
 import WalletSettingsPanel from './WalletSettingsPanel';
+import PaymentHelpTour, { HelpButton } from './PaymentHelpTour';
+import { PAYMENT_HELP, HelpTopicId } from './paymentHelpTopics';
 import {
   getPaymentConfigStatus,
   savePaymentConfig,
@@ -134,6 +136,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
   const [message, setMessage] = useState<Notice>(null);
   const [bankMessage, setBankMessage] = useState<Notice>(null);
   const [brandMessage, setBrandMessage] = useState<Notice>(null);
+  const [help, setHelp] = useState<HelpTopicId | null>(null);
 
   useEffect(() => {
     getPaymentConfigStatus()
@@ -385,6 +388,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
 
   return (
     <div className="mt-6 rounded-3xl border border-ink/10 p-5">
+      {help && <PaymentHelpTour key={help} topic={PAYMENT_HELP[help]} onClose={() => setHelp(null)} />}
       <div className="mb-1 flex items-center gap-2">
         <FaCreditCard className="text-lagoon-dark" />
         <h3 className="text-lg font-semibold text-ink">Pagos</h3>
@@ -465,11 +469,14 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
       <div className="mt-5 rounded-3xl border border-ink/10 bg-paper-warm/40 p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h4 className="font-semibold text-ink">Stripe</h4>
-          <ReadyChip ready={processorReady.stripe} mode={status?.stripeMode} />
+          <div className="flex flex-wrap items-center gap-2">
+            <HelpButton onClick={() => setHelp('stripe')} />
+            <ReadyChip ready={processorReady.stripe} mode={status?.stripeMode} />
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-[2fr,1fr]">
-          <label className={label}>
+          <label data-help="stripe.secret" className={label}>
             <span className={labelText}>
               {status?.stripeSecretConfigured ? 'Reemplazar la clave secreta' : 'Clave secreta de Stripe'}
             </span>
@@ -482,7 +489,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
               className={field}
             />
           </label>
-          <label className={label}>
+          <label data-help="stripe.currency" className={label}>
             <span className={labelText}>Moneda</span>
             <input
               type="text"
@@ -504,7 +511,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
+          <button data-help="stripe.save"
             onClick={handleSaveStripe}
             disabled={saving || (!secretDraft.trim() && !currencyDraft.trim())}
             className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
@@ -536,6 +543,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           <div className="mb-1 flex items-center gap-2">
             <FaUniversity className="text-lagoon-dark" />
             <h4 className="font-semibold text-ink">AZUL y CardNET</h4>
+            <div className="ml-auto"><HelpButton onClick={() => setHelp('banks')} /></div>
           </div>
           <p className="mb-4 max-w-2xl text-xs text-ink-soft">
             Con los datos de afiliado, cada reserva viaja con su importe exacto a la página de pago del
@@ -544,7 +552,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           </p>
 
           <div className="mb-5 grid gap-4 md:grid-cols-2">
-            <label className={label}>
+            <label data-help="banks.rate" className={label}>
               <span className={labelText}>Tasa: pesos por dólar (RD$ por US$ 1)</span>
               <input
                 type="text"
@@ -559,7 +567,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
                 esta tasa; sin tasa, ese banco no cobra.
               </span>
             </label>
-            <label className={label}>
+            <label data-help="banks.itbis" className={label}>
               <span className={labelText}>ITBIS incluido en los precios (%)</span>
               <input
                 type="text"
@@ -586,27 +594,27 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <label className={label}>
+                <label data-help="azul.merchantId" className={label}>
                   <span className={labelText}>Merchant ID</span>
                   <input className={field} value={bank.azulMerchantId} onChange={(e) => updateBank({ azulMerchantId: e.target.value })} placeholder="39038540035" />
                 </label>
-                <label className={label}>
+                <label data-help="azul.merchantName" className={label}>
                   <span className={labelText}>Nombre del comercio</span>
                   <input className={field} value={bank.azulMerchantName} onChange={(e) => updateBank({ azulMerchantName: e.target.value })} placeholder="Como lo registró AZUL" />
                 </label>
-                <label className={label}>
+                <label data-help="azul.merchantType" className={label}>
                   <span className={labelText}>Tipo de comercio</span>
                   <input className={field} value={bank.azulMerchantType} onChange={(e) => updateBank({ azulMerchantType: e.target.value })} placeholder="ECommerce" />
                 </label>
-                <label className={label}>
+                <label data-help="azul.currencyCode" className={label}>
                   <span className={labelText}>Código de moneda de AZUL</span>
                   <input className={field} value={bank.azulCurrencyCode} onChange={(e) => updateBank({ azulCurrencyCode: e.target.value })} placeholder="$" />
                 </label>
-                <label className={label}>
+                <label data-help="azul.currency" className={label}>
                   <span className={labelText}>Cobra en</span>
                   <CurrencySwitch value={bank.azulCurrency} onChange={(azulCurrency) => updateBank({ azulCurrency })} />
                 </label>
-                <label className={label}>
+                <label data-help="azul.authKey" className={label}>
                   <span className={labelText}>
                     AuthKey{' '}
                     {status.azul.authKeyConfigured && (
@@ -643,23 +651,23 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <label className={label}>
+                <label data-help="cardnet.merchantNumber" className={label}>
                   <span className={labelText}>Número de afiliado</span>
                   <input className={field} value={bank.cardnetMerchantNumber} onChange={(e) => updateBank({ cardnetMerchantNumber: e.target.value })} placeholder="349…" />
                 </label>
-                <label className={label}>
+                <label data-help="cardnet.terminal" className={label}>
                   <span className={labelText}>Terminal</span>
                   <input className={field} value={bank.cardnetTerminal} onChange={(e) => updateBank({ cardnetTerminal: e.target.value })} placeholder="8 dígitos" />
                 </label>
-                <label className={label}>
+                <label data-help="cardnet.mcc" className={label}>
                   <span className={labelText}>Categoría (MCC)</span>
                   <input className={field} value={bank.cardnetMerchantType} maxLength={4} onChange={(e) => updateBank({ cardnetMerchantType: e.target.value.replace(/\D/g, '') })} placeholder="4722" />
                 </label>
-                <label className={label}>
+                <label data-help="cardnet.currency" className={label}>
                   <span className={labelText}>Cobra en</span>
                   <CurrencySwitch value={bank.cardnetCurrency} onChange={(cardnetCurrency) => updateBank({ cardnetCurrency })} />
                 </label>
-                <label className={`${label} sm:col-span-2`}>
+                <label data-help="cardnet.merchantName" className={`${label} sm:col-span-2`}>
                   <span className={labelText}>Nombre del comercio (como lo registró CardNET, máx. 40)</span>
                   <input className={field} value={bank.cardnetMerchantName} maxLength={40} onChange={(e) => updateBank({ cardnetMerchantName: e.target.value.toUpperCase() })} placeholder="EL CORTECITO TOURS   PUNTA CANA     DO" />
                 </label>
@@ -677,7 +685,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <button
+            <button data-help="banks.save"
               onClick={() => handleSaveBanks()}
               disabled={saving}
               className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
@@ -712,13 +720,14 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <HelpButton onClick={() => setHelp('verifone')} />
             <ReadyChip ready={processorReady.verifone} mode={status?.verifone?.mode} />
             <ModeSwitch value={verifoneMode} onChange={setVerifoneMode} />
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <label className={label}>
+          <label data-help="verifone.code" className={label}>
             <span className={labelText}>Código de comerciante (Merchant Code)</span>
             <input
               className={field}
@@ -728,7 +737,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
               autoComplete="off"
             />
           </label>
-          <label className={label}>
+          <label data-help="verifone.secret" className={label}>
             <span className={labelText}>
               Buy-Link Secret Word {status?.verifone?.secretWordConfigured && '(guardada)'}
             </span>
@@ -741,7 +750,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
               autoComplete="off"
             />
           </label>
-          <label className={label}>
+          <label data-help="verifone.currency" className={label}>
             <span className={labelText}>Moneda del cobro</span>
             <CurrencySwitch value={verifoneCurrency} onChange={setVerifoneCurrency} />
           </label>
@@ -758,7 +767,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
+          <button data-help="verifone.save"
             onClick={() => handleSaveVerifone()}
             disabled={saving}
             className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
@@ -793,17 +802,18 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <HelpButton onClick={() => setHelp('paypal')} />
             <ReadyChip ready={Boolean(status?.paypal?.ready)} mode={status?.paypal?.mode} />
             <ModeSwitch value={paypalMode} onChange={setPaypalMode} />
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <label className={label}>
+          <label data-help="paypal.clientId" className={label}>
             <span className={labelText}>Client ID</span>
             <input className={field} value={paypalClientId} onChange={(e) => setPaypalClientId(e.target.value)} placeholder="AX…" autoComplete="off" />
           </label>
-          <label className={label}>
+          <label data-help="paypal.secret" className={label}>
             <span className={labelText}>Secret {status?.paypal?.secretConfigured && '(guardado)'}</span>
             <input
               type="password"
@@ -826,7 +836,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
+          <button data-help="paypal.save"
             onClick={() => handleSavePayPal()}
             disabled={saving}
             className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
@@ -861,17 +871,18 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <HelpButton onClick={() => setHelp('mio')} />
             <ReadyChip ready={Boolean(status?.mio?.ready)} mode={status?.mio?.mode} />
             <ModeSwitch value={mioMode} onChange={setMioMode} />
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <label className={label}>
+          <label data-help="mio.clientId" className={label}>
             <span className={labelText}>Client ID</span>
             <input className={field} value={mioClientId} onChange={(e) => setMioClientId(e.target.value)} autoComplete="off" />
           </label>
-          <label className={label}>
+          <label data-help="mio.secret" className={label}>
             <span className={labelText}>Client secret {status?.mio?.secretConfigured && '(guardado)'}</span>
             <input
               type="password"
@@ -882,22 +893,22 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
               autoComplete="off"
             />
           </label>
-          <label className={label}>
+          <label data-help="mio.merchantId" className={label}>
             <span className={labelText}>Número de comercio (merchant ID)</span>
             <input className={field} value={mioMerchantId} onChange={(e) => setMioMerchantId(e.target.value)} inputMode="numeric" placeholder="77000001" />
           </label>
-          <label className={label}>
+          <label data-help="mio.currency" className={label}>
             <span className={labelText}>Moneda del cobro</span>
             <select className={field} value={mioCurrency} onChange={(e) => setMioCurrency(e.target.value as LocalCurrency)}>
               <option value="DOP">Pesos dominicanos (DOP)</option>
               <option value="USD">Dólares (USD)</option>
             </select>
           </label>
-          <label className={`${label} md:col-span-2`}>
+          <label data-help="mio.authUrl" className={`${label} md:col-span-2`}>
             <span className={labelText}>Dirección del token (te la da MIO)</span>
             <input className={field} value={mioAuthUrl} onChange={(e) => setMioAuthUrl(e.target.value)} placeholder="https://…/oauth/token" autoComplete="off" />
           </label>
-          <label className={`${label} md:col-span-2`}>
+          <label data-help="mio.apiBase" className={`${label} md:col-span-2`}>
             <span className={labelText}>Dirección de la API (opcional)</span>
             <input
               className={field}
@@ -919,7 +930,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
+          <button data-help="mio.save"
             onClick={() => handleSaveMio()}
             disabled={saving}
             className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
