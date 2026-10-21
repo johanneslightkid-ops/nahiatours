@@ -64,6 +64,22 @@ const Admin: React.FC = () => {
 
   const triggerBrandIconUpload = () => fileInputRef.current?.click();
 
+  /** Open the current logo in the editor, to crop, reshape or clean it up again. */
+  const [loadingCurrentIcon, setLoadingCurrentIcon] = useState(false);
+  const editCurrentBrandIcon = async () => {
+    if (!brandSettings.brandicon) return;
+    setLoadingCurrentIcon(true);
+    try {
+      const response = await fetch(brandSettings.brandicon, { mode: 'cors' });
+      const blob = await response.blob();
+      setPendingIconFile(new File([blob], 'logo.png', { type: blob.type || 'image/png' }));
+    } catch (error) {
+      console.error('No se pudo abrir el logo actual:', error);
+    } finally {
+      setLoadingCurrentIcon(false);
+    }
+  };
+
   const loadTours = useCallback(async () => {
     const fetchedTours = await getTours(locale);
     setTours(fetchedTours);
@@ -91,12 +107,12 @@ const Admin: React.FC = () => {
                 <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-ink-soft mb-2">Logo del negocio</label>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <div className="h-20 w-20 rounded-full overflow-hidden bg-paper-warm ring-1 ring-slate-200">
+                    <div className="flex h-20 w-28 items-center justify-center overflow-hidden rounded-lg bg-paper-warm p-1.5 ring-1 ring-slate-200">
                       {brandSettings.brandicon ? (
                         <img
                           src={brandSettings.brandicon}
                           alt="Vista previa del logo"
-                          className="h-full w-full object-cover"
+                          className="max-h-full max-w-full object-contain"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-ink-light text-xs uppercase tracking-[.2em]">
@@ -113,7 +129,20 @@ const Admin: React.FC = () => {
                       >
                         {uploadingIcon ? 'Subiendo…' : 'Subir logo'}
                       </button>
-                      <p className="text-xs text-ink-light">Sube un logo cuadrado para usarlo en el menú del panel y en la cabecera del sitio.</p>
+                      {brandSettings.brandicon && (
+                        <button
+                          type="button"
+                          onClick={editCurrentBrandIcon}
+                          disabled={uploadingIcon || loadingCurrentIcon}
+                          className="ml-2 inline-flex items-center justify-center rounded-full border border-ink/20 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-ink hover:text-paper disabled:opacity-50"
+                        >
+                          {loadingCurrentIcon ? 'Abriendo…' : 'Editar el logo actual'}
+                        </button>
+                      )}
+                      <p className="text-xs text-ink-light">
+                        Al subirlo o editarlo puedes recortarlo, elegir forma cuadrada u original, redondear las esquinas (de recto a círculo), hacer
+                        transparente su color de fondo y, con la IA de Cloudinary, quitar cualquier fondo o mejorar su calidad.
+                      </p>
                     </div>
                   </div>
                   <input
@@ -196,9 +225,9 @@ const Admin: React.FC = () => {
             ) : (
               <div className="space-y-4 text-ink-soft">
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full overflow-hidden bg-paper-warm ring-1 ring-slate-200">
+                  <div className="flex h-12 w-16 items-center justify-center overflow-hidden rounded-md bg-paper-warm p-1 ring-1 ring-slate-200">
                     {brandSettings.brandicon ? (
-                      <img src={brandSettings.brandicon} alt="Logo del negocio" className="h-full w-full object-cover" />
+                      <img src={brandSettings.brandicon} alt="Logo del negocio" className="max-h-full max-w-full object-contain" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-ink-light text-xs uppercase tracking-[.2em]">
                         Sin logo
