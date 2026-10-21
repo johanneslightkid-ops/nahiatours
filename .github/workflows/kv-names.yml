@@ -1,0 +1,31 @@
+# Puts the name tokens into Exclusive Dominican Tours' stored site pages and
+# blog posts ({{brand}} in the legal pages, {{name}} elsewhere), so the site
+# fills in the company or the contact person as Admin › Marca says. A
+# snapshot of every record before and after is kept as an artifact.
+name: KV names
+
+on:
+  push:
+    branches: [claude/eager-edison-peyvhu]
+    paths: [.github/workflows/kv-names.yml, scripts/kv-names.mjs]
+
+jobs:
+  names:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      KV_NAMES_APPLY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/kv-names.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kv-names
+          path: kv-names
+          retention-days: 90
