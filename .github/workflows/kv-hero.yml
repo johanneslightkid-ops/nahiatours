@@ -1,0 +1,30 @@
+# Puts the AI-enhanced hero photographs into Exclusive Dominican Tours'
+# stored brand record (exclusive-tours-data → brand → heroMedia). One key, one
+# field; a snapshot of the record before and after is kept as an artifact.
+name: KV hero
+
+on:
+  push:
+    branches: [claude/eager-edison-peyvhu]
+    paths: [.github/workflows/kv-hero.yml, scripts/kv-hero.mjs]
+
+jobs:
+  hero:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      KV_HERO_APPLY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/kv-hero.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kv-hero
+          path: kv-hero
+          retention-days: 90
