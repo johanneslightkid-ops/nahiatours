@@ -73,6 +73,10 @@ export interface BrandSettings {
   showBrandName?: boolean;
   /** How that name is written: 'upper' in capitals, 'asis' exactly as entered. */
   brandNameCase?: BrandNameCase;
+  /** How the hero's photographs give way to each other (a site's own transition names). */
+  heroTransition?: string;
+  /** Seconds each hero photograph holds the stage. */
+  heroSeconds?: number;
 }
 
 export type BrandNameCase = 'upper' | 'asis';
@@ -120,7 +124,7 @@ const normalizePaymentVisibility = (input: unknown): PaymentVisibility => {
 };
 
 /** The most slides a hero takes; each one is a full-screen download. */
-export const MAX_HERO_MEDIA = 8;
+export const MAX_HERO_MEDIA = 12;
 
 /**
  * Any number of slides from one to eight. The first three fall back to the
@@ -186,6 +190,8 @@ const normalizeBrandSettings = (input: Partial<BrandSettings> | null | undefined
   heroRatingRange: normalizeHeroRatingRange(input?.heroRatingRange),
   ...(typeof input?.showBrandName === 'boolean' ? { showBrandName: input.showBrandName } : {}),
   ...(input?.brandNameCase === 'upper' || input?.brandNameCase === 'asis' ? { brandNameCase: input.brandNameCase } : {}),
+  ...(typeof input?.heroTransition === 'string' && input.heroTransition ? { heroTransition: input.heroTransition.slice(0, 24) } : {}),
+  ...(Number.isFinite(Number(input?.heroSeconds)) && Number(input?.heroSeconds) > 0 ? { heroSeconds: Math.min(30, Math.max(3, Number(input?.heroSeconds))) } : {}),
 });
 
 export const getBrandSettings = async (): Promise<BrandSettings> => {

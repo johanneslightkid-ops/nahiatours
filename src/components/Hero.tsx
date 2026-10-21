@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaStar, FaWhatsapp } from 'react-icons/fa';
 import { HiArrowDown, HiArrowRight } from 'react-icons/hi';
@@ -14,6 +14,11 @@ import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { descriptionField, smallImage, useTours } from '../edt/useTours';
 import { InspireToggle } from './edt/inspire/InspireContext';
 import YouTubeBackground from './edt/YouTubeBackground';
+import InspireSlideshow from './edt/inspire/InspireSlideshow';
+import { INSPIRE_TRANSITIONS, InspireTransition } from '../edt/inspireConfig';
+import { heroCut } from '../edt/heroImages';
+import { isBigScreen } from '../edt/bigScreen';
+import { useMediaQuery } from '../lib/useMediaQuery';
 import { isYouTube } from '../lib/youtube';
 
 interface HeroProps {
@@ -49,7 +54,9 @@ const COPY = {
   transfers: { en: 'private transfers, every day', es: 'traslados privados, cada día', fr: 'transferts privés, tous les jours', de: 'private Transfers, jeden Tag' },
 };
 
-const SLIDE_MS = 7000;
+/** How long a photograph holds the stage, and how long the change takes, unless the admin set otherwise. */
+const HOLD_SECONDS = 7;
+const TRANSITION_SECONDS = 1.6;
 
 /**
  * Full throttle, in daylight.
@@ -73,8 +80,12 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
 
   /** YouTube backgrounds that turned out not to play here: left out, never a blank hero. */
   const [unplayable, setUnplayable] = useState<string[]>([]);
+  // Until the stored settings arrive, the site's own set — so the first photo
+  // painted is the one that stays, not a stand-in swapped a moment later.
   const configured: HeroMediaItem[] = brandSettings.heroMedia?.length
     ? brandSettings.heroMedia
+    : defaultHeroMedia.length
+    ? defaultHeroMedia
     : [{ url: backgroundImage, type: 'image', alt: '' }];
   let media = configured.filter((item) => item.url && !unplayable.includes(item.url));
   if (!media.length) {
@@ -86,11 +97,24 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
   }
   const showVideo = useDeferredVideo(media.some((item) => item.type === 'video' || isYouTube(item.url)));
 
+  // Photographs only: they give way to each other with the admin's transition
+  // (Admin → Look), one picture decoded at a time, each in the cut that fits
+  // the screen — the upright one on a phone held upright.
+  const photosOnly = media.every((item) => item.type !== 'video' && !isYouTube(item.url));
+  const upright = useMediaQuery('(orientation: portrait) and (max-width: 820px)');
+  const cut = upright ? 'portrait' : isBigScreen() ? 'large' : 'small';
+  const mediaKey = media.map((item) => item.url).join('|');
+  const pictures = useMemo(() => media.map((item) => heroCut(item.url, cut)), [mediaKey, cut]); // eslint-disable-line react-hooks/exhaustive-deps
+  const transition: InspireTransition = INSPIRE_TRANSITIONS.includes(brandSettings.heroTransition as InspireTransition)
+    ? (brandSettings.heroTransition as InspireTransition)
+    : 'kenburns';
+  const holdSeconds = brandSettings.heroSeconds && brandSettings.heroSeconds >= 3 ? brandSettings.heroSeconds : HOLD_SECONDS;
+
   useEffect(() => {
     if (reduced || media.length < 2) return undefined;
-    const timer = window.setInterval(() => setSlide((value) => (value + 1) % media.length), SLIDE_MS);
+    const timer = window.setInterval(() => setSlide((value) => (value + 1) % media.length), (holdSeconds + TRANSITION_SECONDS) * 1000);
     return () => window.clearInterval(timer);
-  }, [media.length, reduced]);
+  }, [media.length, reduced, holdSeconds]);
 
   useEffect(() => {
     let active = true;
@@ -132,7 +156,19 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
     <section ref={sectionRef} className="relative isolate overflow-hidden bg-ink text-white">
       {/* The photographs. */}
       <motion.div className="absolute inset-0 -z-10" style={{ scale: mediaScale }} aria-hidden="true">
-        {media.map((item, index) => {
+        {photosOnly && (
+          <InspireSlideshow
+            // A different list (the stored one arriving, a phone turned) starts again from its first photo.
+            key={`${mediaKey}|${cut}`}
+            slides={pictures}
+            index={slide % pictures.length}
+            transition={transition}
+            transitionSeconds={TRANSITION_SECONDS}
+            holdSeconds={holdSeconds}
+            drift={!reduced}
+          />
+        )}
+        {!photosOnly && media.map((item, index) => {
           const on = index === slide % media.length;
           return (
             <div key={`${item.url}-${index}`} className={`hero-slide ${index % 2 ? 'is-back' : ''} ${on ? 'is-on' : ''}`}>
@@ -274,9 +310,12 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
                 type="button"
                 tabIndex={-1}
                 onClick={() => setSlide(index)}
-                className="h-1 w-10 overflow-hidden rounded-full bg-white/25"
+                className={`h-1 overflow-hidden rounded-full bg-white/25 ${media.length > 6 ? 'w-6' : 'w-10'}`}
               >
-                <span className={`hero-progress block h-full origin-left bg-mango ${index === slide ? 'is-on' : ''}`} style={{ animationDuration: `${SLIDE_MS}ms` }} />
+                <span
+                  className={`hero-progress block h-full origin-left bg-mango ${index === slide % media.length ? 'is-on' : ''}`}
+                  style={{ animationDuration: `${Math.round((holdSeconds + TRANSITION_SECONDS) * 1000)}ms` }}
+                />
               </button>
             ))}
           </div>
