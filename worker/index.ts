@@ -43,6 +43,8 @@ import { onRequest as handleCardnetCheckout } from '../functions/api/cardnet-che
 import { onRequest as handlePayReturn } from '../functions/api/pay-return';
 import { onRequest as handlePaymentResult } from '../functions/api/payment-result';
 import { onRequest as handlePayPalCheckout } from '../functions/api/paypal-checkout';
+import { onRequest as handleMioCheckout } from '../functions/api/mio-checkout';
+import { onRequest as handleMioWebhook } from '../functions/api/mio-webhook';
 import { onRequest as handlePayRetry } from '../functions/api/pay-retry';
 import { onRequest as handleContactRequest } from '../functions/api/contact-request';
 import { onRequest as handleNotifyConfig } from '../functions/api/notify-config';
@@ -107,6 +109,8 @@ const ROUTES: Record<string, RouteHandler> = {
   // PayPal through its API (captured here on return), and "try again" on an
   // order that did not go through.
   '/api/paypal-checkout': handlePayPalCheckout,
+  '/api/mio-checkout': handleMioCheckout,
+  '/api/mio-webhook': handleMioWebhook,
   '/api/pay-retry': handlePayRetry,
   '/api/contact-request': handleContactRequest,
   // The shopping cart's side of things: who to tell (and how), payment

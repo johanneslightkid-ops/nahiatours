@@ -98,6 +98,17 @@ export interface PaymentConfigStatus {
     clientId: string;
     secretConfigured: boolean;
   };
+  /** MIO's API Checkout — a one-use MIO payment link per booking, verified on return. */
+  mio?: {
+    ready: boolean;
+    mode: GatewayMode;
+    clientId: string;
+    merchantId: string;
+    authUrl: string;
+    apiBase: string;
+    currency: LocalCurrency;
+    secretConfigured: boolean;
+  };
 }
 
 /** Everything the admin panel may send. Omitted fields stay as stored. */
@@ -130,6 +141,14 @@ export interface PaymentConfigPatch {
   paypalClientId?: string;
   /** Write-only. Empty string clears it. */
   paypalSecret?: string;
+  mioMode?: GatewayMode;
+  mioClientId?: string;
+  /** Write-only. Empty string clears it. */
+  mioClientSecret?: string;
+  mioMerchantId?: string;
+  mioAuthUrl?: string;
+  mioApiBase?: string;
+  mioCurrency?: LocalCurrency;
 }
 
 /**
@@ -147,6 +166,11 @@ export interface PaymentsReady {
   wallets: Array<'apple_pay' | 'google_pay'>;
   /** PayPal can be paid through its API, with the answer coming back here. */
   paypal: boolean;
+  /** MIO can be paid through its API Checkout, with the answer coming back here. */
+  mio: boolean;
+  /** What MIO charges in, and pesos per catalogue dollar when that is DOP. */
+  mioCurrency: string;
+  mioDopPerUsd: number | null;
 }
 
 /** Where to send the guest: a hosted page to open, or a form to post to one. */
@@ -175,7 +199,7 @@ export type PaymentReason =
 export interface BankPaymentResult {
   provider: BankProvider | 'stripe' | 'paypal';
   /** What the guest chose: all the page may name. */
-  method: 'card' | 'paypal';
+  method: 'card' | 'paypal' | 'mio';
   status: 'pending' | 'paid' | 'declined' | 'cancelled' | 'unverified' | 'error';
   paid: boolean;
   reason: PaymentReason;
@@ -243,7 +267,16 @@ export const savePaymentConfig = async (patch: PaymentConfigPatch): Promise<Paym
   return body as PaymentConfigStatus;
 };
 
-const NOT_READY: PaymentsReady = { card: false, currency: 'USD', dopPerUsd: null, wallets: [], paypal: false };
+const NOT_READY: PaymentsReady = {
+  card: false,
+  currency: 'USD',
+  dopPerUsd: null,
+  wallets: [],
+  paypal: false,
+  mio: false,
+  mioCurrency: 'DOP',
+  mioDopPerUsd: null,
+};
 
 /**
  * Can the storefront take a card? A failure answers "no", so a hiccup hides
@@ -263,6 +296,9 @@ export const getPaymentsReady = async (): Promise<PaymentsReady> => {
         ? body.wallets.filter((wallet: unknown): wallet is 'apple_pay' | 'google_pay' => wallet === 'apple_pay' || wallet === 'google_pay')
         : [],
       paypal: body.paypal === true,
+      mio: body.mio === true,
+      mioCurrency: typeof body.mioCurrency === 'string' && body.mioCurrency ? body.mioCurrency.toUpperCase() : 'DOP',
+      mioDopPerUsd: typeof body.mioDopPerUsd === 'number' && body.mioDopPerUsd > 0 ? body.mioDopPerUsd : null,
     };
   } catch {
     return NOT_READY;
@@ -305,6 +341,24 @@ export const startPayPalCheckout = async (booking: CheckoutBooking): Promise<str
   const body = await response.json().catch(() => null);
   if (!response.ok || typeof body?.url !== 'string') {
     throw new Error(body?.error || 'Could not open PayPal.');
+  }
+  return body.url;
+};
+
+/**
+ * Pay with MIO through its API Checkout. Answers with MIO's payment page; the
+ * guest comes back to /api/pay-return, where MIO is asked about the payment.
+ */
+export const startMioCheckout = async (booking: CheckoutBooking): Promise<string> => {
+  const response = await fetch('/api/mio-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    body: JSON.stringify({ ...booking, returnPath: booking.returnPath ?? window.location.pathname }),
+  });
+  const body = await response.json().catch(() => null);
+  if (!response.ok || typeof body?.url !== 'string') {
+    throw new Error(body?.error || 'Could not open MIO.');
   }
   return body.url;
 };

@@ -751,7 +751,7 @@ const Transport: React.FC = () => {
                         bookingDate={when}
                         category="transport"
                         locale={locale}
-                        methods={['card', 'applepay', 'googlepay', 'paypal']}
+                        methods={['card', 'applepay', 'googlepay', 'paypal', 'mio']}
                         hideWhenEmpty
                         buttonLabel={t('payNow', 'Book & pay now')}
                         className="w-full"

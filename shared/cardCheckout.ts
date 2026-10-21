@@ -22,6 +22,7 @@ import {
   isCardnetReady,
   isVerifoneReady,
   isPayPalReady,
+  isMioReady,
   kvOf,
   stripeApiBase,
   PaymentEnv,
@@ -41,9 +42,10 @@ import {
   OrderProvider,
 } from './bankGateways';
 import { createPayPalOrder } from './paypal';
+import { createMioLink } from './mio';
 
 export type CardCheckout =
-  | { ok: true; kind: 'redirect'; url: string; ref: string; processor: CardProcessor | 'paypal' }
+  | { ok: true; kind: 'redirect'; url: string; ref: string; processor: CardProcessor | 'paypal' | 'mio' }
   | {
       ok: true;
       kind: 'form';
@@ -167,7 +169,13 @@ const newOrder = (provider: OrderProvider, booking: PricedBooking, secrets: Paym
     };
   }
   const currency =
-    provider === 'azul' ? secrets.azulCurrency : provider === 'cardnet' ? secrets.cardnetCurrency : secrets.verifoneCurrency;
+    provider === 'azul'
+      ? secrets.azulCurrency
+      : provider === 'cardnet'
+      ? secrets.cardnetCurrency
+      : provider === 'mio'
+      ? secrets.mioCurrency
+      : secrets.verifoneCurrency;
   return { ...base, currency, ...toLocalAmount(booking.total, currency, secrets) };
 };
 
@@ -255,6 +263,33 @@ export const startPayPal = async (
   return { ok: true, kind: 'redirect', url: created.url, ref: order.id, processor: 'paypal' };
 };
 
+/**
+ * MIO — a one-use MIO payment link for the exact amount, paid on MIO's page
+ * and asked about here when the guest comes back. See shared/mio.ts.
+ */
+export const startMio = async (
+  env: PaymentEnv,
+  secrets: PaymentSecrets,
+  booking: PricedBooking,
+  origin: string
+): Promise<CardCheckout> => {
+  if (!isMioReady(secrets)) return { ok: false, status: 503, error: UNAVAILABLE, code: 'mio_not_configured' };
+  const order = newOrder('mio', booking, secrets);
+  const created = await createMioLink(secrets, order, origin);
+  if (!created.ok) return { ok: false, status: 502, error: FAILED };
+  if (!(await saveOrder(env, order))) return { ok: false, status: 503, error: FAILED };
+  return { ok: true, kind: 'redirect', url: created.url, ref: order.id, processor: 'mio' };
+};
+
+/** Price a booking and open a MIO payment link for it. */
+export const startMioCheckout = async (env: PaymentEnv, request: Request, body: BookingRequest): Promise<CardCheckout> => {
+  const secrets = await readPaymentSecrets(env);
+  if (!isMioReady(secrets)) return { ok: false, status: 503, error: UNAVAILABLE, code: 'mio_not_configured' };
+  const priced = await priceBooking(env, body);
+  if (!priced.ok) return { ok: false, status: 400, error: priced.error };
+  return startMio(env, secrets, priced.booking, new URL(request.url).origin);
+};
+
 /** Start an already-priced booking with one card processor. */
 export const startWithProcessor = (
   env: PaymentEnv,
@@ -329,6 +364,7 @@ export const retryOrder = async (env: PaymentEnv, request: Request, previous: Pa
   const secrets = await readPaymentSecrets(env);
   const origin = new URL(request.url).origin;
   if (previous.provider === 'paypal') return startPayPal(env, secrets, previous.booking, origin);
+  if (previous.provider === 'mio') return startMio(env, secrets, previous.booking, origin);
   const processor = resolveCardProcessor(secrets);
   if (!processor) return { ok: false, status: 503, error: UNAVAILABLE, code: 'card_not_configured' };
   return startWithProcessor(

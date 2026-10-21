@@ -13,6 +13,7 @@ import {
   postToGateway,
   startCardCheckout,
   startPayPalCheckout,
+  startMioCheckout,
   PaymentsReady,
 } from '../../services/paymentService';
 import { submitContactRequest } from '../../services/contactRequestService';
@@ -58,7 +59,7 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
   const [ready, setReady] = useState<PaymentsReady | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [left, setLeft] = useState<'' | 'card' | 'paypal'>('');
+  const [left, setLeft] = useState<'' | 'card' | 'paypal' | 'mio'>('');
 
   const [guestEmail, setGuestEmail] = useState(false);
 
@@ -107,7 +108,7 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
   };
 
   const cardReady = Boolean(ready?.card);
-  const methods = getPaymentMethodStates(brandSettings, cardReady, [], Boolean(ready?.paypal));
+  const methods = getPaymentMethodStates(brandSettings, cardReady, [], Boolean(ready?.paypal), Boolean(ready?.mio));
   const cardLink = getCardPaymentLink(brandSettings);
   const value = Number(String(amount).replace(',', '.'));
   const valid = Number.isFinite(value) && value >= MIN && value <= MAX;
@@ -208,12 +209,40 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
     }
   };
 
+  const payByMio = async () => {
+    if (!valid) return setError(t.badAmount);
+    setError('');
+    record('MIO');
+    if (ready?.mio) {
+      // A MIO payment link for this amount, in this tab; MIO brings the guest
+      // back and the payment is checked with MIO on the way in.
+      setBusy(true);
+      try {
+        const url = await startMioCheckout({ category: 'custom', title: label, persons: 1, amount: value, locale, returnPath: '/contact' });
+        attempt('mio');
+        window.location.href = url;
+      } catch (failure: any) {
+        setBusy(false);
+        setError(failure?.message || 'MIO could not be opened.');
+      }
+      return;
+    }
+    // The Milin link from the MIO app, with the amount filled in where it asks for one.
+    const charged = ready?.mioCurrency === 'DOP' && ready.mioDopPerUsd ? value * ready.mioDopPerUsd : value;
+    const url = (brandSettings.mioLink ?? '').replace(/\{amount\}/g, encodeURIComponent(charged.toFixed(2)));
+    if (url) {
+      attempt('mio', url);
+      window.open(url, '_blank', 'noopener');
+      setLeft('mio');
+    }
+  };
+
   const tellUrl = generateWhatsAppMessage(
     brandSettings.phoneNumber,
-    `${localeText(locale, { en: 'Hello! I just paid', es: '¡Hola! Acabo de pagar', de: 'Hallo! Ich habe gerade', fr: 'Bonjour ! Je viens de payer' })} US$ ${valid ? value.toFixed(2) : amount}${locale === 'de' ? ' bezahlt' : ''} (${left === 'paypal' ? 'PayPal' : localeText(locale, { en: 'card', es: 'tarjeta', de: 'Karte', fr: 'carte' })}) — ${reference.trim() || '—'}${name ? ` · ${name}` : ''}`
+    `${localeText(locale, { en: 'Hello! I just paid', es: '¡Hola! Acabo de pagar', de: 'Hallo! Ich habe gerade', fr: 'Bonjour ! Je viens de payer' })} US$ ${valid ? value.toFixed(2) : amount}${locale === 'de' ? ' bezahlt' : ''} (${left === 'paypal' ? 'PayPal' : left === 'mio' ? 'MIO' : localeText(locale, { en: 'card', es: 'tarjeta', de: 'Karte', fr: 'carte' })}) — ${reference.trim() || '—'}${name ? ` · ${name}` : ''}`
   );
 
-  const anyMethod = methods.card.visible || methods.paypal.visible;
+  const anyMethod = methods.card.visible || methods.paypal.visible || methods.mio.visible;
 
   return (
     <section id={id} className="scroll-mt-28 rounded-[28px] border border-ink/15 bg-paper p-6 shadow-ink-sm md:p-8">
@@ -302,6 +331,11 @@ const QuickPay: React.FC<{ id?: string }> = ({ id = 'pay' }) => {
               {methods.paypal.visible && (
                 <button type="button" onClick={payByPayPal} className="tropical-button-outline w-full gap-2 sm:w-auto">
                   <FaPaypal /> {t.paypal}
+                </button>
+              )}
+              {methods.mio.visible && (
+                <button type="button" onClick={payByMio} disabled={busy} className="tropical-button-outline w-full gap-2 disabled:opacity-60 sm:w-auto">
+                  <span className="text-xs font-black">MIO</span> {localeText(locale, { en: 'Pay with MIO', es: 'Pagar con MIO', de: 'Mit MIO bezahlen', fr: 'Payer avec MIO' })}
                 </button>
               )}
             </div>

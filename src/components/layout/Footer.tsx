@@ -211,6 +211,9 @@ const Footer = () => {
                 <FaCcPaypal className="h-7 w-7" title="PayPal" />
                 <FaApplePay className="h-9 w-9" title="Apple Pay" />
                 <FaGooglePay className="h-9 w-9" title="Google Pay" />
+                {brandSettings.mioLink && (
+                  <span title="MIO" className="rounded border border-paper/50 px-1.5 py-0.5 text-[0.7rem] font-black leading-none">MIO</span>
+                )}
               </div>
             </div>
           </div>

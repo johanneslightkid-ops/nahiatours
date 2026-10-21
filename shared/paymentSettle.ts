@@ -16,6 +16,7 @@
 import { readPaymentSecrets, stripeApiBase, PaymentEnv, PaymentSecrets } from './paymentConfig';
 import { readCardnetResult, verifyAzulReturn, verifyVerifoneReturn, PaymentOrder } from './bankGateways';
 import { capturePayPalOrder } from './paypal';
+import { readMioLink, MioVerdict } from './mio';
 import { reasonFromIso } from './paymentOutcome';
 
 /**
@@ -88,6 +89,17 @@ const settleStripe = async (env: PaymentEnv, secrets: PaymentSecrets, order: Pay
     order.status = 'unverified';
   }
   order.code = String(session.payment_status ?? '');
+};
+
+/** What MIO said about an order's link, onto the order. */
+const applyMio = (order: PaymentOrder, verdict: MioVerdict) => {
+  order.code = verdict.code ?? order.code;
+  order.reference = verdict.reference ?? order.reference;
+  order.authorizationCode = verdict.authorizationCode ?? order.authorizationCode;
+  if (verdict.status === 'paid' || verdict.status === 'declined' || verdict.status === 'error') {
+    order.status = verdict.status;
+    order.reason = verdict.reason;
+  }
 };
 
 /**
@@ -182,6 +194,22 @@ export const settleReturn = async (
     return;
   }
 
+  if (order.provider === 'mio') {
+    // MIO is asked either way: its "failure" address is also where a guest
+    // lands who gave up, and only the link knows whether a payment went through.
+    const verdict = await readMioLink(secrets, order);
+    if (verdict.known) applyMio(order, verdict);
+    if (order.status === 'pending') {
+      if (verdict.known && outcome === 'declined') {
+        order.status = 'cancelled';
+        order.reason = 'cancelled';
+      } else {
+        order.status = 'unverified';
+      }
+    }
+    return;
+  }
+
   if (order.provider === 'paypal') {
     if (outcome === 'cancelled') {
       order.status = 'cancelled';
@@ -225,6 +253,9 @@ export const refreshOrder = async (env: PaymentEnv, order: PaymentOrder): Promis
     }
   } else if (order.provider === 'stripe' && order.session) {
     await settleStripe(env, secrets, order, order.session);
+  } else if (order.provider === 'mio' && order.session) {
+    const verdict = await readMioLink(secrets, order);
+    if (verdict.known) applyMio(order, verdict);
   } else if (order.provider === 'paypal' && order.status === 'unverified' && order.session) {
     // Captured already, or approved and never captured because the return
     // failed half-way: capturing is idempotent per order, so ask by capturing.

@@ -23,9 +23,9 @@ import { BrandSettings } from '../services/brandService';
  * payment link from a processor's portal.
  */
 
-export type PaymentMethodId = 'card' | 'applepay' | 'googlepay' | 'paypal' | 'cash';
+export type PaymentMethodId = 'card' | 'applepay' | 'googlepay' | 'paypal' | 'mio' | 'cash';
 
-export const PAYMENT_METHOD_IDS: PaymentMethodId[] = ['card', 'applepay', 'googlepay', 'paypal', 'cash'];
+export const PAYMENT_METHOD_IDS: PaymentMethodId[] = ['card', 'applepay', 'googlepay', 'paypal', 'mio', 'cash'];
 
 /**
  * APPLE PAY and GOOGLE PAY are the card payment too, paid from a wallet: the
@@ -85,7 +85,8 @@ export const isPaymentMethodConfigured = (
   method: PaymentMethodId,
   cardReady = false,
   wallets: WalletId[] = [],
-  paypalReady = false
+  paypalReady = false,
+  mioReady = false
 ): boolean => {
   switch (method) {
     case 'card':
@@ -96,6 +97,9 @@ export const isPaymentMethodConfigured = (
     case 'paypal':
       // Through PayPal's API (configured in the payments admin), or a PayPal.Me link.
       return paypalReady || hasValue(brandSettings.paypalMeLink);
+    case 'mio':
+      // MIO's API Checkout (configured in the payments admin), or a Milin link.
+      return mioReady || hasValue(brandSettings.mioLink);
     case 'cash':
       return hasValue(brandSettings.phoneNumber);
     default:
@@ -127,10 +131,11 @@ export const getPaymentMethodStates = (
   brandSettings: BrandSettings,
   cardReady = false,
   wallets: WalletId[] = [],
-  paypalReady = false
+  paypalReady = false,
+  mioReady = false
 ): PaymentMethodStates =>
   PAYMENT_METHOD_IDS.reduce((states, method) => {
-    const configured = isPaymentMethodConfigured(brandSettings, method, cardReady, wallets, paypalReady);
+    const configured = isPaymentMethodConfigured(brandSettings, method, cardReady, wallets, paypalReady, mioReady);
     const enabled = isPaymentMethodEnabled(brandSettings, method);
     states[method] = { configured, enabled, visible: configured && enabled };
     return states;

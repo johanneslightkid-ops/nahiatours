@@ -153,7 +153,7 @@ const PaymentConfirmPrompt: React.FC<Props> = ({ attempt, onSnooze, onClose }) =
       outcome === 'paid'
         ? localeText(locale, { en: 'Hello! I just paid', es: '¡Hola! Acabo de pagar', de: 'Hallo! Ich habe gerade bezahlt', fr: 'Bonjour ! Je viens de payer' })
         : localeText(locale, { en: 'Hello! I had a problem paying', es: '¡Hola! Tuve un problema al pagar', de: 'Hallo! Beim Bezahlen gab es ein Problem', fr: 'Bonjour ! J’ai eu un problème pour payer' })
-    } (${attempt.method === 'paypal' ? 'PayPal' : localeText(locale, { en: 'card', es: 'tarjeta', de: 'Karte', fr: 'carte' })}):\n${summary}${details.name ? `\n${details.name}` : ''}`;
+    } (${attempt.method === 'paypal' ? 'PayPal' : attempt.method === 'mio' ? 'MIO' : localeText(locale, { en: 'card', es: 'tarjeta', de: 'Karte', fr: 'carte' })}):\n${summary}${details.name ? `\n${details.name}` : ''}`;
   const chatUrl = generateWhatsAppMessage(brandSettings.phoneNumber, operatorText(answered === 'problem' ? 'problem' : 'paid'));
 
   const how = [
@@ -220,7 +220,7 @@ const PaymentConfirmPrompt: React.FC<Props> = ({ attempt, onSnooze, onClose }) =
             <div className={`${card} mt-3`}>
               <div className="font-bold text-ink">{what}</div>
               <div>
-                {attempt.method === 'paypal' ? 'PayPal' : localeText(locale, { en: 'Card', es: 'Tarjeta', de: 'Karte', fr: 'Carte' })}
+                {attempt.method === 'paypal' ? 'PayPal' : attempt.method === 'mio' ? 'MIO' : localeText(locale, { en: 'Card', es: 'Tarjeta', de: 'Karte', fr: 'Carte' })}
                 {attempt.total ? ` · ${usd(attempt.total)}` : ''}
               </div>
             </div>

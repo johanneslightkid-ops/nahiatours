@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FaPaypal, FaCreditCard, FaWhatsapp, FaChevronDown, FaShieldAlt, FaCopy, FaApple, FaGoogle } from 'react-icons/fa';
+import { FaPaypal, FaWallet, FaCreditCard, FaWhatsapp, FaChevronDown, FaShieldAlt, FaCopy, FaApple, FaGoogle } from 'react-icons/fa';
 import { useDeviceWallets } from '../../lib/wallets';
 import { useBrand } from '../../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
@@ -10,6 +10,7 @@ import {
   getPaymentsReady,
   startCardCheckout,
   startPayPalCheckout,
+  startMioCheckout,
   postToGateway,
   fillPaymentLink,
   PaymentsReady,
@@ -125,6 +126,13 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalGo: 'Continue to PayPal',
     paypalNote: 'PayPal opens in a new tab. Come back here afterwards.',
     paypalNoteBack: 'You come back here automatically once PayPal is done.',
+    mio: 'MIO',
+    mioHint: 'Visa, Mastercard or your MIO account',
+    mioTitle: 'Pay with MIO',
+    mioGo: 'Continue to MIO',
+    mioNote: 'MIO opens in a new tab. Come back here afterwards.',
+    mioNoteBack: 'You come back here automatically once MIO is done.',
+    inPesos: 'In Dominican pesos',
     applepay: 'Apple Pay',
     applepayHint: 'Face ID or Touch ID — no card to type',
     googlepay: 'Google Pay',
@@ -166,6 +174,13 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalGo: 'Continuar a PayPal',
     paypalNote: 'PayPal se abre en otra pestaña. Vuelve aquí después.',
     paypalNoteBack: 'Al terminar en PayPal vuelves aquí automáticamente.',
+    mio: 'MIO',
+    mioHint: 'Visa, Mastercard o tu cuenta MIO',
+    mioTitle: 'Pagar con MIO',
+    mioGo: 'Continuar a MIO',
+    mioNote: 'MIO se abre en otra pestaña. Vuelve aquí después.',
+    mioNoteBack: 'Al terminar en MIO vuelves aquí automáticamente.',
+    inPesos: 'En pesos dominicanos',
     applepay: 'Apple Pay',
     applepayHint: 'Face ID o Touch ID, sin escribir la tarjeta',
     googlepay: 'Google Pay',
@@ -207,6 +222,13 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalGo: 'Weiter zu PayPal',
     paypalNote: 'PayPal öffnet sich in einem neuen Tab. Kommen Sie danach hierher zurück.',
     paypalNoteBack: 'Nach PayPal kommen Sie automatisch hierher zurück.',
+    mio: 'MIO',
+    mioHint: 'Visa, Mastercard oder Ihr MIO-Konto',
+    mioTitle: 'Mit MIO bezahlen',
+    mioGo: 'Weiter zu MIO',
+    mioNote: 'MIO öffnet sich in einem neuen Tab. Kommen Sie danach hierher zurück.',
+    mioNoteBack: 'Nach MIO kommen Sie automatisch hierher zurück.',
+    inPesos: 'In Dominikanischen Pesos',
     applepay: 'Apple Pay',
     applepayHint: 'Face ID oder Touch ID — ohne Kartennummer',
     googlepay: 'Google Pay',
@@ -248,6 +270,13 @@ const COPY: Record<Lang, Record<string, string>> = {
     paypalGo: 'Continuer vers PayPal',
     paypalNote: 'PayPal s’ouvre dans un nouvel onglet. Revenez ici ensuite.',
     paypalNoteBack: 'Une fois sur PayPal terminé, vous revenez ici automatiquement.',
+    mio: 'MIO',
+    mioHint: 'Visa, Mastercard ou votre compte MIO',
+    mioTitle: 'Payer avec MIO',
+    mioGo: 'Continuer vers MIO',
+    mioNote: 'MIO s’ouvre dans un nouvel onglet. Revenez ici ensuite.',
+    mioNoteBack: 'Une fois sur MIO terminé, vous revenez ici automatiquement.',
+    inPesos: 'En pesos dominicains',
     applepay: 'Apple Pay',
     applepayHint: 'Face ID ou Touch ID, sans saisir de carte',
     googlepay: 'Google Pay',
@@ -311,6 +340,8 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   const [copied, setCopied] = useState(false);
   const [ready, setReady] = useState<PaymentsReady | null>(null);
   const [paypalModalOpen, setPaypalModalOpen] = useState(false);
+  /** Which hosted page the second dialog leads to: PayPal's or MIO's. */
+  const [hosted, setHosted] = useState<'paypal' | 'mio'>('paypal');
   /** Apple Pay or Google Pay, when the guest chose a wallet rather than the card form. */
   const [wallet, setWallet] = useState<WalletId | null>(null);
   const deviceWallets = useDeviceWallets();
@@ -340,11 +371,13 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
   const cardReady = ready?.card ?? false;
   // A wallet the payment page offers but this device cannot use is not offered.
   const paypalApi = ready?.paypal ?? false;
+  const mioApi = ready?.mio ?? false;
   const methods = getPaymentMethodStates(
     brandSettings,
     cardReady,
     (ready?.wallets ?? []).filter((id) => deviceWallets.includes(id)),
-    paypalApi
+    paypalApi,
+    mioApi
   );
   if (allowedMethods) {
     for (const id of Object.keys(methods) as PaymentMethodId[]) {
@@ -461,7 +494,53 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
     refreshPrePay();
     setCardError('');
     track('pay_click', { method: 'paypal', title: excursionTitle, total: totalUsd ?? 0, source, locale: lang });
+    setHosted('paypal');
     setPaypalModalOpen(true);
+  };
+
+  const handleMio = () => {
+    playClickFx();
+    setIsOpen(false);
+    setPrePayError('');
+    refreshPrePay();
+    setCardError('');
+    track('pay_click', { method: 'mio', title: excursionTitle, total: totalUsd ?? 0, source, locale: lang });
+    setHosted('mio');
+    setPaypalModalOpen(true);
+  };
+
+  /** What MIO charges, when it charges in pesos and the rate is known. */
+  const mioPesos = totalUsd && ready?.mioCurrency === 'DOP' && ready.mioDopPerUsd ? Math.round(totalUsd * ready.mioDopPerUsd * 100) / 100 : null;
+
+  /**
+   * MIO without its API: the Milin link from the MIO app, with the amount
+   * filled in where the link asks for it ({amount}, in what MIO charges).
+   */
+  const handleMioLink = () => {
+    const amountText = mioPesos ? mioPesos.toFixed(2) : totalUsd ? totalUsd.toFixed(2) : '';
+    const targetUrl = (brandSettings.mioLink ?? '').replace(/\{amount\}/g, encodeURIComponent(amountText));
+    recordAttempt('mio', targetUrl || undefined);
+    if (targetUrl) window.open(targetUrl, '_blank');
+    if (!flags.operatorAlerts) openWhatsAppConfirmation('MIO');
+    setPaypalModalOpen(false);
+  };
+
+  const handleMioProceed = async () => {
+    playClickFx();
+    if (!prePayOk()) return;
+    if (!mioApi) return handleMioLink();
+    // MIO's own payment link, in this tab: MIO brings the guest back to
+    // /api/pay-return, where MIO is asked whether the payment went through.
+    setStarting(true);
+    setCardError('');
+    try {
+      const url = await startMioCheckout(checkoutBooking());
+      recordAttempt('mio');
+      window.location.href = url;
+    } catch (error: any) {
+      setStarting(false);
+      setCardError(error?.message || t.failed);
+    }
   };
 
   /** The booking as the server prices it, for the card page and PayPal alike. */
@@ -673,6 +752,8 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
             methodButton('googlepay', () => handleWallet('google_pay'), <FaGoogle className="h-4 w-4" />, 'bg-paper/15 text-white', t.googlepay, t.googlepayHint)}
           {methods.paypal.visible &&
             methodButton('paypal', handlePayPal, <FaPaypal className="h-4 w-4" />, 'bg-sky-dark/30 text-sky-light', t.paypal, t.paypalHint)}
+          {methods.mio.visible &&
+            methodButton('mio', handleMio, <FaWallet className="h-4 w-4" />, 'bg-hibiscus/25 text-hibiscus-light', t.mio, t.mioHint)}
           {methods.cash.visible &&
             methodButton('cash', handleWhatsApp, <FaWhatsapp className="h-4 w-4" />, 'bg-jungle/25 text-jungle-light', t.cash, t.cashHint)}
         </div>,
@@ -814,10 +895,10 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
             </button>
             <div className="mb-5 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky/25 text-sky-light">
-                <FaPaypal />
+                {hosted === 'mio' ? <span className="text-[0.65rem] font-black">MIO</span> : <FaPaypal />}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{t.paypalTitle}</h3>
+                <h3 className="text-lg font-bold text-white">{hosted === 'mio' ? t.mioTitle : t.paypalTitle}</h3>
                 <p className="text-xs text-paper/70">{excursionTitle}</p>
               </div>
             </div>
@@ -848,29 +929,37 @@ export const PaymentDropdown: React.FC<PaymentDropdownProps> = ({
                 <span className="text-paper/70">{t.total}:</span>
                 <span className="text-sm font-bold text-mango-light">{displayPrice}</span>
               </div>
+              {hosted === 'mio' && mioPesos && (
+                <div className="flex justify-between">
+                  <span className="text-paper/70">{t.inPesos}:</span>
+                  <span className="font-bold text-white">{formatMoney(mioPesos, 'DOP', lang)}</span>
+                </div>
+              )}
             </div>
 
             <div className="mt-4">
-              <PrePayDetails value={prePay} onChange={setPrePay} locale={lang} emailAvailable={flags.guestEmail} method="paypal" />
+              <PrePayDetails value={prePay} onChange={setPrePay} locale={lang} emailAvailable={flags.guestEmail} method={hosted} />
             </div>
 
             {prePayError && (
               <div className="mt-4 rounded-xl border-2 border-mango-light/50 bg-mango/20 p-3 text-xs text-mango-light">{prePayError}</div>
             )}
 
-            {paypalApi && cardError && (
+            {(hosted === 'mio' ? mioApi : paypalApi) && cardError && (
               <div className="mt-4 rounded-xl border-2 border-hibiscus-light/50 bg-hibiscus/20 p-3 text-xs text-paper">{cardError}</div>
             )}
 
             <div className="mt-5 space-y-3">
               <button
-                onClick={handlePayPalProceed}
+                onClick={hosted === 'mio' ? handleMioProceed : handlePayPalProceed}
                 disabled={starting}
                 className="w-full rounded-full border border-[rgba(150,112,31,0.4)] bg-lagoon-light py-3 text-xs font-extrabold uppercase tracking-wider text-ink shadow-ink-sm transition hover:bg-mango-light disabled:opacity-60"
               >
-                {starting ? '…' : `${t.paypalGo} · ${displayPrice}`}
+                {starting ? '…' : `${hosted === 'mio' ? t.mioGo : t.paypalGo} · ${hosted === 'mio' && mioPesos ? formatMoney(mioPesos, 'DOP', lang) : displayPrice}`}
               </button>
-              <p className="text-center text-[0.65rem] text-paper/60">{paypalApi ? t.paypalNoteBack : t.paypalNote}</p>
+              <p className="text-center text-[0.65rem] text-paper/60">
+                {hosted === 'mio' ? (mioApi ? t.mioNoteBack : t.mioNote) : paypalApi ? t.paypalNoteBack : t.paypalNote}
+              </p>
             </div>
           </div>
         </div>,

@@ -55,7 +55,7 @@ type Receipt = {
   /** Paid, but the processor's word could not be checked: the operator must look. */
   unverified: boolean;
   reason: PaymentReason;
-  method: 'card' | 'paypal';
+  method: 'card' | 'paypal' | 'mio';
   amountTotal: number | null;
   currency: string | null;
   tour: string;
@@ -92,7 +92,7 @@ const fromOrder = (payment: BankPaymentResult, ref: string): Receipt => ({
       : 'error',
   unverified: payment.status === 'unverified',
   reason: payment.reason || (payment.status === 'declined' ? 'declined' : ''),
-  method: payment.method === 'paypal' ? 'paypal' : 'card',
+  method: payment.method === 'paypal' ? 'paypal' : payment.method === 'mio' ? 'mio' : 'card',
   amountTotal: payment.amountTotal,
   currency: payment.currency,
   tour: payment.tour,
@@ -114,7 +114,8 @@ const fromOrder = (payment: BankPaymentResult, ref: string): Receipt => ({
 const settleAttempt = (receipt: Receipt | null, outcome: 'verified' | 'paid' | 'problem' | 'cancelled', reference: string) => {
   const attempt = readPendingAttempt();
   if (!attempt) return;
-  const sameKind = receipt?.method === 'paypal' ? attempt.method === 'paypal' : attempt.method.startsWith('card');
+  const sameKind =
+    receipt?.method === 'paypal' || receipt?.method === 'mio' ? attempt.method === receipt.method : attempt.method.startsWith('card');
   if (!sameKind) return;
   void answerAttempt(attempt, outcome, { reference, sendReceipt: outcome === 'verified' && attempt.contact.email });
   if ((outcome === 'verified' || outcome === 'paid') && attempt.clearsCart) clearCart('paid');
@@ -334,7 +335,7 @@ const PaymentReturn: React.FC = () => {
       ? '\n\n⚠️ El pago no se pudo verificar automáticamente — revísalo en tu portal de pagos antes de confirmar. / ' +
         'The payment could not be verified automatically — check it in your payment portal before confirming.'
       : '';
-    const how = result.method === 'paypal' ? 'PayPal' : 'tarjeta en línea / online by card';
+    const how = result.method === 'paypal' ? 'PayPal' : result.method === 'mio' ? 'MIO' : 'tarjeta en línea / online by card';
 
     // Built line by line and joined, so an absent date leaves no gap rather
     // than a stray blank line in the middle of the operator's message.
@@ -389,7 +390,7 @@ const PaymentReturn: React.FC = () => {
     if (!orderRef) return;
     setRetrying(true);
     setRetryError('');
-    track('pay_start', { method: result?.method === 'paypal' ? 'paypal' : 'card', source: 'retry', total: result?.amountTotal ?? 0, title: result?.tour, locale });
+    track('pay_start', { method: result?.method === 'paypal' || result?.method === 'mio' ? result.method : 'card', source: 'retry', total: result?.amountTotal ?? 0, title: result?.tour, locale });
     try {
       followCheckout(await retryPayment(orderRef));
     } catch (error: any) {

@@ -1,4 +1,4 @@
-import { readPaymentSecrets, resolveCardProcessor, cardChargeCurrency, isPayPalReady, CARD_WALLETS, PaymentEnv } from '../../shared/paymentConfig';
+import { readPaymentSecrets, resolveCardProcessor, cardChargeCurrency, isPayPalReady, isMioReady, CARD_WALLETS, PaymentEnv } from '../../shared/paymentConfig';
 
 /**
  * Can the storefront take a card, and in what currency — the guest's page's
@@ -33,6 +33,10 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
       wallets: processor ? CARD_WALLETS[processor] : [],
       // PayPal through its API (an answer comes back), rather than PayPal.Me.
       paypal: isPayPalReady(secrets),
+      // MIO through its API Checkout, rather than a Milin link; and what it charges in.
+      mio: isMioReady(secrets),
+      mioCurrency: secrets.mioCurrency,
+      mioDopPerUsd: secrets.mioCurrency === 'DOP' && secrets.dopPerUsd > 0 ? secrets.dopPerUsd : null,
     }),
     {
       status: 200,

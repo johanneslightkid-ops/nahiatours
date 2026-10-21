@@ -46,8 +46,8 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
 
   return json({
     provider: order.provider,
-    /** 'card' or 'paypal' — what the guest chose, which is all the page may name. */
-    method: order.provider === 'paypal' ? 'paypal' : 'card',
+    /** 'card', 'paypal' or 'mio' — what the guest chose, which is all the page may name. */
+    method: order.provider === 'paypal' ? 'paypal' : order.provider === 'mio' ? 'mio' : 'card',
     status: order.status,
     paid: order.status === 'paid',
     reason: order.reason ?? (order.status === 'paid' ? 'approved' : order.status === 'cancelled' ? 'cancelled' : ''),

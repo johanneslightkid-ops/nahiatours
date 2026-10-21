@@ -45,7 +45,7 @@ export type BankProvider = 'azul' | 'cardnet' | 'verifone';
  * PayPal keep an order too, so all of them come back the same way and the
  * receipt, the decline message and "try again" work alike for each.
  */
-export type OrderProvider = BankProvider | 'stripe' | 'paypal';
+export type OrderProvider = BankProvider | 'stripe' | 'paypal' | 'mio';
 /** `error`: the processor failed rather than the card — nothing was charged. */
 export type OrderStatus = 'pending' | 'paid' | 'declined' | 'cancelled' | 'unverified' | 'error';
 
@@ -66,11 +66,11 @@ export interface PaymentOrder {
   itbisMinor: number;
   /** Verifone only: the price exactly as it was signed into the buy-link. */
   signedPrice?: string;
-  /** CardNET's session, Stripe's Checkout Session, PayPal's order id. */
+  /** CardNET's session, Stripe's Checkout Session, PayPal's order id, MIO's payment link id. */
   session?: string;
   /** CardNET only: reads the session's result back. */
   sessionKey?: string;
-  /** PayPal only: where the guest approves the order, to send them back to. */
+  /** PayPal and MIO: where the guest pays, to send them back to. */
   approveUrl?: string;
   /** Apple Pay or Google Pay, when the guest chose one; kept for "try again". */
   wallet?: string;

@@ -39,6 +39,11 @@ const TEXT_FIELDS: Partial<Record<keyof PaymentSecrets, number>> = {
   verifoneSecretWord: 400,
   paypalClientId: 200,
   paypalSecret: 200,
+  mioClientId: 200,
+  mioClientSecret: 400,
+  mioMerchantId: 20,
+  mioAuthUrl: 300,
+  mioApiBase: 300,
 };
 export async function onRequest(context: { request: Request; env: PaymentEnv }) {
   const { request, env } = context;
@@ -109,10 +114,10 @@ export async function onRequest(context: { request: Request; env: PaymentEnv }) 
       patch.cardProcessor = body.cardProcessor as PaymentSecrets['cardProcessor'];
     }
 
-    for (const field of ['azulMode', 'cardnetMode', 'verifoneMode', 'paypalMode'] as const) {
+    for (const field of ['azulMode', 'cardnetMode', 'verifoneMode', 'paypalMode', 'mioMode'] as const) {
       if (body[field] === 'test' || body[field] === 'live') patch[field] = body[field] as 'test' | 'live';
     }
-    for (const field of ['azulCurrency', 'cardnetCurrency', 'verifoneCurrency'] as const) {
+    for (const field of ['azulCurrency', 'cardnetCurrency', 'verifoneCurrency', 'mioCurrency'] as const) {
       if (body[field] === 'USD' || body[field] === 'DOP') patch[field] = body[field] as 'USD' | 'DOP';
     }
 

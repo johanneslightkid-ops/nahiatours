@@ -148,6 +148,29 @@ export interface PaymentSecrets {
   paypalClientId: string;
   /** The app's Secret. Never leaves the server. */
   paypalSecret: string;
+
+  /**
+   * MIO (Banreservas' e-money and acquiring company, mio.com.do), through its
+   * "API Checkout": the server mints a one-use MIO payment link for the exact
+   * amount, the guest pays on MIO's page (Visa, Mastercard, a MIO account),
+   * and the server asks MIO about that link before anything is called paid.
+   * MIO runs on Geopagos, and its API is Geopagos' Payments API v4
+   * (docs.geopagos.io). The credentials come from MIO's business adviser once
+   * "API Checkout" is enabled for the merchant; without them the storefront
+   * falls back to the "Milin" link kept in the brand settings. See shared/mio.ts.
+   */
+  mioMode: GatewayMode;
+  /** OAuth client id, from MIO. */
+  mioClientId: string;
+  /** OAuth client secret, from MIO. Never leaves the server. */
+  mioClientSecret: string;
+  /** The merchant's number at MIO (digits). */
+  mioMerchantId: string;
+  /** The token address MIO gives with the credentials (…/oauth/token). Geopagos does not publish it. */
+  mioAuthUrl: string;
+  /** The Payments API host, when MIO names one other than Geopagos' own for the mode. */
+  mioApiBase: string;
+  mioCurrency: LocalCurrency;
 }
 
 /** What the admin panel is allowed to know about the above. */
@@ -196,6 +219,16 @@ export interface PaymentConfigStatus {
     clientId: string;
     secretConfigured: boolean;
   };
+  mio: {
+    ready: boolean;
+    mode: GatewayMode;
+    clientId: string;
+    merchantId: string;
+    authUrl: string;
+    apiBase: string;
+    currency: LocalCurrency;
+    secretConfigured: boolean;
+  };
 }
 
 const DEFAULTS: PaymentSecrets = {
@@ -225,6 +258,13 @@ const DEFAULTS: PaymentSecrets = {
   paypalMode: 'test',
   paypalClientId: '',
   paypalSecret: '',
+  mioMode: 'test',
+  mioClientId: '',
+  mioClientSecret: '',
+  mioMerchantId: '',
+  mioAuthUrl: '',
+  mioApiBase: '',
+  mioCurrency: 'DOP',
 };
 
 /** 2Checkout's hosted ConvertPlus cart — where a Verifone buy-link points. */
@@ -250,6 +290,12 @@ export const AZUL_HOSTS: Record<GatewayMode, string> = {
 export const PAYPAL_HOSTS: Record<GatewayMode, string> = {
   test: 'https://api-m.sandbox.paypal.com',
   live: 'https://api-m.paypal.com',
+};
+
+/** Geopagos' Payments API, which MIO runs on (docs.geopagos.io, "Payments API" servers). */
+export const MIO_HOSTS: Record<GatewayMode, string> = {
+  test: 'https://api-stable.stg.geopagos.io',
+  live: 'https://api.geopagos.io',
 };
 
 export const CARDNET_HOSTS: Record<GatewayMode, string> = {
@@ -285,6 +331,8 @@ export interface PaymentEnv {
   PAYPAL_API_BASE?: string;
   /** The PayPal app Secret as a Worker secret, which wins over KV. */
   PAYPAL_SECRET?: string;
+  /** The MIO client secret as a Worker secret, which wins over KV. */
+  MIO_CLIENT_SECRET?: string;
   [key: string]: unknown;
 }
 
@@ -304,11 +352,26 @@ export const paypalApiBase = (env: PaymentEnv, mode: GatewayMode): string => {
   return (override || PAYPAL_HOSTS[mode]).replace(/\/+$/, '');
 };
 
+/** The API host MIO named, else Geopagos' own for the mode. */
+export const mioApiBase = (secrets: PaymentSecrets): string =>
+  (secrets.mioApiBase || MIO_HOSTS[secrets.mioMode]).replace(/\/+$/, '');
+
 /** Same binding order as functions/api/data.ts. */
 export const kvOf = (env: PaymentEnv): KVLike | null => (env.DATA_KV_F ?? env.DATA_KV) ?? null;
 
 const text = (value: unknown, max = 200): string =>
   typeof value === 'string' ? value.trim().slice(0, max) : '';
+
+/** An https address (or a local one, for testing against a stand-in), or nothing. */
+const httpsUrl = (value: unknown): string => {
+  const candidate = text(value, 300);
+  try {
+    const url = new URL(candidate);
+    return url.protocol === 'https:' || (url.protocol === 'http:' && /^(127\.0\.0\.1|localhost)$/.test(url.hostname)) ? candidate : '';
+  } catch {
+    return '';
+  }
+};
 
 const mode = (value: unknown): GatewayMode => (value === 'live' ? 'live' : 'test');
 const currency = (value: unknown, fallback: LocalCurrency): LocalCurrency =>
@@ -358,6 +421,14 @@ const normalize = (input: unknown): PaymentSecrets => {
     paypalMode: mode(source.paypalMode),
     paypalClientId: text(source.paypalClientId, 200).replace(/\s+/g, ''),
     paypalSecret: text(source.paypalSecret, 200).replace(/\s+/g, ''),
+
+    mioMode: mode(source.mioMode),
+    mioClientId: text(source.mioClientId, 200).replace(/\s+/g, ''),
+    mioClientSecret: text(source.mioClientSecret, 400).replace(/\s+/g, ''),
+    mioMerchantId: text(source.mioMerchantId, 20).replace(/\D+/g, ''),
+    mioAuthUrl: httpsUrl(source.mioAuthUrl),
+    mioApiBase: httpsUrl(source.mioApiBase),
+    mioCurrency: currency(source.mioCurrency, DEFAULTS.mioCurrency),
   };
 };
 
@@ -391,6 +462,10 @@ export const readPaymentSecrets = async (env: PaymentEnv): Promise<PaymentSecret
   const paypalFromEnv = typeof env.PAYPAL_SECRET === 'string' ? env.PAYPAL_SECRET.trim() : '';
   if (paypalFromEnv) {
     stored.paypalSecret = paypalFromEnv;
+  }
+  const mioFromEnv = typeof env.MIO_CLIENT_SECRET === 'string' ? env.MIO_CLIENT_SECRET.trim() : '';
+  if (mioFromEnv) {
+    stored.mioClientSecret = mioFromEnv;
   }
 
   return stored;
@@ -453,6 +528,16 @@ export const isVerifoneReady = (secrets: PaymentSecrets): boolean =>
 /** PayPal's API, as opposed to the PayPal.Me link kept in the brand settings. */
 export const isPayPalReady = (secrets: PaymentSecrets): boolean =>
   Boolean(secrets.paypalClientId && secrets.paypalSecret);
+
+/** MIO's API Checkout, as opposed to the Milin link kept in the brand settings. */
+export const isMioReady = (secrets: PaymentSecrets): boolean =>
+  Boolean(
+    secrets.mioClientId &&
+      secrets.mioClientSecret &&
+      secrets.mioMerchantId &&
+      secrets.mioAuthUrl &&
+      currencyUsable(secrets.mioCurrency, secrets)
+  );
 
 export const processorReady = (secrets: PaymentSecrets): Record<CardProcessor, boolean> => ({
   stripe: secrets.stripeSecretKey.length > 0,
@@ -540,6 +625,16 @@ export const describePaymentConfig = async (env: PaymentEnv): Promise<PaymentCon
       mode: secrets.paypalMode,
       clientId: secrets.paypalClientId,
       secretConfigured: secrets.paypalSecret.length > 0,
+    },
+    mio: {
+      ready: isMioReady(secrets),
+      mode: secrets.mioMode,
+      clientId: secrets.mioClientId,
+      merchantId: secrets.mioMerchantId,
+      authUrl: secrets.mioAuthUrl,
+      apiBase: secrets.mioApiBase,
+      currency: secrets.mioCurrency,
+      secretConfigured: secrets.mioClientSecret.length > 0,
     },
   };
 };

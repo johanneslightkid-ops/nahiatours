@@ -111,8 +111,8 @@ const CartView: React.FC<{ locale: string }> = ({ locale }) => {
       ? formatCartDate(dated[0].date, locale)
       : `${formatCartDate(dated[0].date, locale)} – ${formatCartDate(dated[dated.length - 1].date, locale)}`;
 
-  const methods = getPaymentMethodStates(brandSettings, Boolean(ready?.card), [], Boolean(ready?.paypal));
-  const canPayOnline = methods.card.visible || methods.paypal.visible;
+  const methods = getPaymentMethodStates(brandSettings, Boolean(ready?.card), [], Boolean(ready?.paypal), Boolean(ready?.mio));
+  const canPayOnline = methods.card.visible || methods.paypal.visible || methods.mio.visible;
   const phone = brandSettings.phoneNumber || '';
   const telHref = phone ? `tel:${phone.replace(/[^\d+]/g, '')}` : '';
 
@@ -599,7 +599,7 @@ const CartView: React.FC<{ locale: string }> = ({ locale }) => {
                 source="cart"
                 clearsCart
                 prePayDefaults={details}
-                methods={['card', 'applepay', 'googlepay', 'paypal']}
+                methods={['card', 'applepay', 'googlepay', 'paypal', 'mio']}
                 hideWhenEmpty
                 buttonLabel={L({ en: `Pay all now · ${usd(total)}`, es: `Pagar todo ahora · ${usd(total)}`, de: `Alles jetzt bezahlen · ${usd(total)}`, fr: `Tout payer maintenant · ${usd(total)}` })}
                 className="w-full"
@@ -674,6 +674,11 @@ const CartView: React.FC<{ locale: string }> = ({ locale }) => {
             {methods.paypal.visible && (
               <li className="flex items-center gap-2">
                 <FaPaypal className="text-sky-dark" /> PayPal
+              </li>
+            )}
+            {methods.mio.visible && (
+              <li className="flex items-center gap-2">
+                <span className="text-[0.65rem] font-black text-hibiscus-dark">MIO</span> {L({ en: 'MIO — card or MIO account', es: 'MIO — tarjeta o cuenta MIO', de: 'MIO — Karte oder MIO-Konto', fr: 'MIO — carte ou compte MIO' })}
               </li>
             )}
             <li className="flex items-center gap-2">

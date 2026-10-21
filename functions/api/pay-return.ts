@@ -10,6 +10,7 @@ import { readReturnParams, settleReturn } from '../../shared/paymentSettle';
  *   /api/pay-return/verifone/<order>/approved
  *   /api/pay-return/stripe/<order>/approved?session_id=…|cancelled
  *   /api/pay-return/paypal/<order>/approved?token=…|cancelled
+ *   /api/pay-return/mio/<order>/approved|declined
  *
  * The outcome in the path is only a hint; shared/paymentSettle.ts asks each
  * processor (or checks its signature) before anything is called paid. Then
@@ -20,7 +21,7 @@ import { readReturnParams, settleReturn } from '../../shared/paymentSettle';
  * GET or POST: a processor that posts the guest back is read the same way.
  */
 
-const PROVIDERS: OrderProvider[] = ['azul', 'cardnet', 'verifone', 'stripe', 'paypal'];
+const PROVIDERS: OrderProvider[] = ['azul', 'cardnet', 'verifone', 'stripe', 'paypal', 'mio'];
 
 const redirect = (location: string) =>
   new Response(null, { status: 303, headers: { Location: location, 'Cache-Control': 'no-store' } });

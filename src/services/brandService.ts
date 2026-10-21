@@ -11,6 +11,7 @@ export interface PaymentVisibility {
   cardnet?: boolean;
   applepay?: boolean;
   googlepay?: boolean;
+  mio?: boolean;
 }
 
 export type HeroMediaType = 'image' | 'video';
@@ -67,6 +68,12 @@ export interface BrandSettings {
    */
   azulLink?: string;
   cardnetLink?: string;
+  /**
+   * A MIO "Milin" payment link, made in the MIO app (Cobrar → Link de pago).
+   * Used when MIO's API Checkout is not configured; opened as it is, with the
+   * guest shown the amount to pay — or filled in when it carries {amount}.
+   */
+  mioLink?: string;
   /** Master switch for card payments. Off by default: nothing takes money by accident. */
   stripeEnabled?: boolean;
   paymentVisibility?: PaymentVisibility;
@@ -130,6 +137,7 @@ const normalizePaymentVisibility = (input: unknown): PaymentVisibility => {
     cardnet: typeof source.cardnet === 'boolean' ? source.cardnet : true,
     applepay: typeof source.applepay === 'boolean' ? source.applepay : true,
     googlepay: typeof source.googlepay === 'boolean' ? source.googlepay : true,
+    mio: typeof source.mio === 'boolean' ? source.mio : true,
   };
 };
 
@@ -194,6 +202,7 @@ const normalizeBrandSettings = (input: Partial<BrandSettings> | null | undefined
   verifoneLink: typeof input?.verifoneLink === 'string' ? input.verifoneLink : '',
   azulLink: typeof input?.azulLink === 'string' ? input.azulLink.trim() : '',
   cardnetLink: typeof input?.cardnetLink === 'string' ? input.cardnetLink.trim() : '',
+  mioLink: typeof input?.mioLink === 'string' ? input.mioLink.trim() : '',
   brandicon:
    typeof input?.brandicon === 'string' && input.brandicon.trim()
      ? input.brandicon

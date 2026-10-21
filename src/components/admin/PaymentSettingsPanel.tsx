@@ -42,6 +42,10 @@ const METHOD_LABELS: Record<PaymentMethodId, { name: string; requirement: string
     name: 'PayPal',
     requirement: 'Necesita la app de PayPal (abajo) o un enlace de PayPal.Me',
   },
+  mio: {
+    name: 'MIO',
+    requirement: 'Necesita las credenciales de API Checkout de MIO (abajo) o un link de pago Milin',
+  },
   cash: {
     name: 'Concierge / efectivo por WhatsApp',
     requirement: 'Necesita un número de teléfono',
@@ -152,7 +156,8 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
     brandSettings,
     Boolean(status?.activeCardProcessor),
     WALLETS_BY_PROCESSOR[String(status?.activeCardProcessor ?? '')] ?? [],
-    Boolean(status?.paypal?.ready)
+    Boolean(status?.paypal?.ready),
+    Boolean(status?.mio?.ready)
   );
 
   const run = async (setNotice: (notice: Notice) => void, work: () => Promise<string>) => {
@@ -278,6 +283,46 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
       setStatus(next);
       setPaypalSecret('');
       return clearSecret ? 'Secret de PayPal eliminado.' : 'Datos de PayPal guardados.';
+    });
+
+  // ── MIO (API Checkout) ────────────────────────────────────────────────
+  const [mioClientId, setMioClientId] = useState('');
+  const [mioClientSecret, setMioClientSecret] = useState('');
+  const [mioMerchantId, setMioMerchantId] = useState('');
+  const [mioAuthUrl, setMioAuthUrl] = useState('');
+  const [mioApiBase, setMioApiBase] = useState('');
+  const [mioCurrency, setMioCurrency] = useState<LocalCurrency>('DOP');
+  const [mioMode, setMioMode] = useState<GatewayMode>('test');
+  const [mioMessage, setMioMessage] = useState<Notice>(null);
+  useEffect(() => {
+    if (!status?.mio) return;
+    setMioClientId(status.mio.clientId);
+    setMioMerchantId(status.mio.merchantId);
+    setMioAuthUrl(status.mio.authUrl);
+    setMioApiBase(status.mio.apiBase);
+    setMioCurrency(status.mio.currency);
+    setMioMode(status.mio.mode);
+  }, [status?.mio?.clientId, status?.mio?.merchantId, status?.mio?.authUrl, status?.mio?.apiBase, status?.mio?.currency, status?.mio?.mode]);
+
+  const handleSaveMio = (clearSecret = false) =>
+    run(setMioMessage, async () => {
+      if (mioAuthUrl.trim() && !/^https:\/\//.test(mioAuthUrl.trim())) throw new Error('La dirección del token debe empezar por https://');
+      if (mioApiBase.trim() && !/^https:\/\//.test(mioApiBase.trim())) throw new Error('La dirección de la API debe empezar por https://');
+      const patch: PaymentConfigPatch = {
+        mioClientId: mioClientId.trim(),
+        mioMerchantId: mioMerchantId.trim(),
+        mioAuthUrl: mioAuthUrl.trim(),
+        mioApiBase: mioApiBase.trim(),
+        mioCurrency,
+        mioMode,
+      };
+      // Write-only: only sent when something was typed.
+      if (clearSecret) patch.mioClientSecret = '';
+      else if (mioClientSecret.trim()) patch.mioClientSecret = mioClientSecret.trim();
+      const next = await savePaymentConfig(patch);
+      setStatus(next);
+      setMioClientSecret('');
+      return clearSecret ? 'Client secret de MIO eliminado.' : 'Datos de MIO guardados.';
     });
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -799,6 +844,99 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
         </div>
       </div>
 
+      {/* ── MIO (API Checkout) ─────────────────────────────────────────── */}
+      <div className="mt-5 rounded-3xl border border-ink/10 bg-paper-warm/40 p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h4 className="flex items-center gap-2 font-semibold text-ink">
+              <span className="rounded bg-hibiscus px-1.5 py-0.5 text-[0.65rem] font-black text-white">MIO</span> MIO · cobro con respuesta
+            </h4>
+            <p className="max-w-2xl text-xs text-ink-soft">
+              Con la «API Checkout» de MIO, cada reserva crea un link de pago MIO de un solo uso por el importe
+              exacto; el visitante paga en la página de MIO (Visa, Mastercard o su cuenta MIO), vuelve a este
+              sitio y el cobro se confirma aquí preguntándole a MIO. Sin estas credenciales se usa el link de pago
+              Milin de más abajo, que no devuelve respuesta. En pesos, necesita la tasa de cambio de arriba.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <ReadyChip ready={Boolean(status?.mio?.ready)} mode={status?.mio?.mode} />
+            <ModeSwitch value={mioMode} onChange={setMioMode} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className={label}>
+            <span className={labelText}>Client ID</span>
+            <input className={field} value={mioClientId} onChange={(e) => setMioClientId(e.target.value)} autoComplete="off" />
+          </label>
+          <label className={label}>
+            <span className={labelText}>Client secret {status?.mio?.secretConfigured && '(guardado)'}</span>
+            <input
+              type="password"
+              className={field}
+              value={mioClientSecret}
+              onChange={(e) => setMioClientSecret(e.target.value)}
+              placeholder={status?.mio?.secretConfigured ? 'Dejar vacío para conservar' : 'Client secret'}
+              autoComplete="off"
+            />
+          </label>
+          <label className={label}>
+            <span className={labelText}>Número de comercio (merchant ID)</span>
+            <input className={field} value={mioMerchantId} onChange={(e) => setMioMerchantId(e.target.value)} inputMode="numeric" placeholder="77000001" />
+          </label>
+          <label className={label}>
+            <span className={labelText}>Moneda del cobro</span>
+            <select className={field} value={mioCurrency} onChange={(e) => setMioCurrency(e.target.value as LocalCurrency)}>
+              <option value="DOP">Pesos dominicanos (DOP)</option>
+              <option value="USD">Dólares (USD)</option>
+            </select>
+          </label>
+          <label className={`${label} md:col-span-2`}>
+            <span className={labelText}>Dirección del token (te la da MIO)</span>
+            <input className={field} value={mioAuthUrl} onChange={(e) => setMioAuthUrl(e.target.value)} placeholder="https://…/oauth/token" autoComplete="off" />
+          </label>
+          <label className={`${label} md:col-span-2`}>
+            <span className={labelText}>Dirección de la API (opcional)</span>
+            <input
+              className={field}
+              value={mioApiBase}
+              onChange={(e) => setMioApiBase(e.target.value)}
+              placeholder={mioMode === 'live' ? 'https://api.geopagos.io' : 'https://api-stable.stg.geopagos.io'}
+              autoComplete="off"
+            />
+          </label>
+        </div>
+
+        <p className="mt-3 flex items-start gap-2 text-xs text-ink-light">
+          <FaLock className="mt-0.5 shrink-0" />
+          <span>
+            MIO funciona sobre la plataforma Geopagos. Las credenciales (client ID, client secret, número de comercio
+            y dirección del token) te las entrega tu asesor de negocios de MIO al activar «API Checkout». Deja la
+            dirección de la API vacía salvo que MIO te indique otra. El client secret se queda en el servidor.
+          </span>
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => handleSaveMio()}
+            disabled={saving}
+            className="rounded-full bg-lagoon-dark px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            {saving ? 'Guardando…' : 'Guardar MIO'}
+          </button>
+          {status?.mio?.secretConfigured && (
+            <button
+              onClick={() => window.confirm('¿Borrar el client secret? MIO volverá al link Milin hasta que guardes otro.') && handleSaveMio(true)}
+              disabled={saving}
+              className="rounded-full border border-sunset-dark/40 px-5 py-2 text-sm font-semibold text-sunset-dark disabled:opacity-50"
+            >
+              Borrar el client secret
+            </button>
+          )}
+          <NoticeLine value={mioMessage} />
+        </div>
+      </div>
+
       {/* ── Where each processor sends the guest back ───────────────────── */}
       <div className="mt-5 rounded-3xl border border-ink/10 p-5">
         <h4 className="flex items-center gap-2 font-semibold text-ink">
@@ -817,6 +955,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           <li>Verifone: {origin}/api/pay-return/verifone/{'{pedido}'}/approved</li>
           <li>Stripe: {origin}/api/pay-return/stripe/{'{pedido}'}/approved · /cancelled</li>
           <li>PayPal: {origin}/api/pay-return/paypal/{'{pedido}'}/approved · /cancelled</li>
+          <li>MIO: {origin}/api/pay-return/mio/{'{pedido}'}/approved · /declined · aviso: {origin}/api/mio-webhook</li>
         </ul>
       </div>
 
@@ -831,7 +970,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           visitante lo verá simplemente como «pagar con tarjeta». Escribe {'{amount}'} donde el enlace
           acepte el importe; si no lo acepta, se le muestra el importe a poner.
         </p>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-2">
           <label className={label}>
             <span className={labelText}>Link de Pagos AZUL</span>
             <input className={field} value={brandSettings.azulLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, azulLink: e.target.value })} placeholder="https://…" />
@@ -843,6 +982,10 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           <label className={label}>
             <span className={labelText}>Verifone u otro (2Checkout, Stripe Payment Link…)</span>
             <input className={field} value={brandSettings.verifoneLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, verifoneLink: e.target.value })} placeholder="https://…" />
+          </label>
+          <label className={label}>
+            <span className={labelText}>Link de pago MIO (Milin) — aparece como «MIO»</span>
+            <input className={field} value={brandSettings.mioLink ?? ''} onChange={(e) => setBrandSettings({ ...brandSettings, mioLink: e.target.value })} placeholder="https://…" />
           </label>
         </div>
 
