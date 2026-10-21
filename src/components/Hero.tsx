@@ -5,7 +5,7 @@ import { HiArrowDown, HiArrowRight } from 'react-icons/hi';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useDeferredVideo } from '../lib/useDeferredVideo';
 import { useBrand } from '../contexts/BrandContext';
-import { HeroMediaItem } from '../services/brandService';
+import { defaultHeroMedia, HeroMediaItem } from '../services/brandService';
 import { useI18n, type Locale } from '../contexts/I18nContext';
 import { playClickFx } from '../lib/soundEngine';
 import { getPublishedTestimonials, getRatingVisibility } from '../services/testimonialService';
@@ -13,6 +13,8 @@ import { getServiceSlug } from '../services/toursService';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { descriptionField, smallImage, useTours } from '../edt/useTours';
 import { InspireToggle } from './edt/inspire/InspireContext';
+import YouTubeBackground from './edt/YouTubeBackground';
+import { isYouTube } from '../lib/youtube';
 
 interface HeroProps {
   backgroundImage: string;
@@ -69,14 +71,20 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
   const [slide, setSlide] = useState(0);
   const [ratingBadge, setRatingBadge] = useState<{ average: number; count: number } | null>(null);
 
+  /** YouTube backgrounds that turned out not to play here: left out, never a blank hero. */
+  const [unplayable, setUnplayable] = useState<string[]>([]);
   const configured: HeroMediaItem[] = brandSettings.heroMedia?.length
     ? brandSettings.heroMedia
     : [{ url: backgroundImage, type: 'image', alt: '' }];
-  const media = configured.filter((item) => item.url);
+  let media = configured.filter((item) => item.url && !unplayable.includes(item.url));
+  if (!media.length) {
+    const fallback = defaultHeroMedia.filter((item) => item.url && !isYouTube(item.url));
+    media = fallback.length ? fallback : [{ url: backgroundImage, type: 'image', alt: '' }];
+  }
   if (backgroundVideo && !media.some((item) => item.type === 'video') && media.length === 0) {
     media.push({ url: backgroundVideo, type: 'video' });
   }
-  const showVideo = useDeferredVideo(media.some((item) => item.type === 'video'));
+  const showVideo = useDeferredVideo(media.some((item) => item.type === 'video' || isYouTube(item.url)));
 
   useEffect(() => {
     if (reduced || media.length < 2) return undefined;
@@ -125,10 +133,18 @@ const Hero: React.FC<HeroProps> = ({ backgroundImage, backgroundVideo }) => {
       {/* The photographs. */}
       <motion.div className="absolute inset-0 -z-10" style={{ scale: mediaScale }} aria-hidden="true">
         {media.map((item, index) => {
-          const on = index === slide;
+          const on = index === slide % media.length;
           return (
             <div key={`${item.url}-${index}`} className={`hero-slide ${index % 2 ? 'is-back' : ''} ${on ? 'is-on' : ''}`}>
-              {item.type === 'video' && showVideo ? (
+              {/* A YouTube address plays in YouTube's player, whichever type it was saved as. */}
+              {isYouTube(item.url) ? (
+                <YouTubeBackground
+                  url={item.url}
+                  active={on}
+                  enabled={showVideo}
+                  onUnavailable={() => setUnplayable((list) => (list.includes(item.url) ? list : [...list, item.url]))}
+                />
+              ) : item.type === 'video' && showVideo ? (
                 <video className="h-full w-full object-cover" src={item.url} autoPlay muted loop playsInline preload="metadata" />
               ) : item.type === 'video' ? null : (
                 <img

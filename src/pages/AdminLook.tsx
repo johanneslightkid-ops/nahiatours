@@ -5,6 +5,7 @@ import { adminLang } from '../lib/adminNav';
 import { adminText, uploadAdminFile } from '../edt/adminUpload';
 import { apiGet, apiPut } from '../services/apiClient';
 import { defaultHeroMedia, HeroMediaItem, MAX_HERO_MEDIA } from '../services/brandService';
+import { isYouTube, youtubeId, youtubeThumb } from '../lib/youtube';
 import {
   DEFAULT_GALLERY_MOTION,
   GalleryMotion,
@@ -13,7 +14,43 @@ import {
   saveGalleryMotion,
 } from '../edt/galleryConfig';
 
-const isVideo = (url: string) => /\.(mp4|webm|mov)(\?|$)/i.test(url) || /\/video\/upload\//.test(url);
+/**
+ * Whether a pasted YouTube link can really play as the background: checked
+ * with YouTube itself (through /api/youtube?check=), so a private, deleted or
+ * embedding-forbidden video is caught here instead of leaving the home page
+ * without its video.
+ */
+const YouTubeLinkStatus: React.FC<{ url: string; say: (text: { en: string; es: string }) => string }> = ({ url, say }) => {
+  const id = youtubeId(url);
+  const [state, setState] = useState<{ id: string; ok: boolean; reason: string; title: string } | null>(null);
+  useEffect(() => {
+    if (!id) return undefined;
+    let alive = true;
+    setState(null);
+    const timer = window.setTimeout(() => {
+      fetch(`/api/youtube?check=${id}`)
+        .then((response) => response.json())
+        .then((result) => alive && setState(result))
+        .catch(() => undefined);
+    }, 400);
+    return () => {
+      alive = false;
+      window.clearTimeout(timer);
+    };
+  }, [id]);
+  if (!id) return null;
+  if (!state) return <p className="text-xs text-ink-soft">YouTube · {say({ en: 'checking the video…', es: 'comprobando el video…' })}</p>;
+  if (state.ok) return <p className="text-xs font-semibold text-jungle-dark">✓ YouTube{state.title ? ` · ${state.title}` : ''}</p>;
+  return (
+    <p className="rounded bg-hibiscus-light/30 px-2 py-1 text-xs font-semibold text-hibiscus-dark">
+      {state.reason === 'no-embed'
+        ? say({ en: 'Its owner does not allow this video on other websites, so it cannot play here. Choose another one.', es: 'Su autor no permite este video en otras webs, así que aquí no se puede reproducir. Elige otro.' })
+        : say({ en: 'This video is private, deleted or does not exist, so it cannot play. The home page shows its photos instead.', es: 'Este video es privado, se borró o no existe, así que no se puede reproducir. La portada muestra sus fotos en su lugar.' })}
+    </p>
+  );
+};
+
+const isVideo = (url: string) => /\.(mp4|webm|mov)(\?|$)/i.test(url) || /\/video\/upload\//.test(url) || isYouTube(url);
 
 /**
  * Admin → Look: what the home page opens with and how the galleries move.
@@ -158,8 +195,8 @@ const AdminLook: React.FC = () => {
           <h2 className="text-xl font-bold text-ink">{say({ en: 'Home page background', es: 'Fondo de la portada' })}</h2>
           <p className="mt-1 text-sm text-ink-soft">
             {say({
-              en: `Photographs and videos behind the big headline, shown one after another every 7 seconds (up to ${MAX_HERO_MEDIA}). One entry simply stays. Videos play muted and are only loaded on fast connections; landscape, at least 1600 px wide, works best.`,
-              es: `Fotos y videos detrás del gran titular, uno tras otro cada 7 segundos (hasta ${MAX_HERO_MEDIA}). Con uno solo, se queda fijo. Los videos se reproducen sin sonido y solo se cargan con buena conexión; mejor en horizontal y de al menos 1600 px de ancho.`,
+              en: `Photographs and videos behind the big headline, shown one after another every 7 seconds (up to ${MAX_HERO_MEDIA}). One entry simply stays. Videos play muted and are only loaded on fast connections; landscape, at least 1600 px wide, works best. A YouTube link works too (youtube.com/watch, youtu.be, Shorts): it plays muted and looping, and its still shows until it does.`,
+              es: `Fotos y videos detrás del gran titular, uno tras otro cada 7 segundos (hasta ${MAX_HERO_MEDIA}). Con uno solo, se queda fijo. Los videos se reproducen sin sonido y solo se cargan con buena conexión; mejor en horizontal y de al menos 1600 px de ancho. También sirve un enlace de YouTube (youtube.com/watch, youtu.be, Shorts): se reproduce sin sonido y en bucle, y mientras carga se ve su imagen fija.`,
             })}
           </p>
 
@@ -176,17 +213,20 @@ const AdminLook: React.FC = () => {
                 {slides.map((item, index) => (
                   <li key={`${index}-${item.url}`} className="overflow-hidden rounded-lg ring-1 ring-ink/10">
                     <div className="relative aspect-video bg-ink">
-                      {item.type === 'video' || isVideo(item.url) ? (
+                      {youtubeId(item.url) ? (
+                        <img src={youtubeThumb(youtubeId(item.url)!, 'hqdefault')} alt="" className="h-full w-full object-cover" />
+                      ) : item.type === 'video' || isVideo(item.url) ? (
                         <video src={item.url} muted playsInline loop autoPlay preload="metadata" className="h-full w-full object-cover" />
                       ) : (
                         <img src={item.url} alt="" className="h-full w-full object-cover" />
                       )}
                       <span className="absolute left-2 top-2 rounded bg-ink/80 px-2 py-0.5 text-xs font-bold text-white">
-                        {index + 1} · {item.type === 'video' ? 'Video' : say({ en: 'Photo', es: 'Foto' })}
+                        {index + 1} · {isYouTube(item.url) ? 'YouTube' : item.type === 'video' ? 'Video' : say({ en: 'Photo', es: 'Foto' })}
                       </span>
                     </div>
                     <div className="space-y-2 p-3">
                       <input className={field} value={item.url} onChange={(event) => setSlide(index, { url: event.target.value, type: isVideo(event.target.value) ? 'video' : item.type })} placeholder="https://…" />
+                      <YouTubeLinkStatus url={item.url} say={say} />
                       <input className={field} value={item.alt ?? ''} onChange={(event) => setSlide(index, { alt: event.target.value })} placeholder={say({ en: 'What it shows (for screen readers)', es: 'Qué muestra (para lectores de pantalla)' })} />
                       <div className="flex flex-wrap items-center gap-1.5">
                         <select className="rounded-md border border-ink/15 bg-white px-2 py-1.5 text-sm" value={item.type} onChange={(event) => setSlide(index, { type: event.target.value as HeroMediaItem['type'] })}>

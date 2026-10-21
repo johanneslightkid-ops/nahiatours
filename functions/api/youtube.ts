@@ -4,6 +4,9 @@
  *   GET  ?q=<tour words>&channel=<@handle | URL | UC…id>&shorts=1&max=12
  *        → { videos: Video[], source: 'api' | 'pages' }
  *   GET  ?status=1            → { hasKey }
+ *   GET  ?check=<video id>    → { id, ok, reason: '' | 'missing' | 'no-embed', title }
+ *        whether one video can play embedded on this site (the admin checks
+ *        a pasted hero-background link with it)
  *   PUT  { apiKey }  (admin)  → stores or clears the YouTube Data API key
  *
  * The order is the operator's brief: first the company's own channel — its
@@ -277,6 +280,22 @@ export const onRequest = async ({ request, env, waitUntil }: { request: Request;
   }
 
   if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405);
+
+  // One video: can it play embedded? YouTube's oEmbed says 401/403 when its owner
+  // forbids embedding, 404 when it is private, deleted or never existed.
+  const check = (url.searchParams.get('check') ?? '').trim();
+  if (check) {
+    if (!/^[A-Za-z0-9_-]{11}$/.test(check)) return json({ error: 'Not a YouTube video id' }, 400);
+    try {
+      const response = await fetch(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${check}`)}`);
+      const body = (response.ok ? await response.json().catch(() => ({})) : {}) as { title?: string };
+      const reason = response.ok ? '' : response.status === 401 || response.status === 403 ? 'no-embed' : response.status === 404 || response.status === 400 ? 'missing' : '';
+      return json({ id: check, ok: response.ok || !reason, reason, title: String(body.title ?? '') }, 200, { 'Cache-Control': 'public, max-age=3600' });
+    } catch {
+      // YouTube unreachable from here: no verdict, so no warning.
+      return json({ id: check, ok: true, reason: '', title: '' }, 200, { 'Cache-Control': 'no-store' });
+    }
+  }
 
   const key = await storedKey(env);
   if (url.searchParams.has('status')) return json({ hasKey: Boolean(key) }, 200, { 'Cache-Control': 'no-store' });
