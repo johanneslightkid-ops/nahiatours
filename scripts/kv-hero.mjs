@@ -5,8 +5,8 @@
 // only its heroMedia (plus the hero transition and seconds when unset).
 // Everything else in the record is written back exactly as read.
 //
-// Refuses unless the namespace is exclusive-tours-data and the record is
-// Exclusive Dominican Tours'. Saves the record before and after as an artifact,
+// Refuses unless the namespace is exclusive-tours-data and the value is a
+// brand record. Saves the record before and after as an artifact,
 // so the old value can be put back. Dry run unless KV_HERO_APPLY=1.
 import { mkdirSync, writeFileSync } from 'node:fs';
 
@@ -51,7 +51,11 @@ const read = async () => {
 const before = await read();
 writeFileSync(`${OUT}/brand-before.json`, JSON.stringify(before, null, 2));
 const record = before?.record ?? before;
-if (!/exclusive\s+dominican/i.test(String(record?.brandName ?? ''))) throw new Error(`Not Exclusive Dominican Tours' record: brandName ${JSON.stringify(record?.brandName)}`);
+// The namespace is what makes it this site's; the business may have been renamed
+// in the admin (it is "MyN Excursiones" now), so only check it is a brand record.
+if (!record || typeof record !== 'object' || typeof record.brandName !== 'string' || !('phoneNumber' in record)) {
+  throw new Error(`Not a brand record: ${JSON.stringify(record).slice(0, 200)}`);
+}
 console.log(`brand record of ${record.brandName}; heroMedia now: ${JSON.stringify(record.heroMedia)}`);
 
 const nextRecord = {
