@@ -46,6 +46,7 @@ export const WALLETS_BY_PROCESSOR: Record<string, WalletId[]> = {
   verifone: ['apple_pay', 'google_pay'],
   azul: [],
   cardnet: [],
+  mio: [],
 };
 
 export interface PaymentMethodState {

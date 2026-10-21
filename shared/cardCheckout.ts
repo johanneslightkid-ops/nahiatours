@@ -303,6 +303,7 @@ export const startWithProcessor = (
   if (processor === 'azul') return startAzul(env, secrets, booking, origin);
   if (processor === 'verifone') return startVerifone(env, secrets, booking, origin);
   if (processor === 'cardnet') return startCardnet(env, secrets, booking, origin, clientIp);
+  if (processor === 'mio') return startMio(env, secrets, booking, origin);
   return startStripe(env, secrets, booking, origin, wallet);
 };
 
@@ -323,6 +324,7 @@ export const startCardCheckout = async (
     azul: isAzulReady(secrets),
     cardnet: isCardnetReady(secrets),
     verifone: isVerifoneReady(secrets),
+    mio: isMioReady(secrets),
   };
   const processor = force ? (ready[force] ? force : null) : resolveCardProcessor(secrets);
   if (!processor) {

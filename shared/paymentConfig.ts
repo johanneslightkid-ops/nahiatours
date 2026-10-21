@@ -77,9 +77,9 @@ export type GatewayMode = 'test' | 'live';
  * is purely the operator's choice, made in the admin. 'auto' takes the first
  * one that is configured, in CARD_PROCESSOR_ORDER.
  */
-export type CardProcessor = 'stripe' | 'azul' | 'cardnet' | 'verifone';
+export type CardProcessor = 'stripe' | 'azul' | 'cardnet' | 'verifone' | 'mio';
 export type CardProcessorChoice = 'auto' | CardProcessor;
-export const CARD_PROCESSOR_ORDER: CardProcessor[] = ['stripe', 'azul', 'cardnet', 'verifone'];
+export const CARD_PROCESSOR_ORDER: CardProcessor[] = ['stripe', 'azul', 'cardnet', 'verifone', 'mio'];
 /** What a Dominican acquirer charges in. The catalogue itself is priced in USD. */
 export type LocalCurrency = 'USD' | 'DOP';
 
@@ -389,7 +389,7 @@ const normalize = (input: unknown): PaymentSecrets => {
   const choice = source.cardProcessor;
   return {
     cardProcessor:
-      choice === 'stripe' || choice === 'azul' || choice === 'cardnet' || choice === 'verifone'
+      choice === 'stripe' || choice === 'azul' || choice === 'cardnet' || choice === 'verifone' || choice === 'mio'
         ? choice
         : 'auto',
     stripeSecretKey: text(source.stripeSecretKey, 400),
@@ -544,6 +544,9 @@ export const processorReady = (secrets: PaymentSecrets): Record<CardProcessor, b
   azul: isAzulReady(secrets),
   cardnet: isCardnetReady(secrets),
   verifone: isVerifoneReady(secrets),
+  // MIO's checkout page takes Visa and Mastercard, so its API Checkout can be
+  // the card processor too — as well as the separate «MIO» method.
+  mio: isMioReady(secrets),
 });
 
 /**
@@ -571,6 +574,7 @@ export const CARD_WALLETS: Record<CardProcessor, Array<'apple_pay' | 'google_pay
   verifone: ['apple_pay', 'google_pay'],
   azul: [],
   cardnet: [],
+  mio: [],
 };
 
 /** What the chosen processor charges in, for showing a guest the amount before they leave. */
@@ -578,6 +582,7 @@ export const cardChargeCurrency = (secrets: PaymentSecrets, processor: CardProce
   if (processor === 'azul') return secrets.azulCurrency;
   if (processor === 'cardnet') return secrets.cardnetCurrency;
   if (processor === 'verifone') return secrets.verifoneCurrency;
+  if (processor === 'mio') return secrets.mioCurrency;
   return secrets.stripeCurrency.toUpperCase();
 };
 

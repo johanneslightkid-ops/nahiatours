@@ -57,6 +57,7 @@ const PROCESSOR_NAMES: Record<CardProcessor, string> = {
   azul: 'AZUL · Banco Popular',
   cardnet: 'CardNET',
   verifone: 'Verifone · 2Checkout',
+  mio: 'MIO · API Checkout',
 };
 
 /** CardNET publishes these for its certification lab. They only work in test mode. */
@@ -151,6 +152,7 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
     azul: status?.azul?.ready ?? false,
     cardnet: status?.cardnet?.ready ?? false,
     verifone: status?.verifone?.ready ?? false,
+    mio: status?.mio?.ready ?? false,
   };
   const methods = getPaymentMethodStates(
     brandSettings,
@@ -413,8 +415,8 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
           </label>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" role="radiogroup" aria-label="Procesador de tarjetas">
-          {(['auto', 'stripe', 'azul', 'cardnet', 'verifone'] as CardProcessorChoice[]).map((option) => {
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" role="radiogroup" aria-label="Procesador de tarjetas">
+          {(['auto', 'stripe', 'azul', 'cardnet', 'verifone', 'mio'] as CardProcessorChoice[]).map((option) => {
             const active = choice === option;
             const ready = option === 'auto' ? Boolean(status?.activeCardProcessor) : processorReady[option];
             return (

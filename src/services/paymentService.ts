@@ -49,7 +49,7 @@ export interface CheckoutResult {
 export type GatewayMode = 'test' | 'live';
 export type LocalCurrency = 'USD' | 'DOP';
 export type BankProvider = 'azul' | 'cardnet' | 'verifone';
-export type CardProcessor = 'stripe' | BankProvider;
+export type CardProcessor = 'stripe' | BankProvider | 'mio';
 export type CardProcessorChoice = 'auto' | CardProcessor;
 
 export interface PaymentConfigStatus {
