@@ -1,0 +1,31 @@
+# Takes the old company name (and its e-mail addresses) out of Exclusive
+# Dominican Tours' stored site pages and blog posts (exclusive-tours-data →
+# site-pages-*, blog-*). A snapshot of every record before and after is kept
+# as an artifact.
+name: KV rebrand
+
+on:
+  push:
+    branches: [claude/eager-edison-peyvhu]
+    paths: [.github/workflows/kv-rebrand.yml, scripts/kv-rebrand.mjs]
+
+jobs:
+  rebrand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+      KV_REBRAND_APPLY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/kv-rebrand.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kv-rebrand
+          path: kv-rebrand
+          retention-days: 90
