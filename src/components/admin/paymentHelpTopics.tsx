@@ -10,7 +10,7 @@ import { HelpTopic } from './PaymentHelpTour';
  * Their steps say so and link to where to ask.
  */
 
-export type HelpTopicId = 'stripe' | 'banks' | 'verifone' | 'paypal' | 'mio';
+export type HelpTopicId = 'stripe' | 'azul' | 'cardnet' | 'verifone' | 'paypal' | 'mio';
 
 const BCRD_RATE = { label: 'Tasa del dólar del Banco Central', url: 'https://www.bancentral.gov.do/a/d/2538-mercado-cambiario' };
 
@@ -72,26 +72,24 @@ export const PAYMENT_HELP: Record<HelpTopicId, HelpTopic> = {
     ],
   },
 
-  banks: {
-    title: 'AZUL y CardNET',
+  azul: {
+    title: 'AZUL',
     intro: (
       <>
         <p>
-          Ninguno de los dos bancos muestra estos datos en una página web: te los entrega el banco al firmar la
-          afiliación de <strong>comercio electrónico</strong> (no basta con tener un POS / verifone físico).
+          AZUL (Banco Popular) no muestra estos datos en una página web: te los entrega al firmar la afiliación de 
+          <strong>comercio electrónico</strong> (no basta con tener un POS físico).
         </p>
         <p>
-          1. Pide a tu ejecutivo de AZUL (Banco Popular) la <strong>«Página de Pagos»</strong>, o a CardNET el{' '}
-          <strong>«Botón de Pago»</strong>. Te enviarán por correo dos juegos de datos: uno de pruebas y otro de
-          producción.
+          1. Pide a tu ejecutivo de AZUL la <strong>«Página de Pagos»</strong>. Te enviarán por correo dos juegos de
+          datos: uno de pruebas y otro de producción.
         </p>
-        <p>2. Rellena solo el banco que tengas; el otro puede quedarse vacío.</p>
+        <p>2. Rellena aquí el juego que corresponda al modo elegido («Pruebas» o «Real»).</p>
       </>
     ),
     introLinks: [
       { label: 'AZUL · afiliación de comercio', url: 'https://www.azul.com.do' },
       { label: 'AZUL · documentación para desarrolladores', url: 'https://dev.azul.com.do' },
-      { label: 'CardNET · afiliación de comercio', url: 'https://www.cardnet.com.do' },
       BCRD_RATE,
     ],
     steps: [
@@ -148,6 +146,50 @@ export const PAYMENT_HELP: Record<HelpTopicId, HelpTopic> = {
         ),
       },
       {
+        target: 'azul.save',
+        title: 'Guardar',
+        body: <p>Pulsa «Guardar AZUL». Con todos los datos, la etiqueta pasa a <strong>lista</strong>. Prueba primero en modo «Pruebas».</p>,
+      },
+    ],
+  },
+
+  cardnet: {
+    title: 'CardNET',
+    intro: (
+      <>
+        <p>
+          CardNET no muestra estos datos en una página web: te los entrega al firmar la afiliación de 
+          <strong>comercio electrónico</strong> (no basta con tener un POS físico).
+        </p>
+        <p>
+          1. Pide a tu ejecutivo de CardNET el <strong>«Botón de Pago»</strong>. Te enviarán por correo los datos de
+          pruebas y los de producción.
+        </p>
+        <p>2. Para probar antes de tenerlos, elige «Pruebas» y usa el botón de los datos públicos del laboratorio.</p>
+      </>
+    ),
+    introLinks: [
+      { label: 'CardNET · afiliación de comercio', url: 'https://www.cardnet.com.do' },
+      BCRD_RATE,
+    ],
+    steps: [
+      {
+        target: 'banks.rate',
+        title: 'Tasa: pesos por dólar',
+        body: (
+          <p>
+            Cuántos pesos se cobran por cada dólar del catálogo, si el banco cobra en pesos. Usa la tasa de venta del
+            día del Banco Central o la de tu banco, por ejemplo <code>60.50</code>.
+          </p>
+        ),
+        link: BCRD_RATE,
+      },
+      {
+        target: 'banks.itbis',
+        title: 'ITBIS incluido',
+        body: <p>El porcentaje de ITBIS que ya llevan tus precios: 18 normalmente, 0 si el negocio está exento. Pregúntale a tu contador si dudas.</p>,
+      },
+      {
         target: 'cardnet.merchantNumber',
         title: 'CardNET · Número de afiliado',
         body: (
@@ -179,9 +221,9 @@ export const PAYMENT_HELP: Record<HelpTopicId, HelpTopic> = {
         body: <p>Tal como lo registró CardNET, hasta 40 caracteres en mayúsculas: nombre, ciudad y país (<code>DO</code>).</p>,
       },
       {
-        target: 'banks.save',
+        target: 'cardnet.save',
         title: 'Guardar',
-        body: <p>Pulsa «Guardar datos de los bancos». Cada banco que tenga todo lo necesario pasa a <strong>lista</strong>. Prueba primero en modo «Pruebas».</p>,
+        body: <p>Pulsa «Guardar CardNET». Con todos los datos, la etiqueta pasa a <strong>lista</strong>. Prueba primero en modo «Pruebas».</p>,
       },
     ],
   },
@@ -321,7 +363,7 @@ export const PAYMENT_HELP: Record<HelpTopicId, HelpTopic> = {
       {
         target: 'mio.currency',
         title: 'Moneda del cobro',
-        body: <p>Normalmente pesos (DOP). En pesos hace falta la tasa de cambio de la sección de AZUL y CardNET.</p>,
+        body: <p>Normalmente pesos (DOP). En pesos hace falta la «Tasa de cambio e ITBIS» de más arriba.</p>,
         link: BCRD_RATE,
       },
       {
