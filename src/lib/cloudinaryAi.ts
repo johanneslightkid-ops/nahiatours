@@ -44,9 +44,13 @@ const upload = async (file: Blob): Promise<string> => {
   return String(data.secure_url);
 };
 
-/** The address of the AI version of an uploaded image. Always PNG, to keep transparency. */
+/**
+ * The address of the AI version of an uploaded image. WebP at high quality:
+ * it keeps transparency like PNG, at a fraction of the size — a 4× upscale as
+ * PNG easily passes the 10 MB Cloudinary allows a derived image on most plans.
+ */
 export const aiVariantUrl = (secureUrl: string, effect: CloudinaryAiEffect) =>
-  secureUrl.replace('/image/upload/', `/image/upload/e_${effect}/f_png/`);
+  secureUrl.replace('/image/upload/', `/image/upload/e_${effect}/q_95,f_webp/`);
 
 const REFUSED: Record<number, string> = {
   400: 'Cloudinary no aplicó el efecto (puede que tu plan no lo incluya o que falten créditos).',
@@ -70,7 +74,11 @@ export const cloudinaryAi = async (
     const response = await fetch(url, { cache: 'no-store' }).catch(() => null);
     if (response?.ok) return response.blob();
     const status = response?.status ?? 0;
-    if (status !== 420 && status !== 423 && status !== 0) throw new Error(REFUSED[status] ?? `Cloudinary respondió ${status}.`);
+    if (status !== 420 && status !== 423 && status !== 0) {
+      // Cloudinary says why in a header it lets the page read.
+      const reason = response?.headers.get('x-cld-error') ?? '';
+      throw new Error(`${REFUSED[status] ?? `Cloudinary respondió ${status}.`}${reason ? ` (${reason})` : ''}`);
+    }
     if (Date.now() - started > 90_000) throw new Error('Cloudinary sigue procesando la imagen. Vuelve a intentarlo en un minuto.');
     await wait(2500);
   }
