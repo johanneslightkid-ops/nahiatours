@@ -1013,7 +1013,10 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
                         <span>configurada, pero apagada</span>
                       )
                     ) : (
-                      METHOD_LABELS[method].requirement
+                      <>
+                        {METHOD_LABELS[method].requirement}
+                        {state.enabled && <span className="text-mango-dark"> · se mostrará en cuanto esté configurada</span>}
+                      </>
                     )}
                   </div>
                 </div>
@@ -1022,7 +1025,6 @@ const PaymentSettingsPanel: React.FC<PaymentSettingsPanelProps> = ({ brandSettin
                     type="checkbox"
                     className="h-5 w-5 accent-lagoon-dark"
                     checked={state.enabled}
-                    disabled={!state.configured}
                     onChange={(event) => setBrandSettings(withPaymentMethodEnabled(brandSettings, method, event.target.checked))}
                   />
                   <span className="text-xs font-semibold text-ink-soft">Mostrar</span>
