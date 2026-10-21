@@ -1,8 +1,8 @@
 {
   "about": {
     "title": "Dein schönstes Reiseerlebnis beginnt hier",
-    "intro": "Bei {{brand}} ist es unsere Leidenschaft, deine Reiseträume in unvergessliche Erlebnisse zu verwandeln. Seit unserer Gründung im Jahr 2015 setzen wir alles daran, erstklassige touristische Leistungen mit persönlicher Note anzubieten.",
-    "body": "Von unserem Sitz in der wunderschönen Dominikanischen Republik aus haben wir uns auf **Ausflüge, Transfers, Hotels, Flüge und Kreuzfahrten** spezialisiert und bieten dir eine individuelle Betreuung für eine reibungslose und angenehme Reise von Anfang bis Ende.\n\nUnser Team zeichnet sich durch Liebe zum Detail, herausragenden Kundenservice und sorgfältig ausgewählte Erlebnisse aus – stets zu den besten Preisen am Markt. Ob du verborgene Schätze suchst oder einfach komfortabel reisen möchtest: {{brand}} ist dein verlässlicher Partner für die unvergesslichsten Abenteuer.",
+    "intro": "Bei {{name}} ist es unsere Leidenschaft, deine Reiseträume in unvergessliche Erlebnisse zu verwandeln. Seit unserer Gründung im Jahr 2015 setzen wir alles daran, erstklassige touristische Leistungen mit persönlicher Note anzubieten.",
+    "body": "Von unserem Sitz in der wunderschönen Dominikanischen Republik aus haben wir uns auf **Ausflüge, Transfers, Hotels, Flüge und Kreuzfahrten** spezialisiert und bieten dir eine individuelle Betreuung für eine reibungslose und angenehme Reise von Anfang bis Ende.\n\nUnser Team zeichnet sich durch Liebe zum Detail, herausragenden Kundenservice und sorgfältig ausgewählte Erlebnisse aus – stets zu den besten Preisen am Markt. Ob du verborgene Schätze suchst oder einfach komfortabel reisen möchtest: {{name}} ist dein verlässlicher Partner für die unvergesslichsten Abenteuer.",
     "vision": "Unvergessliche Reiseerlebnisse in der Dominikanischen Republik zu schaffen – mit einem persönlichen, zuverlässigen und hochwertigen Service, der die Erwartungen jedes Reisenden übertrifft, und mit Respekt vor unserer Kultur und unserer Natur.",
     "mission": "Das führende Incoming-Reiseunternehmen der Dominikanischen Republik zu werden – anerkannt für exzellenten Service, ständige Innovation und ein starkes Engagement für Nachhaltigkeit – und damit die erste Wahl für Reisende aus aller Welt.",
     "promises": [
@@ -57,7 +57,7 @@
     "whatsapp": "+1 (829) 783-8842",
     "phone2": "+1 (809) 982-6438",
     "mapUrl": "https://www.google.com/maps/search/?api=1&query=Punta+Cana+Dominican+Republic",
-    "intro": "Bereit für dein nächstes Karibikabenteuer? Ob du Fragen zu Touren, Transfers, Hotels oder sogar Kreuzfahrten hast – melde dich einfach. Bei {{brand}} behandeln wir jeden Reisenden wie Familie."
+    "intro": "Bereit für dein nächstes Karibikabenteuer? Ob du Fragen zu Touren, Transfers, Hotels oder sogar Kreuzfahrten hast – melde dich einfach. Bei {{name}} behandeln wir jeden Reisenden wie Familie."
   },
   "policies": [
     {

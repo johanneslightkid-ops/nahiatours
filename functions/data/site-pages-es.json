@@ -1,8 +1,8 @@
 {
   "about": {
     "title": "Tu mejor experiencia de viaje empieza aquí",
-    "intro": "En {{brand}} nos apasiona convertir tus sueños de viaje en experiencias inolvidables. Desde nuestra fundación en 2015, nos hemos comprometido a ofrecer servicios turísticos de la más alta calidad con un toque personal.",
-    "body": "Desde la hermosa República Dominicana, nos especializamos en **excursiones, traslados, hoteles, vuelos y cruceros**, con una atención a la medida para que tu viaje sea fluido y placentero de principio a fin.\n\nNuestro equipo se distingue por su atención al detalle, un servicio al cliente excepcional y experiencias cuidadosamente seleccionadas, siempre a los mejores precios del mercado. Ya sea que busques joyas escondidas o viajar con total comodidad, {{brand}} es tu aliado de confianza para vivir las aventuras más memorables.",
+    "intro": "En {{name}} nos apasiona convertir tus sueños de viaje en experiencias inolvidables. Desde nuestra fundación en 2015, nos hemos comprometido a ofrecer servicios turísticos de la más alta calidad con un toque personal.",
+    "body": "Desde la hermosa República Dominicana, nos especializamos en **excursiones, traslados, hoteles, vuelos y cruceros**, con una atención a la medida para que tu viaje sea fluido y placentero de principio a fin.\n\nNuestro equipo se distingue por su atención al detalle, un servicio al cliente excepcional y experiencias cuidadosamente seleccionadas, siempre a los mejores precios del mercado. Ya sea que busques joyas escondidas o viajar con total comodidad, {{name}} es tu aliado de confianza para vivir las aventuras más memorables.",
     "vision": "Ofrecer experiencias de viaje inolvidables en la República Dominicana a través de un servicio personalizado, confiable y de alta calidad que supere las expectativas de cada viajero, promoviendo a la vez el respeto por nuestra cultura y nuestro entorno natural.",
     "mission": "Convertirnos en la empresa líder de turismo receptivo en la República Dominicana, reconocida por la excelencia en el servicio, la innovación continua y un firme compromiso con la sostenibilidad: la opción preferida por viajeros de todo el mundo.",
     "promises": [
@@ -57,7 +57,7 @@
     "whatsapp": "+1 (829) 783-8842",
     "phone2": "+1 (809) 982-6438",
     "mapUrl": "https://www.google.com/maps/search/?api=1&query=Punta+Cana+Dominican+Republic",
-    "intro": "¿Listo para tu próxima aventura caribeña? Si tienes preguntas sobre tours, traslados, hoteles o incluso cruceros, solo escríbenos. En {{brand}} tratamos a cada viajero como de la familia."
+    "intro": "¿Listo para tu próxima aventura caribeña? Si tienes preguntas sobre tours, traslados, hoteles o incluso cruceros, solo escríbenos. En {{name}} tratamos a cada viajero como de la familia."
   },
   "policies": [
     {

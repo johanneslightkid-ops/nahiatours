@@ -1,8 +1,8 @@
 {
   "about": {
     "title": "Your best travel experience starts here",
-    "intro": "At {{brand}}, we’re passionate about turning your travel dreams into unforgettable experiences. Since our founding in 2015, we’ve been committed to delivering top-quality tourism services with a personal touch.",
-    "body": "Based in the beautiful Dominican Republic, we specialize in **excursions, transfers, hotels, flights and cruises**, offering tailored attention to ensure a smooth and enjoyable journey from start to finish.\n\nOur team stands out for its attention to detail, outstanding customer service and carefully curated experiences — always at the best market prices. Whether you’re seeking hidden gems or travelling in comfort, {{brand}} is your trusted partner for the most memorable adventures.",
+    "intro": "At {{name}}, we’re passionate about turning your travel dreams into unforgettable experiences. Since our founding in 2015, we’ve been committed to delivering top-quality tourism services with a personal touch.",
+    "body": "Based in the beautiful Dominican Republic, we specialize in **excursions, transfers, hotels, flights and cruises**, offering tailored attention to ensure a smooth and enjoyable journey from start to finish.\n\nOur team stands out for its attention to detail, outstanding customer service and carefully curated experiences — always at the best market prices. Whether you’re seeking hidden gems or travelling in comfort, {{name}} is your trusted partner for the most memorable adventures.",
     "vision": "To provide unforgettable travel experiences in the Dominican Republic through personalized, reliable and high-quality service that exceeds every traveller’s expectations, while promoting respect for our culture and natural environment.",
     "mission": "To become the leading inbound tourism company in the Dominican Republic, recognized for service excellence, continuous innovation and a strong commitment to sustainability — the preferred choice for travellers from around the world.",
     "promises": [
@@ -57,7 +57,7 @@
     "whatsapp": "+1 (829) 783-8842",
     "phone2": "+1 (809) 982-6438",
     "mapUrl": "https://www.google.com/maps/search/?api=1&query=Punta+Cana+Dominican+Republic",
-    "intro": "Ready for your next Caribbean adventure? Whether you have questions about tours, transfers, hotels or even cruises — just reach out. At {{brand}} we treat every traveller like family."
+    "intro": "Ready for your next Caribbean adventure? Whether you have questions about tours, transfers, hotels or even cruises — just reach out. At {{name}} we treat every traveller like family."
   },
   "policies": [
     {

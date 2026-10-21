@@ -1,8 +1,8 @@
 {
   "about": {
     "title": "Votre plus belle expérience de voyage commence ici",
-    "intro": "Chez {{brand}}, nous mettons toute notre passion à transformer vos rêves de voyage en expériences inoubliables. Depuis notre création en 2015, nous nous engageons à offrir des services touristiques de grande qualité, avec une attention toute personnelle.",
-    "body": "Installés dans la magnifique République dominicaine, nous sommes spécialisés dans les **excursions, transferts, hôtels, vols et croisières**, avec un accompagnement sur mesure pour que votre voyage se déroule en douceur et en toute sérénité, du début à la fin.\n\nNotre équipe se distingue par son souci du détail, un service client exceptionnel et des expériences soigneusement sélectionnées — toujours aux meilleurs prix du marché. Que vous partiez en quête de trésors cachés ou que vous souhaitiez voyager en tout confort, {{brand}} est votre partenaire de confiance pour des aventures inoubliables.",
+    "intro": "Chez {{name}}, nous mettons toute notre passion à transformer vos rêves de voyage en expériences inoubliables. Depuis notre création en 2015, nous nous engageons à offrir des services touristiques de grande qualité, avec une attention toute personnelle.",
+    "body": "Installés dans la magnifique République dominicaine, nous sommes spécialisés dans les **excursions, transferts, hôtels, vols et croisières**, avec un accompagnement sur mesure pour que votre voyage se déroule en douceur et en toute sérénité, du début à la fin.\n\nNotre équipe se distingue par son souci du détail, un service client exceptionnel et des expériences soigneusement sélectionnées — toujours aux meilleurs prix du marché. Que vous partiez en quête de trésors cachés ou que vous souhaitiez voyager en tout confort, {{name}} est votre partenaire de confiance pour des aventures inoubliables.",
     "vision": "Offrir des expériences de voyage inoubliables en République dominicaine grâce à un service personnalisé, fiable et de grande qualité, qui dépasse les attentes de chaque voyageur, tout en promouvant le respect de notre culture et de notre environnement naturel.",
     "mission": "Devenir l’entreprise de tourisme réceptif de référence en République dominicaine, reconnue pour l’excellence de son service, son innovation constante et son engagement fort en faveur du développement durable — le choix privilégié des voyageurs du monde entier.",
     "promises": [
@@ -57,7 +57,7 @@
     "whatsapp": "+1 (829) 783-8842",
     "phone2": "+1 (809) 982-6438",
     "mapUrl": "https://www.google.com/maps/search/?api=1&query=Punta+Cana+Dominican+Republic",
-    "intro": "Votre prochaine aventure dans les Caraïbes vous attend ! Une question sur les excursions, les transferts, les hôtels ou même les croisières ? Contactez-nous, tout simplement. Chez {{brand}}, nous accueillons chaque voyageur comme un membre de la famille."
+    "intro": "Votre prochaine aventure dans les Caraïbes vous attend ! Une question sur les excursions, les transferts, les hôtels ou même les croisières ? Contactez-nous, tout simplement. Chez {{name}}, nous accueillons chaque voyageur comme un membre de la famille."
   },
   "policies": [
     {

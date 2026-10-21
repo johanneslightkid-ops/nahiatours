@@ -11,6 +11,7 @@ import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import { PricingOption, Tour, perPersonTier } from '../../services/toursService';
 import AddToCartButton from '../cart/AddToCartButton';
 import PaymentDropdown from '../ui/PaymentDropdown';
+import { siteNames } from '../../utils/brandText';
 
 /**
  * Booking, beside the tour: the price per person, how many are coming, which
@@ -83,7 +84,8 @@ const BookingPanel: React.FC<Props> = ({ service, detailsPath, locale }) => {
 
   const reserveOnWhatsApp = () => {
     playClickFx();
-    const name = brandSettings.brandName;
+    // "Hello …!" greets the person guests write to.
+    const name = siteNames(brandSettings).contact;
     const english = [
       `Hello ${name}! I would like to book: ${service.title}`,
       `People: ${multi ? breakdown : persons}`,

@@ -40,6 +40,11 @@ export interface BrandSettings {
   /** The named person guests will speak with on WhatsApp and in the planner. */
   contactName: string;
   phoneNumber: string;
+  /**
+   * Which name the site uses where a sentence could take either the company's
+   * or the contact person's (src/utils/brandText.ts). Unset means the company.
+   */
+  namePreference?: 'brand' | 'contact';
   /** The address guests write to. Unset means the one stored with the site's contact page. */
   contactEmail?: string;
   /** Partner sites the footer sends guests to; unset or empty means "ask us on WhatsApp". */
@@ -180,6 +185,7 @@ const normalizeBrandSettings = (input: Partial<BrandSettings> | null | undefined
    * a dead one.
    */
   phoneNumber: typeof input?.phoneNumber === 'string' ? input.phoneNumber : '',
+  ...(input?.namePreference === 'brand' || input?.namePreference === 'contact' ? { namePreference: input.namePreference } : {}),
   ...(typeof input?.contactEmail === 'string' && input.contactEmail.trim() ? { contactEmail: input.contactEmail.trim() } : {}),
   // Unset keeps the site's own partner; set but empty means there is none.
   ...(typeof input?.partnerHotelsUrl === 'string' ? { partnerHotelsUrl: input.partnerHotelsUrl.trim() } : {}),

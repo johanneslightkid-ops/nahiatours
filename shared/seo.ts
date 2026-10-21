@@ -105,6 +105,8 @@ interface Brand {
   phoneNumber: string;
   brandicon: string;
   heroImage: string;
+  /** Which of the two names prose uses (src/utils/brandText.ts). */
+  namePreference: 'brand' | 'contact';
 }
 
 const readBrand = async (env: SeoEnv, origin: string): Promise<Brand> => {
@@ -118,6 +120,7 @@ const readBrand = async (env: SeoEnv, origin: string): Promise<Brand> => {
     phoneNumber: String(raw.phoneNumber ?? '').trim(),
     brandicon: String(raw.brandicon ?? '').trim(),
     heroImage,
+    namePreference: raw.namePreference === 'contact' ? 'contact' : 'brand',
   };
 };
 
@@ -181,16 +184,33 @@ interface Post {
   image: string;
 }
 
+/**
+ * The name tokens posts carry instead of a written-out name, filled in the way
+ * the app fills them (src/utils/brandText.ts): {{brand}} the company,
+ * {{contact}} the person, {{name}} whichever the admin prefers; each falls
+ * back to the other when it is not set.
+ */
+const fillNames = (text: string, brand: Brand) => {
+  const company = brand.brandName;
+  const person = brand.contactName || company;
+  const names: Record<string, string> = {
+    brand: company || person,
+    contact: person,
+    name: brand.namePreference === 'contact' ? person : company || person,
+  };
+  return text.replace(/\{\{\s*(brand|contact|name)\s*\}\}/g, (_token, key: string) => names[key]);
+};
+
 const readPosts = async (env: SeoEnv, origin: string, locale: Locale): Promise<Post[]> => {
-  const raw: any = await loadJson(env, origin, `blog-${locale}`);
+  const [raw, brand]: [any, Brand] = await Promise.all([loadJson(env, origin, `blog-${locale}`), readBrand(env, origin)]);
   const list = Array.isArray(raw) ? raw : Array.isArray(raw?.posts) ? raw.posts : [];
   return list
     .filter((post: any) => post?.visible !== false && post?.title)
     .map((post: any) => ({
-      title: String(post.title),
+      title: fillNames(String(post.title), brand),
       slug: String(post.slug ?? post.id ?? ''),
       date: String(post.date ?? ''),
-      caption: String(post.caption ?? post.prelude ?? ''),
+      caption: fillNames(String(post.caption ?? post.prelude ?? ''), brand),
       image: String((Array.isArray(post.images) ? post.images[0]?.url ?? post.images[0] : '') ?? ''),
     }))
     .sort((a: Post, b: Post) => b.date.localeCompare(a.date));

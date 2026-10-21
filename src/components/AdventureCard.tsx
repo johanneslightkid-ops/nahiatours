@@ -5,6 +5,7 @@ import { FaPlayCircle, FaMapPin, FaClock, FaUsers } from 'react-icons/fa';
 import { useBrand } from '../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
+import { siteNames } from '../utils/brandText';
 
 interface Adventure {
   id: string;
@@ -36,7 +37,7 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ adventure, onBook, index 
 
   const handleWhatsAppClick = () => {
     playClickFx();
-    const message = `Hola! Me gustaría más información sobre: ${adventure.title} con ${brandSettings.brandName}`;
+    const message = `Hola! Me gustaría más información sobre: ${adventure.title} con ${siteNames(brandSettings).name}`;
     window.open(generateWhatsAppMessage(whatsappPhone, message), '_blank');
   };
 

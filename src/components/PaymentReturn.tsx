@@ -17,6 +17,7 @@ import {
 import { answerAttempt, readPendingAttempt } from '../lib/paymentAttempt';
 import { clearCart, readCart } from '../lib/cart';
 import { track } from '../lib/activity';
+import { siteNames } from '../utils/brandText';
 
 /**
  * Where the guest lands after paying — or after not paying.
@@ -497,10 +498,10 @@ const PaymentReturn: React.FC = () => {
 
             <p className="mt-5 text-sm text-ink-soft">
               {L({
-                en: `We are now letting ${brandSettings.brandName} know on WhatsApp with your payment details.`,
-                es: `Ahora avisamos a ${brandSettings.brandName} por WhatsApp con los detalles de tu pago.`,
-                de: `Wir informieren jetzt ${brandSettings.brandName} per WhatsApp über Ihre Zahlung.`,
-                fr: `Nous prévenons maintenant ${brandSettings.brandName} sur WhatsApp avec les détails de votre paiement.`,
+                en: `We are now letting ${siteNames(brandSettings).contact} know on WhatsApp with your payment details.`,
+                es: `Ahora avisamos a ${siteNames(brandSettings).contact} por WhatsApp con los detalles de tu pago.`,
+                de: `Wir informieren jetzt ${siteNames(brandSettings).contact} per WhatsApp über Ihre Zahlung.`,
+                fr: `Nous prévenons maintenant ${siteNames(brandSettings).contact} sur WhatsApp avec les détails de votre paiement.`,
               })}
             </p>
 

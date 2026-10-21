@@ -22,6 +22,7 @@ import {
   searchArticles,
   snippetFor,
 } from '../lib/blogSearch';
+import { siteNames } from '../utils/brandText';
 
 type Sort = 'newest' | 'oldest' | 'az' | 'relevance';
 
@@ -389,7 +390,7 @@ const Blog = () => {
         image="/imgs/edt/dest/punta-cana-views.webp"
         kicker={localeText(locale, { en: 'Trip ideas', es: 'Ideas de viaje', de: 'Reiseideen', fr: 'Idées de voyage' })}
         title={<FormattedMessage id="blog.title" defaultMessage="Blog" />}
-        subtitle={<FormattedMessage id="blog.description" values={{ brand: brandSettings.brandName }} />}
+        subtitle={<FormattedMessage id="blog.description" values={{ brand: siteNames(brandSettings).name }} />}
         artLeft={<Toucan className="h-28 w-32 animate-bob" />}
         artRight={<PalmFrond className="h-32 w-32 animate-frond" />}
       />

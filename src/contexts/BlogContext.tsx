@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState, ReactNo
 import { useI18n } from './I18nContext';
 import { useBrand } from './BrandContext';
 import { BlogArticle, getBlogArticles } from '../services/blogService';
-import { applyBrandTokensDeep } from '../utils/brandText';
+import { applyBrandTokensDeep, siteNames } from '../utils/brandText';
 
 type Locale = 'en' | 'es' | 'de' | 'fr';
 
@@ -28,9 +28,10 @@ interface BlogProviderProps {
 
 export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
   const { locale } = useI18n();
-  // Articles carry {{brand}} rather than a hardcoded company name.
+  // Articles carry {{name}} / {{brand}} rather than a written-out company name.
   const { brandSettings } = useBrand();
-  const brandName = brandSettings.brandName;
+  const names = siteNames(brandSettings);
+  const namesKey = `${names.brand}|${names.contact}|${names.name}`;
   const [blogArticles, setBlogArticles] = useState<Partial<Record<Locale, BlogArticle[]>>>({ en: [], es: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -67,8 +68,9 @@ export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
   }, [locale]);
 
   const brandedArticles = useMemo(
-    () => applyBrandTokensDeep(blogArticles, brandName),
-    [blogArticles, brandName]
+    () => applyBrandTokensDeep(blogArticles, names),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [blogArticles, namesKey]
   );
 
   return (

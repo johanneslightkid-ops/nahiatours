@@ -197,13 +197,34 @@ const Admin: React.FC = () => {
                   placeholder="Número de teléfono"
                   className="rounded-2xl border border-ink/15 px-4 py-3"
                 />
-                <input
-                  type="text"
-                  value={brandSettings.contactName}
-                  onChange={(event) => setBrandSettings({ ...brandSettings, contactName: event.target.value })}
-                  placeholder="Nombre de la persona de contacto (WhatsApp)"
-                  className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
-                />
+                <label className="grid gap-1 text-sm font-semibold text-ink-soft">
+                  Persona de contacto
+                  <input
+                    type="text"
+                    value={brandSettings.contactName}
+                    onChange={(event) => setBrandSettings({ ...brandSettings, contactName: event.target.value })}
+                    placeholder="p. ej. María Pérez"
+                    className="rounded-2xl border border-ink/15 px-4 py-3 font-normal text-ink"
+                  />
+                  <span className="text-xs font-normal">Quien atiende a los clientes por WhatsApp y en el planificador.</span>
+                </label>
+                <label className="grid gap-1 text-sm font-semibold text-ink-soft">
+                  Nombre que usa la página
+                  <select
+                    value={brandSettings.namePreference ?? 'brand'}
+                    onChange={(event) => setBrandSettings({ ...brandSettings, namePreference: event.target.value as 'brand' | 'contact' })}
+                    className="rounded-2xl border border-ink/15 bg-white px-4 py-3 font-normal text-ink"
+                  >
+                    <option value="brand">El nombre del negocio</option>
+                    <option value="contact">El nombre de la persona de contacto</option>
+                  </select>
+                  <span className="text-xs font-normal">
+                    Para los textos generales (Nosotros, blog, preguntas frecuentes). Donde el contexto lo pide se usa el
+                    adecuado: las páginas legales y el copyright llevan el del negocio; los mensajes personales («te
+                    contactará personalmente», «¡Hola …!») el de la persona. Si uno de los dos falta, se usa el otro. En
+                    los artículos del blog puedes escribir {'{{name}}'}, {'{{brand}}'} o {'{{contact}}'}.
+                  </span>
+                </label>
                 <label className="grid gap-1 text-sm font-semibold text-ink-soft md:col-span-2">
                   Correo de contacto
                   <input
@@ -288,6 +309,10 @@ const Admin: React.FC = () => {
                 </p>
                 <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
                 <p><strong>Contacto:</strong> {brandSettings.contactName || '—'}</p>
+                <p>
+                  <strong>Nombre en la página:</strong>{' '}
+                  {brandSettings.namePreference === 'contact' ? 'el de la persona de contacto' : 'el del negocio'}
+                </p>
                 <p><strong>Correo:</strong> {brandSettings.contactEmail || 'el de la página de contacto'}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>
                 <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-lagoon-dark px-5 py-2 font-semibold text-white">

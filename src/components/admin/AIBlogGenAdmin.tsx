@@ -19,6 +19,7 @@ import { BLOG_TEMPLATES } from '../../lib/blogTemplates';
 import { getPublishedTestimonials } from '../../services/testimonialService';
 import { SHARE_TARGETS, shareTo, copyText, shareTargetFor } from '../../lib/socialShare';
 import ArticleBody from '../ui/ArticleBody';
+import { siteNames } from '../../utils/brandText';
 
 /**
  * The blog generator.
@@ -315,7 +316,7 @@ const AIBlogGenAdmin: React.FC = () => {
           voiceTranscript: notes,
           mediaBase64: firstImageBase64,
           images,
-          brandName: brandSettings.brandName,
+          brandName: siteNames(brandSettings).name,
           socialPlatforms: platforms,
           template,
           reviews: quoteReviews ? reviews : [],

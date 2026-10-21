@@ -3,6 +3,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { useBrand } from '../contexts/BrandContext';
 import { generateWhatsAppMessage } from '../utils/whatsapp';
 import { playClickFx, playHoverFx } from '../lib/soundEngine';
+import { siteNames } from '../utils/brandText';
 
 interface FABWhatsAppProps {
   phoneNumber?: string;
@@ -13,7 +14,8 @@ interface FABWhatsAppProps {
 const FABWhatsApp: React.FC<FABWhatsAppProps> = ({ phoneNumber, message }) => {
   const { brandSettings } = useBrand();
   const effectivePhone = phoneNumber || brandSettings.phoneNumber;
-  const brandName = brandSettings.brandName;
+  // "Los tours de …": the company's.
+  const brandName = siteNames(brandSettings).brand;
 
   // Built from the configured brand rather than hardcoded, so renaming the
   // company in the admin panel renames it here too.

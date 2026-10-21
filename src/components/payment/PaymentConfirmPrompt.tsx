@@ -10,6 +10,7 @@ import { shareToWhatsApp, usd } from '../../lib/cartSummary';
 import { getNotifyFlags } from '../../services/notifyService';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import PrePayDetails, { PrePayState, prePayProblem } from './PrePayDetails';
+import { siteNames } from '../../utils/brandText';
 
 /**
  * "Welcome back — did the payment go through?"
@@ -34,7 +35,8 @@ type Step = 'ask' | AttemptOutcome | 'sent';
 const PaymentConfirmPrompt: React.FC<Props> = ({ attempt, onSnooze, onClose }) => {
   const { brandSettings } = useBrand();
   const locale = attempt.locale || 'en';
-  const brand = brandSettings.brandName || localeText(locale, { en: 'the team', es: 'el equipo', de: 'das Team', fr: 'l’équipe' });
+  // "… will confirm your booking personally": the person, the company when there is none.
+  const brand = siteNames(brandSettings).contact || localeText(locale, { en: 'the team', es: 'el equipo', de: 'das Team', fr: 'l’équipe' });
   const [step, setStep] = useState<Step>('ask');
   const [answered, setAnswered] = useState<AttemptOutcome | null>(null);
   const [details, setDetails] = useState<PrePayState>({

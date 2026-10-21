@@ -12,6 +12,7 @@ import AddToCartButton from './cart/AddToCartButton';
 import { summariseDescription } from '../lib/cart';
 import { playClickFx } from '../lib/soundEngine';
 import { descriptionField, excerpt, includedItems, smallImage } from '../edt/useTours';
+import { siteNames } from '../utils/brandText';
 
 interface TourCardProps {
   image: string;
@@ -65,7 +66,7 @@ const TourCard: React.FC<TourCardProps> = ({
 }) => {
   const intl = useIntl();
   const { brandSettings } = useBrand();
-  const brandName = brandSettings.brandName;
+  const brandName = siteNames(brandSettings).name;
   const locale = (['es', 'de', 'fr'].includes(intl.locale) ? intl.locale : 'en') as Lang;
 
   // Everyone pays the same rate, so a tour has one price and the only thing

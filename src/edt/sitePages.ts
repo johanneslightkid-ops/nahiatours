@@ -3,16 +3,19 @@ import { apiGet, apiPut } from '../services/apiClient';
 import type { Locale } from '../contexts/I18nContext';
 import { useBrand } from '../contexts/BrandContext';
 import type { BrandSettings } from '../services/brandService';
+import { siteNames } from '../utils/brandText';
 
 /**
  * About, FAQ, contact details and the legal pages — the company's own copy,
  * one record per language (`site-pages-<locale>`). A language that has none
  * yet is served the English one by the data endpoint.
  *
- * The copy never spells out the company's name or address: it says {{brand}}
- * and {{email}}, and they are filled in from Admin › Marca as it is read — so
- * a new name or a new address is one change there, not one per paragraph in
- * four languages.
+ * The copy never spells out the company's name or address: the legal pages
+ * say {{brand}} (the company), the rest {{name}} (the company or the contact
+ * person, as Admin › Marca prefers — see src/utils/brandText.ts), and the
+ * address is {{email}}. They are filled in from the brand settings as the
+ * copy is read, so a new name or address is one change there, not one per
+ * paragraph in four languages.
  */
 export interface SitePolicy {
   slug: string;
@@ -96,7 +99,7 @@ export const useSitePages = (locale: Locale): SitePages | null => {
   return useMemo(() => {
     if (!pages) return null;
     const email = contactEmailOf(brandSettings, pages);
-    const filled = fill(pages, { brand: brandSettings.brandName.trim(), email });
+    const filled = fill(pages, { ...siteNames(brandSettings), email });
     return { ...filled, contact: { ...filled.contact, email } };
   }, [pages, brandSettings]);
 };

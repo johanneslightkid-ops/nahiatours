@@ -30,6 +30,7 @@ import { getPaymentMethodStates } from '../../utils/paymentMethods';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import PaymentDropdown from '../ui/PaymentDropdown';
 import PrePayDetails, { initialPrePay, PrePayState, prePayProblem } from '../payment/PrePayDetails';
+import { siteNames } from '../../utils/brandText';
 
 /**
  * The cart: everything a guest set aside, as a trip they can read at a
@@ -94,7 +95,8 @@ const CartView: React.FC<{ locale: string }> = ({ locale }) => {
   }, [removed]);
 
   const L = (texts: { en: string; es: string; de: string; fr: string }) => localeText(locale, texts);
-  const brand = brandSettings.brandName || L({ en: 'our team', es: 'nuestro equipo', de: 'unser Team', fr: 'notre équipe' });
+  // "… will get back to you personally": the person, the company when there is none.
+  const brand = siteNames(brandSettings).contact || L({ en: 'our team', es: 'nuestro equipo', de: 'unser Team', fr: 'notre équipe' });
   const total = cartTotal(items);
   const people = items.reduce((max, item) => Math.max(max, item.persons), 0);
   const seats = items.reduce((sum, item) => sum + item.persons, 0);
@@ -150,7 +152,7 @@ const CartView: React.FC<{ locale: string }> = ({ locale }) => {
   }, [items, locale]);
 
   const cartText = (intro: string) =>
-    buildCartText(items, locale, { intro, brandName: brandSettings.brandName, phone, guestName: details.name.trim() });
+    buildCartText(items, locale, { intro, brandName: siteNames(brandSettings).name, phone, guestName: details.name.trim() });
 
   const reserveUrl = generateWhatsAppMessage(
     phone,
