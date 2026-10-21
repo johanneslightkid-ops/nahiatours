@@ -28,7 +28,9 @@ import { verifyAdminRequest } from '../../shared/adminAuth';
  * model that has been retired is stepped over rather than fatal.
  */
 
-type Provider = 'gemini' | 'cloudflare' | 'openrouter';
+type Provider = 'gemini' | 'cloudflare' | 'openrouter' | 'openai';
+
+const PROVIDERS: Provider[] = ['cloudflare', 'gemini', 'openrouter', 'openai'];
 
 interface ProviderSettings {
   apiKey?: string;
@@ -40,6 +42,8 @@ interface AISettings {
   gemini?: ProviderSettings;
   cloudflare?: ProviderSettings;
   openrouter?: ProviderSettings;
+  /** ChatGPT's models, through OpenAI's own API (platform.openai.com). */
+  openai?: ProviderSettings;
   activeProvider?: Provider;
 }
 
@@ -51,6 +55,9 @@ interface AISettings {
  * has been retired too.
  */
 const FALLBACK_MODELS: Record<Provider, string[]> = {
+  // The small GPT-5 first (cheap, fast, writes well); the 4.1 and 4o minis for
+  // projects or accounts that have not been given it.
+  openai: ['gpt-5-mini', 'gpt-4.1-mini', 'gpt-4o-mini'],
   gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-1.5-flash'],
   openrouter: [
     'meta-llama/llama-3.3-70b-instruct:free',
@@ -105,6 +112,27 @@ const loadSettings = async (env: Record<string, any>): Promise<AISettings> => {
   } catch {
     return {};
   }
+};
+
+/**
+ * The saved settings with the panel's unsaved edits on top. The panel never
+ * sees a saved key (functions/api/ai-settings.ts blanks them), so an empty key
+ * in the edits means "the one on file", not "none".
+ */
+const mergeSettings = (saved: AISettings, edits: any): AISettings => {
+  if (!edits || typeof edits !== 'object') return saved;
+  const merged: AISettings = { ...saved, activeProvider: edits.activeProvider || saved.activeProvider };
+  for (const provider of PROVIDERS) {
+    const before = (saved as any)[provider] ?? {};
+    const after = edits[provider] ?? {};
+    (merged as any)[provider] = {
+      ...before,
+      ...(after.selectedModel ? { selectedModel: String(after.selectedModel) } : {}),
+      ...(provider === 'cloudflare' && typeof after.accountId === 'string' && after.accountId.trim() ? { accountId: after.accountId } : {}),
+      apiKey: String(after.apiKey ?? '').trim() || before.apiKey || '',
+    };
+  }
+  return merged;
 };
 
 /** Configured model first, then the fallbacks, without duplicates. */
@@ -266,6 +294,75 @@ const runOpenRouter = async (
   throw new Error('OpenRouter could not produce text.');
 };
 
+/** Reasoning models (GPT-5, o-series) take max_completion_tokens and no temperature. */
+const isReasoningModel = (model: string) => /^(gpt-5|o\d)/i.test(model);
+
+const runOpenAI = async (
+  config: ProviderSettings,
+  prompt: string,
+  system: string | undefined,
+  maxTokens: number,
+  temperature: number,
+  imageBase64: string | undefined,
+  attempts: Attempt[]
+): Promise<RunResult> => {
+  const key = config.apiKey?.trim();
+  if (!key) throw new Error('No OpenAI API key saved. Add one under AI settings.');
+
+  const userContent: any = imageBase64
+    ? [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: imageBase64 } },
+      ]
+    : prompt;
+  const messages: any[] = [];
+  if (system) messages.push({ role: 'system', content: system });
+  messages.push({ role: 'user', content: userContent });
+
+  // A reasoning model spends part of its token allowance thinking before it
+  // writes, so it gets room for that on top of the text asked for — otherwise a
+  // short request comes back empty.
+  const shapes = (model: string) => {
+    const classic = { model, messages, max_tokens: maxTokens, temperature };
+    const reasoning = { model, messages, max_completion_tokens: maxTokens + 4000, reasoning_effort: 'low' };
+    return isReasoningModel(model) ? [reasoning, classic] : [classic, reasoning];
+  };
+
+  for (const model of modelChain('openai', config.selectedModel)) {
+    for (const payload of shapes(model)) {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const data: any = await res.json();
+        const text = String(data.choices?.[0]?.message?.content || '').trim();
+        if (text) return { text, model };
+        attempts.push({
+          provider: 'openai',
+          model,
+          status: 200,
+          detail:
+            data.choices?.[0]?.finish_reason === 'length'
+              ? 'OpenAI ran out of tokens before writing anything.'
+              : 'OpenAI answered with an empty response.',
+        });
+        break;
+      }
+      const detail = await textOf(res);
+      attempts.push({ provider: 'openai', model, status: res.status, detail });
+      // A parameter this model does not take: the other request shape fits it.
+      if (res.status === 400 && /unsupported|max_tokens|max_completion_tokens|temperature|reasoning_effort/i.test(detail)) continue;
+      // A bad key or an empty balance fails the same way on every model.
+      if (!modelMightBeTheProblem(res.status, detail)) throw new Error('OpenAI could not produce text.');
+      break;
+    }
+  }
+
+  throw new Error('OpenAI could not produce text.');
+};
+
 const runCloudflare = async (
   env: Record<string, any>,
   config: ProviderSettings,
@@ -362,6 +459,22 @@ const listModels = async (provider: Provider, config: ProviderSettings) => {
       }));
   }
 
+  if (provider === 'openai') {
+    if (!config.apiKey) return [];
+    const res = await fetch('https://api.openai.com/v1/models', {
+      headers: { Authorization: `Bearer ${config.apiKey.trim()}` },
+    });
+    if (!res.ok) throw new Error(await textOf(res));
+    const data: any = await res.json();
+    // Only the models that write text in a chat; not audio, images, embeddings or moderation.
+    return (data.data || [])
+      .map((m: any) => String(m.id))
+      .filter((id: string) => /^(gpt-|chatgpt-|o\d)/i.test(id))
+      .filter((id: string) => !/audio|realtime|tts|transcribe|image|embedding|search|moderation|instruct|codex/i.test(id))
+      .sort((a: string, b: string) => b.localeCompare(a))
+      .map((id: string) => ({ id, name: id }));
+  }
+
   if (provider === 'openrouter') {
     const res = await fetch('https://openrouter.ai/api/v1/models', {
       headers: config.apiKey ? { Authorization: `Bearer ${config.apiKey.trim()}` } : {},
@@ -417,6 +530,9 @@ const explain = (provider: Provider, status: number | undefined, detail: string)
       ? 'Cloudflare rejected the account id or token saved under AI settings. Clear both to use this Worker\u2019s own Workers AI binding instead \u2014 it needs no credentials.'
       : `The ${provider} API key was rejected. Check it under AI settings, or switch the active provider to Cloudflare, which needs no key on this deployment.`;
   }
+  if (provider === 'openai' && /insufficient_quota|exceeded your current quota|billing/i.test(d)) {
+    return 'The OpenAI account has no credit for the API (a ChatGPT Plus subscription does not include it). Add a balance at platform.openai.com \u2192 Settings \u2192 Billing, then try again.';
+  }
   if (status === 429 || /quota|rate.?limit|too many requests|exceeded/i.test(d)) {
     return `${provider} is refusing further requests right now (quota or rate limit). Wait a few minutes, or switch the active provider under AI settings.`;
   }
@@ -448,6 +564,9 @@ const runProvider = async (
   if (provider === 'openrouter') {
     return runOpenRouter(config, prompt, system, maxTokens, temperature, image, origin, attempts);
   }
+  if (provider === 'openai') {
+    return runOpenAI(config, prompt, system, maxTokens, temperature, image, attempts);
+  }
   return runCloudflare(env, config, prompt, system, maxTokens, temperature, attempts);
 };
 
@@ -475,7 +594,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
     const saved = await loadSettings(env);
     // An override is accepted so the admin panel can test a key that has been
     // typed but not yet saved.
-    const settings: AISettings = { ...saved, ...(body.settings || {}) };
+    const settings: AISettings = mergeSettings(saved, body.settings);
     const provider: Provider = (body.provider || settings.activeProvider || 'cloudflare') as Provider;
     const config: ProviderSettings = (settings as any)[provider] || {};
 
@@ -497,7 +616,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
         ok: true,
         activeProvider: provider,
         binding: Boolean(env.AI),
-        providers: (['cloudflare', 'gemini', 'openrouter'] as Provider[]).map((name) => ({
+        providers: PROVIDERS.map((name) => ({
           provider: name,
           usable: providerIsUsable(name, settings, env),
           hasKey: Boolean(((settings as any)[name] as ProviderSettings)?.apiKey?.trim()),
@@ -529,7 +648,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
     //   the binding cannot see one, and quietly dropping the picture would be
     //   worse than saying so.
     const fallbackAllowed = body.allowFallback !== false;
-    const others = (['cloudflare', 'gemini', 'openrouter'] as Provider[]).filter(
+    const others = PROVIDERS.filter(
       (name) =>
         name !== provider &&
         providerIsUsable(name, settings, env) &&

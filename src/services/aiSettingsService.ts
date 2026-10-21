@@ -1,17 +1,36 @@
-import { ApiError, apiGet, apiPost, apiPut } from './apiClient';
+import { ApiError, apiPost } from './apiClient';
+import { getAdminPassword } from './authStore';
+
+export type AIProvider = 'gemini' | 'cloudflare' | 'openrouter' | 'openai';
 
 export interface AIProviderSettings {
+  /**
+   * A key being typed in. A saved key is never sent back to the browser
+   * (functions/api/ai-settings.ts), so this is empty for one on file; empty on
+   * save keeps it.
+   */
   apiKey: string;
   accountId?: string; // used for Cloudflare
   selectedModel: string;
+  /** A key is on file on the server. */
+  hasKey?: boolean;
+  /** Its last four characters, so the admin can tell which one it is. */
+  keyHint?: string;
+  /** Remove the key on file at the next save. */
+  clearKey?: boolean;
 }
 
 export interface AISettings {
   gemini: AIProviderSettings;
   cloudflare: AIProviderSettings;
   openrouter: AIProviderSettings;
-  activeProvider: 'gemini' | 'cloudflare' | 'openrouter';
+  /** ChatGPT, through OpenAI's own API. */
+  openai: AIProviderSettings;
+  activeProvider: AIProvider;
 }
+
+/** A key the provider can be called with: typed in now, or on file. */
+export const hasUsableKey = (provider: AIProviderSettings) => Boolean(provider.apiKey.trim() || (provider.hasKey && !provider.clearKey));
 
 /**
  * Cloudflare is the default provider, and the defaults below are models that
@@ -31,6 +50,7 @@ const defaultAISettings: AISettings = {
   gemini: { apiKey: '', selectedModel: 'gemini-2.5-flash' },
   cloudflare: { apiKey: '', accountId: '', selectedModel: '@cf/meta/llama-3.1-8b-instruct-fp8' },
   openrouter: { apiKey: '', selectedModel: 'meta-llama/llama-3.3-70b-instruct:free' },
+  openai: { apiKey: '', selectedModel: 'gpt-5-mini' },
   activeProvider: 'cloudflare',
 };
 
@@ -49,34 +69,52 @@ const normalizeAISettings = (input: unknown): AISettings => {
   
   // A retired model saved months ago is silently upgraded rather than left to
   // 404 on the next click.
-  const migrate = (provider: AIProviderSettings): AIProviderSettings => ({
+  const migrate = (provider: AIProviderSettings, fallback: AIProviderSettings): AIProviderSettings => ({
     ...provider,
-    selectedModel: RETIRED_MODELS[provider.selectedModel] || provider.selectedModel,
+    selectedModel: RETIRED_MODELS[provider.selectedModel] || provider.selectedModel || fallback.selectedModel,
   });
 
   return {
     ...defaultAISettings,
     ...(data as Partial<AISettings>),
-    gemini: migrate({ ...defaultAISettings.gemini, ...(data as any).gemini }),
-    cloudflare: migrate({ ...defaultAISettings.cloudflare, ...(data as any).cloudflare }),
-    openrouter: migrate({ ...defaultAISettings.openrouter, ...(data as any).openrouter }),
+    gemini: migrate({ ...defaultAISettings.gemini, ...(data as any).gemini }, defaultAISettings.gemini),
+    cloudflare: migrate({ ...defaultAISettings.cloudflare, ...(data as any).cloudflare }, defaultAISettings.cloudflare),
+    openrouter: migrate({ ...defaultAISettings.openrouter, ...(data as any).openrouter }, defaultAISettings.openrouter),
+    openai: migrate({ ...defaultAISettings.openai, ...(data as any).openai }, defaultAISettings.openai),
   };
 };
 
+const settingsRequest = async (method: 'GET' | 'PUT', body?: unknown) => {
+  const response = await fetch('/api/ai-settings', {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'X-Admin-Password': getAdminPassword() ?? '',
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+    cache: 'no-store',
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new ApiError(`AI settings ${method} failed with status ${response.status}`, response.status, data);
+  return data;
+};
+
+/** The settings, with any saved key blanked: only whether one is on file comes back. */
 export const getAISettings = async (): Promise<AISettings> => {
   try {
-    const data = await apiGet<unknown>('ai-settings');
-    return normalizeAISettings(data);
+    return normalizeAISettings(await settingsRequest('GET'));
   } catch (error) {
     console.warn('Failed to fetch AI settings, returning defaults:', error);
     return defaultAISettings;
   }
 };
 
+/** Saves, and answers with the settings as stored (keys blanked again). */
 export const saveAISettings = async (settings: AISettings): Promise<AISettings> => {
   try {
-    await apiPut<unknown>('ai-settings', settings);
-    return settings;
+    const data = await settingsRequest('PUT', settings);
+    return normalizeAISettings(data.settings);
   } catch (error) {
     console.error('Error saving AI settings:', error);
     throw error;
@@ -102,7 +140,7 @@ export interface AIModel {
  * typed but not yet saved.
  */
 export const fetchModels = async (
-  provider: 'gemini' | 'cloudflare' | 'openrouter',
+  provider: AIProvider,
   settings?: AISettings
 ): Promise<AIModel[]> => {
   try {

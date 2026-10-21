@@ -361,7 +361,7 @@ const AIBlogGenAdmin: React.FC = () => {
   );
 
   const providerLabel = aiSettings
-    ? { cloudflare: 'Cloudflare Workers AI', gemini: 'Google Gemini', openrouter: 'OpenRouter' }[
+    ? { cloudflare: 'Cloudflare Workers AI', gemini: 'Google Gemini', openrouter: 'OpenRouter', openai: 'ChatGPT (OpenAI)' }[
         aiSettings.activeProvider
       ]
     : '…';
@@ -432,7 +432,7 @@ const AIBlogGenAdmin: React.FC = () => {
           <p className="text-sm font-bold text-ink">Ningún proveedor de IA está listo</p>
           <p className="mt-1 text-sm text-ink-soft">
             Esta instalación no tiene el binding de Workers AI ni una clave guardada. Abre
-            “Integraciones de IA” y pega una clave de Gemini o de OpenRouter — o vuelve a
+            “Integraciones de IA” y pega una clave de ChatGPT (OpenAI), Gemini o OpenRouter — o vuelve a
             desplegar el sitio, que es lo que concede el binding de Cloudflare y no necesita
             ninguna clave.
           </p>

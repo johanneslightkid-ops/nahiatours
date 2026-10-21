@@ -543,7 +543,7 @@ export const probeProvider = async (
 
 /** One provider, and whether this deployment could actually call it. */
 export interface ProviderStatus {
-  provider: 'cloudflare' | 'gemini' | 'openrouter';
+  provider: 'cloudflare' | 'gemini' | 'openrouter' | 'openai';
   usable: boolean;
   hasKey: boolean;
   model: string;
