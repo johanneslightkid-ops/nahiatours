@@ -71,7 +71,11 @@ export interface BrandSettings {
    * site's own default (src/config/siteDefaults.ts, read via lib/brandDisplay).
    */
   showBrandName?: boolean;
+  /** How that name is written: 'upper' in capitals, 'asis' exactly as entered. */
+  brandNameCase?: BrandNameCase;
 }
+
+export type BrandNameCase = 'upper' | 'asis';
 
 /**
  * NOTE: there is deliberately no `stripeSecretKey` here.
@@ -181,6 +185,7 @@ const normalizeBrandSettings = (input: Partial<BrandSettings> | null | undefined
   heroRatingEnabled: typeof input?.heroRatingEnabled === 'boolean' ? input.heroRatingEnabled : true,
   heroRatingRange: normalizeHeroRatingRange(input?.heroRatingRange),
   ...(typeof input?.showBrandName === 'boolean' ? { showBrandName: input.showBrandName } : {}),
+  ...(input?.brandNameCase === 'upper' || input?.brandNameCase === 'asis' ? { brandNameCase: input.brandNameCase } : {}),
 });
 
 export const getBrandSettings = async (): Promise<BrandSettings> => {

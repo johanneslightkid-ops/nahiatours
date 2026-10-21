@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { getBrandSettings, saveBrandSettings, BrandSettings, uploadBrandIcon } from '../services/brandService';
-import { showsBrandName } from '../lib/brandDisplay';
+import { brandNameStyle } from '../lib/brandDisplay';
 import BrandIconEditor from '../components/admin/BrandIconEditor';
 import { getTours, saveTours, Tour } from '../services/toursService';
 import { useI18n } from '../contexts/I18nContext';
@@ -170,14 +170,24 @@ const Admin: React.FC = () => {
                   placeholder="Nombre del negocio"
                   className="rounded-2xl border border-ink/15 px-4 py-3"
                 />
-                <label className="flex items-center gap-3 rounded-2xl border border-ink/15 px-4 py-3 text-sm font-semibold text-ink-soft md:col-span-2">
-                  <input
-                    type="checkbox"
-                    checked={showsBrandName(brandSettings)}
-                    onChange={(event) => setBrandSettings({ ...brandSettings, showBrandName: event.target.checked })}
-                    className="h-4 w-4"
-                  />
-                  Mostrar el nombre del negocio junto al logo, en la barra de navegación
+                <label className="flex flex-wrap items-center gap-3 rounded-2xl border border-ink/15 px-4 py-3 text-sm font-semibold text-ink-soft md:col-span-2">
+                  <span>Nombre junto al logo (barra de navegación y pie de página)</span>
+                  <select
+                    value={brandNameStyle(brandSettings)}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setBrandSettings({
+                        ...brandSettings,
+                        showBrandName: value !== 'hidden',
+                        ...(value === 'hidden' ? {} : { brandNameCase: value as 'upper' | 'asis' }),
+                      });
+                    }}
+                    className="rounded-xl border border-ink/15 bg-white px-3 py-2 text-sm text-ink"
+                  >
+                    <option value="upper">En mayúsculas</option>
+                    <option value="asis">Tal como está escrito</option>
+                    <option value="hidden">Oculto (solo el logo)</option>
+                  </select>
                 </label>
                 <input
                   type="text"
@@ -237,7 +247,10 @@ const Admin: React.FC = () => {
                   <span className="text-sm font-semibold text-ink-soft">Icono del menú, arriba a la izquierda</span>
                 </div>
                 <p><strong>Negocio:</strong> {brandSettings.brandName}</p>
-                <p><strong>Nombre junto al logo:</strong> {showsBrandName(brandSettings) ? 'visible' : 'oculto'}</p>
+                <p>
+                  <strong>Nombre junto al logo:</strong>{' '}
+                  {{ upper: 'en mayúsculas', asis: 'tal como está escrito', hidden: 'oculto' }[brandNameStyle(brandSettings)]}
+                </p>
                 <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
                 <p><strong>Contacto:</strong> {brandSettings.contactName || '—'}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>

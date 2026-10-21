@@ -2,19 +2,24 @@ import React, { useEffect, useState } from 'react';
 import type { IconType } from 'react-icons';
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTiktok, FaTripadvisor, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { useBrand } from '../../contexts/BrandContext';
-import { showsBrandName } from '../../lib/brandDisplay';
+import { brandNameStyle } from '../../lib/brandDisplay';
 import { getSocialMediaData, SocialMediaAccount } from '../../services/socialMediaService';
 
 /** The company's own mark, as it ships with the site. */
 export const DEFAULT_MARK = '/imgs/edt/brand/mark.webp';
+/** The name the horizontal logo spells out. */
+const OWN_NAME = 'exclusive dominican tours';
 const WIDE = '/imgs/edt/brand/logo-wide.webp';
 const WIDE_WHITE = '/imgs/edt/brand/logo-wide-white.webp';
 
 /**
- * The logo. With the company's own mark it is their full horizontal logo —
- * swoosh and wordmark — in colour, or in white on a photograph. An operator
- * who uploads a different icon gets that icon with the brand name beside it;
- * hiding the name in the admin leaves the icon alone.
+ * The logo, with the name beside it as the admin set it (Marca → "Nombre junto
+ * al logo"): in capitals, exactly as entered, or hidden — the icon alone.
+ *
+ * In capitals, with the company's own mark and the company's own name, it is
+ * their full horizontal logo — swoosh and wordmark — in colour, or in white on
+ * a photograph, since that wordmark is the name in capitals. A different name,
+ * or the name as entered, is written out beside the icon.
  */
 export const BrandLogo: React.FC<{ tone?: 'colour' | 'white'; className?: string; size?: 'sm' | 'md' | 'lg' }> = ({
   tone = 'colour',
@@ -24,10 +29,11 @@ export const BrandLogo: React.FC<{ tone?: 'colour' | 'white'; className?: string
   const { brandSettings } = useBrand();
   const icon = brandSettings.brandicon || DEFAULT_MARK;
   const own = icon === DEFAULT_MARK;
-  const withName = showsBrandName(brandSettings);
+  const style = brandNameStyle(brandSettings);
+  const withName = style !== 'hidden' && Boolean(brandSettings.brandName.trim());
   const height = size === 'lg' ? 'h-14' : size === 'sm' ? 'h-9' : 'h-11';
 
-  if (own && withName) {
+  if (own && style === 'upper' && brandSettings.brandName.trim().toLowerCase() === OWN_NAME) {
     return (
       <img
         src={tone === 'white' ? WIDE_WHITE : WIDE}
@@ -41,7 +47,11 @@ export const BrandLogo: React.FC<{ tone?: 'colour' | 'white'; className?: string
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <img src={icon} alt={withName ? '' : brandSettings.brandName} className={`${height} w-auto select-none`} draggable={false} />
       {withName && (
-        <span className={`max-w-[12rem] font-display text-lg uppercase leading-none ${tone === 'white' ? 'text-white' : 'text-ink'}`}>
+        <span
+          className={`max-w-[12rem] font-display text-lg leading-none ${tone === 'white' ? 'text-white' : 'text-ink'}`}
+          // .font-display sets capitals for every headline; "as entered" overrides it here.
+          style={{ textTransform: style === 'upper' ? 'uppercase' : 'none' }}
+        >
           {brandSettings.brandName}
         </span>
       )}
