@@ -139,12 +139,14 @@
     </script>
 <!-- seo:end -->
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <!-- Icons and manifest: the Worker answers these from the logo and name in
+         Admin › Marca (shared/seo.ts brandAssetResponse); the files in public/
+         are the neutral ones for a site with no logo yet. -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Performance: preconnect to the services the app actually calls -->
     <link rel="preconnect" href="https://res.cloudinary.com" />
@@ -152,7 +154,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://res.cloudinary.com" />
 
-    <!-- Exclusive Dominican Tours' type: Anton (condensed display, set big
+    <!-- The site's type: Anton (condensed display, set big
          and tight on photographs), Barlow for reading, Barlow Condensed for
          labels and buttons, Cormorant Garamond italic for the small luxury
          notes. Linked here rather than @imported from the stylesheet, so the

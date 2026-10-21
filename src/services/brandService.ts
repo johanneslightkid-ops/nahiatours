@@ -40,6 +40,11 @@ export interface BrandSettings {
   /** The named person guests will speak with on WhatsApp and in the planner. */
   contactName: string;
   phoneNumber: string;
+  /** The address guests write to. Unset means the one stored with the site's contact page. */
+  contactEmail?: string;
+  /** Partner sites the footer sends guests to; unset or empty means "ask us on WhatsApp". */
+  partnerHotelsUrl?: string;
+  partnerFlightsUrl?: string;
   paypalMeLink: string;
   /**
    * A hosted card page the operator pasted in — their own Stripe Payment Link,
@@ -175,6 +180,10 @@ const normalizeBrandSettings = (input: Partial<BrandSettings> | null | undefined
    * a dead one.
    */
   phoneNumber: typeof input?.phoneNumber === 'string' ? input.phoneNumber : '',
+  ...(typeof input?.contactEmail === 'string' && input.contactEmail.trim() ? { contactEmail: input.contactEmail.trim() } : {}),
+  // Unset keeps the site's own partner; set but empty means there is none.
+  ...(typeof input?.partnerHotelsUrl === 'string' ? { partnerHotelsUrl: input.partnerHotelsUrl.trim() } : {}),
+  ...(typeof input?.partnerFlightsUrl === 'string' ? { partnerFlightsUrl: input.partnerFlightsUrl.trim() } : {}),
   paypalMeLink: typeof input?.paypalMeLink === 'string' ? input.paypalMeLink : '',
   verifoneLink: typeof input?.verifoneLink === 'string' ? input.verifoneLink : '',
   azulLink: typeof input?.azulLink === 'string' ? input.azulLink.trim() : '',

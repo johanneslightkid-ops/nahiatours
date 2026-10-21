@@ -1,10 +1,10 @@
 {
-  "brandName": "Exclusive Dominican Tours",
+  "brandName": "MyN Excursiones",
   "contactName": "",
   "phoneNumber": "+1 (829) 783-8842",
   "paypalMeLink": "",
   "verifoneLink": "",
-  "brandicon": "/imgs/edt/brand/mark.webp",
+  "brandicon": "https://res.cloudinary.com/dkxlhxpe4/image/upload/v1792552944/brand-icons/bf8zdtazh56sw9wy20lc.png",
   "heroMedia": [
     {
       "url": "/imgs/edt/banners/hero-palm-beach.webp",
@@ -66,5 +66,6 @@
   "heroRatingRange": {
     "min": 3,
     "max": 5
-  }
+  },
+  "showBrandName": false
 }

@@ -679,6 +679,61 @@ export const withPageSeo = async (request: Request, response: Response, env: Seo
   }
 };
 
+/* ── The tab icon, the home-screen icon and the web app manifest ────────── */
+
+/** Each icon a browser asks for, and the square it should be. */
+const ICONS: Record<string, { size: number; background?: string }> = {
+  '/favicon.ico': { size: 48 },
+  '/favicon.svg': { size: 64 },
+  '/favicon-16x16.png': { size: 16 },
+  '/favicon-32x32.png': { size: 32 },
+  // iOS paints a transparent home-screen icon black, so that one gets a white ground.
+  '/apple-touch-icon.png': { size: 180, background: 'white' },
+  '/android-chrome-192x192.png': { size: 192 },
+  '/android-chrome-512x512.png': { size: 512 },
+};
+
+const CLOUDINARY_IMAGE = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.+)$/;
+
+/**
+ * The icons and the manifest follow the logo and the name set in Admin › Marca,
+ * so a new brand is a new tab icon and a new home-screen name without a
+ * deploy. A Cloudinary logo is cut to each square on the way out (padded, not
+ * cropped: a wide logo stays whole); any other logo is sent as it is; with no
+ * logo, the neutral icons that ship with the site. Null for any other address.
+ */
+export const brandAssetResponse = async (env: SeoEnv, url: URL): Promise<Response | null> => {
+  const icon = ICONS[url.pathname];
+  if (!icon && url.pathname !== '/site.webmanifest') return null;
+  const origin = siteOrigin(env, url);
+  const brand = await readBrand(env, origin);
+
+  if (icon) {
+    if (!brand.brandicon) return null; // the file in public/
+    const cloud = CLOUDINARY_IMAGE.exec(brand.brandicon);
+    const target = cloud
+      ? `${cloud[1]}c_pad,w_${icon.size},h_${icon.size}${icon.background ? `,b_${icon.background}` : ''}/f_png/${cloud[2]}`
+      : absolute(origin, brand.brandicon);
+    return new Response(null, { status: 302, headers: { Location: target, 'Cache-Control': 'public, max-age=3600' } });
+  }
+
+  const name = brand.brandName;
+  const manifest = {
+    name,
+    short_name: name.length <= 12 ? name : name.split(/\s+/)[0].slice(0, 12),
+    icons: [
+      { src: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    theme_color: '#14161A',
+    background_color: '#F7F4EE',
+    display: 'standalone',
+  };
+  return new Response(JSON.stringify(manifest), {
+    headers: { 'Content-Type': 'application/manifest+json; charset=utf-8', 'Cache-Control': 'public, max-age=3600' },
+  });
+};
+
 /* ── /sitemap.xml and /robots.txt ──────────────────────────────────────── */
 
 export const sitemapResponse = async (env: SeoEnv, url: URL): Promise<Response> => {

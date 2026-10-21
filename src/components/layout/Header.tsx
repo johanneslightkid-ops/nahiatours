@@ -17,6 +17,7 @@ import { getAdminPassword, clearAdminPassword } from '../../services/authStore';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
 import { BrandLogo, CONTACT, SocialIcons } from '../edt/brand';
 import PlannerBarControls from '../edt/PlannerBarControls';
+import { useSitePages } from '../../edt/sitePages';
 
 /**
  * A thin black line of contact details, and under it the bar: clear over the
@@ -142,6 +143,7 @@ const MobileMenu: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 const Header: React.FC = () => {
   const { brandSettings } = useBrand();
   const { locale } = useI18n();
+  const contactEmail = useSitePages(locale)?.contact.email || brandSettings.contactEmail || '';
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -187,7 +189,11 @@ const Header: React.FC = () => {
           title={brandSettings.brandName}
           className="fixed left-2 top-1.5 z-[60] grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-white no-underline ring-2 ring-ink/10"
         >
-          <img src={brandSettings.brandicon || '/imgs/edt/brand/mark.webp'} alt="" className="h-7 w-7 object-contain" />
+          {brandSettings.brandicon ? (
+            <img src={brandSettings.brandicon} alt="" className="h-7 w-7 object-contain" />
+          ) : (
+            <span className="font-display text-sm text-ink">{brandSettings.brandName.trim().charAt(0)}</span>
+          )}
         </Link>
         <header className="lobster-header sticky top-0 z-50">
           <nav className="flex items-center gap-2 py-1.5 pl-14 pr-2">
@@ -221,9 +227,11 @@ const Header: React.FC = () => {
           <div className="section-shell flex h-9 items-center justify-between text-[0.8rem] font-medium">
             <div className="flex items-center gap-6">
               <span className="inline-flex items-center gap-1.5"><HiOutlineLocationMarker className="h-3.5 w-3.5 text-gold" /> {CONTACT.address}</span>
-              <a href={`mailto:${CONTACT.email}`} className="inline-flex items-center gap-1.5 font-medium text-paper/80 no-underline hover:text-mango-light">
-                <HiOutlineMail className="h-3.5 w-3.5 text-gold" /> {CONTACT.email}
-              </a>
+              {contactEmail && (
+                <a href={`mailto:${contactEmail}`} className="inline-flex items-center gap-1.5 font-medium text-paper/80 no-underline hover:text-mango-light">
+                  <HiOutlineMail className="h-3.5 w-3.5 text-gold" /> {contactEmail}
+                </a>
+              )}
               {brandSettings.phoneNumber && (
                 <span className="inline-flex items-center gap-1.5"><HiPhone className="h-3.5 w-3.5 text-gold" /> {brandSettings.phoneNumber}</span>
               )}

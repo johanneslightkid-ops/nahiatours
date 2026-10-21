@@ -51,7 +51,7 @@ import { onRequest as handleSendSummary } from '../functions/api/send-summary';
 import { onRequest as handleYoutube } from '../functions/api/youtube';
 import { onRequest as handleTrash } from '../functions/api/trash';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
-import { robotsResponse, sitemapResponse, withPageSeo } from '../shared/seo';
+import { brandAssetResponse, robotsResponse, sitemapResponse, withPageSeo } from '../shared/seo';
 
 export interface Env {
   /** Static assets binding, declared in wrangler.toml. */
@@ -165,6 +165,9 @@ export default {
     // at once, and both always name the site's own address (SITE_URL).
     if (url.pathname === '/sitemap.xml') return withPreviewHeaders(await sitemapResponse(env, url), url.hostname, env);
     if (url.pathname === '/robots.txt') return robotsResponse(env, url);
+    // The tab and home-screen icons and the manifest follow Admin › Marca.
+    const brandAsset = await brandAssetResponse(env, url).catch(() => null);
+    if (brandAsset) return brandAsset;
 
     const serveAsset = () => env.ASSETS.fetch(request);
     const waitUntil = ctx ? (promise: Promise<unknown>) => ctx.waitUntil(promise) : undefined;

@@ -543,7 +543,7 @@ const AdminInspire: React.FC = () => {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <label className="text-xs font-semibold text-ink-soft">
               {say({ en: 'Channel (@handle, URL or ID)', es: 'Canal (@usuario, URL o ID)' })}
-              <input className={field} value={config.youtube.channel} placeholder="@exclusivedominicantours" onChange={(event) => set({ youtube: { ...config.youtube, channel: event.target.value } })} />
+              <input className={field} value={config.youtube.channel} placeholder="@tucanal" onChange={(event) => set({ youtube: { ...config.youtube, channel: event.target.value } })} />
             </label>
             <label className="text-xs font-semibold text-ink-soft">
               {say({ en: 'Words added to every search', es: 'Palabras añadidas a cada búsqueda' })}

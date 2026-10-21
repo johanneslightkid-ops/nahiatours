@@ -7,9 +7,21 @@
  */
 import type { HeroMediaItem } from '../services/brandService';
 
-export const SITE_DEFAULTS: { showBrandName: boolean; heroMedia?: HeroMediaItem[] } = {
+export const SITE_DEFAULTS: {
+  showBrandName: boolean;
+  heroMedia?: HeroMediaItem[];
+  partners?: { hotels: string; flights: string };
+} = {
   /** The company name beside the logo in the navigation bar. */
   showBrandName: true,
+  /**
+   * The partner sites the footer sends guests to for hotels and flights, until
+   * Admin › Marca names others (or none: an empty address asks on WhatsApp).
+   */
+  partners: {
+    hotels: 'https://exclusivehotelpuntacana.com/',
+    flights: 'https://exclusivehotelpuntacana.com/flights/',
+  },
   /**
    * The home page's hero: eleven of the tours' own photographs, restored and
    * upscaled 4× by Cloudinary's AI (generative restore, then super-resolution)

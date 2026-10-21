@@ -8,7 +8,7 @@ import { useBrand } from '../../contexts/BrandContext';
 import { useI18n, type Locale } from '../../contexts/I18nContext';
 import { useSitePages } from '../../edt/sitePages';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
-import { BrandLogo, CONTACT, PARTNERS, SOCIAL_ICONS, SOCIAL_NAMES, useSocialAccounts } from '../edt/brand';
+import { BrandLogo, CONTACT, SOCIAL_ICONS, SOCIAL_NAMES, usePartners, useSocialAccounts } from '../edt/brand';
 
 type L = Record<Locale, string>;
 const t = (locale: Locale, text: L) => text[locale] ?? text.en;
@@ -22,6 +22,8 @@ const COPY = {
   flightsText: { en: 'Domestic and international fares, last-minute or early-bird.', es: 'Tarifas nacionales e internacionales, de último minuto o anticipadas.', fr: 'Tarifs nationaux et internationaux, dernière minute ou anticipés.', de: 'Inlands- und Auslandsflüge, last minute oder frühzeitig.' },
   cruises: { en: 'Cruises', es: 'Cruceros', fr: 'Croisières', de: 'Kreuzfahrten' },
   cruisesText: { en: 'Caribbean and Mediterranean voyages — ask us for your dates.', es: 'Travesías por el Caribe y el Mediterráneo: pídenos tus fechas.', fr: 'Croisières Caraïbes et Méditerranée — demandez-nous vos dates.', de: 'Karibik- und Mittelmeerreisen — frag uns nach deinen Terminen.' },
+  hotelsAsk: { en: 'Hello! I would like information about hotels.', es: '¡Hola! Me gustaría información sobre hoteles.', fr: 'Bonjour ! Je voudrais des informations sur les hôtels.', de: 'Hallo! Ich hätte gern Informationen zu Hotels.' },
+  flightsAsk: { en: 'Hello! I would like information about flights.', es: '¡Hola! Me gustaría información sobre vuelos.', fr: 'Bonjour ! Je voudrais des informations sur les vols.', de: 'Hallo! Ich hätte gern Informationen zu Flügen.' },
   cruisesAsk: { en: 'Hello! I would like information about cruises.', es: '¡Hola! Me gustaría información sobre cruceros.', fr: 'Bonjour ! Je voudrais des informations sur les croisières.', de: 'Hallo! Ich hätte gern Informationen zu Kreuzfahrten.' },
   visit: { en: 'Visit site', es: 'Visitar', fr: 'Visiter', de: 'Besuchen' },
   ask: { en: 'Ask us', es: 'Consultar', fr: 'Nous demander', de: 'Anfragen' },
@@ -58,6 +60,8 @@ const Footer = () => {
   const { locale } = useI18n();
   const pages = useSitePages(locale);
   const accounts = useSocialAccounts();
+  const partnerSites = usePartners();
+  const contactEmail = pages?.contact.email || brandSettings.contactEmail || '';
   const year = new Date().getFullYear();
 
   const policies = POLICY_FALLBACK.map((item) => ({
@@ -65,9 +69,20 @@ const Footer = () => {
     title: pages?.policies.find((policy) => policy.slug === item.slug)?.title || t(locale, item.title),
   }));
 
+  // A partner site when Admin › Marca names one; otherwise the same question on WhatsApp the cruises card asks.
+  const partnerCard = (key: string, title: L, text: L, ask: L, image: string, href: string) => ({
+    key,
+    title: t(locale, title),
+    text: t(locale, text),
+    image,
+    href: href || generateWhatsAppMessage(brandSettings.phoneNumber, t(locale, ask)),
+    cta: t(locale, href ? COPY.visit : COPY.ask),
+    external: true,
+  });
+
   const partners = [
-    { key: 'hotels', title: t(locale, COPY.hotels), text: t(locale, COPY.hotelsText), image: '/imgs/edt/banners/hotels-sm.webp', href: PARTNERS.hotels, cta: t(locale, COPY.visit), external: true },
-    { key: 'flights', title: t(locale, COPY.flights), text: t(locale, COPY.flightsText), image: '/imgs/edt/banners/flights-sm.webp', href: PARTNERS.flights, cta: t(locale, COPY.visit), external: true },
+    partnerCard('hotels', COPY.hotels, COPY.hotelsText, COPY.hotelsAsk, '/imgs/edt/banners/hotels-sm.webp', partnerSites.hotels),
+    partnerCard('flights', COPY.flights, COPY.flightsText, COPY.flightsAsk, '/imgs/edt/banners/flights-sm.webp', partnerSites.flights),
     {
       key: 'cruises',
       title: t(locale, COPY.cruises),
@@ -137,10 +152,12 @@ const Footer = () => {
                     <a className={linkClass} href={generateWhatsAppMessage(brandSettings.phoneNumber, '')} target="_blank" rel="noopener noreferrer">{brandSettings.phoneNumber}</a>
                   </li>
                 )}
-                <li className="flex items-center gap-2">
-                  <HiOutlineMail className="h-4 w-4 text-gold" />
-                  <a className={linkClass} href={`mailto:${pages?.contact.email || CONTACT.email}`}>{pages?.contact.email || CONTACT.email}</a>
-                </li>
+                {contactEmail && (
+                  <li className="flex items-center gap-2">
+                    <HiOutlineMail className="h-4 w-4 text-gold" />
+                    <a className={linkClass} href={`mailto:${contactEmail}`}>{contactEmail}</a>
+                  </li>
+                )}
               </ul>
             </div>
 
@@ -150,8 +167,9 @@ const Footer = () => {
                 <li><Link to="/tours" className={linkClass}>{t(locale, COPY.tours)}</Link></li>
                 <li><Link to="/transport" className={linkClass}>{t(locale, COPY.transfers)}</Link></li>
                 <li><Link to="/plan" className={linkClass}>{t(locale, COPY.plan)}</Link></li>
-                <li><a href={PARTNERS.hotels} target="_blank" rel="noopener noreferrer" className={linkClass}>{t(locale, COPY.hotels)} ↗</a></li>
-                <li><a href={PARTNERS.flights} target="_blank" rel="noopener noreferrer" className={linkClass}>{t(locale, COPY.flights)} ↗</a></li>
+                {partners.slice(0, 2).map((partner) => (
+                  <li key={partner.key}><a href={partner.href} target="_blank" rel="noopener noreferrer" className={linkClass}>{partner.title} ↗</a></li>
+                ))}
               </ul>
             </div>
 

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { getBrandSettings, saveBrandSettings, BrandSettings, uploadBrandIcon } from '../services/brandService';
 import { brandNameStyle } from '../lib/brandDisplay';
 import BrandIconEditor from '../components/admin/BrandIconEditor';
+import { SITE_DEFAULTS } from '../config/siteDefaults';
 import { getTours, saveTours, Tour } from '../services/toursService';
 import { useI18n } from '../contexts/I18nContext';
 import ServiceAdminPanel from '../components/admin/ServiceAdminPanel';
@@ -203,6 +204,40 @@ const Admin: React.FC = () => {
                   placeholder="Nombre de la persona de contacto (WhatsApp)"
                   className="rounded-2xl border border-ink/15 px-4 py-3 md:col-span-2"
                 />
+                <label className="grid gap-1 text-sm font-semibold text-ink-soft md:col-span-2">
+                  Correo de contacto
+                  <input
+                    type="email"
+                    value={brandSettings.contactEmail ?? ''}
+                    onChange={(event) => setBrandSettings({ ...brandSettings, contactEmail: event.target.value })}
+                    placeholder="reservas@tu-dominio.com"
+                    className="rounded-2xl border border-ink/15 px-4 py-3 font-normal text-ink"
+                  />
+                  <span className="text-xs font-normal">
+                    Aparece en la barra superior, el pie de página y las páginas legales (privacidad, términos,
+                    cancelaciones). Vacío: se usa el de la página de contacto guardada.
+                  </span>
+                </label>
+                <label className="grid gap-1 text-sm font-semibold text-ink-soft">
+                  Sitio aliado para hoteles
+                  <input
+                    type="url"
+                    value={brandSettings.partnerHotelsUrl ?? SITE_DEFAULTS.partners?.hotels ?? ''}
+                    onChange={(event) => setBrandSettings({ ...brandSettings, partnerHotelsUrl: event.target.value })}
+                    placeholder="https://… (vacío: se consulta por WhatsApp)"
+                    className="rounded-2xl border border-ink/15 px-4 py-3 font-normal text-ink"
+                  />
+                </label>
+                <label className="grid gap-1 text-sm font-semibold text-ink-soft">
+                  Sitio aliado para vuelos
+                  <input
+                    type="url"
+                    value={brandSettings.partnerFlightsUrl ?? SITE_DEFAULTS.partners?.flights ?? ''}
+                    onChange={(event) => setBrandSettings({ ...brandSettings, partnerFlightsUrl: event.target.value })}
+                    placeholder="https://… (vacío: se consulta por WhatsApp)"
+                    className="rounded-2xl border border-ink/15 px-4 py-3 font-normal text-ink"
+                  />
+                </label>
                 <input
                   type="text"
                   value={brandSettings.paypalMeLink}
@@ -253,6 +288,7 @@ const Admin: React.FC = () => {
                 </p>
                 <p><strong>Teléfono:</strong> {brandSettings.phoneNumber}</p>
                 <p><strong>Contacto:</strong> {brandSettings.contactName || '—'}</p>
+                <p><strong>Correo:</strong> {brandSettings.contactEmail || 'el de la página de contacto'}</p>
                 <p><strong>PayPal:</strong> {brandSettings.paypalMeLink}</p>
                 <button onClick={() => setEditingBrand(true)} className="mt-4 rounded-full bg-lagoon-dark px-5 py-2 font-semibold text-white">
                   Editar datos del negocio

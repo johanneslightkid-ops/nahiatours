@@ -1,5 +1,5 @@
 /**
- * Exclusive Dominican Tours — Full Throttle, in daylight.
+ * This site — Full Throttle, in daylight.
  *
  * Action-documentary photography graded like a jet-set film: ivory and sand
  * where the other cut was black, charcoal ink, amber for energy, a thin line
