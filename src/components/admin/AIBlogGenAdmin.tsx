@@ -14,13 +14,20 @@ import { getSocialMediaData, SocialMediaAccount } from '../../services/socialMed
 import { apiPost } from '../../services/apiClient';
 import { getAdminPassword } from '../../services/authStore';
 import { useBrand } from '../../contexts/BrandContext';
-import { TOPICS, hashtagsFor, keywordsFor, seasonalNote, BlogLang } from '../../lib/blogTopics';
+import { TOPICS, keywordsFor, seasonalNote, BlogLang } from '../../lib/blogTopics';
 import { BLOG_TEMPLATES } from '../../lib/blogTemplates';
 import { getPublishedTestimonials } from '../../services/testimonialService';
 import { SHARE_TARGETS, shareTo, copyText, shareTargetFor } from '../../lib/socialShare';
 import ArticleBody from '../ui/ArticleBody';
 import { BLOG_AUDIENCE_PRESETS, BlogAudience as Audience, findAudiencePreset } from '../../lib/blogAudiencePresets';
 import { getImageCatalog, PoolImage } from '../../services/imageCatalogService';
+import {
+  BLOG_HASHTAG_PACKS,
+  BLOG_HASHTAGS,
+  findRelevantHashtags,
+  HASHTAG_CATEGORIES,
+} from '../../lib/blogHashtagPacks';
+import type { HashtagCategory } from '../../lib/blogHashtagPacks';
 
 /**
  * The blog generator.
@@ -53,6 +60,12 @@ const AUDIENCE_LABELS: Record<keyof Audience, string> = {
   gender: 'Público',
   style: 'Estilo',
 };
+
+const tourTerms = (value: string) =>
+  value
+    .toLowerCase()
+    .split(/[^a-z0-9áéíóúüñ]+/)
+    .filter((term) => term.length > 2 && !['tour', 'tours', 'excursion', 'excursions', 'island', 'isla', 'beach', 'playa'].includes(term));
 
 interface AudiencePreset {
   id: string;
@@ -107,78 +120,7 @@ const GOOGLE_SEARCH_CHANNEL = {
   note: 'SEO title, meta description, search phrase and snippet for Google search results.',
 };
 
-const AUDIENCE_HASHTAGS: Record<string, string[]> = {
-  'us-family-beach': ['FamilyTravel', 'PuntaCana'],
-  'latam-family-classic': ['ViajarEnFamilia', 'TurismoFamiliar'],
-  'canada-friends-adventure': ['AdventureTravel', 'TravelWithFriends'],
-  'france-couple-culture': ['VoyageCulturel', 'VoyageEnCouple'],
-  'germany-family-practical': ['Familienurlaub', 'AusflugTipps'],
-};
 
-const TEMPLATE_HASHTAGS: Record<string, string[]> = {
-  guide: ['PuntaCanaGuide'],
-  story: ['PuntaCanaDayOut'],
-  list: ['TravelTips'],
-  faq: ['TravelQuestions'],
-  itinerary: ['ExcursionPlanning'],
-  compare: ['ChooseYourExcursion'],
-  'local-culture': ['DominicanCulture'],
-  family: ['FamilyTravel'],
-  romantic: ['CouplesTravel'],
-};
-
-const tourHashtagMatches: Array<[RegExp, string[]]> = [
-  [/\bsaona\b/i, ['SaonaIsland', 'IslaSaona']],
-  [/\bcatalina\b/i, ['IslaCatalina', 'Snorkeling']],
-  [/\bbugg(y|ies)\b|\batv\b|quad/i, ['BuggyTour', 'OffRoad']],
-  [/catamaran|party boat/i, ['Catamaran', 'BavaroBeach']],
-  [/macao/i, ['MacaoBeach']],
-  [/santo domingo/i, ['SantoDomingo', 'DominicanCulture']],
-  [/altos de chav[oó]n/i, ['AltosDeChavon', 'DominicanCulture']],
-  [/monta[nñ]a redonda/i, ['MontanaRedonda', 'DominicanRepublic']],
-];
-
-const normalizeAudience = (audience: Audience) => Object.values(audience).join(' ').toLowerCase();
-const tourTerms = (value: string) =>
-  value
-    .toLowerCase()
-    .split(/[^a-z0-9áéíóúüñ]+/)
-    .filter((term) => term.length > 2 && !['tour', 'tours', 'excursion', 'excursions', 'island', 'isla', 'beach', 'playa'].includes(term));
-
-const hashtagsForBrief = (
-  topics: string[],
-  audienceIds: string[],
-  audience: Audience,
-  templateIds: string[],
-  selectedTours: string[]
-): string[] => {
-  const topicTags = topics.flatMap((id) => TOPICS.find((topic) => topic.id === id)?.hashtags ?? []);
-  const audienceTags = audienceIds.flatMap((id) => AUDIENCE_HASHTAGS[id] ?? []);
-  const normalizedAudience = normalizeAudience(audience);
-  const customAudienceTags = audienceIds.length
-    ? []
-    : [
-        ...(normalizedAudience.includes('familia') ? ['FamilyTravel'] : []),
-        ...(normalizedAudience.includes('pareja') ? ['CouplesTravel'] : []),
-        ...(normalizedAudience.includes('aventura') ? ['AdventureTravel'] : []),
-      ];
-  const templateTags = templateIds.flatMap((id) => TEMPLATE_HASHTAGS[id] ?? []);
-  const tourTags = selectedTours.flatMap((title) =>
-    tourHashtagMatches
-      .filter(([pattern]) => pattern.test(title))
-      .flatMap(([, tags]) => tags)
-  );
-  return [
-    'PuntaCana',
-    'DominicanRepublic',
-    'CaribbeanTravel',
-    ...audienceTags,
-    ...customAudienceTags,
-    ...templateTags,
-    ...tourTags,
-    ...topicTags,
-  ].filter((tag, index, tags) => tags.indexOf(tag) === index).slice(0, 12);
-};
 
 /** Short, well-rated reviews make the best quotes. */
 const quotableReviews = (reviews: { review: string; rating: number }[]): string[] =>
@@ -216,11 +158,10 @@ const AIBlogGenAdmin: React.FC = () => {
   const [activeAudienceId, setActiveAudienceId] = useState('us-family-beach');
   const [audienceCustomized, setAudienceCustomized] = useState(false);
   const [audienceFocus, setAudienceFocus] = useState(BLOG_AUDIENCE_PRESETS[0].focus);
-  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([
-    'PuntaCana',
-    'DominicanRepublic',
-    'CaribbeanTravel',
-  ]);
+  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
+  const [hashtagQuery, setHashtagQuery] = useState('');
+  const [hashtagCategory, setHashtagCategory] = useState<HashtagCategory | 'all' | 'recommended'>('recommended');
+  const [customHashtag, setCustomHashtag] = useState('');
   const [reviews, setReviews] = useState<string[]>([]);
   const [quoteReviews, setQuoteReviews] = useState(false);
   const [selectedTours, setSelectedTours] = useState<string[]>([]);
@@ -321,18 +262,39 @@ const AIBlogGenAdmin: React.FC = () => {
   };
 
   const activeAudiencePreset = findAudiencePreset(activeAudienceId);
-  const suggestedHashtags = hashtagsForBrief(
-    selectedTopics,
-    selectedAudienceIds,
-    audience,
-    selectedTemplateIds,
-    selectedTours
-  );
-  const hashtagSuggestionKey = suggestedHashtags.join('|');
+  const rankedHashtags = findRelevantHashtags(selectedTours, selectedTopics, selectedAudienceIds);
+  const suggestedHashtags = rankedHashtags.filter(({ relevance }) => relevance > 0);
+  const suggestedTagNames = new Set(suggestedHashtags.map(({ hashtag }) => hashtag.tag.toLowerCase()));
+  const visibleHashtags = BLOG_HASHTAGS.filter((item) => {
+    const categoryMatches = hashtagCategory === 'all'
+      || (hashtagCategory === 'recommended'
+        ? suggestedTagNames.has(item.tag.toLowerCase())
+        : item.category === hashtagCategory);
+    const query = hashtagQuery.trim().toLowerCase();
+    return categoryMatches
+      && (!query || `${item.tag} ${item.description}`.toLowerCase().includes(query));
+  });
 
-  useEffect(() => {
-    setSelectedHashtags(suggestedHashtags);
-  }, [hashtagSuggestionKey]);
+  const toggleHashtagPack = (tags: string[]) => {
+    setSelectedHashtags((current) => {
+      const selected = new Set(current.map((tag) => tag.toLowerCase()));
+      const allSelected = tags.every((tag) => selected.has(tag.toLowerCase()));
+      return allSelected
+        ? current.filter((tag) => !tags.some((packTag) => packTag.toLowerCase() === tag.toLowerCase()))
+        : [...current, ...tags.filter((tag) => !selected.has(tag.toLowerCase()))];
+    });
+  };
+
+  const addCustomHashtag = () => {
+    const tag = customHashtag.trim().replace(/^#+/, '').replace(/[^\p{L}\p{N}_]/gu, '');
+    if (!tag) return;
+    setSelectedHashtags((current) =>
+      current.some((selected) => selected.toLowerCase() === tag.toLowerCase())
+        ? current
+        : [...current, tag]
+    );
+    setCustomHashtag('');
+  };
 
   /** Upload straight away, so the article can reference a real URL. */
   const handleImages = async (files: FileList | null) => {
@@ -873,15 +835,6 @@ const AIBlogGenAdmin: React.FC = () => {
             <p className="mb-3 mt-1 break-words text-sm text-ink-soft">
               {keywordsFor(selectedTopics, 'es').join(' · ')}
             </p>
-            <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-              Hashtags que se usarán
-            </p>
-            <p className="mt-1 break-words text-sm text-ink-soft">
-              {hashtagsFor(selectedTopics)
-                .slice(0, 18)
-                .map((h) => `#${h}`)
-                .join('  ')}
-            </p>
           </div>
         )}
       </section>
@@ -910,7 +863,7 @@ const AIBlogGenAdmin: React.FC = () => {
           />
         </div>
 
-        <div className="max-h-56 overflow-y-auto rounded-2xl border border-ink/10 p-2">
+        <div className="rounded-2xl border border-ink/10 p-2">
           <div className="flex flex-wrap gap-2">
             {visibleTours.map((tour) => {
               const active = selectedTours.includes(tour.title);
@@ -1112,26 +1065,147 @@ const AIBlogGenAdmin: React.FC = () => {
           <div className="mt-4">
             <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
               <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-                Hashtags sugeridos para esta idea
+                Sal y sabor · hashtags opcionales
               </p>
               <span className="text-xs text-ink-light">{selectedHashtags.length} seleccionados</span>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {suggestedHashtags.map((tag) => (
+            <p className="mb-3 text-xs leading-relaxed text-ink-light">
+              No hay etiquetas preseleccionadas. Elige solo las que describen de verdad la experiencia; las redes usarán como máximo cinco de las seleccionadas por publicación.
+            </p>
+            {selectedHashtags.length > 0 && (
+              <div className="mb-4 rounded-2xl bg-paper-warm p-3">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <p className="text-xs font-bold text-ink">Tu selección</p>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedHashtags([])}
+                    className="text-xs font-semibold text-sunset-dark hover:underline"
+                  >
+                    Quitar todas
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedHashtags.map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      aria-label={`Quitar #${tag}`}
+                      onClick={() => setSelectedHashtags((current) => current.filter((value) => value !== tag))}
+                      className={chip(true)}
+                    >
+                      #{tag} <span aria-hidden="true">×</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p className="mb-2 text-xs font-bold text-ink">Packs temáticos</p>
+            <div className="mb-4 flex flex-wrap gap-2">
+              {BLOG_HASHTAG_PACKS.map((pack) => {
+                const active = pack.tags.every((tag) =>
+                  selectedHashtags.some((selected) => selected.toLowerCase() === tag.toLowerCase())
+                );
+                return (
+                  <button
+                    key={pack.id}
+                    type="button"
+                    title={pack.description}
+                    aria-pressed={active}
+                    onClick={() => toggleHashtagPack(pack.tags)}
+                    className={chip(active)}
+                  >
+                    {pack.label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Filtrar hashtags">
+              {HASHTAG_CATEGORIES.map((category) => (
                 <button
-                  key={tag}
+                  key={category.id}
                   type="button"
-                  aria-pressed={selectedHashtags.includes(tag)}
-                  onClick={() => setSelectedHashtags((prev) => toggle(prev, tag))}
-                  className={chip(selectedHashtags.includes(tag))}
+                  aria-pressed={hashtagCategory === category.id}
+                  onClick={() => setHashtagCategory(category.id)}
+                  className={chip(hashtagCategory === category.id)}
                 >
-                  #{tag}
+                  {category.label}
                 </button>
               ))}
             </div>
+            <div className="relative mb-3">
+              <FaSearch className="pointer-events-none absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-light" />
+              <input
+                type="search"
+                value={hashtagQuery}
+                onChange={(event) => setHashtagQuery(event.target.value)}
+                placeholder="Buscar por etiqueta o descripción…"
+                aria-label="Buscar hashtags"
+                className="w-full rounded-full border border-ink/15 py-2.5 pl-10 pr-4 text-sm"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {visibleHashtags.map((item) => {
+                const active = selectedHashtags.some((tag) => tag.toLowerCase() === item.tag.toLowerCase());
+                return (
+                  <button
+                    key={item.tag}
+                    type="button"
+                    title={item.description}
+                    aria-pressed={active}
+                    onClick={() => setSelectedHashtags((current) =>
+                      active
+                        ? current.filter((tag) => tag.toLowerCase() !== item.tag.toLowerCase())
+                        : [...current, item.tag]
+                    )}
+                    className={`${chip(active)} !inline-flex !flex-col !items-start !gap-1 !rounded-2xl !text-left`}
+                  >
+                    <span>
+                      #{item.tag}
+                      {suggestedTagNames.has(item.tag.toLowerCase()) && (
+                        <span className="ml-1 text-[0.65rem] font-normal opacity-70">· sugerido</span>
+                      )}
+                    </span>
+                    <span className="max-w-[18rem] whitespace-normal text-left text-[0.65rem] font-normal leading-snug opacity-75">
+                      {item.description}
+                    </span>
+                  </button>
+                );
+              })}
+              {visibleHashtags.length === 0 && (
+                <p className="text-sm text-ink-light">
+                  {hashtagCategory === 'recommended'
+                    ? 'Aún no hay sugerencias para esta selección. Elige otro filtro o busca en Todos.'
+                    : 'No hay hashtags que coincidan.'}
+                </p>
+              )}
+            </div>
+            <form
+              className="mt-4 flex flex-wrap gap-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                addCustomHashtag();
+              }}
+            >
+              <input
+                type="text"
+                value={customHashtag}
+                onChange={(event) => setCustomHashtag(event.target.value)}
+                placeholder="Añadir hashtag propio"
+                aria-label="Añadir hashtag propio"
+                className="min-w-[14rem] flex-1 rounded-full border border-ink/15 px-4 py-2.5 text-sm"
+              />
+              <button
+                type="submit"
+                disabled={!customHashtag.trim()}
+                className="rounded-full bg-ink px-4 py-2.5 text-sm font-bold text-paper disabled:opacity-50"
+              >
+                Añadir
+              </button>
+            </form>
             <p className="mt-2 text-xs leading-relaxed text-ink-light">
-              Las sugerencias siguen los temas, el público, el formato y las excursiones seleccionadas.
-              Reflejan lugares y actividades reales del destino, no prometen alcance. Referencia:{' '}
+              Las sugerencias se relacionan con el público, los temas y las excursiones seleccionadas.
+              Los hashtags no garantizan alcance; prioriza la relevancia y evita afirmaciones que no correspondan.
+              Referencias:{' '}
               <a
                 href="https://www.godominicanrepublic.com/destinations/punta-cana/"
                 target="_blank"
@@ -1139,6 +1213,15 @@ const AIBlogGenAdmin: React.FC = () => {
                 className="font-semibold text-lagoon-dark underline"
               >
                 guía oficial de Punta Cana
+              </a>{' '}
+              ·{' '}
+              <a
+                href="https://later.com/blog/instagram-hashtags/"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-lagoon-dark underline"
+              >
+                guía actual de hashtags de Instagram
               </a>
               .
             </p>

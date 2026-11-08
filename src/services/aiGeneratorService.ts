@@ -1,6 +1,6 @@
 import { AISettings } from './aiSettingsService';
 import { ApiError, apiPost } from './apiClient';
-import { BlogLang, hashtagsFor, keywordsFor, seasonalNote, topicById } from '../lib/blogTopics';
+import { BlogLang, keywordsFor, seasonalNote, topicById } from '../lib/blogTopics';
 import { LANGUAGE_NAME, LANGUAGE_VOICE, templateById } from '../lib/blogTemplates';
 
 /**
@@ -343,8 +343,9 @@ ${topicLabels.length ? topicLabels.join(', ') : 'whatever the notes below sugges
 
 SELECTED HASHTAGS
 ${params.hashtags?.length ? params.hashtags.map((tag) => `#${tag}`).join(' ') : 'None selected'}
-Treat these as relevant subject cues, not as claims. Do not insert hashtag syntax
-into the article prose; use a topic only when it fits the confirmed experience.
+These are optional editorial seasoning, not facts. If none are selected, do not
+invent hashtags or a seasoning list. Never put hashtag syntax in article prose;
+use a selected tag only when it fits the confirmed experience.
 
 SEARCH PHRASES — what travellers type. Use the first one in the title or the
 first subheading, and the others naturally in subheadings and text, never as a
@@ -448,21 +449,23 @@ article gives them. Speak like a local who loves the place, not like an ad.
 
 Rules per platform:
 - instagram: 3 to 5 short lines, warm and visual, one emoji at most per line,
-  ends with a call to action. 8 to 12 hashtags on the final line.
+  ends with a call to action. Add up to 5 selected hashtags on the final line.
 - facebook: one paragraph of 60 to 90 words, conversational, ends with a
-  question. 3 to 5 hashtags on the final line.
-- tiktok: 2 punchy lines, present tense, 5 to 8 hashtags on the final line.
-- twitter: under 260 characters including the hashtags.
-- youtube: 2 sentences of description plus 5 hashtags.
-- linkedin: 70 words, professional, about the operation rather than the party.
+  question. Add up to 5 selected hashtags on the final line.
+- tiktok: 2 punchy lines, present tense, with up to 5 selected hashtags.
+- twitter: under 260 characters including any selected hashtags.
+- youtube: 2 sentences of description, with up to 5 selected hashtags.
+- linkedin: 70 words, professional, about the operation rather than the party;
+  include hashtags only when selected.
 - google-search: Write a Google-ready search result package, not a social post.
   Keep the title and description within the character limits above, answer the
   traveller's intent, use natural language, and make no unsupported claims.
   Do not promise rankings or stuff keywords.
 
-Write each post in the same language as the article. Draw hashtags from this
-list where they fit, and add others that genuinely match:
-${hashtags.map((h) => `#${h}`).join(' ')}
+Write each post in the same language as the article. Use only hashtags from the
+operator's selection below, choosing at most 5 that fit each post. Never invent
+or add generic hashtags. If the selection is empty, do not include hashtags.
+${hashtags.length ? hashtags.map((h) => `#${h}`).join(' ') : 'No hashtags selected'}
 
 --- ARTICLE ---
 ${article.title}
@@ -473,15 +476,35 @@ ${article.prelude}
 ${article.body.slice(0, 2500)}
 --- END ---`;
 
-const parseSocial = (raw: string, platforms: string[]): SocialCut[] => {
+const parseSocial = (raw: string, platforms: string[], selectedHashtags: string[]): SocialCut[] => {
   const cuts: SocialCut[] = [];
+  const allowed = new Map(
+    selectedHashtags.map((tag) => [tag.replace(/^#/, '').toLowerCase(), tag.replace(/^#/, '')])
+  );
 
   for (const platform of platforms) {
     const re = new RegExp(`\\[${platform}\\]\\s*([\\s\\S]*?)(?=\\n\\s*\\[[a-z-]+\\]|$)`, 'i');
-    const text = re.exec(raw)?.[1]?.trim();
-    if (!text) continue;
-    const hashtags = [...text.matchAll(/#([\p{L}\p{N}_]+)/gu)].map((m) => m[1]);
-    cuts.push({ platform, text, hashtags: [...new Set(hashtags)] });
+    const rawText = re.exec(raw)?.[1]?.trim();
+    if (!rawText) continue;
+    const used = new Set<string>();
+    let hashtagCount = 0;
+    const text = rawText
+      .replace(/#([\p{L}\p{N}_]+)/gu, (_match, tag: string) => {
+        const key = tag.toLowerCase();
+        if (!allowed.has(key) || used.has(key) || hashtagCount >= 5) return '';
+        used.add(key);
+        hashtagCount += 1;
+        return `#${allowed.get(key)}`;
+      })
+      .replace(/[ \t]{2,}/g, ' ')
+      .replace(/ *\n */g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+    const hashtags = [...used].flatMap((tag) => {
+      const selected = allowed.get(tag);
+      return selected ? [selected] : [];
+    });
+    cuts.push({ platform, text, hashtags });
   }
 
   return cuts;
@@ -571,12 +594,7 @@ export const generateBlogPost = async (
         prompt: buildSocialPrompt(
           en,
           params.socialPlatforms,
-          [
-            ...new Set([
-              ...(params.hashtags ?? []),
-              ...hashtagsFor(params.topics, 'en'),
-            ]),
-          ],
+          params.hashtags ?? [],
           brand
         ),
         system: SYSTEM,
@@ -584,7 +602,7 @@ export const generateBlogPost = async (
         temperature: 0.9,
         settings,
       });
-      social = parseSocial(cut.text, params.socialPlatforms);
+      social = parseSocial(cut.text, params.socialPlatforms, params.hashtags ?? []);
     } catch {
       social = [];
     }
