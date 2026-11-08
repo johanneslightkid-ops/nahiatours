@@ -14,15 +14,12 @@ export interface AISettings {
 }
 
 /**
- * Cloudflare is the default provider, and the defaults below are models that
- * exist.
+ * OpenRouter is the default provider, with a currently free model suitable
+ * for long-form multilingual writing.
  *
- * Both of those are corrections. The old defaults were `gemini-1.5-pro` and
- * `google/gemini-pro-1.5`, which a key issued today cannot reach — so a fresh
- * install failed on its first click and the panel said only "Failed to
- * generate blog posts". And the old default provider was Gemini, which cannot
- * write a word until somebody pastes a key; Cloudflare runs through the
- * Worker's own `AI` binding with nothing configured at all.
+ * The old Google model defaults were retired, so a fresh install failed on its
+ * first click. OpenRouter still requires an API key, so the endpoint can fall
+ * back to the Worker's Cloudflare AI binding when one is not configured.
  *
  * The server keeps a fallback chain behind these (functions/api/ai.ts), so a
  * name that retires next year is stepped over rather than fatal.
@@ -30,16 +27,17 @@ export interface AISettings {
 const defaultAISettings: AISettings = {
   gemini: { apiKey: '', selectedModel: 'gemini-2.5-flash' },
   cloudflare: { apiKey: '', accountId: '', selectedModel: '@cf/meta/llama-3.1-8b-instruct-fp8' },
-  openrouter: { apiKey: '', selectedModel: 'meta-llama/llama-3.3-70b-instruct:free' },
-  activeProvider: 'cloudflare',
+  openrouter: { apiKey: '', selectedModel: 'google/gemma-4-31b-it:free' },
+  activeProvider: 'openrouter',
 };
 
-/** Model names that no longer resolve, mapped to their live equivalents. */
-const RETIRED_MODELS: Record<string, string> = {
+/** Legacy model choices mapped to current equivalents. */
+const MODEL_MIGRATIONS: Record<string, string> = {
   'gemini-1.5-pro': 'gemini-2.5-flash',
   'gemini-1.5-pro-latest': 'gemini-2.5-flash',
   'gemini-pro': 'gemini-2.5-flash',
-  'google/gemini-pro-1.5': 'meta-llama/llama-3.3-70b-instruct:free',
+  'google/gemini-pro-1.5': 'google/gemma-4-31b-it:free',
+  'meta-llama/llama-3.3-70b-instruct:free': 'google/gemma-4-31b-it:free',
   '@cf/meta/llama-3-8b-instruct': '@cf/meta/llama-3.1-8b-instruct-fp8',
 };
 
@@ -47,20 +45,34 @@ const normalizeAISettings = (input: unknown): AISettings => {
   const data = (input as Record<string, unknown>)?.record ?? input;
   if (!data || typeof data !== 'object') return defaultAISettings;
   
-  // A retired model saved months ago is silently upgraded rather than left to
-  // 404 on the next click.
+  // A legacy model saved months ago is upgraded rather than left to 404.
   const migrate = (provider: AIProviderSettings): AIProviderSettings => ({
     ...provider,
-    selectedModel: RETIRED_MODELS[provider.selectedModel] || provider.selectedModel,
+    selectedModel: MODEL_MIGRATIONS[provider.selectedModel] || provider.selectedModel,
   });
 
-  return {
+  const settings: AISettings = {
     ...defaultAISettings,
     ...(data as Partial<AISettings>),
     gemini: migrate({ ...defaultAISettings.gemini, ...(data as any).gemini }),
     cloudflare: migrate({ ...defaultAISettings.cloudflare, ...(data as any).cloudflare }),
     openrouter: migrate({ ...defaultAISettings.openrouter, ...(data as any).openrouter }),
   };
+
+  // Upgrade untouched prior defaults, but preserve provider choices once the
+  // operator has configured credentials.
+  const hasCredentials = [settings.gemini, settings.cloudflare, settings.openrouter].some(
+    (provider) => Boolean(provider.apiKey?.trim() || provider.accountId?.trim())
+  );
+  if (
+    !hasCredentials &&
+    settings.activeProvider === 'cloudflare' &&
+    settings.cloudflare.selectedModel === '@cf/meta/llama-3.1-8b-instruct-fp8'
+  ) {
+    settings.activeProvider = 'openrouter';
+  }
+
+  return settings;
 };
 
 export const getAISettings = async (): Promise<AISettings> => {

@@ -53,6 +53,8 @@ interface AISettings {
 const FALLBACK_MODELS: Record<Provider, string[]> = {
   gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-1.5-flash'],
   openrouter: [
+    'google/gemma-4-31b-it:free',
+    'google/gemma-4-26b-a4b-it:free',
     'meta-llama/llama-3.3-70b-instruct:free',
     'google/gemma-2-9b-it:free',
     'mistralai/mistral-7b-instruct:free',
@@ -136,6 +138,12 @@ const textOf = async (res: Response) => {
   }
 };
 
+const withoutPrivateReasoning = (text: string) =>
+  text
+    .replace(/<(think|thinking|analysis|reasoning)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
+    .replace(/<(think|thinking|analysis|reasoning)\b[^>]*>[\s\S]*$/gi, '')
+    .trim();
+
 interface Attempt {
   provider: Provider;
   model: string;
@@ -182,10 +190,10 @@ const runGemini = async (
 
     if (res.ok) {
       const data: any = await res.json();
-      const text = (data.candidates?.[0]?.content?.parts || [])
+      const text = withoutPrivateReasoning((data.candidates?.[0]?.content?.parts || [])
         .map((p: any) => p.text || '')
         .join('')
-        .trim();
+      );
       if (text) return { text, model };
       attempts.push({
         provider: 'gemini',
@@ -242,12 +250,18 @@ const runOpenRouter = async (
         'HTTP-Referer': origin,
         'X-Title': 'Tour operator blog generator',
       },
-      body: JSON.stringify({ model, messages, max_tokens: maxTokens, temperature }),
+      body: JSON.stringify({
+        model,
+        messages,
+        max_tokens: maxTokens,
+        temperature,
+        reasoning: { exclude: true },
+      }),
     });
 
     if (res.ok) {
       const data: any = await res.json();
-      const text = (data.choices?.[0]?.message?.content || '').trim();
+      const text = withoutPrivateReasoning(data.choices?.[0]?.message?.content || '');
       if (text) return { text, model };
       attempts.push({
         provider: 'openrouter',
@@ -299,7 +313,7 @@ const runCloudflare = async (
       }
       try {
         const result: any = await env.AI.run(model, payload);
-        const text = (result?.response || '').trim();
+        const text = withoutPrivateReasoning(result?.response || '');
         if (text) return { text, model };
         attempts.push({
           provider: 'cloudflare',
@@ -326,7 +340,7 @@ const runCloudflare = async (
 
     if (res.ok) {
       const data: any = await res.json();
-      const text = (data?.result?.response || '').trim();
+      const text = withoutPrivateReasoning(data?.result?.response || '');
       if (text) return { text, model };
       attempts.push({
         provider: 'cloudflare',
@@ -373,11 +387,17 @@ const listModels = async (provider: Provider, config: ProviderSettings) => {
       name: m.name || m.id,
       free: m.pricing?.prompt === '0' && m.pricing?.completion === '0',
     }));
-    // Free first, but never hide the paid ones: the old code filtered them out
-    // entirely, so the saved default could not even be selected back.
-    return [...all.filter((m: any) => m.free), ...all.filter((m: any) => !m.free)].map(
-      ({ id, name, free }: any) => ({ id, name: free ? `${name} · free` : name })
+    // Keep every model selectable, with free options first and the requested
+    // DeepSeek/Qwen families easy to find even when the catalog is large.
+    const free = all.filter((m: any) => m.free);
+    const featured = all.filter((m: any) => !m.free && /^(deepseek|qwen)\//i.test(m.id));
+    const otherPaid = all.filter(
+      (m: any) => !m.free && !/^(deepseek|qwen)\//i.test(m.id)
     );
+    return [...free, ...featured, ...otherPaid].map(({ id, name, free }: any) => ({
+      id,
+      name: `${name} · ${free ? 'gratis' : 'de pago'}`,
+    }));
   }
 
   const accountId = config.accountId?.trim();
@@ -476,7 +496,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
     // An override is accepted so the admin panel can test a key that has been
     // typed but not yet saved.
     const settings: AISettings = { ...saved, ...(body.settings || {}) };
-    const provider: Provider = (body.provider || settings.activeProvider || 'cloudflare') as Provider;
+    const provider: Provider = (body.provider || settings.activeProvider || 'openrouter') as Provider;
     const config: ProviderSettings = (settings as any)[provider] || {};
 
     if (body.action === 'models') {

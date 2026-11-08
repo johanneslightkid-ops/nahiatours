@@ -41,7 +41,9 @@ const AIAssistantAdmin: React.FC = () => {
     // Cloudflare always lists: with the Workers AI binding it needs no key.
     loadModels('cloudflare', data);
     if (data.gemini.apiKey) loadModels('gemini', data);
-    if (data.openrouter.apiKey) loadModels('openrouter', data);
+    // The OpenRouter catalog is public; show DeepSeek and Qwen choices before
+    // the operator has entered a key.
+    loadModels('openrouter', data);
   };
 
   /**
@@ -95,7 +97,7 @@ const AIAssistantAdmin: React.FC = () => {
       // Refresh models after save, in case the keys changed.
       loadModels('cloudflare', settings);
       if (settings.gemini.apiKey) loadModels('gemini', settings);
-      if (settings.openrouter.apiKey) loadModels('openrouter', settings);
+      loadModels('openrouter', settings);
     } catch (error) {
       console.error('No se pudo guardar', error);
     } finally {
@@ -304,9 +306,12 @@ const AIAssistantAdmin: React.FC = () => {
             </div>
             <div>
               <label className="block text-sm font-semibold text-purple-900 mb-2">
-                Modelo seleccionado (solo gratuitos)
+                Modelo seleccionado
                 {loadingOpenRouter && <span className="ml-2 text-xs font-normal text-purple-600 animate-pulse">Buscando...</span>}
               </label>
+              <p className="mb-2 text-xs text-purple-800">
+                DeepSeek y Qwen están disponibles en la lista. Las opciones gratis aparecen primero.
+              </p>
               <select
                 value={settings.openrouter.selectedModel}
                 onChange={e => setSettings({ ...settings, openrouter: { ...settings.openrouter, selectedModel: e.target.value } })}

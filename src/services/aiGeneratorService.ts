@@ -89,7 +89,10 @@ const MAX_OUTPUT_TOKENS = 4000;
 const SYSTEM =
   'You are an award-winning travel writer and SEO editor for a Caribbean tour ' +
   'operator. You write long, specific, sensory destination features that read ' +
-  'like a magazine, not like a brochure. You follow output formats exactly.';
+  'like a magazine, not like a brochure. You follow output formats exactly. ' +
+  'Keep all private analysis, reasoning, planning, and model commentary out of ' +
+  'the response. Return only the finished requested copy. Write naturally and ' +
+  'idiomatically for the target culture; avoid literal translation and generic AI phrasing.';
 
 interface AiResponse {
   ok: boolean;
@@ -347,6 +350,8 @@ const buildEditionPrompt = (english: GeneratedArticle, lang: BlogLang, params: B
 
 This is not a translation exercise. Rewrite it as a travel writer who writes in
 that language would have written it in the first place: ${LANGUAGE_VOICE[lang]}
+Use natural local phrasing, idioms, and cultural references appropriate to
+readers of that language; avoid literal translation and machine-like wording.
 Keep the same structure, the same sections, the same facts and the same length
 — about ${TARGET_WORDS} words — and keep every [[IMAGE-n]] marker exactly where
 it is. Guest quotes stay as they are, in their original words.
