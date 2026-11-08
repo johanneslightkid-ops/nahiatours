@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import TourCard from '../components/TourCard';
 import { Tour, getTours, getServiceSlug } from '../services/toursService';
@@ -10,12 +11,24 @@ import { Sailboat, Pineapple } from '../components/ui/Illustrations';
 const Tours: React.FC = () => {
   const { locale } = useI18n();
   const { brandSettings } = useBrand();
+  const location = useLocation();
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadTours();
   }, [locale]);
+
+  useEffect(() => {
+    if (loading || !location.hash) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(location.hash.slice(1))?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [loading, location.hash, tours]);
 
   const loadTours = async () => {
     setLoading(true);
@@ -50,6 +63,7 @@ const Tours: React.FC = () => {
           {tours.map((tour, index) => (
             <TourCard
               key={tour.id}
+              anchorId={`tour-${tour.id}`}
               image={tour.image}
               title={tour.title}
               description={tour.description}
@@ -67,4 +81,3 @@ const Tours: React.FC = () => {
 };
 
 export default Tours;
-

@@ -23,6 +23,7 @@ interface TourCardProps {
   showPrice?: boolean;
   showDetailsLink?: boolean;
   index?: number;
+  anchorId?: string;
 }
 
 const TourCard: React.FC<TourCardProps> = ({
@@ -37,6 +38,7 @@ const TourCard: React.FC<TourCardProps> = ({
   showPrice = true,
   showDetailsLink = true,
   index = 0,
+  anchorId,
 }) => {
   const intl = useIntl();
   const { brandSettings } = useBrand();
@@ -113,8 +115,9 @@ const TourCard: React.FC<TourCardProps> = ({
 
   return (
     <article
+      id={anchorId}
       onMouseEnter={() => playHoverFx()}
-      className={`group mb-8 inline-block flex h-auto w-full break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
+      className={`group mb-8 inline-block flex h-auto w-full scroll-mt-28 break-inside-avoid flex-col justify-between overflow-hidden ${radiusClass} artsy-glass-card ${swayClass}`}
     >
       {/* Media Frame */}
       <div className="relative aspect-[16/10] overflow-hidden border-b-[2.5px] border-ink">

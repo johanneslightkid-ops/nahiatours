@@ -19,6 +19,7 @@ import {
 } from '../../services/blogService';
 import { getAdminPassword } from '../../services/authStore';
 import { BLOG_TEMPLATES } from '../../lib/blogTemplates';
+import { getTours, Tour } from '../../services/toursService';
 
 const LANGUAGES: Locale[] = ['en', 'es', 'fr', 'de'];
 const LANGUAGE_NAME: Record<Locale, string> = { en: 'English', es: 'Español', fr: 'Français', de: 'Deutsch' };
@@ -39,6 +40,7 @@ const emptyArticle = (locale: Locale): BlogArticle => ({
   caption: '',
   prelude: '',
   images: [],
+  relatedTourIds: [],
   social: [],
 });
 
@@ -65,6 +67,7 @@ const articleForLanguage = (article: GeneratedArticle, base: BlogArticle, locale
 const BlogAdminPanel: React.FC = () => {
   const { brandSettings } = useBrand();
   const [groups, setGroups] = useState<ArticleGroup[]>([]);
+  const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState('');
@@ -113,6 +116,7 @@ const BlogAdminPanel: React.FC = () => {
 
   useEffect(() => {
     void refresh();
+    getTours('en').then(setTours);
   }, [refresh]);
 
   const selectedGroup = groups.find((group) => group.id === selectedId);
@@ -135,7 +139,7 @@ const BlogAdminPanel: React.FC = () => {
     setIsNew(false);
     setSelectedId(group.id);
     setEditingLocale(preferred);
-    setDraft({ ...article, tags: [...article.tags], images: [...article.images] });
+    setDraft({ ...article, tags: [...article.tags], images: [...article.images], relatedTourIds: [...article.relatedTourIds] });
     setScope([...LANGUAGES]);
     setInstructions('');
     setProblem('');
@@ -160,7 +164,7 @@ const BlogAdminPanel: React.FC = () => {
     }
     const article = selectedGroup?.variants[locale];
     if (article) {
-      setDraft({ ...article, tags: [...article.tags], images: [...article.images] });
+      setDraft({ ...article, tags: [...article.tags], images: [...article.images], relatedTourIds: [...article.relatedTourIds] });
     } else {
       setDraft((current) => ({ ...current, locale }));
     }
@@ -197,6 +201,7 @@ const BlogAdminPanel: React.FC = () => {
             ...value,
             tags: source.tags,
             images: source.images,
+            relatedTourIds: source.relatedTourIds,
             social: source.social,
             locale,
             slug: slugify(value.title) || source.slug,
@@ -510,6 +515,42 @@ const BlogAdminPanel: React.FC = () => {
                   Excursión o tema
                   <input value={draft.tour} onChange={(event) => setDraft({ ...draft, tour: event.target.value })} className={fieldClass} />
                 </label>
+                <fieldset className="space-y-2 sm:col-span-2">
+                  <legend className="text-xs font-bold text-ink-soft">Tours relacionados · widget al final del artículo</legend>
+                  {tours.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {tours.map((tour) => {
+                        const selected = draft.relatedTourIds.includes(tour.id);
+                        return (
+                          <label
+                            key={tour.id}
+                            className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold ${
+                              selected ? 'border-lagoon-dark bg-lagoon-light text-ink' : 'border-ink/15 bg-white text-ink-soft'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selected}
+                              onChange={() => setDraft((current) => ({
+                                ...current,
+                                relatedTourIds: selected
+                                  ? current.relatedTourIds.filter((id) => id !== tour.id)
+                                  : [...current.relatedTourIds, tour.id],
+                              }))}
+                              className="accent-lagoon-dark"
+                            />
+                            {tour.title}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-ink-light">No se pudieron cargar los tours para vincularlos.</p>
+                  )}
+                  <p className="text-xs text-ink-light">
+                    Los tours elegidos mostrarán fotos, información y precio con un enlace directo para consultar y reservar.
+                  </p>
+                </fieldset>
                 <label className="space-y-1.5 text-xs font-bold text-ink-soft sm:col-span-2">
                   Resumen
                   <textarea rows={2} value={draft.caption} onChange={(event) => setDraft({ ...draft, caption: event.target.value })} className={fieldClass} />

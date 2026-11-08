@@ -359,6 +359,9 @@ const AIBlogGenAdmin: React.FC = () => {
     caption: article.caption,
     prelude: article.prelude,
     images: post.images,
+    relatedTourIds: tours
+      .filter((tour) => selectedTours.includes(tour.title))
+      .map((tour) => tour.id),
     social: post.social,
   });
 

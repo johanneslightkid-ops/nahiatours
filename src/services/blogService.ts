@@ -19,6 +19,8 @@ export interface RawBlogArticle {
   prelude?: string | { en?: string; es?: string };
   /** Photographs referenced from the body as [[IMAGE-1]] … in order. */
   images?: string[];
+  /** Stable IDs of related tours in the Tours catalogue. */
+  relatedTourIds?: number[];
   /** Per-platform social cut, written alongside the article. */
   social?: Array<{ platform: string; text: string; hashtags?: string[] }>;
 }
@@ -42,6 +44,7 @@ export interface BlogArticle {
   caption: string;
   prelude: string;
   images: string[];
+  relatedTourIds: number[];
   social: SocialCutRecord[];
 }
 
@@ -97,6 +100,9 @@ const normalizeBlogArticle = (rawArticle: RawBlogArticle, locale: Locale): BlogA
     caption: getLocalizedValue(rawArticle.caption, locale),
     prelude: getLocalizedValue(rawArticle.prelude, locale),
     images: Array.isArray(rawArticle.images) ? rawArticle.images.filter(Boolean) : [],
+    relatedTourIds: Array.isArray(rawArticle.relatedTourIds)
+      ? rawArticle.relatedTourIds.map(Number).filter((id) => Number.isSafeInteger(id) && id > 0)
+      : [],
     social: Array.isArray(rawArticle.social)
       ? rawArticle.social
           .filter((cut) => cut && cut.platform && cut.text)
@@ -185,6 +191,7 @@ export const saveBlogArticle = async (article: BlogArticle, locale: Locale): Pro
       caption: article.caption,
       prelude: article.prelude,
       images: article.images,
+      relatedTourIds: article.relatedTourIds,
       social: article.social,
     };
 

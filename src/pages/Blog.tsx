@@ -1,5 +1,5 @@
 import React, { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { localeText } from '../lib/localeText';
 import { FormattedMessage } from 'react-intl';
@@ -12,6 +12,7 @@ import { useBlog } from '../contexts/BlogContext';
 import { generateBlogPageMeta, generateBlogListStructuredData } from '../utils/seoHelpers';
 import ArticleBody from '../components/ui/ArticleBody';
 import type { BlogArticle } from '../services/blogService';
+import { getTours, Tour } from '../services/toursService';
 import {
   buildSearchIndex,
   completeWord,
@@ -75,11 +76,62 @@ const Blog = () => {
   const { brandSettings } = useBrand();
   const { blogArticles, loading, error } = useBlog();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [tourCatalog, setTourCatalog] = useState<Tour[]>([]);
 
   const all = useMemo(
     () => (blogArticles[getContentLocale(locale)] ?? []).filter((a) => a.visible !== false),
     [blogArticles, locale]
   );
+
+  useEffect(() => {
+    let active = true;
+    getTours(getContentLocale(locale))
+      .then((tours) => {
+        if (active) setTourCatalog(tours);
+      })
+      .catch((loadError) => {
+        console.error('[Blog] Could not load related tours:', loadError);
+        if (active) setTourCatalog([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [locale]);
+
+  const relatedToursFor = (article: BlogArticle): Tour[] => {
+    if (article.relatedTourIds.length > 0) {
+      const byId = new Set(article.relatedTourIds);
+      const matches = tourCatalog.filter((tour) => byId.has(tour.id));
+      if (matches.length > 0) return matches;
+    }
+
+    const legacyNames = (article.tour || '')
+      .split(',')
+      .map((name) => normalizeText(name))
+      .filter(Boolean);
+    return legacyNames.length
+      ? tourCatalog.filter((tour) => legacyNames.includes(normalizeText(tour.title)))
+      : [];
+  };
+
+  const relatedToursHeading = localeText(locale, {
+    en: 'Make this day yours',
+    es: 'Vive esta experiencia',
+    fr: 'Vivez cette expérience',
+    de: 'Erlebe diesen Ausflug',
+  });
+  const tourPageLinkLabel = localeText(locale, {
+    en: 'See tour details & book',
+    es: 'Ver detalles y reservar',
+    fr: 'Voir les détails et réserver',
+    de: 'Details ansehen & buchen',
+  });
+  const perPersonLabel = localeText(locale, {
+    en: 'per person',
+    es: 'por persona',
+    fr: 'par personne',
+    de: 'pro Person',
+  });
   // ── State, mirrored in the URL so a filtered view can be shared ──────────
   const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
 
@@ -620,6 +672,7 @@ const Blog = () => {
               <ol className="mt-4 space-y-3">
                 {results.map((article, position) => {
                   const open = isOpen(article.slug, position);
+                  const relatedTours = relatedToursFor(article);
                   const hit = hitBySlug.get(article.slug);
                   const matched = hit?.matched ?? [];
                   const panelId = `story-${article.slug}`;
@@ -715,6 +768,54 @@ const Blog = () => {
                               title={article.title}
                             />
                           </div>
+                          {relatedTours.length > 0 && (
+                            <section className="mt-8 border-t-2 border-dashed border-ink/20 pt-6" aria-label={relatedToursHeading}>
+                              <h3 className="mb-4 font-display text-xl font-extrabold text-ink sm:text-2xl">
+                                {relatedToursHeading}
+                              </h3>
+                              <div className="grid gap-4 lg:grid-cols-2">
+                                {relatedTours.map((tour) => {
+                                  const photos = [...new Set([tour.image, ...tour.details.images].filter(Boolean))].slice(0, 3);
+                                  const price = tour.pricingOptions[0]?.price || tour.price;
+                                  return (
+                                    <article key={tour.id} className="overflow-hidden rounded-2xl border border-ink/15 bg-white shadow-sm">
+                                      <div className="grid grid-cols-3 gap-1">
+                                        {photos.map((photo, index) => (
+                                          <img
+                                            key={photo}
+                                            src={photo}
+                                            alt={`${tour.title} · ${index + 1}`}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className={`h-28 w-full object-cover sm:h-36 ${index === 0 ? 'col-span-2 row-span-2 h-full min-h-56 sm:min-h-72' : ''}`}
+                                          />
+                                        ))}
+                                      </div>
+                                      <div className="p-4 sm:p-5">
+                                        <div className="flex flex-wrap items-start justify-between gap-3">
+                                          <h4 className="font-display text-lg font-extrabold text-ink">{tour.title}</h4>
+                                          {price && (
+                                            <p className="shrink-0 rounded-full bg-mango-light px-3 py-1 text-sm font-extrabold text-ink">
+                                              {price} <span className="font-semibold">{perPersonLabel}</span>
+                                            </p>
+                                          )}
+                                        </div>
+                                        <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                                          {tour.details.description || tour.description}
+                                        </p>
+                                        <Link
+                                          to={`/tours#tour-${tour.id}`}
+                                          className="mt-4 inline-flex rounded-full border-2 border-ink bg-ink px-4 py-2 text-sm font-extrabold text-paper transition hover:bg-lagoon-dark"
+                                        >
+                                          {tourPageLinkLabel}
+                                        </Link>
+                                      </div>
+                                    </article>
+                                  );
+                                })}
+                              </div>
+                            </section>
+                          )}
                           <div className="mt-6 flex justify-end">
                             <button
                               type="button"

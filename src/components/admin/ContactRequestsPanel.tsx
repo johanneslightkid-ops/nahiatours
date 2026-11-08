@@ -5,6 +5,12 @@ import {
   markContactRequest,
 } from '../../services/contactRequestService';
 import { generateWhatsAppMessage } from '../../utils/whatsapp';
+import { Lang, translateRecord } from '../../lib/autoTranslate';
+
+type RequestTranslation = Pick<ContactRequest, 'message' | 'context' | 'when'>;
+
+const isLang = (locale: string): locale is Lang =>
+  locale === 'en' || locale === 'es' || locale === 'de' || locale === 'fr';
 
 const KIND: Record<ContactRequest['kind'], { label: string; emoji: string }> = {
   callback: { label: 'Llamar de vuelta', emoji: '📞' },
@@ -31,6 +37,9 @@ const ContactRequestsPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showDone, setShowDone] = useState(false);
+  const [translations, setTranslations] = useState<Record<string, RequestTranslation>>({});
+  const [translationErrors, setTranslationErrors] = useState<Record<string, string>>({});
+  const [translatingId, setTranslatingId] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -56,6 +65,32 @@ const ContactRequestsPanel: React.FC = () => {
     } catch (failure: any) {
       setError(failure?.message || 'No se pudo actualizar.');
       load();
+    }
+  };
+
+  const translateToSpanish = async (request: ContactRequest) => {
+    setTranslatingId(request.id);
+    setTranslationErrors((current) => ({ ...current, [request.id]: '' }));
+    try {
+      const source: RequestTranslation = {
+        message: request.message,
+        context: request.context,
+        when: request.when,
+      };
+      if (request.locale === 'es') {
+        setTranslations((current) => ({ ...current, [request.id]: source }));
+        return;
+      }
+      const from = isLang(request.locale) ? request.locale : 'en';
+      const { value } = await translateRecord(source, from, 'es');
+      setTranslations((current) => ({ ...current, [request.id]: value }));
+    } catch (failure) {
+      setTranslationErrors((current) => ({
+        ...current,
+        [request.id]: failure instanceof Error ? failure.message : String(failure),
+      }));
+    } finally {
+      setTranslatingId('');
     }
   };
 
@@ -115,6 +150,35 @@ const ContactRequestsPanel: React.FC = () => {
                   {request.context && <div className="text-ink-soft">Sobre: {request.context}</div>}
                   {request.message && <div className="whitespace-pre-line rounded-xl bg-ink/5 p-3 text-ink-soft">{request.message}</div>}
                 </div>
+                {(request.message || request.context || request.when) && (
+                  <div className="mt-3">
+                    <button
+                      type="button"
+                      onClick={() => void translateToSpanish(request)}
+                      disabled={Boolean(translatingId)}
+                      className="rounded-full border border-lagoon-dark/40 bg-white px-4 py-1.5 text-sm font-bold text-lagoon-dark transition hover:bg-lagoon/10 disabled:opacity-60"
+                    >
+                      {translatingId === request.id ? 'Traduciendo…' : 'Traducir al español'}
+                    </button>
+                    {translations[request.id] && (
+                      <div className="mt-3 rounded-xl border border-lagoon/30 bg-lagoon/10 p-3 text-sm text-ink" aria-live="polite">
+                        <p className="mb-2 text-xs font-extrabold uppercase tracking-wide text-lagoon-dark">
+                          {request.locale === 'es' ? 'El texto original ya está en español' : 'Traducción al español'}
+                        </p>
+                        {translations[request.id].when && <p>🕑 {translations[request.id].when}</p>}
+                        {translations[request.id].context && <p className="mt-1">Sobre: {translations[request.id].context}</p>}
+                        {translations[request.id].message && (
+                          <p className="mt-2 whitespace-pre-line">{translations[request.id].message}</p>
+                        )}
+                      </div>
+                    )}
+                    {translationErrors[request.id] && (
+                      <p className="mt-2 text-sm font-semibold text-hibiscus-dark" role="alert">
+                        No se pudo traducir: {translationErrors[request.id]}
+                      </p>
+                    )}
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => toggle(request)}
