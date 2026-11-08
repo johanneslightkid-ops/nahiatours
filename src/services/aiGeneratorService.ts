@@ -32,6 +32,10 @@ export interface BlogGenerationParams {
   template?: string;
   /** Editorial angle for the selected audience; not a claim about a nationality. */
   audienceFocus?: string;
+  /** Existing article to use as the factual starting point when recreating. */
+  sourceArticle?: GeneratedArticle;
+  /** Specific editorial changes requested for a recreation. */
+  recreateInstruction?: string;
   /** Selected contextual hashtags, without the leading #. */
   hashtags?: string[];
   /** Short real guest reviews, quoted as social proof. Never invented. */
@@ -300,6 +304,7 @@ const buildEnglishPrompt = (
   const targetWords = template.targetWords;
   const keywords = keywordsFor(params.topics, 'en');
   const reviews = (params.reviews || []).filter(Boolean).slice(0, 3);
+  const sourceArticle = params.sourceArticle;
 
   return `Write a long-form travel feature in ENGLISH for ${brand}, a tour operator in
 Punta Cana, Dominican Republic.
@@ -324,6 +329,8 @@ trying to decide, what worries them (safety, value, getting there, the kids,
 the sun) and what they will want to tell their friends afterwards — and answer
 all three.
 ${params.audienceFocus ? `EDITORIAL ANGLE FOR THIS AUDIENCE\n${params.audienceFocus}\nUse this as a writing lens, not as a claim about everyone from that place. Avoid stereotypes and explain local context naturally.\n` : ''}
+${sourceArticle ? `EXISTING ARTICLE TO RECREATE\nUse this article as the factual and editorial starting point. Preserve accurate details, but rewrite it to fit the selected format and the specific instructions. Do not copy stale phrasing or add unsupported facts.\nTITLE: ${sourceArticle.title}\nCAPTION: ${sourceArticle.caption}\nPRELUDE: ${sourceArticle.prelude}\nBODY:\n${sourceArticle.body}\n` : ''}
+${params.recreateInstruction?.trim() ? `SPECIFIC RECREATION INSTRUCTIONS\n${params.recreateInstruction.trim()}\n` : ''}
 
 EXCURSIONS TO FEATURE
 ${params.selectedTours.length ? params.selectedTours.join('\n') : 'the best of Punta Cana and the Bávaro coast'}
@@ -421,13 +428,17 @@ const buildSocialPrompt = (
   hashtags: string[],
   brand: string
 ) =>
-  `Write the social media cut of this article for a Caribbean tour operator called ${brand}.
+  `Create one standalone content asset per selected channel for a Caribbean tour operator called ${brand}.
 
-One post per platform, in this exact format, nothing else:
+Use this exact format, nothing else:
 
-${platforms.map((p) => `[${p.toUpperCase()}]\n<the post>`).join('\n\n')}
+${platforms.map((p) =>
+    p === 'google-search'
+      ? '[GOOGLE-SEARCH]\nSEO title: <max 60 characters>\nMeta description: <max 155 characters>\nPrimary search phrase: <one phrase>\nRelated phrases: <up to 5 natural phrases>\nSearch snippet: <clear, factual, inviting answer>'
+      : `[${p.toUpperCase()}]\n<the post>`
+  ).join('\n\n')}
 
-Rules for every platform: the first line is the hook — a specific detail or a
+For every social platform, the first line is the hook — a specific detail or a
 question the reader cannot scroll past — and it must make sense on its own. No
 engagement bait ("tag a friend who…"), no invented facts, no prices unless the
 article gives them. Speak like a local who loves the place, not like an ad.
@@ -441,6 +452,10 @@ Rules per platform:
 - twitter: under 260 characters including the hashtags.
 - youtube: 2 sentences of description plus 5 hashtags.
 - linkedin: 70 words, professional, about the operation rather than the party.
+- google-search: Write a Google-ready search result package, not a social post.
+  Keep the title and description within the character limits above, answer the
+  traveller's intent, use natural language, and make no unsupported claims.
+  Do not promise rankings or stuff keywords.
 
 Write each post in the same language as the article. Draw hashtags from this
 list where they fit, and add others that genuinely match:
@@ -459,7 +474,7 @@ const parseSocial = (raw: string, platforms: string[]): SocialCut[] => {
   const cuts: SocialCut[] = [];
 
   for (const platform of platforms) {
-    const re = new RegExp(`\\[${platform}\\]\\s*([\\s\\S]*?)(?=\\n\\s*\\[[a-z]+\\]|$)`, 'i');
+    const re = new RegExp(`\\[${platform}\\]\\s*([\\s\\S]*?)(?=\\n\\s*\\[[a-z-]+\\]|$)`, 'i');
     const text = re.exec(raw)?.[1]?.trim();
     if (!text) continue;
     const hashtags = [...text.matchAll(/#([\p{L}\p{N}_]+)/gu)].map((m) => m[1]);

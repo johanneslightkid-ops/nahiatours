@@ -116,11 +116,35 @@ interface PostState {
   view: BlogLang;
 }
 
+const GENERATED_DRAFTS_KEY = 'nahiatours:blog-generator:drafts:v1';
+
+const loadGeneratedDrafts = (): PostState[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = window.localStorage.getItem(GENERATED_DRAFTS_KEY);
+    if (!stored) return [];
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (entry): entry is PostState =>
+        Boolean(entry && typeof entry.id === 'string' && entry.post && entry.brief)
+    );
+  } catch (error) {
+    console.warn('[Blog generator] Could not restore saved drafts:', error);
+    return [];
+  }
+};
+
 /** The generator writes every site language itself, from the English piece. */
 const EDITIONS = SUPPORTED_LOCALES.filter((l) => l !== 'en') as BlogLang[];
 const LANGUAGE_TABS: Record<BlogLang, string> = { es: 'Español', en: 'English', fr: 'Français', de: 'Deutsch' };
 const PROGRESS_LANGUAGE: Record<BlogLang, string> = { en: 'inglés', es: 'español', fr: 'francés', de: 'alemán' };
 const MAX_BATCH_ARTICLES = 6;
+const GOOGLE_SEARCH_CHANNEL = {
+  platform: 'google-search',
+  label: 'Google Search · SEO',
+  note: 'SEO title, meta description, search phrase and snippet for Google search results.',
+};
 
 const AUDIENCE_HASHTAGS: Record<string, string[]> = {
   'us-couple-premium': ['CouplesTravel', 'TravelPlanning'],
@@ -229,7 +253,7 @@ const AIBlogGenAdmin: React.FC = () => {
     'CaribbeanTravel',
   ]);
   const [reviews, setReviews] = useState<string[]>([]);
-  const [quoteReviews, setQuoteReviews] = useState(true);
+  const [quoteReviews, setQuoteReviews] = useState(false);
   const [selectedTours, setSelectedTours] = useState<string[]>([]);
   const [audience, setAudience] = useState<Audience>({
     origin: 'Estados Unidos',
@@ -244,8 +268,8 @@ const AIBlogGenAdmin: React.FC = () => {
   const [uploading, setUploading] = useState(false);
 
   // ── How it comes out ─────────────────────────────────────────────────────
-  const [platforms, setPlatforms] = useState<string[]>([]);
-  const [autoSave, setAutoSave] = useState(false);
+  const [platforms, setPlatforms] = useState<string[]>(['google-search']);
+  const [autoSave, setAutoSave] = useState(true);
   const [autoPublish, setAutoPublish] = useState(false);
 
   // ── Running ──────────────────────────────────────────────────────────────
@@ -256,14 +280,26 @@ const AIBlogGenAdmin: React.FC = () => {
   const [problemFailures, setProblemFailures] = useState<{ provider: string; error: string }[]>([]);
   /** Null until the deployment has been asked; false means nothing can run. */
   const [anyProviderUsable, setAnyProviderUsable] = useState<boolean | null>(null);
-  const [posts, setPosts] = useState<PostState[]>([]);
+  const [posts, setPosts] = useState<PostState[]>(loadGeneratedDrafts);
   const [copied, setCopied] = useState('');
+  const [draftPersistenceProblem, setDraftPersistenceProblem] = useState('');
+  const [pendingGenerate, setPendingGenerate] = useState<ArticleBrief[] | null | undefined>(undefined);
   const sync = useTranslationSync('en');
 
   // ── Dictation ────────────────────────────────────────────────────────────
   // The notes are dictated in the language the admin is working in.
   const { locale } = useI18n();
   const dictation = useDictation(notes, setNotes, locale);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(GENERATED_DRAFTS_KEY, JSON.stringify(posts));
+      setDraftPersistenceProblem('');
+    } catch (error) {
+      console.error('[Blog generator] Could not persist generated articles:', error);
+      setDraftPersistenceProblem('No se pudieron guardar los borradores en este navegador. Publica el artículo para conservarlo en el sitio.');
+    }
+  }, [posts]);
 
   useEffect(() => {
     (async () => {
@@ -369,10 +405,14 @@ const AIBlogGenAdmin: React.FC = () => {
 
   /** All four languages at once; an edition the model could not write is translated instead. */
   const savePost = async (entry: PostState) => {
-    await saveBlogArticle(buildArticleRecord(entry.post.en, entry.post, 'en', entry.id), 'en');
+    if (!(await saveBlogArticle(buildArticleRecord(entry.post.en, entry.post, 'en', entry.id), 'en'))) {
+      throw new Error('No se pudo guardar la versión en inglés.');
+    }
     for (const lang of EDITIONS) {
       if (entry.post.missing.includes(lang)) continue;
-      await saveBlogArticle(buildArticleRecord(entry.post[lang], entry.post, lang, entry.id), lang);
+      if (!(await saveBlogArticle(buildArticleRecord(entry.post[lang], entry.post, lang, entry.id), lang))) {
+        throw new Error(`No se pudo guardar la versión en ${LANGUAGE_TABS[lang]}.`);
+      }
     }
     setPosts((prev) => prev.map((p) => (p.id === entry.id ? { ...p, saved: true } : p)));
     const toTranslate = entry.post.missing.filter((lang) => EDITIONS.includes(lang)) as Lang[];
@@ -430,8 +470,20 @@ const AIBlogGenAdmin: React.FC = () => {
     }
   };
 
-  const handleGenerate = async (requestedBriefs?: ArticleBrief[]) => {
+  const handleGenerate = async (
+    requestedBriefs?: ArticleBrief[],
+    channelOverride?: string[]
+  ) => {
     if (!aiSettings) return;
+    if (
+      channelOverride === undefined &&
+      platforms.includes(GOOGLE_SEARCH_CHANNEL.platform) &&
+      platforms.length > 1
+    ) {
+      setPendingGenerate(requestedBriefs ?? null);
+      return;
+    }
+    const outputChannels = channelOverride ?? platforms;
     const activeAudiences: Array<{
       audience: Audience;
       audienceLabel: string;
@@ -492,7 +544,7 @@ const AIBlogGenAdmin: React.FC = () => {
             mediaBase64: firstImageBase64,
             images,
             brandName: brandSettings.brandName,
-            socialPlatforms: platforms,
+            socialPlatforms: outputChannels,
             template: brief.templateId,
             reviews: quoteReviews ? reviews : [],
             languages: EDITIONS,
@@ -556,6 +608,10 @@ const AIBlogGenAdmin: React.FC = () => {
         aiSettings.activeProvider
       ]
     : '…';
+  const channelOptions = [
+    ...SHARE_TARGETS.map((target) => ({ ...target, noteText: target.note.es })),
+    { ...GOOGLE_SEARCH_CHANNEL, noteText: GOOGLE_SEARCH_CHANNEL.note },
+  ];
 
   const chip = (active: boolean) =>
     `rounded-full border px-3.5 py-1.5 text-sm font-semibold transition ${
@@ -615,8 +671,13 @@ const AIBlogGenAdmin: React.FC = () => {
             <strong className="text-ink">{providerLabel}</strong>
           </p>
         </div>
-        <GenerateButton size="lead" />
       </div>
+      {posts.length > 0 && (
+        <p className="text-xs text-ink-light">
+          {posts.length} artículo(s) recuperado(s) o generado(s) en este navegador.{' '}
+          {posts.filter((entry) => entry.saved).length} guardado(s) en el sitio.
+        </p>
+      )}
 
       {anyProviderUsable === false && !problem && (
         <div className="rounded-2xl border border-sunset/50 bg-sunset/10 p-5">
@@ -654,6 +715,67 @@ const AIBlogGenAdmin: React.FC = () => {
             Puedes probar cada proveedor por separado en “Integraciones de IA”, con el botón
             “Probar”. Cloudflare Workers AI funciona sin clave en esta instalación.
           </p>
+        </div>
+      )}
+      {draftPersistenceProblem && (
+        <p className="rounded-2xl border border-sunset/40 bg-sunset/10 p-4 text-sm font-semibold text-sunset-dark">
+          {draftPersistenceProblem}
+        </p>
+      )}
+      {pendingGenerate !== undefined && (
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-ink/60 p-4" role="dialog" aria-modal="true" aria-labelledby="output-selection-title">
+          <div className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl">
+            <h3 id="output-selection-title" className="text-xl font-bold text-ink">Confirmar los formatos de salida</h3>
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+              Google Search y las redes sociales necesitan piezas distintas: la búsqueda usa título y descripción SEO,
+              mientras que cada red tiene su propio formato. Puedes generar todo por separado o elegir un conjunto enfocado.
+            </p>
+            <div className="mt-5 grid gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const briefs = pendingGenerate;
+                  setPendingGenerate(undefined);
+                  void handleGenerate(briefs ?? undefined, platforms);
+                }}
+                className="rounded-2xl bg-lagoon-dark px-4 py-3 text-left text-sm font-bold text-white"
+              >
+                Continuar con Google Search y redes
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const briefs = pendingGenerate;
+                  setPendingGenerate(undefined);
+                  setPlatforms([GOOGLE_SEARCH_CHANNEL.platform]);
+                  void handleGenerate(briefs ?? undefined, [GOOGLE_SEARCH_CHANNEL.platform]);
+                }}
+                className="rounded-2xl border border-ink/15 px-4 py-3 text-left text-sm font-bold text-ink"
+              >
+                Usar solo Google Search
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const briefs = pendingGenerate;
+                  const socialChannels = platforms.filter((platform) => platform !== GOOGLE_SEARCH_CHANNEL.platform);
+                  setPendingGenerate(undefined);
+                  setPlatforms(socialChannels);
+                  void handleGenerate(briefs ?? undefined, socialChannels);
+                }}
+                className="rounded-2xl border border-ink/15 px-4 py-3 text-left text-sm font-bold text-ink"
+              >
+                Usar solo redes sociales
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingGenerate(undefined)}
+                className="rounded-2xl px-4 py-3 text-sm font-semibold text-ink-light hover:bg-paper-warm"
+              >
+                Volver a editar
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -1026,10 +1148,10 @@ const AIBlogGenAdmin: React.FC = () => {
 
           <div>
             <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-              Versión para redes
+              Uso y optimización
             </p>
             <div className="flex flex-wrap gap-1.5">
-              {SHARE_TARGETS.map((target) => {
+              {channelOptions.map((target) => {
                 const configured = socialAccounts.some(
                   (a) => a.platform === target.platform
                 );
@@ -1038,17 +1160,23 @@ const AIBlogGenAdmin: React.FC = () => {
                     key={target.platform}
                     type="button"
                     onClick={() => setPlatforms((prev) => toggle(prev, target.platform))}
-                    title={configured ? 'Cuenta configurada' : 'Sin cuenta configurada — se podrá copiar y compartir'}
+                    title={
+                      target.platform === 'google-search'
+                        ? target.noteText
+                        : configured
+                          ? 'Cuenta configurada'
+                          : 'Sin cuenta configurada — se podrá copiar y compartir'
+                    }
                     className={`${chip(platforms.includes(target.platform))} !px-3 !py-1 !text-[0.8rem]`}
                   >
                     {target.label}
-                    {configured && <span className="ml-1.5 text-[0.7em]">●</span>}
+                    {configured && target.platform !== 'google-search' && <span className="ml-1.5 text-[0.7em]">●</span>}
                   </button>
                 );
               })}
             </div>
             <p className="mt-2 text-xs text-ink-light">
-              ● = cuenta configurada. Las demás se generan igual y se comparten con copiar y pegar.
+              Google Search crea un paquete de SEO; cada red social recibe su propio texto adaptado.
             </p>
           </div>
         </div>
@@ -1208,7 +1336,7 @@ const AIBlogGenAdmin: React.FC = () => {
             {/* The social cut. */}
             {entry.post.social.length > 0 && (
               <div className="mt-8 border-t border-ink/10 pt-6">
-                <h4 className="mb-4 text-lg font-bold text-ink">Versión para redes</h4>
+                <h4 className="mb-4 text-lg font-bold text-ink">Adaptaciones por canal</h4>
                 <div className="grid gap-4 md:grid-cols-2">
                   {entry.post.social.map((cut) => {
                     const target = shareTargetFor(cut.platform);
@@ -1223,14 +1351,16 @@ const AIBlogGenAdmin: React.FC = () => {
                         className="flex flex-col rounded-2xl border border-ink/12 bg-paper-warm p-4"
                       >
                         <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-                          {target?.label || cut.platform}
+                          {target?.label || (cut.platform === 'google-search' ? 'Google Search · SEO' : cut.platform)}
                         </p>
                         <p className="flex-1 whitespace-pre-wrap text-sm leading-relaxed text-ink-soft">
                           {cut.text}
                         </p>
-                        {target && (
-                          <p className="mt-3 text-xs text-ink-light">{target.note.es}</p>
-                        )}
+                        <p className="mt-3 text-xs text-ink-light">
+                          {target?.note.es || (cut.platform === 'google-search'
+                            ? GOOGLE_SEARCH_CHANNEL.note
+                            : '')}
+                        </p>
                         <div className="mt-3 flex gap-2">
                           <button
                             type="button"
@@ -1239,13 +1369,15 @@ const AIBlogGenAdmin: React.FC = () => {
                           >
                             {copied === key ? <FaCheck /> : <FaCopy />} Copiar
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => shareTo(cut.platform, cut.text, url)}
-                            className="inline-flex items-center gap-2 rounded-full bg-lagoon-dark px-4 py-2 text-xs font-bold text-white transition hover:brightness-110"
-                          >
-                            <FaShareAlt /> Compartir
-                          </button>
+                          {target && (
+                            <button
+                              type="button"
+                              onClick={() => shareTo(cut.platform, cut.text, url)}
+                              className="inline-flex items-center gap-2 rounded-full bg-lagoon-dark px-4 py-2 text-xs font-bold text-white transition hover:brightness-110"
+                            >
+                              <FaShareAlt /> Compartir
+                            </button>
+                          )}
                         </div>
                       </div>
                     );

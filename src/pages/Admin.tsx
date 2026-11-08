@@ -10,6 +10,7 @@ import SocialMediaAdmin from '../components/admin/SocialMediaAdmin';
 import StoryAdmin from '../components/admin/StoryAdmin';
 import AIAssistantAdmin from '../components/admin/AIAssistantAdmin';
 import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
+import BlogAdminPanel from '../components/admin/BlogAdminPanel';
 import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
 import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
@@ -38,6 +39,7 @@ const Admin: React.FC = () => {
   const [tours, setTours] = useState<Tour[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeSection = searchParams.get('section') || 'brand';
+  const blogTab = searchParams.get('blogTab') === 'manage' ? 'manage' : 'generate';
 
   useEffect(() => {
     const fetchBrand = async () => {
@@ -289,7 +291,32 @@ const Admin: React.FC = () => {
         {/* AI Blog Gen Section */}
         {activeSection === 'aiBlogGen' && (
           <div className="rounded-3xl bg-paper p-6 shadow-lg border border-ink/15">
-            <AIBlogGenAdmin />
+            <div className="mb-6 flex flex-wrap gap-2 border-b border-ink/10 pb-4">
+              {([
+                ['generate', 'Generar artículos'],
+                ['manage', 'Gestionar artículos'],
+              ] as const).map(([tab, label]) => (
+                <button
+                  type="button"
+                  key={tab}
+                  aria-current={blogTab === tab ? 'page' : undefined}
+                  onClick={() => {
+                    const next = new URLSearchParams(searchParams);
+                    next.set('section', 'aiBlogGen');
+                    next.set('blogTab', tab);
+                    setSearchParams(next);
+                  }}
+                  className={`rounded-full px-5 py-2.5 text-sm font-bold transition ${
+                    blogTab === tab
+                      ? 'bg-lagoon-dark text-white'
+                      : 'border border-ink/15 bg-white text-ink-soft hover:border-lagoon'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {blogTab === 'manage' ? <BlogAdminPanel /> : <AIBlogGenAdmin />}
           </div>
         )}
       </div>
