@@ -3,6 +3,7 @@ import { FaImage, FaSave, FaSearch, FaTrash, FaUpload } from 'react-icons/fa';
 import { getAdminPassword } from '../../services/authStore';
 import {
   getImageCatalog,
+  BLOG_IMAGE_TAGS,
   IMAGE_POOL_PACKS,
   PoolImage,
   saveImageCatalog,
@@ -11,7 +12,7 @@ import {
 const commaList = (value: string) =>
   [...new Set(value.split(',').map((item) => item.trim()).filter(Boolean))];
 
-const fromFile = (file: File, url: string, packIds: string[]): PoolImage => {
+const fromFile = (file: File, url: string, packIds: string[], hashtags: string[]): PoolImage => {
   const packs = IMAGE_POOL_PACKS.filter((pack) => packIds.includes(pack.id));
   const unique = (values: string[]) => [...new Set(values)];
   return {
@@ -24,6 +25,7 @@ const fromFile = (file: File, url: string, packIds: string[]): PoolImage => {
     audiences: unique(packs.flatMap((pack) => pack.audiences)),
     ageGroups: unique(packs.flatMap((pack) => pack.ageGroups)),
     travelStyles: unique(packs.flatMap((pack) => pack.travelStyles)),
+    hashtags,
     createdAt: new Date().toISOString(),
   };
 };
@@ -35,6 +37,7 @@ const ImagePoolAdmin: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedPacks, setSelectedPacks] = useState<string[]>(['saona-family']);
+  const [selectedUploadHashtags, setSelectedUploadHashtags] = useState<string[]>([]);
   const [notice, setNotice] = useState('');
   const [problem, setProblem] = useState('');
 
@@ -55,6 +58,7 @@ const ImagePoolAdmin: React.FC = () => {
         ...image.categories,
         ...image.excursions,
         ...image.audiences,
+        ...image.hashtags,
       ].join(' ').toLowerCase().includes(query)
     );
   }, [images, search]);
@@ -64,10 +68,15 @@ const ImagePoolAdmin: React.FC = () => {
       ? current.filter((value) => value !== id)
       : [...current, id]);
 
+  const toggleUploadHashtag = (tag: string) =>
+    setSelectedUploadHashtags((current) => current.includes(tag)
+      ? current.filter((value) => value !== tag)
+      : [...current, tag]);
+
   const updateImage = (id: string, key: keyof PoolImage, value: string) => {
     setImages((current) => current.map((image) =>
       image.id === id
-        ? { ...image, [key]: ['categories', 'excursions', 'audiences', 'ageGroups', 'travelStyles'].includes(key) ? commaList(value) : value }
+        ? { ...image, [key]: ['categories', 'excursions', 'audiences', 'ageGroups', 'travelStyles', 'hashtags'].includes(key) ? commaList(value) : value }
         : image
     ));
   };
@@ -98,7 +107,7 @@ const ImagePoolAdmin: React.FC = () => {
         if (!response.ok || typeof result.secure_url !== 'string') {
           throw new Error(result.error || `No se pudo subir ${file.name}.`);
         }
-        uploaded.push(fromFile(file, result.secure_url, selectedPacks));
+        uploaded.push(fromFile(file, result.secure_url, selectedPacks, selectedUploadHashtags));
       } catch (error) {
         failures.push(error instanceof Error ? error.message : String(error));
       }
@@ -165,6 +174,27 @@ const ImagePoolAdmin: React.FC = () => {
             </label>
           ))}
         </div>
+        <fieldset className="mt-5">
+          <legend className="text-sm font-bold text-ink">Etiquetas visuales para estas imágenes (opcional)</legend>
+          <p className="mt-1 text-xs text-ink-light">Ayudan a encontrar fotos compatibles para artículos automáticos. Marca solo lo que aparece realmente; no se selecciona ninguna por defecto.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {BLOG_IMAGE_TAGS.map(({ tag, label }) => (
+              <button
+                type="button"
+                key={tag}
+                aria-pressed={selectedUploadHashtags.includes(tag)}
+                onClick={() => toggleUploadHashtag(tag)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                  selectedUploadHashtags.includes(tag)
+                    ? 'border-lagoon-dark bg-lagoon-dark text-white'
+                    : 'border-ink/15 bg-white text-ink-soft hover:border-lagoon'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
         <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-lagoon-dark px-5 py-3 text-sm font-bold text-white">
           <FaUpload /> {uploading ? 'Subiendo imágenes…' : 'Seleccionar varias imágenes'}
           <input type="file" accept="image/*" multiple disabled={uploading} className="hidden" onChange={(event) => { void uploadFiles(event.target.files); event.target.value = ''; }} />
@@ -201,11 +231,42 @@ const ImagePoolAdmin: React.FC = () => {
                   ['audiences', 'Públicos (perfiles editoriales)'],
                   ['ageGroups', 'Edades'],
                   ['travelStyles', 'Estilos'],
+                  ['hashtags', 'Etiquetas visuales (hashtags)'],
                 ] as const).map(([key, label]) => (
                   <label key={key} className="block text-xs font-bold text-ink-soft">{label}
                     <input value={image[key].join(', ')} onChange={(event) => updateImage(image.id, key, event.target.value)} className={`${inputClass} mt-1`} />
                   </label>
                 ))}
+                <div>
+                  <p className="text-xs font-bold text-ink-soft">Añadir etiquetas sugeridas</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {BLOG_IMAGE_TAGS.map(({ tag, label, description }) => (
+                      <button
+                        type="button"
+                        key={tag}
+                        title={description}
+                        aria-pressed={image.hashtags.includes(tag)}
+                        onClick={() => updateImage(
+                          image.id,
+                          'hashtags',
+                          [...new Set(image.hashtags.includes(tag)
+                            ? image.hashtags.filter((value) => value !== tag)
+                            : [...image.hashtags, tag])].join(', ')
+                        )}
+                        className={`rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold ${
+                          image.hashtags.includes(tag)
+                            ? 'border-lagoon-dark bg-lagoon-dark text-white'
+                            : 'border-ink/15 text-ink-soft hover:border-lagoon'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="mt-2 block text-xs font-bold text-ink-soft">Etiquetas personalizadas (separadas por comas)
+                    <input value={image.hashtags.join(', ')} onChange={(event) => updateImage(image.id, 'hashtags', event.target.value)} placeholder="Ej.: paseo al amanecer, paseo en familia" className={`${inputClass} mt-1`} />
+                  </label>
+                </div>
                 <p className="break-all text-[0.65rem] text-ink-light"><FaImage className="mr-1 inline" />Cloudinary · {image.url}</p>
               </div>
             </article>

@@ -46,6 +46,8 @@ import { onRequest as handleNotifyConfig } from '../functions/api/notify-config'
 import { onRequest as handlePayAttempt, sweepOverdue } from '../functions/api/pay-attempt';
 import { onRequest as handleActivity } from '../functions/api/activity';
 import { onRequest as handleSendSummary } from '../functions/api/send-summary';
+import { onRequest as handleBlogAutomation } from '../functions/api/blog-automation';
+import { runScheduledBlogAutomation } from './blogAutomation';
 import { canonicalRedirect, withPreviewHeaders } from '../shared/canonical';
 import { robotsResponse, sitemapResponse, withPageSeo } from '../shared/seo';
 
@@ -79,6 +81,7 @@ const ROUTES: Record<string, RouteHandler> = {
   // One endpoint for Gemini, OpenRouter and Workers AI. `/api/cf-ai` stays
   // routed below so an older client build keeps working after a deploy.
   '/api/ai': handleAi,
+  '/api/blog-automation': handleBlogAutomation,
   // Dictation from a phone: recorded audio to Whisper on Workers AI.
   '/api/transcribe': handleTranscribe,
   '/api/admin-password': handleAdminPassword,
@@ -172,8 +175,9 @@ export default {
     return withPreviewHeaders(response, url.hostname, env);
   },
 
-  /** For a `[triggers] crons` entry, should one ever be added to wrangler.toml. */
-  async scheduled(_event: unknown, env: Env, ctx: ExecutionContext): Promise<void> {
+  /** The hourly trigger also drives admin-configured blog generation intervals. */
+  async scheduled(event: { scheduledTime?: number }, env: Env, ctx: ExecutionContext): Promise<void> {
     ctx.waitUntil(sweepOverdue(env));
+    await runScheduledBlogAutomation(env, event.scheduledTime ?? Date.now());
   },
 };

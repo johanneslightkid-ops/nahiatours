@@ -1,4 +1,5 @@
 import { apiGet, apiPut } from './apiClient';
+import { BLOG_IMAGE_TAGS } from '../lib/blogImageTags';
 
 export interface PoolImage {
   id: string;
@@ -10,6 +11,7 @@ export interface PoolImage {
   audiences: string[];
   ageGroups: string[];
   travelStyles: string[];
+  hashtags: string[];
   createdAt: string;
 }
 
@@ -27,6 +29,8 @@ export interface ImagePoolPack {
   ageGroups: string[];
   travelStyles: string[];
 }
+
+export { BLOG_IMAGE_TAGS };
 
 export const IMAGE_POOL_PACKS: ImagePoolPack[] = [
   {
@@ -130,6 +134,7 @@ const normalizeImage = (value: unknown): PoolImage | null => {
     audiences: unique(image.audiences),
     ageGroups: unique(image.ageGroups),
     travelStyles: unique(image.travelStyles),
+    hashtags: unique(image.hashtags),
     createdAt: typeof image.createdAt === 'string' ? image.createdAt : '',
   };
 };

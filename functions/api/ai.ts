@@ -471,6 +471,74 @@ const runProvider = async (
   return runCloudflare(env, config, prompt, system, maxTokens, temperature, attempts);
 };
 
+export interface AutomationGenerationResult {
+  text: string;
+  provider: Provider;
+  model: string;
+}
+
+/**
+ * Internal Worker entry point for scheduled copy. It shares the same saved
+ * provider settings, model fallbacks, quota handling, and reasoning cleanup as
+ * the authenticated AI endpoint without manufacturing an admin request.
+ */
+export const generateAutomationText = async (
+  env: Record<string, any>,
+  prompt: string,
+  maxTokens = 3200
+): Promise<AutomationGenerationResult> => {
+  const settings = await loadSettings(env);
+  const configuredProvider = settings.activeProvider;
+  const preferred: Provider =
+    configuredProvider === 'gemini' || configuredProvider === 'cloudflare' || configuredProvider === 'openrouter'
+      ? configuredProvider
+      : 'openrouter';
+  const providers: Provider[] = [
+    preferred,
+    ...(['cloudflare', 'gemini', 'openrouter'] as Provider[]).filter((provider) => provider !== preferred),
+  ].filter((provider) => providerIsUsable(provider, settings, env));
+
+  if (!providers.length) {
+    throw new Error('No AI provider is available. Configure OpenRouter or Gemini, or use this Worker’s Workers AI binding.');
+  }
+
+  let origin = 'https://nahia.tours';
+  try {
+    if (typeof env.SITE_URL === 'string') origin = new URL(env.SITE_URL).origin;
+  } catch {
+    console.warn('[blog automation] Invalid SITE_URL; using the canonical site origin for OpenRouter.');
+  }
+
+  const attempts: Attempt[] = [];
+  const failures: string[] = [];
+  for (const provider of providers) {
+    try {
+      const result = await runProvider(
+        provider,
+        env,
+        settings,
+        prompt,
+        'Write polished, natural travel journalism. Keep all private reasoning, analysis, planning, and model commentary out of the response. Return only the requested finished copy.',
+        maxTokens,
+        0.75,
+        undefined,
+        origin,
+        attempts
+      );
+      return { ...result, provider };
+    } catch (error) {
+      const attempt = [...attempts].reverse().find((item) => item.provider === provider);
+      failures.push(explain(
+        provider,
+        attempt?.status,
+        attempt?.detail || (error instanceof Error ? error.message : String(error))
+      ));
+    }
+  }
+
+  throw new Error(failures.join(' | ') || 'All configured AI providers failed to generate the article.');
+};
+
 export async function onRequest(context: { request: Request; env: Record<string, any> }) {
   const { request, env } = context;
 

@@ -28,6 +28,11 @@ account_id = "d5272033401c64f8cc6ce650a8321cb2"
 # A brand-new Worker is not guaranteed a workers.dev subdomain unless it asks.
 workers_dev = true
 
+# Check every six hours; KV settings can skip ticks for twelve- or twenty-four-
+# hour intervals. The feature remains off until an admin enables it.
+[triggers]
+crons = ["0 */6 * * *"]
+
 # Static build output. `single-page-application` serves index.html for paths
 # with no matching file, which is what React Router needs for /tours, /plan and
 # the rest. API routes never reach this: worker/index.ts matches them first.

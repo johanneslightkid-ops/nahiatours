@@ -11,6 +11,7 @@ import StoryAdmin from '../components/admin/StoryAdmin';
 import AIAssistantAdmin from '../components/admin/AIAssistantAdmin';
 import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
 import BlogAdminPanel from '../components/admin/BlogAdminPanel';
+import BlogAutomationAdmin from '../components/admin/BlogAutomationAdmin';
 import ImagePoolAdmin from '../components/admin/ImagePoolAdmin';
 import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
@@ -40,7 +41,10 @@ const Admin: React.FC = () => {
   const [tours, setTours] = useState<Tour[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeSection = searchParams.get('section') || 'brand';
-  const blogTab = searchParams.get('blogTab') === 'manage' ? 'manage' : 'generate';
+  const requestedBlogTab = searchParams.get('blogTab');
+  const blogTab = requestedBlogTab === 'manage' || requestedBlogTab === 'automation'
+    ? requestedBlogTab
+    : 'generate';
 
   useEffect(() => {
     const fetchBrand = async () => {
@@ -296,6 +300,7 @@ const Admin: React.FC = () => {
               {([
                 ['generate', 'Generar artículos'],
                 ['manage', 'Gestionar artículos'],
+                ['automation', 'Automatización'],
               ] as const).map(([tab, label]) => (
                 <button
                   type="button"
@@ -317,7 +322,11 @@ const Admin: React.FC = () => {
                 </button>
               ))}
             </div>
-            {blogTab === 'manage' ? <BlogAdminPanel /> : <AIBlogGenAdmin />}
+            {blogTab === 'manage'
+              ? <BlogAdminPanel />
+              : blogTab === 'automation'
+                ? <BlogAutomationAdmin />
+                : <AIBlogGenAdmin />}
           </div>
         )}
 
