@@ -30,6 +30,10 @@ export interface BlogGenerationParams {
   socialPlatforms: string[];
   /** Article shape, an id from lib/blogTemplates. */
   template?: string;
+  /** Editorial angle for the selected audience; not a claim about a nationality. */
+  audienceFocus?: string;
+  /** Selected contextual hashtags, without the leading #. */
+  hashtags?: string[];
   /** Short real guest reviews, quoted as social proof. Never invented. */
   reviews?: string[];
   /** Editions to write besides English. Defaults to Spanish, French and German. */
@@ -73,18 +77,12 @@ export interface GeneratedPost {
 }
 
 /**
- * About 1500 words.
- *
- * The old brief asked for "about 1500 characters — roughly 230 to 280 words"
- * and got exactly that: a thin two-paragraph post. A destination feature that
- * ranks and that somebody reads to the end is an order of magnitude longer,
- * so the target is stated in words, repeated, and backed by a section count —
- * models hold a length far better when they are told the shape as well.
+ * Article lengths are defined per template. Keeping each language edition
+ * focused reduces truncation and free-provider rate-limit failures.
  */
-const TARGET_WORDS = 1500;
 
-/** Enough headroom for 1500 words plus the title, caption, tags and Markdown. */
-const MAX_OUTPUT_TOKENS = 4000;
+/** Enough headroom for the longest template plus the article metadata. */
+const MAX_OUTPUT_TOKENS = 3200;
 
 const SYSTEM =
   'You are an award-winning travel writer and SEO editor for a Caribbean tour ' +
@@ -244,6 +242,11 @@ const parseArticle = (raw: string, fallbackTitle: string): GeneratedArticle => {
   };
 };
 
+const addSelectedHashtags = (article: GeneratedArticle, hashtags: string[] = []) => ({
+  ...article,
+  tags: [...new Set([...article.tags, ...hashtags.map((tag) => tag.replace(/^#/, '').toLowerCase())])],
+});
+
 const FORMAT = (imageCount: number) => `OUTPUT FORMAT — follow it exactly, no preamble, no sign-off:
 
 TITLE: <one line. Specific and inviting. Not a category label.>
@@ -265,25 +268,50 @@ image syntax.`
     : ''
 }`;
 
-const buildEnglishPrompt = (params: BlogGenerationParams, topicLabels: string[]) => {
+const modelGuidance = (settings: AISettings): string => {
+  const provider = settings.activeProvider;
+  const model = settings[provider].selectedModel.toLowerCase();
+  if (provider === 'openrouter' && model.includes('gemma')) {
+    return 'MODEL NOTE: Follow the requested article structure and output labels exactly. ' +
+      'Prefer concrete, verified detail to length; do not repeat the same advice in multiple sections.';
+  }
+  if (provider === 'openrouter' && /deepseek|qwen/.test(model)) {
+    return 'MODEL NOTE: Keep private reasoning private. Return only the finished article in the exact requested structure; ' +
+      'do not add analysis, a plan, or commentary.';
+  }
+  if (provider === 'gemini') {
+    return 'MODEL NOTE: Treat the output format and section order as strict requirements. ' +
+      'Do not add preambles, explanations, or facts beyond the supplied material.';
+  }
+  if (provider === 'cloudflare') {
+    return 'MODEL NOTE: Use short, clear sections and preserve every required output label. ' +
+      'Prioritize accuracy and complete structure over extra length.';
+  }
+  return 'MODEL NOTE: Follow the structure and output labels exactly. Return only the finished article.';
+};
+
+const buildEnglishPrompt = (
+  params: BlogGenerationParams,
+  topicLabels: string[],
+  settings: AISettings
+) => {
   const brand = params.brandName?.trim() || 'our tour company';
   const template = templateById(params.template || 'guide');
+  const targetWords = template.targetWords;
   const keywords = keywordsFor(params.topics, 'en');
   const reviews = (params.reviews || []).filter(Boolean).slice(0, 3);
 
   return `Write a long-form travel feature in ENGLISH for ${brand}, a tour operator in
 Punta Cana, Dominican Republic.
 
-LENGTH — this is the requirement most often missed, so read it twice.
-About ${TARGET_WORDS} words in the BODY. Not 300. Not 600. Around ${TARGET_WORDS}.
-Build it as six to eight developed sections with "## " subheadings, each two or
-three real paragraphs long. If you find yourself finishing early, you have
-skipped the detail that makes the piece worth reading — go deeper instead of
-padding with adjectives.
+LENGTH — aim for about ${targetWords} words in the BODY. Follow the template's
+section count and write one or two developed paragraphs per section. Do not
+pad, repeat points, or sacrifice the requested structure to reach the target.
 
 THE SHAPE OF THIS PIECE — ${template.label.en}
 ${template.structure}
 Title: ${template.title}
+${modelGuidance(settings)}
 
 WHO YOU ARE WRITING FOR
 - Coming from: ${params.povOrigin || 'anywhere in the world'}
@@ -295,12 +323,18 @@ Write to that reader in the second person. Think about what this reader is
 trying to decide, what worries them (safety, value, getting there, the kids,
 the sun) and what they will want to tell their friends afterwards — and answer
 all three.
+${params.audienceFocus ? `EDITORIAL ANGLE FOR THIS AUDIENCE\n${params.audienceFocus}\nUse this as a writing lens, not as a claim about everyone from that place. Avoid stereotypes and explain local context naturally.\n` : ''}
 
 EXCURSIONS TO FEATURE
 ${params.selectedTours.length ? params.selectedTours.join('\n') : 'the best of Punta Cana and the Bávaro coast'}
 
 TOPICS TO LEAN INTO
 ${topicLabels.length ? topicLabels.join(', ') : 'whatever the notes below suggest'}
+
+SELECTED HASHTAGS
+${params.hashtags?.length ? params.hashtags.map((tag) => `#${tag}`).join(' ') : 'None selected'}
+Treat these as relevant subject cues, not as claims. Do not insert hashtag syntax
+into the article prose; use a topic only when it fits the confirmed experience.
 
 SEARCH PHRASES — what travellers type. Use the first one in the title or the
 first subheading, and the others naturally in subheadings and text, never as a
@@ -338,23 +372,31 @@ HOW IT SHOULD READ
   fact is not in the notes, write around it.
 - Banned: "nestled", "hidden gem", "bucket list", "paradise found", "little
   slice of heaven", "unforgettable memories", "dive into", "look no further".
-- ${template.id === 'faq' ? 'The questions are the body; no separate FAQ.' : 'End with "## Good to know": three short questions a reader would ask, each answered in two sentences.'}
+- Keep to the exact section count in the template. Do not append a bonus FAQ or
+  "Good to know" section; close naturally within the final requested section.
 - Close with a warm, confident invitation to get in touch on WhatsApp. No hard sell.
 
 ${FORMAT(params.images.length)}`;
 };
 
-const buildEditionPrompt = (english: GeneratedArticle, lang: BlogLang, params: BlogGenerationParams) => {
+const buildEditionPrompt = (
+  english: GeneratedArticle,
+  lang: BlogLang,
+  params: BlogGenerationParams,
+  settings: AISettings
+) => {
   const keywords = keywordsFor(params.topics, lang);
+  const targetWords = templateById(params.template || 'guide').targetWords;
   return `Below is a finished English travel feature. Produce the ${LANGUAGE_NAME[lang]} edition of it.
 
 This is not a translation exercise. Rewrite it as a travel writer who writes in
 that language would have written it in the first place: ${LANGUAGE_VOICE[lang]}
 Use natural local phrasing, idioms, and cultural references appropriate to
 readers of that language; avoid literal translation and machine-like wording.
-Keep the same structure, the same sections, the same facts and the same length
-— about ${TARGET_WORDS} words — and keep every [[IMAGE-n]] marker exactly where
-it is. Guest quotes stay as they are, in their original words.
+Keep the same structure, section order and facts. Aim for about ${targetWords}
+words without padding. Keep every [[IMAGE-n]] marker exactly where it is.
+Guest quotes stay as they are, in their original words.
+${modelGuidance(settings)}
 
 Write the title and the subheadings for how people search in that language.${
     keywords.length ? ` Use these phrases where they fit naturally: ${keywords.join(' · ')}` : ''
@@ -458,7 +500,7 @@ export const generateBlogPost = async (
   const topicLabels = params.topics.map((id) => topicById(id)?.label.en || id);
 
   const english = await callAi({
-    prompt: buildEnglishPrompt(params, topicLabels),
+    prompt: buildEnglishPrompt(params, topicLabels, settings),
     system: SYSTEM,
     maxTokens: MAX_OUTPUT_TOKENS,
     temperature: 0.85,
@@ -466,7 +508,10 @@ export const generateBlogPost = async (
     settings,
   });
 
-  const en = parseArticle(english.text, `A day out from ${brand}`);
+  const en = addSelectedHashtags(
+    parseArticle(english.text, `A day out from ${brand}`),
+    params.hashtags
+  );
   en.body = applyImagePlacement(en.body, params.images);
 
   // Each edition is written from the finished English piece, so all four carry
@@ -480,13 +525,13 @@ export const generateBlogPost = async (
     params.onProgress?.(lang);
     try {
       const edition = await callAi({
-        prompt: buildEditionPrompt(en, lang, params),
+        prompt: buildEditionPrompt(en, lang, params, settings),
         system: SYSTEM,
         maxTokens: MAX_OUTPUT_TOKENS,
         temperature: 0.8,
         settings,
       });
-      const article = parseArticle(edition.text, en.title);
+      const article = addSelectedHashtags(parseArticle(edition.text, en.title), params.hashtags);
       article.body = applyImagePlacement(article.body, params.images);
       editions[lang] = article;
     } catch {
@@ -505,7 +550,17 @@ export const generateBlogPost = async (
   if (params.socialPlatforms.length > 0) {
     try {
       const cut = await callAi({
-        prompt: buildSocialPrompt(en, params.socialPlatforms, hashtagsFor(params.topics, 'en'), brand),
+        prompt: buildSocialPrompt(
+          en,
+          params.socialPlatforms,
+          [
+            ...new Set([
+              ...(params.hashtags ?? []),
+              ...hashtagsFor(params.topics, 'en'),
+            ]),
+          ],
+          brand
+        ),
         system: SYSTEM,
         maxTokens: 1500,
         temperature: 0.9,

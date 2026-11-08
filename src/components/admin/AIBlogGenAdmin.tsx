@@ -45,7 +45,7 @@ type Audience = {
 };
 
 const AUDIENCE_OPTIONS = {
-  origin: ['Estados Unidos', 'Canadá', 'Europa', 'América Latina', 'Asia'],
+  origin: ['Estados Unidos', 'Canadá', 'América Latina', 'Europa', 'Francia', 'Alemania', 'Reino Unido', 'Asia'],
   age: ['Jóvenes', 'Adultos', 'Personas mayores', 'Todas las edades'],
   group: ['Familia', 'Pareja', 'Amigos', 'Grupo', 'Solo/a'],
   gender: ['Mixto', 'Mujeres', 'Hombres'],
@@ -60,10 +60,58 @@ const AUDIENCE_LABELS: Record<keyof Audience, string> = {
   style: 'Estilo',
 };
 
+interface AudiencePreset {
+  id: string;
+  label: string;
+  audience: Audience;
+  focus: string;
+}
+
+const AUDIENCE_PRESETS: AudiencePreset[] = [
+  {
+    id: 'us-couple-premium',
+    label: 'Estados Unidos · pareja premium',
+    audience: { origin: 'Estados Unidos', age: 'Adultos', group: 'Pareja', gender: 'Mixto', style: 'Premium' },
+    focus: 'Make inclusions, comfort, and practical planning clear; foreground meaningful moments for two without assuming a honeymoon.',
+  },
+  {
+    id: 'latam-family-standard',
+    label: 'América Latina · familia',
+    audience: { origin: 'América Latina', age: 'Todas las edades', group: 'Familia', gender: 'Mixto', style: 'Estándar' },
+    focus: 'Help a mixed-age family picture how the day can work for them, with warm, natural language and clear preparation advice. Do not assume family roles, budget, or travel habits.',
+  },
+  {
+    id: 'canada-friends-adventure',
+    label: 'Canadá · amigos aventureros',
+    audience: { origin: 'Canadá', age: 'Adultos', group: 'Amigos', gender: 'Mixto', style: 'Aventura' },
+    focus: 'Emphasize the feel of the activity, what to bring, and which details need checking before booking; keep the adventure grounded rather than extreme.',
+  },
+  {
+    id: 'france-culture-couple',
+    label: 'Francia · pareja curiosa',
+    audience: { origin: 'Francia', age: 'Adultos', group: 'Pareja', gender: 'Mixto', style: 'Relajado' },
+    focus: 'Give local context and sensory detail where the operator has facts; balance the experience with practical planning and avoid exoticising local people.',
+  },
+  {
+    id: 'germany-family-practical',
+    label: 'Alemania · familia práctica',
+    audience: { origin: 'Alemania', age: 'Todas las edades', group: 'Familia', gender: 'Mixto', style: 'Estándar' },
+    focus: 'Make the sequence of the day and confirmed practical details easy to understand; be candid about unknowns instead of guessing.',
+  },
+];
+
+interface ArticleBrief {
+  audience: Audience;
+  audienceLabel: string;
+  audienceFocus: string;
+  templateId: string;
+}
+
 interface PostState {
   id: string;
   post: GeneratedPost;
   saved: boolean;
+  brief: ArticleBrief;
   /** Which language the preview is showing. */
   view: BlogLang;
 }
@@ -72,6 +120,75 @@ interface PostState {
 const EDITIONS = SUPPORTED_LOCALES.filter((l) => l !== 'en') as BlogLang[];
 const LANGUAGE_TABS: Record<BlogLang, string> = { es: 'Español', en: 'English', fr: 'Français', de: 'Deutsch' };
 const PROGRESS_LANGUAGE: Record<BlogLang, string> = { en: 'inglés', es: 'español', fr: 'francés', de: 'alemán' };
+const MAX_BATCH_ARTICLES = 6;
+
+const AUDIENCE_HASHTAGS: Record<string, string[]> = {
+  'us-couple-premium': ['CouplesTravel', 'TravelPlanning'],
+  'latam-family-standard': ['ViajarEnFamilia', 'TurismoFamiliar'],
+  'canada-friends-adventure': ['AdventureTravel', 'TravelWithFriends'],
+  'france-culture-couple': ['VoyageCulturel', 'VoyageEnCouple'],
+  'germany-family-practical': ['Familienurlaub', 'AusflugTipps'],
+};
+
+const TEMPLATE_HASHTAGS: Record<string, string[]> = {
+  guide: ['PuntaCanaGuide'],
+  story: ['PuntaCanaDayOut'],
+  list: ['TravelTips'],
+  faq: ['TravelQuestions'],
+  itinerary: ['ExcursionPlanning'],
+  compare: ['ChooseYourExcursion'],
+  'local-culture': ['DominicanCulture'],
+  family: ['FamilyTravel'],
+  romantic: ['CouplesTravel'],
+};
+
+const tourHashtagMatches: Array<[RegExp, string[]]> = [
+  [/\bsaona\b/i, ['SaonaIsland', 'IslaSaona']],
+  [/\bcatalina\b/i, ['IslaCatalina', 'Snorkeling']],
+  [/\bbugg(y|ies)\b|\batv\b|quad/i, ['BuggyTour', 'OffRoad']],
+  [/catamaran|party boat/i, ['Catamaran', 'BavaroBeach']],
+  [/macao/i, ['MacaoBeach']],
+  [/santo domingo/i, ['SantoDomingo', 'DominicanCulture']],
+  [/altos de chav[oó]n/i, ['AltosDeChavon', 'DominicanCulture']],
+  [/monta[nñ]a redonda/i, ['MontanaRedonda', 'DominicanRepublic']],
+];
+
+const normalizeAudience = (audience: Audience) => Object.values(audience).join(' ').toLowerCase();
+
+const hashtagsForBrief = (
+  topics: string[],
+  audienceIds: string[],
+  audience: Audience,
+  templateIds: string[],
+  selectedTours: string[]
+): string[] => {
+  const topicTags = topics.flatMap((id) => TOPICS.find((topic) => topic.id === id)?.hashtags ?? []);
+  const audienceTags = audienceIds.flatMap((id) => AUDIENCE_HASHTAGS[id] ?? []);
+  const normalizedAudience = normalizeAudience(audience);
+  const customAudienceTags = audienceIds.length
+    ? []
+    : [
+        ...(normalizedAudience.includes('familia') ? ['FamilyTravel'] : []),
+        ...(normalizedAudience.includes('pareja') ? ['CouplesTravel'] : []),
+        ...(normalizedAudience.includes('aventura') ? ['AdventureTravel'] : []),
+      ];
+  const templateTags = templateIds.flatMap((id) => TEMPLATE_HASHTAGS[id] ?? []);
+  const tourTags = selectedTours.flatMap((title) =>
+    tourHashtagMatches
+      .filter(([pattern]) => pattern.test(title))
+      .flatMap(([, tags]) => tags)
+  );
+  return [
+    'PuntaCana',
+    'DominicanRepublic',
+    'CaribbeanTravel',
+    ...audienceTags,
+    ...customAudienceTags,
+    ...templateTags,
+    ...tourTags,
+    ...topicTags,
+  ].filter((tag, index, tags) => tags.indexOf(tag) === index).slice(0, 12);
+};
 
 /** Short, well-rated reviews make the best quotes. */
 const quotableReviews = (reviews: { review: string; rating: number }[]): string[] =>
@@ -101,7 +218,16 @@ const AIBlogGenAdmin: React.FC = () => {
 
   // ── The brief ────────────────────────────────────────────────────────────
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [template, setTemplate] = useState<string>(BLOG_TEMPLATES[0].id);
+  const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>(['guide']);
+  const [selectedAudienceIds, setSelectedAudienceIds] = useState<string[]>([
+    'us-couple-premium',
+    'latam-family-standard',
+  ]);
+  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([
+    'PuntaCana',
+    'DominicanRepublic',
+    'CaribbeanTravel',
+  ]);
   const [reviews, setReviews] = useState<string[]>([]);
   const [quoteReviews, setQuoteReviews] = useState(true);
   const [selectedTours, setSelectedTours] = useState<string[]>([]);
@@ -118,7 +244,6 @@ const AIBlogGenAdmin: React.FC = () => {
   const [uploading, setUploading] = useState(false);
 
   // ── How it comes out ─────────────────────────────────────────────────────
-  const [variations, setVariations] = useState(1);
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [autoSave, setAutoSave] = useState(false);
   const [autoPublish, setAutoPublish] = useState(false);
@@ -162,6 +287,19 @@ const AIBlogGenAdmin: React.FC = () => {
 
   const toggle = (list: string[], value: string) =>
     list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+
+  const suggestedHashtags = hashtagsForBrief(
+    selectedTopics,
+    selectedAudienceIds,
+    audience,
+    selectedTemplateIds,
+    selectedTours
+  );
+  const hashtagSuggestionKey = suggestedHashtags.join('|');
+
+  useEffect(() => {
+    setSelectedHashtags(suggestedHashtags);
+  }, [hashtagSuggestionKey]);
 
   /** Upload straight away, so the article can reference a real URL. */
   const handleImages = async (files: FileList | null) => {
@@ -292,57 +430,106 @@ const AIBlogGenAdmin: React.FC = () => {
     }
   };
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (requestedBriefs?: ArticleBrief[]) => {
     if (!aiSettings) return;
+    const activeAudiences: Array<{
+      audience: Audience;
+      audienceLabel: string;
+      audienceFocus: string;
+    }> = selectedAudienceIds.length
+      ? AUDIENCE_PRESETS.filter((preset) => selectedAudienceIds.includes(preset.id)).map((preset) => ({
+          audience: preset.audience,
+          audienceLabel: preset.label,
+          audienceFocus: preset.focus,
+        }))
+      : [{
+          audience,
+          audienceLabel: 'Público personalizado',
+          audienceFocus: 'Write inclusively for this specific audience. Avoid assumptions and stereotypes.',
+        }];
+    const queue =
+      requestedBriefs ??
+      activeAudiences.flatMap((selectedAudience) =>
+        selectedTemplateIds.map((templateId) => ({
+          ...selectedAudience,
+          templateId,
+        }))
+      );
+    if (!queue.length) {
+      setProblem('Selecciona al menos un formato de artículo y un público.');
+      return;
+    }
+    if (queue.length > MAX_BATCH_ARTICLES) {
+      setProblem(`La tanda contiene ${queue.length} artículos. El máximo es ${MAX_BATCH_ARTICLES}; reduce formatos o públicos.`);
+      return;
+    }
+
     setBusy(true);
     setProblem('');
     setProblemFailures([]);
-    const made: PostState[] = [];
+    const generationErrors: string[] = [];
+    const providerErrors: { provider: string; error: string }[] = [];
+    let generatedCount = 0;
 
     try {
-      for (let i = 0; i < variations; i += 1) {
-        const of = variations > 1 ? ` (${i + 1}/${variations})` : '';
-        setProgress(`Escribiendo en inglés${of}…`);
+      for (const [index, brief] of queue.entries()) {
+        const templateLabel = BLOG_TEMPLATES.find((item) => item.id === brief.templateId)?.label.es;
+        const context = `${index + 1}/${queue.length} · ${brief.audienceLabel} · ${templateLabel}`;
+        setProgress(`${context} · inglés…`);
 
-        const post = await generateBlogPost(aiSettings, {
-          povOrigin: audience.origin,
-          povAge: audience.age,
-          povGroup: audience.group,
-          povGender: audience.gender,
-          povExclusivity: audience.style,
-          selectedTours,
-          topics: selectedTopics,
-          voiceTranscript: notes,
-          mediaBase64: firstImageBase64,
-          images,
-          brandName: brandSettings.brandName,
-          socialPlatforms: platforms,
-          template,
-          reviews: quoteReviews ? reviews : [],
-          languages: EDITIONS,
-          onProgress: (lang) => setProgress(`Escribiendo la edición en ${PROGRESS_LANGUAGE[lang]}${of}…`),
-        });
+        try {
+          const post = await generateBlogPost(aiSettings, {
+            povOrigin: brief.audience.origin,
+            povAge: brief.audience.age,
+            povGroup: brief.audience.group,
+            povGender: brief.audience.gender,
+            povExclusivity: brief.audience.style,
+            audienceFocus: brief.audienceFocus,
+            selectedTours,
+            topics: selectedTopics,
+            hashtags: selectedHashtags,
+            voiceTranscript: notes,
+            mediaBase64: firstImageBase64,
+            images,
+            brandName: brandSettings.brandName,
+            socialPlatforms: platforms,
+            template: brief.templateId,
+            reviews: quoteReviews ? reviews : [],
+            languages: EDITIONS,
+            onProgress: (lang) =>
+              setProgress(`${context} · ${PROGRESS_LANGUAGE[lang]}…`),
+          });
 
-        const entry: PostState = {
-          id: `post-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-          post,
-          saved: false,
-          view: 'es',
-        };
+          const entry: PostState = {
+            id: `post-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+            post,
+            saved: false,
+            brief,
+            view: 'es',
+          };
+          setPosts((prev) => [...prev, entry]);
+          generatedCount += 1;
 
-        if (autoSave) {
-          await savePost(entry);
-          entry.saved = true;
+          if (autoSave) {
+            await savePost(entry);
+            entry.saved = true;
+          }
+          if (autoPublish) await publish(entry);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          generationErrors.push(`${brief.audienceLabel} · ${templateLabel}: ${message}`);
+          if (error instanceof AiGenerationError) {
+            providerErrors.push(...error.failures);
+          }
         }
-        if (autoPublish) await publish(entry);
-
-        made.push(entry);
-        setPosts([...made]);
       }
-    } catch (error) {
-      // The provider's own words, carried all the way from the Worker.
-      setProblem(error instanceof Error ? error.message : String(error));
-      setProblemFailures(error instanceof AiGenerationError ? error.failures : []);
+
+      if (generationErrors.length) {
+        setProblem(
+          `${generatedCount} de ${queue.length} artículos generados. ${generationErrors.join('\n')}`
+        );
+        setProblemFailures(providerErrors);
+      }
     } finally {
       setBusy(false);
       setProgress('');
@@ -359,6 +546,10 @@ const AIBlogGenAdmin: React.FC = () => {
   const visibleTours = tours.filter((tour) =>
     tourQuery.trim() ? tour.title.toLowerCase().includes(tourQuery.trim().toLowerCase()) : true
   );
+
+  const plannedArticleCount =
+    (selectedAudienceIds.length || 1) * selectedTemplateIds.length;
+  const batchWithinLimit = plannedArticleCount <= MAX_BATCH_ARTICLES;
 
   const providerLabel = aiSettings
     ? { cloudflare: 'Cloudflare Workers AI', gemini: 'Google Gemini', openrouter: 'OpenRouter' }[
@@ -385,8 +576,8 @@ const AIBlogGenAdmin: React.FC = () => {
   const GenerateButton = ({ size }: { size: 'lead' | 'foot' }) => (
     <button
       type="button"
-      onClick={handleGenerate}
-      disabled={busy}
+      onClick={() => handleGenerate()}
+      disabled={busy || plannedArticleCount === 0 || !batchWithinLimit}
       aria-busy={busy}
       className={`inline-flex items-center justify-center gap-2 rounded-full bg-mango font-bold uppercase tracking-[0.1em] text-ink transition hover:brightness-95 disabled:opacity-60 ${
         size === 'lead' ? 'px-7 py-3.5 text-sm' : 'w-full px-8 py-4 text-base sm:w-auto'
@@ -398,7 +589,7 @@ const AIBlogGenAdmin: React.FC = () => {
         </>
       ) : (
         <>
-          <FaMagic /> Generar artículo
+          <FaMagic /> Generar {plannedArticleCount === 1 ? 'artículo' : `${plannedArticleCount} artículos`}
         </>
       )}
     </button>
@@ -418,8 +609,8 @@ const AIBlogGenAdmin: React.FC = () => {
             <FaMagic className="text-mango" /> Generador de blog
           </h2>
           <p className="mt-1 text-sm text-ink-light">
-            Escribe un artículo largo en inglés, español, francés y alemán, con pie de foto,
-            entrada en negrita, imágenes colocadas y las búsquedas de cada idioma. Proveedor
+            Combina formatos y públicos para generar hasta {MAX_BATCH_ARTICLES} artículos en inglés,
+            español, francés y alemán, con piezas estructuradas y búsquedas por idioma. Proveedor
             activo:{' '}
             <strong className="text-ink">{providerLabel}</strong>
           </p>
@@ -491,23 +682,28 @@ const AIBlogGenAdmin: React.FC = () => {
 
         <div className="mt-6">
           <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-            Formato del artículo
+            Formatos de artículo · puedes elegir varios
           </p>
           <div className="flex flex-wrap gap-2">
             {BLOG_TEMPLATES.map((t) => (
               <button
                 key={t.id}
                 type="button"
-                onClick={() => setTemplate(t.id)}
+                onClick={() => setSelectedTemplateIds((prev) => toggle(prev, t.id))}
                 title={t.hint}
-                className={chip(template === t.id)}
+                aria-pressed={selectedTemplateIds.includes(t.id)}
+                className={chip(selectedTemplateIds.includes(t.id))}
               >
                 {t.label.es}
               </button>
             ))}
           </div>
           <p className="mt-2 text-xs text-ink-light">
-            {BLOG_TEMPLATES.find((t) => t.id === template)?.hint}
+            {selectedTemplateIds.length
+              ? BLOG_TEMPLATES.filter((t) => selectedTemplateIds.includes(t.id))
+                  .map((t) => `${t.label.es} · ${t.targetWords} palabras`)
+                  .join('  |  ')
+              : 'Elige al menos un formato.'}
           </p>
         </div>
 
@@ -597,27 +793,79 @@ const AIBlogGenAdmin: React.FC = () => {
           )}
         </p>
 
-        {/* Audience: five short rows of chips, not five dropdowns. */}
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          {(Object.keys(AUDIENCE_OPTIONS) as Array<keyof Audience>).map((facet) => (
-            <div key={facet}>
-              <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-                {AUDIENCE_LABELS[facet]}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {AUDIENCE_OPTIONS[facet].map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setAudience((prev) => ({ ...prev, [facet]: option }))}
-                    className={`${chip(audience[facet] === option)} !px-3 !py-1 !text-[0.8rem]`}
-                  >
-                    {option}
-                  </button>
-                ))}
+        <div className="mt-6">
+          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
+              Públicos sugeridos · selecciona varios para crear artículos distintos
+            </p>
+            <button
+              type="button"
+              onClick={() => setSelectedAudienceIds([])}
+              className="text-xs font-semibold text-lagoon-dark hover:underline"
+            >
+              Configurar un público manual
+            </button>
+          </div>
+          <p className="mb-3 text-xs text-ink-light">
+            Son segmentos editoriales editables, no afirmaciones sobre todas las personas de un país.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {AUDIENCE_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                aria-pressed={selectedAudienceIds.includes(preset.id)}
+                onClick={() => setSelectedAudienceIds((prev) => toggle(prev, preset.id))}
+                className={`rounded-2xl border p-4 text-left transition ${
+                  selectedAudienceIds.includes(preset.id)
+                    ? 'border-lagoon-dark bg-lagoon/10'
+                    : 'border-ink/15 bg-white hover:border-lagoon'
+                }`}
+              >
+                <span className="flex items-center justify-between gap-3 text-sm font-bold text-ink">
+                  {preset.label}
+                  <span className="text-xs">{selectedAudienceIds.includes(preset.id) ? '✓' : '+'}</span>
+                </span>
+                <span className="mt-1 block text-xs text-ink-light">
+                  {preset.audience.age} · {preset.audience.group} · {preset.audience.style}
+                </span>
+                <span className="mt-2 block text-xs leading-relaxed text-ink-soft">{preset.focus}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Manual audience controls stay available when no presets are selected. */}
+        {selectedAudienceIds.length === 0 && (
+          <div className="mt-5 grid gap-4 rounded-2xl bg-paper-warm p-4 sm:grid-cols-2">
+            {(Object.keys(AUDIENCE_OPTIONS) as Array<keyof Audience>).map((facet) => (
+              <div key={facet}>
+                <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
+                  {AUDIENCE_LABELS[facet]}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {AUDIENCE_OPTIONS[facet].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setAudience((prev) => ({ ...prev, [facet]: option }))}
+                      className={`${chip(audience[facet] === option)} !px-3 !py-1 !text-[0.8rem]`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4 rounded-xl bg-paper-warm px-4 py-3 text-sm text-ink-soft">
+          {selectedAudienceIds.length || 1} público(s) × {selectedTemplateIds.length} formato(s) ={' '}
+          {selectedAudienceIds.length
+            ? selectedAudienceIds.length * selectedTemplateIds.length
+            : selectedTemplateIds.length}{' '}
+          artículo(s) planificado(s). El máximo por tanda es {MAX_BATCH_ARTICLES}.
         </div>
 
         {/* Notes. Large on a phone, because this is the field that is dictated
@@ -663,6 +911,40 @@ const AIBlogGenAdmin: React.FC = () => {
           <p className="mt-1 text-xs text-ink-light">
             Todo lo que escribas aquí se trata como verdad y entra en el artículo.
           </p>
+          <div className="mt-4">
+            <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
+                Hashtags sugeridos para esta idea
+              </p>
+              <span className="text-xs text-ink-light">{selectedHashtags.length} seleccionados</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {suggestedHashtags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  aria-pressed={selectedHashtags.includes(tag)}
+                  onClick={() => setSelectedHashtags((prev) => toggle(prev, tag))}
+                  className={chip(selectedHashtags.includes(tag))}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-ink-light">
+              Las sugerencias siguen los temas, el público, el formato y las excursiones seleccionadas.
+              Reflejan lugares y actividades reales del destino, no prometen alcance. Referencia:{' '}
+              <a
+                href="https://www.godominicanrepublic.com/destinations/punta-cana/"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-lagoon-dark underline"
+              >
+                guía oficial de Punta Cana
+              </a>
+              .
+            </p>
+          </div>
         </div>
 
         {/* Photos. Uploaded immediately so the article can reference real URLs. */}
@@ -724,22 +1006,22 @@ const AIBlogGenAdmin: React.FC = () => {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-              Cuántas versiones
+          <div className="rounded-2xl bg-paper-warm p-4">
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
+              Tanda de generación
             </p>
-            <div className="flex gap-1.5">
-              {[1, 2, 3].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => setVariations(n)}
-                  className={`${chip(variations === n)} !px-5`}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
+            <p className="mt-1 text-sm font-bold text-ink">
+              {plannedArticleCount} artículo(s) · en secuencia · cuatro idiomas
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-ink-light">
+              Cada formato se combina con cada público seleccionado. El límite de {MAX_BATCH_ARTICLES}
+              artículos ayuda a evitar tandas largas y solicitudes simultáneas al proveedor.
+            </p>
+            {!batchWithinLimit && (
+              <p className="mt-2 text-xs font-bold text-hibiscus-dark">
+                Reduce la selección a {MAX_BATCH_ARTICLES} combinaciones o menos.
+              </p>
+            )}
           </div>
 
           <div>
@@ -866,7 +1148,7 @@ const AIBlogGenAdmin: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={handleGenerate}
+                  onClick={() => handleGenerate([entry.brief])}
                   disabled={busy}
                   className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-4 py-2 text-xs font-bold text-ink-soft transition hover:border-lagoon hover:text-ink disabled:opacity-50"
                 >
@@ -917,6 +1199,8 @@ const AIBlogGenAdmin: React.FC = () => {
             </article>
 
             <p className="mt-6 text-center text-xs text-ink-light">
+              {entry.brief.audienceLabel} ·{' '}
+              {BLOG_TEMPLATES.find((item) => item.id === entry.brief.templateId)?.label.es} ·{' '}
               {entry.post.provider} · {entry.post.model} ·{' '}
               {article.body.split(/\s+/).filter(Boolean).length} palabras
             </p>
