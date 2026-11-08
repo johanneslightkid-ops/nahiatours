@@ -11,6 +11,7 @@ import StoryAdmin from '../components/admin/StoryAdmin';
 import AIAssistantAdmin from '../components/admin/AIAssistantAdmin';
 import AIBlogGenAdmin from '../components/admin/AIBlogGenAdmin';
 import BlogAdminPanel from '../components/admin/BlogAdminPanel';
+import ImagePoolAdmin from '../components/admin/ImagePoolAdmin';
 import TestimonialsAdmin from '../components/admin/TestimonialsAdmin';
 import AdminPasswordPanel from '../components/admin/AdminPasswordPanel';
 import PaymentSettingsPanel from '../components/admin/PaymentSettingsPanel';
@@ -317,6 +318,12 @@ const Admin: React.FC = () => {
               ))}
             </div>
             {blogTab === 'manage' ? <BlogAdminPanel /> : <AIBlogGenAdmin />}
+          </div>
+        )}
+
+        {activeSection === 'imagePool' && (
+          <div className="rounded-3xl border border-ink/15 bg-paper p-6 shadow-lg">
+            <ImagePoolAdmin />
           </div>
         )}
       </div>

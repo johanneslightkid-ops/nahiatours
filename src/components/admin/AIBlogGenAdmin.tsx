@@ -19,6 +19,8 @@ import { BLOG_TEMPLATES } from '../../lib/blogTemplates';
 import { getPublishedTestimonials } from '../../services/testimonialService';
 import { SHARE_TARGETS, shareTo, copyText, shareTargetFor } from '../../lib/socialShare';
 import ArticleBody from '../ui/ArticleBody';
+import { BLOG_AUDIENCE_PRESETS, BlogAudience as Audience, findAudiencePreset } from '../../lib/blogAudiencePresets';
+import { getImageCatalog, PoolImage } from '../../services/imageCatalogService';
 
 /**
  * The blog generator.
@@ -35,14 +37,6 @@ import ArticleBody from '../ui/ArticleBody';
  * The preview is the real article, rendered by the same component the public
  * blog uses, so what is approved here is what ships.
  */
-
-type Audience = {
-  origin: string;
-  age: string;
-  group: string;
-  gender: string;
-  style: string;
-};
 
 const AUDIENCE_OPTIONS = {
   origin: ['Estados Unidos', 'Canadá', 'América Latina', 'Europa', 'Francia', 'Alemania', 'Reino Unido', 'Asia'],
@@ -66,39 +60,6 @@ interface AudiencePreset {
   audience: Audience;
   focus: string;
 }
-
-const AUDIENCE_PRESETS: AudiencePreset[] = [
-  {
-    id: 'us-couple-premium',
-    label: 'Estados Unidos · pareja premium',
-    audience: { origin: 'Estados Unidos', age: 'Adultos', group: 'Pareja', gender: 'Mixto', style: 'Premium' },
-    focus: 'Make inclusions, comfort, and practical planning clear; foreground meaningful moments for two without assuming a honeymoon.',
-  },
-  {
-    id: 'latam-family-standard',
-    label: 'América Latina · familia',
-    audience: { origin: 'América Latina', age: 'Todas las edades', group: 'Familia', gender: 'Mixto', style: 'Estándar' },
-    focus: 'Help a mixed-age family picture how the day can work for them, with warm, natural language and clear preparation advice. Do not assume family roles, budget, or travel habits.',
-  },
-  {
-    id: 'canada-friends-adventure',
-    label: 'Canadá · amigos aventureros',
-    audience: { origin: 'Canadá', age: 'Adultos', group: 'Amigos', gender: 'Mixto', style: 'Aventura' },
-    focus: 'Emphasize the feel of the activity, what to bring, and which details need checking before booking; keep the adventure grounded rather than extreme.',
-  },
-  {
-    id: 'france-culture-couple',
-    label: 'Francia · pareja curiosa',
-    audience: { origin: 'Francia', age: 'Adultos', group: 'Pareja', gender: 'Mixto', style: 'Relajado' },
-    focus: 'Give local context and sensory detail where the operator has facts; balance the experience with practical planning and avoid exoticising local people.',
-  },
-  {
-    id: 'germany-family-practical',
-    label: 'Alemania · familia práctica',
-    audience: { origin: 'Alemania', age: 'Todas las edades', group: 'Familia', gender: 'Mixto', style: 'Estándar' },
-    focus: 'Make the sequence of the day and confirmed practical details easy to understand; be candid about unknowns instead of guessing.',
-  },
-];
 
 interface ArticleBrief {
   audience: Audience;
@@ -147,10 +108,10 @@ const GOOGLE_SEARCH_CHANNEL = {
 };
 
 const AUDIENCE_HASHTAGS: Record<string, string[]> = {
-  'us-couple-premium': ['CouplesTravel', 'TravelPlanning'],
-  'latam-family-standard': ['ViajarEnFamilia', 'TurismoFamiliar'],
+  'us-family-beach': ['FamilyTravel', 'PuntaCana'],
+  'latam-family-classic': ['ViajarEnFamilia', 'TurismoFamiliar'],
   'canada-friends-adventure': ['AdventureTravel', 'TravelWithFriends'],
-  'france-culture-couple': ['VoyageCulturel', 'VoyageEnCouple'],
+  'france-couple-culture': ['VoyageCulturel', 'VoyageEnCouple'],
   'germany-family-practical': ['Familienurlaub', 'AusflugTipps'],
 };
 
@@ -178,6 +139,11 @@ const tourHashtagMatches: Array<[RegExp, string[]]> = [
 ];
 
 const normalizeAudience = (audience: Audience) => Object.values(audience).join(' ').toLowerCase();
+const tourTerms = (value: string) =>
+  value
+    .toLowerCase()
+    .split(/[^a-z0-9áéíóúüñ]+/)
+    .filter((term) => term.length > 2 && !['tour', 'tours', 'excursion', 'excursions', 'island', 'isla', 'beach', 'playa'].includes(term));
 
 const hashtagsForBrief = (
   topics: string[],
@@ -244,9 +210,12 @@ const AIBlogGenAdmin: React.FC = () => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>(['guide']);
   const [selectedAudienceIds, setSelectedAudienceIds] = useState<string[]>([
-    'us-couple-premium',
-    'latam-family-standard',
+    'us-family-beach',
+    'latam-family-classic',
   ]);
+  const [activeAudienceId, setActiveAudienceId] = useState('us-family-beach');
+  const [audienceCustomized, setAudienceCustomized] = useState(false);
+  const [audienceFocus, setAudienceFocus] = useState(BLOG_AUDIENCE_PRESETS[0].focus);
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([
     'PuntaCana',
     'DominicanRepublic',
@@ -255,17 +224,14 @@ const AIBlogGenAdmin: React.FC = () => {
   const [reviews, setReviews] = useState<string[]>([]);
   const [quoteReviews, setQuoteReviews] = useState(false);
   const [selectedTours, setSelectedTours] = useState<string[]>([]);
-  const [audience, setAudience] = useState<Audience>({
-    origin: 'Estados Unidos',
-    age: 'Adultos',
-    group: 'Familia',
-    gender: 'Mixto',
-    style: 'Estándar',
-  });
+  const [audience, setAudience] = useState<Audience>(BLOG_AUDIENCE_PRESETS[0].audience);
   const [notes, setNotes] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [firstImageBase64, setFirstImageBase64] = useState<string | undefined>();
   const [uploading, setUploading] = useState(false);
+  const [poolImages, setPoolImages] = useState<PoolImage[]>([]);
+  const [poolSearch, setPoolSearch] = useState('');
+  const [matchingPoolOnly, setMatchingPoolOnly] = useState(true);
 
   // ── How it comes out ─────────────────────────────────────────────────────
   const [platforms, setPlatforms] = useState<string[]>(['google-search']);
@@ -304,6 +270,13 @@ const AIBlogGenAdmin: React.FC = () => {
   useEffect(() => {
     (async () => {
       setTours(await getTours('en'));
+      try {
+        const catalog = await getImageCatalog();
+        setPoolImages(catalog.images);
+      } catch (error) {
+        console.error('[Blog generator] Could not load the image pool:', error);
+        setProblem('No se pudo cargar el catálogo de imágenes. Puedes continuar con fotos subidas directamente.');
+      }
       setAiSettings(await getAISettings());
       setSocialApiSettings(await getSocialApiSettings());
       // Asked once, so the panel can say "nothing is configured" before a
@@ -324,6 +297,30 @@ const AIBlogGenAdmin: React.FC = () => {
   const toggle = (list: string[], value: string) =>
     list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 
+  const selectAudiencePreset = (id: string) => {
+    const preset = findAudiencePreset(id);
+    if (!preset) return;
+    setActiveAudienceId(id);
+    setAudience(preset.audience);
+    setAudienceFocus(preset.focus);
+    setAudienceCustomized(false);
+    setSelectedAudienceIds((current) => current.includes(id) ? current : [...current, id]);
+  };
+
+  const updateAudience = (facet: keyof Audience, value: string) => {
+    if (audience[facet] === value) return;
+    setAudience((current) => ({ ...current, [facet]: value }));
+    setAudienceCustomized(true);
+    if (!selectedAudienceIds.length) {
+      setSelectedAudienceIds([activeAudienceId]);
+    }
+  };
+
+  const toggleAudiencePreset = (id: string) => {
+    setSelectedAudienceIds((current) => toggle(current, id));
+  };
+
+  const activeAudiencePreset = findAudiencePreset(activeAudienceId);
   const suggestedHashtags = hashtagsForBrief(
     selectedTopics,
     selectedAudienceIds,
@@ -340,10 +337,19 @@ const AIBlogGenAdmin: React.FC = () => {
   /** Upload straight away, so the article can reference a real URL. */
   const handleImages = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
+    const remainingSlots = Math.max(0, 6 - images.length);
+    if (remainingSlots === 0) {
+      setProblem('El artículo admite hasta seis imágenes. Quita una para añadir otra.');
+      return;
+    }
     setUploading(true);
     setProblem('');
 
-    for (const file of Array.from(files).slice(0, 6)) {
+    const selectedFiles = Array.from(files).slice(0, remainingSlots);
+    if (files.length > remainingSlots) {
+      setProblem(`Se pueden añadir ${remainingSlots} imagen(es) más; el límite por artículo es seis.`);
+    }
+    for (const file of selectedFiles) {
       try {
         const form = new FormData();
         form.append('file', file);
@@ -489,15 +495,15 @@ const AIBlogGenAdmin: React.FC = () => {
       audienceLabel: string;
       audienceFocus: string;
     }> = selectedAudienceIds.length
-      ? AUDIENCE_PRESETS.filter((preset) => selectedAudienceIds.includes(preset.id)).map((preset) => ({
-          audience: preset.audience,
-          audienceLabel: preset.label,
-          audienceFocus: preset.focus,
+      ? BLOG_AUDIENCE_PRESETS.filter((preset) => selectedAudienceIds.includes(preset.id)).map((preset) => ({
+          audience: preset.id === activeAudienceId ? audience : preset.audience,
+          audienceLabel: `${preset.label}${preset.id === activeAudienceId && audienceCustomized ? ' · personalizado' : ''}`,
+          audienceFocus: preset.id === activeAudienceId ? audienceFocus : preset.focus,
         }))
       : [{
           audience,
           audienceLabel: 'Público personalizado',
-          audienceFocus: 'Write inclusively for this specific audience. Avoid assumptions and stereotypes.',
+          audienceFocus,
         }];
     const queue =
       requestedBriefs ??
@@ -537,6 +543,9 @@ const AIBlogGenAdmin: React.FC = () => {
             povGender: brief.audience.gender,
             povExclusivity: brief.audience.style,
             audienceFocus: brief.audienceFocus,
+            imageDescriptions: poolImages
+              .filter((image) => images.includes(image.url))
+              .map((image) => [image.title, image.alt, image.excursions.join(', ')].filter(Boolean).join(' — ')),
             selectedTours,
             topics: selectedTopics,
             hashtags: selectedHashtags,
@@ -598,6 +607,33 @@ const AIBlogGenAdmin: React.FC = () => {
   const visibleTours = tours.filter((tour) =>
     tourQuery.trim() ? tour.title.toLowerCase().includes(tourQuery.trim().toLowerCase()) : true
   );
+  const visiblePoolImages = poolImages.filter((image) => {
+    const query = poolSearch.trim().toLowerCase();
+    const textMatches = !query || [
+      image.title,
+      image.alt,
+      ...image.categories,
+      ...image.excursions,
+      ...image.audiences,
+    ].join(' ').toLowerCase().includes(query);
+    if (!textMatches) return false;
+    if (!matchingPoolOnly) return true;
+    const audienceMatches =
+      !selectedAudienceIds.length ||
+      !image.audiences.length ||
+      image.audiences.some((id) => selectedAudienceIds.includes(id));
+    const normalizedTours = selectedTours.map((tour) => tour.toLowerCase());
+    const tourMatches =
+      !selectedTours.length ||
+      !image.excursions.length ||
+      image.excursions.some((excursion) =>
+        normalizedTours.some((tour) => {
+          const imageTerms = tourTerms(excursion);
+          return tour === excursion.toLowerCase() || tourTerms(tour).some((term) => imageTerms.includes(term));
+        })
+      );
+    return audienceMatches && tourMatches;
+  });
 
   const plannedArticleCount =
     (selectedAudienceIds.length || 1) * selectedTemplateIds.length;
@@ -918,59 +954,52 @@ const AIBlogGenAdmin: React.FC = () => {
         <div className="mt-6">
           <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
             <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
-              Públicos sugeridos · selecciona varios para crear artículos distintos
+              Perfil de viajero · elige una preselección y ajusta sus detalles
             </p>
-            <button
-              type="button"
-              onClick={() => setSelectedAudienceIds([])}
-              className="text-xs font-semibold text-lagoon-dark hover:underline"
-            >
-              Configurar un público manual
-            </button>
           </div>
           <p className="mb-3 text-xs text-ink-light">
-            Son segmentos editoriales editables, no afirmaciones sobre todas las personas de un país.
+            Perfiles editoriales prácticos; no son porcentajes ni afirmaciones sobre todas las personas de un mercado.
           </p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {AUDIENCE_PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                type="button"
-                aria-pressed={selectedAudienceIds.includes(preset.id)}
-                onClick={() => setSelectedAudienceIds((prev) => toggle(prev, preset.id))}
-                className={`rounded-2xl border p-4 text-left transition ${
-                  selectedAudienceIds.includes(preset.id)
-                    ? 'border-lagoon-dark bg-lagoon/10'
-                    : 'border-ink/15 bg-white hover:border-lagoon'
-                }`}
-              >
-                <span className="flex items-center justify-between gap-3 text-sm font-bold text-ink">
-                  {preset.label}
-                  <span className="text-xs">{selectedAudienceIds.includes(preset.id) ? '✓' : '+'}</span>
-                </span>
-                <span className="mt-1 block text-xs text-ink-light">
-                  {preset.audience.age} · {preset.audience.group} · {preset.audience.style}
-                </span>
-                <span className="mt-2 block text-xs leading-relaxed text-ink-soft">{preset.focus}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+          <p className="mb-3 text-xs leading-relaxed text-ink-light">
+            La guía oficial de turismo presenta el destino para parejas, familias y grupos y destaca playa, islas, snorkel, aventura y cultura. No publica cuotas por excursión, edad o raza; por eso estos 27 perfiles son hipótesis editoriales útiles, no estadísticas ni segmentación racial.{' '}
+            <a href="https://www.godominicanrepublic.com/destinations/punta-cana/" target="_blank" rel="noreferrer" className="font-semibold text-lagoon-dark underline">Ver guía oficial de Punta Cana</a>
+            {' · '}
+            <a href="https://www.bancentral.gov.do/a/d/2533-sector-turismo" target="_blank" rel="noreferrer" className="font-semibold text-lagoon-dark underline">Estadísticas oficiales del sector turístico</a>
+          </p>
+          <label className="block text-sm font-bold text-ink">
+            Preselección
+            <select
+              value={activeAudienceId}
+              onChange={(event) => selectAudiencePreset(event.target.value)}
+              className="mt-1 w-full rounded-xl border border-ink/15 bg-white px-3 py-3 text-sm font-medium focus:border-lagoon focus:outline-none focus:ring-2 focus:ring-lagoon/20"
+            >
+              {BLOG_AUDIENCE_PRESETS.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.label}{preset.id === activeAudienceId && audienceCustomized ? ' · personalizado' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+          {activeAudiencePreset && (
+            <p className="mt-2 rounded-xl bg-paper-warm p-3 text-sm leading-relaxed text-ink-soft">
+              {activeAudiencePreset.explanation}
+            </p>
+          )}
 
-        {/* Manual audience controls stay available when no presets are selected. */}
-        {selectedAudienceIds.length === 0 && (
-          <div className="mt-5 grid gap-4 rounded-2xl bg-paper-warm p-4 sm:grid-cols-2">
+          <div className="mt-4 rounded-2xl border border-ink/10 bg-white p-4">
+            <p className="mb-3 text-sm font-bold text-ink">Configuración manual · siempre visible</p>
+            <div className="grid gap-4 sm:grid-cols-2">
             {(Object.keys(AUDIENCE_OPTIONS) as Array<keyof Audience>).map((facet) => (
               <div key={facet}>
-                <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-light">
+                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.12em] text-ink-light">
                   {AUDIENCE_LABELS[facet]}
-                </p>
+                </label>
                 <div className="flex flex-wrap gap-1.5">
                   {AUDIENCE_OPTIONS[facet].map((option) => (
                     <button
                       key={option}
                       type="button"
-                      onClick={() => setAudience((prev) => ({ ...prev, [facet]: option }))}
+                      onClick={() => updateAudience(facet, option)}
                       className={`${chip(audience[facet] === option)} !px-3 !py-1 !text-[0.8rem]`}
                     >
                       {option}
@@ -979,8 +1008,55 @@ const AIBlogGenAdmin: React.FC = () => {
                 </div>
               </div>
             ))}
+              <label className="text-xs font-bold uppercase tracking-[0.12em] text-ink-light sm:col-span-2">
+                Enfoque editorial específico
+                <textarea
+                  value={audienceFocus}
+                  onChange={(event) => {
+                    setAudienceFocus(event.target.value);
+                    setAudienceCustomized(true);
+                  }}
+                  rows={2}
+                  className="mt-2 w-full rounded-xl border border-ink/15 bg-white px-3 py-2 text-sm font-normal normal-case leading-relaxed text-ink focus:border-lagoon focus:outline-none focus:ring-2 focus:ring-lagoon/20"
+                />
+              </label>
+            </div>
+            {audienceCustomized && (
+              <p className="mt-3 text-xs font-semibold text-sunset-dark">
+                Esta preselección está personalizada. Elegir otra preselección restablece automáticamente todos sus valores.
+              </p>
+            )}
           </div>
-        )}
+
+          <div className="mt-3">
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-ink-light">
+              Perfiles incluidos en esta tanda
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {BLOG_AUDIENCE_PRESETS.filter((preset) => selectedAudienceIds.includes(preset.id)).map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  aria-pressed="true"
+                  onClick={() => toggleAudiencePreset(preset.id)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                    preset.id === activeAudienceId && audienceCustomized
+                      ? 'border-sunset bg-sunset/10 text-sunset-dark'
+                      : 'border-lagoon-dark bg-lagoon/10 text-ink'
+                  }`}
+                  title="Quitar este perfil de la tanda"
+                >
+                  {preset.label}{preset.id === activeAudienceId && audienceCustomized ? ' · personalizado' : ''} ×
+                </button>
+              ))}
+              {!selectedAudienceIds.length && (
+                <button type="button" onClick={() => setSelectedAudienceIds([activeAudienceId])} className="rounded-full border border-dashed border-lagoon px-3 py-1.5 text-xs font-semibold text-lagoon-dark">
+                  Añadir perfil actual a la tanda
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
 
         <div className="mt-4 rounded-xl bg-paper-warm px-4 py-3 text-sm text-ink-soft">
           {selectedAudienceIds.length || 1} público(s) × {selectedTemplateIds.length} formato(s) ={' '}
@@ -1114,6 +1190,64 @@ const AIBlogGenAdmin: React.FC = () => {
             La IA coloca cada foto donde el texto la describe. Si no encuentra un lugar claro, van
             justo después de la entrada en negrita.
           </p>
+          <div className="mt-5 rounded-2xl border border-ink/10 bg-paper-warm p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h4 className="font-bold text-ink">Elegir del catálogo de imágenes</h4>
+                <p className="mt-1 text-xs text-ink-light">
+                  Sugerencias filtradas por los públicos y excursiones elegidos. Puedes ampliar la búsqueda cuando quieras.
+                </p>
+              </div>
+              <label className="inline-flex items-center gap-2 text-xs font-semibold text-ink-soft">
+                <input type="checkbox" checked={!matchingPoolOnly} onChange={(event) => setMatchingPoolOnly(!event.target.checked)} className="accent-lagoon-dark" />
+                Mostrar todo el catálogo
+              </label>
+            </div>
+            <label className="relative mt-3 block">
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-light" />
+              <input
+                value={poolSearch}
+                onChange={(event) => setPoolSearch(event.target.value)}
+                placeholder="Buscar por excursión, categoría o nombre…"
+                className="w-full rounded-xl border border-ink/15 bg-white py-2.5 pl-9 pr-3 text-sm focus:border-lagoon focus:outline-none"
+              />
+            </label>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              {visiblePoolImages.map((image) => {
+                const selected = images.includes(image.url);
+                return (
+                  <button
+                    key={image.id}
+                    type="button"
+                    aria-pressed={selected}
+                    disabled={!selected && images.length >= 6}
+                    onClick={() => setImages((current) => selected
+                      ? current.filter((url) => url !== image.url)
+                      : current.length < 6 ? [...current, image.url] : current
+                    )}
+                    className={`overflow-hidden rounded-xl border-2 text-left transition ${
+                      selected ? 'border-lagoon-dark ring-2 ring-lagoon/20' : 'border-transparent hover:border-lagoon'
+                    } disabled:cursor-not-allowed disabled:opacity-40`}
+                    title={image.title}
+                  >
+                    <span className="relative block">
+                      <img src={image.url} alt={image.alt} loading="lazy" className="h-24 w-full bg-white object-cover" />
+                      {selected && <span className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-lagoon-dark text-xs font-bold text-white">{images.indexOf(image.url) + 1}</span>}
+                    </span>
+                    <span className="block truncate bg-white p-2 text-xs font-semibold text-ink">{image.title || image.excursions[0] || 'Imagen de excursión'}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {!visiblePoolImages.length && (
+              <p className="mt-3 rounded-xl bg-white p-4 text-center text-xs text-ink-light">
+                No hay coincidencias en este filtro. Desactiva «Mostrar todo el catálogo» o sube imágenes desde la sección Imágenes del admin.
+              </p>
+            )}
+            <p className="mt-3 text-xs text-ink-light">
+              {images.length} de 6 imágenes seleccionadas. Administra y clasifica el catálogo desde la sección independiente «Imágenes».
+            </p>
+          </div>
         </div>
       </section>
 

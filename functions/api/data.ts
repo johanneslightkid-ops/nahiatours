@@ -111,7 +111,7 @@ const buildResourceKey = (resource: string, locale?: string) => {
  * admin session and taught operators to ignore the console, which is where the
  * real failures are printed.
  */
-const EMPTY_WHEN_UNSET = new Set(['social-api-settings', 'ai-settings', 'payment-config-public']);
+const EMPTY_WHEN_UNSET = new Set(['social-api-settings', 'ai-settings', 'payment-config-public', 'image-catalog']);
 
 /** Content that is better read in English than not at all. */
 const FALLBACK_TO_ENGLISH = new Set([
@@ -350,6 +350,22 @@ export async function onRequest(context: { request: Request; env: Record<string,
       const body = await request.json().catch(() => null);
       if (body === null) {
         return createErrorResponse('Request body must be valid JSON.', 400);
+      }
+      if (key === 'image-catalog') {
+        const dataKV = env.DATA_KV_F ?? env.DATA_KV;
+        if (!dataKV || typeof dataKV.put !== 'function') {
+          return createErrorResponse('Image catalogue storage requires the site KV binding.', 503);
+        }
+        try {
+          await dataKV.put(key, JSON.stringify(body));
+        } catch (error) {
+          console.error('[Cloudflare Function] Failed to save image catalogue to KV:', error);
+          return createErrorResponse('Could not save the image catalogue to site KV.', 503);
+        }
+        return new Response(JSON.stringify(body), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
       }
       await saveStoredData(key, body, env);
       return new Response(JSON.stringify(body), {

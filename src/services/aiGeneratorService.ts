@@ -32,6 +32,8 @@ export interface BlogGenerationParams {
   template?: string;
   /** Editorial angle for the selected audience; not a claim about a nationality. */
   audienceFocus?: string;
+  /** Operator-written labels for selected catalogue photos; visual cues only. */
+  imageDescriptions?: string[];
   /** Existing article to use as the factual starting point when recreating. */
   sourceArticle?: GeneratedArticle;
   /** Specific editorial changes requested for a recreation. */
@@ -329,6 +331,7 @@ trying to decide, what worries them (safety, value, getting there, the kids,
 the sun) and what they will want to tell their friends afterwards — and answer
 all three.
 ${params.audienceFocus ? `EDITORIAL ANGLE FOR THIS AUDIENCE\n${params.audienceFocus}\nUse this as a writing lens, not as a claim about everyone from that place. Avoid stereotypes and explain local context naturally.\n` : ''}
+${params.imageDescriptions?.length ? `SELECTED PHOTO CONTEXT\nThese operator-provided labels describe selected catalogue images. Use them only to place the photos naturally; they do not prove tour inclusions or itinerary details.\n${params.imageDescriptions.map((description) => `- ${description}`).join('\n')}\n` : ''}
 ${sourceArticle ? `EXISTING ARTICLE TO RECREATE\nUse this article as the factual and editorial starting point. Preserve accurate details, but rewrite it to fit the selected format and the specific instructions. Do not copy stale phrasing or add unsupported facts.\nTITLE: ${sourceArticle.title}\nCAPTION: ${sourceArticle.caption}\nPRELUDE: ${sourceArticle.prelude}\nBODY:\n${sourceArticle.body}\n` : ''}
 ${params.recreateInstruction?.trim() ? `SPECIFIC RECREATION INSTRUCTIONS\n${params.recreateInstruction.trim()}\n` : ''}
 

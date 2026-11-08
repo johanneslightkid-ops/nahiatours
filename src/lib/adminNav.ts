@@ -1,6 +1,6 @@
 import type { IconType } from 'react-icons';
 import { MdSettings, MdTour, MdLocalTaxi } from 'react-icons/md';
-import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaQuoteRight, FaLanguage, FaCashRegister } from 'react-icons/fa';
+import { FaBook, FaTiktok, FaShareAlt, FaRobot, FaMagic, FaQuoteRight, FaLanguage, FaCashRegister, FaImages } from 'react-icons/fa';
 
 /**
  * The admin menu, in one place.
@@ -44,6 +44,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { section: 'social', icon: FaShareAlt, label: { en: 'Social', es: 'Redes', fr: 'Réseaux', de: 'Social' } },
   { section: 'aiSettings', icon: FaRobot, label: { en: 'AI', es: 'IA', fr: 'IA', de: 'KI' } },
   { section: 'aiBlogGen', icon: FaMagic, label: { en: 'Blog', es: 'Blog', fr: 'Blog', de: 'Blog' } },
+  { section: 'imagePool', icon: FaImages, label: { en: 'Images', es: 'Imágenes', fr: 'Images', de: 'Bilder' } },
 ];
 
 /** The admin's own language. Anything unknown reads Spanish — these sites are Dominican. */
